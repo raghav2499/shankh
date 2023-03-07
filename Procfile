@@ -1,1 +1,1 @@
-web: java -jar -Dserver.port=$PORT target/alpha-0.0.1-SNAPSHOT.jar
+web: java -jar -Dserver.port=$PORT target/shankh-0.0.1-SNAPSHOT.jar
