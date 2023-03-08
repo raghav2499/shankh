@@ -1,1 +1,1 @@
-web: java -jar -Dserver.port=$PORT target/shankh-0.0.1-SNAPSHOT.jar -Dspring.profiles.active=$SPRING_ACTIVE_PROFILE
+web: java -jar target/shankh-0.0.1-SNAPSHOT.jar
