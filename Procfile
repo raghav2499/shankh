@@ -1,1 +1,1 @@
-web: java -jar -Dserver.port=$PORT target/shankh-0.0.1-SNAPSHOT.jar -Dspring.profiles.active=$SPRING_ACTIVE_PROFILE -Dspring.datasource.url=$DATABASE_URL -Dspring.datasource.username=$DATABASE_USERNAME -Dspring.datasource.password=$DATABASE_PASSWORD
+web: java -jar -Dserver.port=$PORT target/shankh-0.0.1-SNAPSHOT.jar -Dspring.profiles.active=$SPRING_ACTIVE_PROFILE
