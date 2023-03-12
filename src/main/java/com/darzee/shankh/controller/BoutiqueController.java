@@ -1,6 +1,6 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.request.CreateBoutiqueRequest;
+import com.darzee.shankh.request.AddBoutiqueDetailsRequest;
 import com.darzee.shankh.service.BoutiqueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,9 +16,9 @@ public class BoutiqueController {
     @Autowired
     private BoutiqueService boutiqueService;
 
-    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity addBoutique(@Valid @RequestBody CreateBoutiqueRequest request) {
-        return boutiqueService.addBoutique(request);
+    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)//can return 2xx or 4xx
+    public ResponseEntity addBoutiqueDetails(@Valid @RequestBody AddBoutiqueDetailsRequest request) {
+        return boutiqueService.addBoutiqueDetails(request);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

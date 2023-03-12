@@ -12,6 +12,7 @@ import java.util.List;
 public class BoutiqueDAO {
 
     private Long id;
+    private String boutiqueReferenceId;
     private String name;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -23,10 +24,9 @@ public class BoutiqueDAO {
     private List<CustomerDAO> customers;
     private List<OrderDAO> orders;
 
-    public BoutiqueDAO(String name, String boutiqueType, Integer tailorCount) {
-        this.name = name;
+    public BoutiqueDAO(String boutiqueName, String boutiqueType, String boutiqueReferenceId) {
+        this.name = boutiqueName;
         this.boutiqueType = BoutiqueType.getEnumMap().get(boutiqueType);
-        this.tailorCount = tailorCount;
+        this.boutiqueReferenceId = boutiqueReferenceId;
     }
-
 }

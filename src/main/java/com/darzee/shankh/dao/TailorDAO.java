@@ -1,5 +1,7 @@
 package com.darzee.shankh.dao;
 
+import com.darzee.shankh.enums.Language;
+import com.darzee.shankh.enums.TailorRole;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,14 +15,17 @@ public class TailorDAO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Integer pay;
-    private Boolean isOwner;
+    private Language language;
+    private TailorRole role;
+    private String phoneNumber;
     private BoutiqueDAO boutique;
 
-    public TailorDAO(String name, Integer pay, Boolean isOwner, BoutiqueDAO boutique) {
+    public TailorDAO(String name, TailorRole role, Language language, String phoneNumber, BoutiqueDAO boutique) {
         this.name = name;
-        this.pay = pay;
-        this.isOwner = isOwner;
+        this.role = role;
+        this.language = language;
         this.boutique = boutique;
+        this.phoneNumber = phoneNumber;
     }
 
 }

@@ -20,6 +20,9 @@ public class Boutique extends GenericEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "boutique-seq")
     private Long id;
 
+    @Column(name = "boutique_reference_id", nullable = false)
+    private String boutiqueReferenceId;
+
     @Column(name = "name")
     private String name;
 

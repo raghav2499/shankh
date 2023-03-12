@@ -4,16 +4,18 @@ import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
 import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.dao.TailorDAO;
+import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.enums.OrderStatus;
+import com.darzee.shankh.enums.TailorRole;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueLedgerRepo;
 import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.repo.OrderRepo;
 import com.darzee.shankh.repo.TailorRepo;
-import com.darzee.shankh.request.CreateBoutiqueRequest;
-import com.darzee.shankh.response.CreateBoutiqueResponse;
+import com.darzee.shankh.request.AddBoutiqueDetailsRequest;
 import com.darzee.shankh.response.GetBoutiqueDataResponse;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BoutiqueService {
@@ -40,24 +43,15 @@ public class BoutiqueService {
     private OrderRepo orderRepo;
 
     @Transactional
-    public ResponseEntity addBoutique(CreateBoutiqueRequest request) {
-        BoutiqueDAO boutiqueDAO = new BoutiqueDAO(request.getBoutiqueName(),
-                request.getBoutiqueType(),
-                request.getTailorCount());
-        boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
-                        new CycleAvoidingMappingContext())),
-                new CycleAvoidingMappingContext());
-
-        BoutiqueLedgerDAO boutiqueLedgerDAO = new BoutiqueLedgerDAO(boutiqueDAO.getId());
-        boutiqueLedgerRepo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));
-
-        TailorDAO tailorDAO = new TailorDAO(request.getTailorName(), Integer.MAX_VALUE, Boolean.TRUE, boutiqueDAO);
-        tailorDAO = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-
-        CreateBoutiqueResponse response = new CreateBoutiqueResponse(boutiqueDAO.getId(), boutiqueDAO.getName(),
-                tailorDAO.getName(),
-                "Boutique created successfully");
-        return new ResponseEntity(response, HttpStatus.CREATED);
+    public ResponseEntity addBoutiqueDetails(AddBoutiqueDetailsRequest request) {
+        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(request.getBoutiqueId());
+        if (optionalBoutique.isPresent()) {
+            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.findById(request.getBoutiqueId()).get(),
+                    new CycleAvoidingMappingContext());
+            boutiqueDAO.setTailorCount(request.getTailorCount());
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity getBoutiqueData(String boutiqueIdString) {
@@ -85,10 +79,15 @@ public class BoutiqueService {
         response.setActiveOrderCount(activeOrderList.size());
         response.setClosedOrderCount(closedOrderList.size());
 
-        TailorDAO tailor = mapper.tailorObjectToDao(tailorRepo.findByBoutiqueIdAndIsOwner(boutiqueId, Boolean.TRUE),
+        TailorDAO tailor = mapper.tailorObjectToDao(tailorRepo.findByBoutiqueIdAndRole(boutiqueId, TailorRole.ADMIN),
                 new CycleAvoidingMappingContext());
         response.setOwnerTailorName(tailor.getName());
         return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    //todo : check if there's no boutique with same reference id
+    public String generateUniqueBoutiqueReferenceId() {
+        return RandomStringUtils.randomAlphanumeric(6);
     }
 
 

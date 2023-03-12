@@ -1,5 +1,7 @@
 package com.darzee.shankh.entity;
 
+import com.darzee.shankh.enums.Language;
+import com.darzee.shankh.enums.TailorRole;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,8 +25,14 @@ public class Tailor extends GenericEntity {
     @Column(name = "pay")
     private Integer pay;
 
-    @Column(name = "is_owner")
-    private Boolean isOwner = Boolean.FALSE;
+    @Column(name = "language")
+    private Language language;
+
+    @Column(name = "role")
+    private TailorRole role;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boutique_id")

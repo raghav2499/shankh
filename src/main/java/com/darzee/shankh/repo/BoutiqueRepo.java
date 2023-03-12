@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BoutiqueRepo extends JpaRepository<Boutique, Long> {
 
+    Boutique findByBoutiqueReferenceId(String boutiqueReferenceId);
 }

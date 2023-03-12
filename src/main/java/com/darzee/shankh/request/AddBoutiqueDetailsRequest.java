@@ -6,11 +6,7 @@ import lombok.Data;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CreateBoutiqueRequest {
-
-    private String tailorName;
-    private String boutiqueName;
-    private String boutiqueType;
+public class AddBoutiqueDetailsRequest {
+    private Long boutiqueId;
     private Integer tailorCount;
-
 }

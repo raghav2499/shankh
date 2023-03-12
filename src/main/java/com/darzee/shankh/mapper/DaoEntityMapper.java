@@ -3,8 +3,10 @@ package com.darzee.shankh.mapper;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.*;
 import com.darzee.shankh.response.GetCustomerResponse;
+import com.darzee.shankh.response.TailorLoginResponse;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,10 @@ public interface DaoEntityMapper {
     Measurement measurementDAOToObject(MeasurementDAO measurement, @Context CycleAvoidingMappingContext context);
 
     MeasurementDAO measurementObjectToDAO(Measurement measurement, @Context CycleAvoidingMappingContext context);
+    @Mapping(source = "tailorDAO.id", target = "tailorId")
+    @Mapping(source = "tailorDAO.name", target = "tailorName")
+    @Mapping(source = "tailorDAO.boutique.id", target = "boutiqueId")
+    TailorLoginResponse tailorDAOToLoginResponse(TailorDAO tailorDAO, String token);
 
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if(orderList == null) {
