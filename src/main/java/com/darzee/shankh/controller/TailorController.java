@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+//Login implementation : https://www.tutorialspoint.com/spring_security/spring_security_with_jwt.htm
 
 @RestController
 @RequestMapping("/tailor")
