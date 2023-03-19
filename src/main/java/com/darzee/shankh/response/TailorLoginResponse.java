@@ -1,6 +1,7 @@
 package com.darzee.shankh.response;
 
 import com.darzee.shankh.request.TailorLoginRequest;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
 public class TailorLoginResponse {
 
