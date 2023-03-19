@@ -104,7 +104,7 @@ public class TailorService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(phoneNumber,
                     ""));
         } catch (AuthenticationException e) {
-            TailorLoginResponse response = new TailorLoginResponse("No user found");
+            TailorLoginResponse response = new TailorLoginResponse("No user found, exception " + e);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(phoneNumber);
