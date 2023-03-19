@@ -34,6 +34,9 @@ public class Tailor extends GenericEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "profile_pic_url")
+    private String profilePicUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;

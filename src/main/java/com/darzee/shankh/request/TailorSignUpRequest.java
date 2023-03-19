@@ -11,6 +11,7 @@ public class TailorSignUpRequest {
     private String tailorName;
     private String phoneNumber;
     private Language language;
+    private String profilePicUrl;
     private BoutiqueDetails boutiqueDetails;
 
     @Data

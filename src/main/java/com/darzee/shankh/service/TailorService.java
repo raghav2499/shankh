@@ -75,6 +75,7 @@ public class TailorService {
                 role,
                 request.getLanguage(),
                 request.getPhoneNumber(),
+                request.getProfilePicUrl(),
                 boutiqueDAO);
         tailorDAO = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
                 new CycleAvoidingMappingContext())),
@@ -86,7 +87,8 @@ public class TailorService {
         TailorLoginResponse response = new TailorLoginResponse(loginToken, tailorDAO.getId(),
                 tailorDAO.getName(),
                 "",
-                tailorDAO.getBoutique().getId());
+                tailorDAO.getBoutique().getId(),
+                "Tailor signup is successful");
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
@@ -102,7 +104,8 @@ public class TailorService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(phoneNumber,
                     ""));
         } catch (AuthenticationException e) {
-            throw new RuntimeException(e);
+            TailorLoginResponse response = new TailorLoginResponse("No user found");
+            return new ResponseEntity(response, HttpStatus.OK);
         }
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(phoneNumber);
 
@@ -111,6 +114,7 @@ public class TailorService {
                 new CycleAvoidingMappingContext());
 
         TailorLoginResponse response = mapper.tailorDAOToLoginResponse(tailorDAO, loginToken);
+        response.setMessage("Tailor logged in successfully");
         return new ResponseEntity(response, HttpStatus.OK);
     }
 }
