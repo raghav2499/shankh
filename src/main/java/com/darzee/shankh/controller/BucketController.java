@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/storage/")
+@RequestMapping("/storage")
 public class BucketController {
 
     @Autowired

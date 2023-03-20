@@ -18,7 +18,7 @@ public class TailorController {
     @Autowired
     private TailorService tailorService;
 
-    @GetMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity boutiqueLogin(@Valid @RequestBody TailorLoginRequest request) {
         return tailorService.tailorLogin(request);
     }
