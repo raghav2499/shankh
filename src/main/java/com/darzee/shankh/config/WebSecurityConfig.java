@@ -42,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeRequests().antMatchers("/tailor/signup", "/tailor/login", "/storage", "/storage/",
+                .authorizeRequests().antMatchers("/tailor/signup", "/tailor/login", "/storage/",
                         "/storage/uploadFile").permitAll()
                 .anyRequest().authenticated()
                 .and()

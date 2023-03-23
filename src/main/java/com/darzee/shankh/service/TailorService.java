@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
 import com.darzee.shankh.dao.TailorDAO;
+import com.darzee.shankh.entity.Tailor;
 import com.darzee.shankh.enums.TailorRole;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -22,6 +23,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class TailorService {
@@ -52,6 +55,10 @@ public class TailorService {
     public ResponseEntity tailorSignup(TailorSignUpRequest request) {
         boolean isAdminSignupRequest = request.getBoutiqueDetails().getBoutiqueReferenceId() == null ? true : false;
         BoutiqueDAO boutiqueDAO = null;
+        if(isTailorAlreadySignedUp(request.getPhoneNumber())) {
+            TailorLoginResponse tailorLoginResponse = new TailorLoginResponse("User already exists. Please login");
+            return new ResponseEntity(tailorLoginResponse, HttpStatus.OK);
+        }
         if(isAdminSignupRequest) {
             BoutiqueDetails boutiqueDetails = request.getBoutiqueDetails();
             String boutiqueReferenceId = boutiqueService.generateUniqueBoutiqueReferenceId();
@@ -116,5 +123,13 @@ public class TailorService {
         TailorLoginResponse response = mapper.tailorDAOToLoginResponse(tailorDAO, loginToken);
         response.setMessage("Tailor logged in successfully");
         return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    private Boolean isTailorAlreadySignedUp(String phoneNumber) {
+        Optional<Tailor> tailor = tailorRepo.findByPhoneNumber(phoneNumber);
+        if(tailor.isPresent()) {
+            return true;
+        }
+        return false;
     }
 }

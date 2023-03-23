@@ -19,7 +19,7 @@ public class Tailor extends GenericEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "pay")
@@ -31,7 +31,7 @@ public class Tailor extends GenericEntity {
     @Column(name = "role")
     private TailorRole role;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
     @Column(name = "profile_pic_url")

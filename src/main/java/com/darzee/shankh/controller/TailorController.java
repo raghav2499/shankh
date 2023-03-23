@@ -6,9 +6,11 @@ import com.darzee.shankh.service.TailorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
 //Login implementation : https://www.tutorialspoint.com/spring_security/spring_security_with_jwt.htm
 
 @RestController

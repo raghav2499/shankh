@@ -23,7 +23,7 @@ public class Boutique extends GenericEntity {
     @Column(name = "boutique_reference_id", nullable = false)
     private String boutiqueReferenceId;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
@@ -38,7 +38,7 @@ public class Boutique extends GenericEntity {
     @Column(name = "closed_orders")
     private Integer closedOrders = 0;
 
-    @Column(name = "boutique_type")
+    @Column(name = "boutique_type", nullable = false)
     private BoutiqueType boutiqueType;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")

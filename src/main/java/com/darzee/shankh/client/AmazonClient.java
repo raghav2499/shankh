@@ -47,7 +47,8 @@ public class AmazonClient {
     }
 
     public byte[] downloadFile(String url) throws Exception {
-        String fileName = url.split("/")[-1];
+        String [] fileNameArray = url.split("/");
+        String fileName = fileNameArray[fileNameArray.length -1];
         String filePath = url.replace(fileName, "");
         S3Object object = s3client.getObject(filePath, fileName);
         S3ObjectInputStream objectContent = object.getObjectContent();
