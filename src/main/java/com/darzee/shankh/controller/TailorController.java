@@ -6,8 +6,10 @@ import com.darzee.shankh.service.TailorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -24,6 +26,7 @@ public class TailorController {
     public ResponseEntity boutiqueLogin(@Valid @RequestBody TailorLoginRequest request) {
         return tailorService.tailorLogin(request);
     }
+
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity tailorSignUp(@Valid @RequestBody TailorSignUpRequest request) {
         return tailorService.tailorSignup(request);

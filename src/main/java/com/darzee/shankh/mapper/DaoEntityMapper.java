@@ -44,6 +44,8 @@ public interface DaoEntityMapper {
     @Mapping(source = "tailorDAO.boutique.id", target = "boutiqueId")
     TailorLoginResponse tailorDAOToLoginResponse(TailorDAO tailorDAO, String token);
 
+    BoutiqueImages boutiqueImagesImagesDAOToBoutiqueImages(BoutiqueImagesDAO boutiqueImagesDAO);
+
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if(orderList == null) {
             return null;

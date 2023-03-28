@@ -2,6 +2,7 @@ package com.darzee.shankh.interceptor;
 
 import com.darzee.shankh.service.JwtUserDetailsService;
 import com.darzee.shankh.utils.jwtutils.TokenManager;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private TokenManager tokenManager;
 
     @Override
+    @SneakyThrows
     //todo : remove sysout, add log statements
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -54,6 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
             } else {
                 System.out.println("Authentication failed for token "+ token
                         + " and username "+ userDetails.getUsername());
+                throw new Exception("Authetication failed. Please use valid token");
             }
         }
         filterChain.doFilter(request, response);

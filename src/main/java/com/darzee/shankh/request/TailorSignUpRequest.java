@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -40,5 +40,7 @@ public class TailorSignUpRequest {
 
         @NotNull(message = "Boutique type is mandatory for sign up request")
         private String boutiqueType;
+
+        private List<String> shopImageUrls;
     }
 }

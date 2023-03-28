@@ -46,4 +46,7 @@ public class Boutique extends GenericEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
     private List<Customer> customers = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
+    private List<BoutiqueImages> boutiqueImages;
 }

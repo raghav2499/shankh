@@ -1,12 +1,14 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.BoutiqueDAO;
+import com.darzee.shankh.dao.BoutiqueImagesDAO;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Tailor;
 import com.darzee.shankh.enums.TailorRole;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
+import com.darzee.shankh.repo.BoutiqueImagesRepo;
 import com.darzee.shankh.repo.BoutiqueLedgerRepo;
 import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.repo.TailorRepo;
@@ -23,7 +25,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,15 +56,18 @@ public class TailorService {
 
     @Autowired
     private TokenManager tokenManager;
+    @Autowired
+    private BoutiqueImagesRepo boutiqueImagesRepo;
 
+    @Transactional
     public ResponseEntity tailorSignup(TailorSignUpRequest request) {
         boolean isAdminSignupRequest = request.getBoutiqueDetails().getBoutiqueReferenceId() == null ? true : false;
         BoutiqueDAO boutiqueDAO = null;
-        if(isTailorAlreadySignedUp(request.getPhoneNumber())) {
+        if (isTailorAlreadySignedUp(request.getPhoneNumber())) {
             TailorLoginResponse tailorLoginResponse = new TailorLoginResponse("User already exists. Please login");
             return new ResponseEntity(tailorLoginResponse, HttpStatus.OK);
         }
-        if(isAdminSignupRequest) {
+        if (isAdminSignupRequest) {
             BoutiqueDetails boutiqueDetails = request.getBoutiqueDetails();
             String boutiqueReferenceId = boutiqueService.generateUniqueBoutiqueReferenceId();
             boutiqueDAO = new BoutiqueDAO(boutiqueDetails.getBoutiqueName(),
@@ -71,9 +79,12 @@ public class TailorService {
 
             BoutiqueLedgerDAO boutiqueLedgerDAO = new BoutiqueLedgerDAO(boutiqueDAO.getId());
             boutiqueLedgerRepo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));
+            if(!CollectionUtils.isEmpty(boutiqueDetails.getShopImageUrls())) {
+                saveBoutiqueImages(boutiqueDetails.getShopImageUrls(), boutiqueDAO);
+            }
         } else {
             boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo
-                    .findByBoutiqueReferenceId(request.getBoutiqueDetails().getBoutiqueReferenceId()),
+                            .findByBoutiqueReferenceId(request.getBoutiqueDetails().getBoutiqueReferenceId()),
                     new CycleAvoidingMappingContext());
         }
 
@@ -85,7 +96,7 @@ public class TailorService {
                 request.getProfilePicUrl(),
                 boutiqueDAO);
         tailorDAO = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
-                new CycleAvoidingMappingContext())),
+                        new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
 
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(tailorDAO.getPhoneNumber());
@@ -127,9 +138,16 @@ public class TailorService {
 
     private Boolean isTailorAlreadySignedUp(String phoneNumber) {
         Optional<Tailor> tailor = tailorRepo.findByPhoneNumber(phoneNumber);
-        if(tailor.isPresent()) {
+        if (tailor.isPresent()) {
             return true;
         }
         return false;
+    }
+
+    private void saveBoutiqueImages(List<String> imageUrls, BoutiqueDAO boutique) {
+        for(String imageUrl : imageUrls) {
+            BoutiqueImagesDAO boutiqueImage = new BoutiqueImagesDAO(imageUrl, Boolean.TRUE, boutique);
+            boutiqueImagesRepo.save(mapper.boutiqueImagesImagesDAOToBoutiqueImages(boutiqueImage));
+        }
     }
 }
