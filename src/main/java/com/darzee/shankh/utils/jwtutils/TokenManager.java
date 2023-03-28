@@ -19,7 +19,7 @@ import java.util.Map;
 @Component
 public class TokenManager implements Serializable {
     private static final long serialVersionUID = 7008375124389347049L;
-    public static final long TOKEN_VALIDITY = 100000000000000L;
+    public static final long TOKEN_VALIDITY = 315360000;
     @Value("${secret}")
     private String jwtSecret;
 
@@ -39,12 +39,6 @@ public class TokenManager implements Serializable {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired);
     }
 
-    public Boolean invalidateJwtToken(String token, UserDetails userDetails) {
-        String username = getUsernameFromToken(token);
-        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
-        claims.setExpiration(Date.from(Instant.now()));
-        return true;
-    }
     public String getUsernameFromToken(String token) {
         final Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
         return claims.getSubject();
