@@ -1,6 +1,7 @@
 package com.darzee.shankh.request;
 
 import com.darzee.shankh.enums.Language;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
@@ -24,7 +25,8 @@ public class TailorSignUpRequest {
 
     private Language language;
 
-    private String profilePicUrl;
+    @JsonProperty("profile_pic_url")//todo : rename this variable to profile_pic_reference_id
+    private String profilePicReferenceId;
 
     private BoutiqueDetails boutiqueDetails;
 
@@ -41,6 +43,7 @@ public class TailorSignUpRequest {
         @NotNull(message = "Boutique type is mandatory for sign up request")
         private String boutiqueType;
 
-        private List<String> shopImageUrls;
+        @JsonProperty("shop_images_url")//todo: rename this variable to shop_image_reference_ids
+        private List<String> shopImageReferenceIds;
     }
 }

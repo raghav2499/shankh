@@ -13,14 +13,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BoutiqueImagesDAO {
     private Long id;
-    private String url;
+    private String referenceId;
     private Boolean isValid;
     private BoutiqueDAO boutique;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public BoutiqueImagesDAO(String url, Boolean isValid, BoutiqueDAO boutique) {
-        this.url = url;
+    public BoutiqueImagesDAO(String referenceId, Boolean isValid, BoutiqueDAO boutique) {
+        this.referenceId = referenceId;
         this.isValid = isValid;
         this.boutique = boutique;
     }

@@ -18,16 +18,16 @@ public class TailorDAO {
     private Language language;
     private TailorRole role;
     private String phoneNumber;
-    private String profilePicUrl;
+    private String profilePicReferenceId;
     private BoutiqueDAO boutique;
 
-    public TailorDAO(String name, TailorRole role, Language language, String phoneNumber, String profilePicUrl, BoutiqueDAO boutique) {
+    public TailorDAO(String name, TailorRole role, Language language, String phoneNumber, String profilePicReferenceId, BoutiqueDAO boutique) {
         this.name = name;
         this.role = role;
         this.language = language;
         this.boutique = boutique;
         this.phoneNumber = phoneNumber;
-        this.profilePicUrl = profilePicUrl;
+        this.profilePicReferenceId = profilePicReferenceId;
     }
 
 }

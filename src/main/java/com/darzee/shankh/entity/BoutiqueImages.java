@@ -17,8 +17,8 @@ public class BoutiqueImages extends GenericEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "url")
-    private String url;
+    @Column(name = "referenceId")
+    private String referenceId;
 
     @Column(name = "is_valid")
     private Boolean isValid;

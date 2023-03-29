@@ -46,6 +46,10 @@ public interface DaoEntityMapper {
 
     BoutiqueImages boutiqueImagesImagesDAOToBoutiqueImages(BoutiqueImagesDAO boutiqueImagesDAO);
 
+    ImageReferenceDAO imageReferenceToImageReferenceDAO(ImageReference imageReference);
+    ImageReference imageReferenceDAOToImageReference(ImageReferenceDAO imageReferenceDAO);
+
+
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if(orderList == null) {
             return null;

@@ -17,7 +17,7 @@ public class TailorLoginResponse {
     private String token;
     private Long tailorId;
     private String tailorName;
-    private String tailorProfilePicLink;
+    private String tailorImageReferenceId;
     private Long boutiqueId;
     private String message;
 

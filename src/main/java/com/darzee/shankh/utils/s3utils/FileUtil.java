@@ -1,5 +1,6 @@
 package com.darzee.shankh.utils.s3utils;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -18,6 +19,7 @@ public class FileUtil {
     }
 
     public static String generateFileName(MultipartFile multiPart) {
-        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
+        return new Date().getTime() + "-" + RandomStringUtils.randomAlphanumeric(8)
+                + multiPart.getOriginalFilename().replace(" ", "_");
     }
 }

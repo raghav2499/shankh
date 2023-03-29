@@ -79,8 +79,8 @@ public class TailorService {
 
             BoutiqueLedgerDAO boutiqueLedgerDAO = new BoutiqueLedgerDAO(boutiqueDAO.getId());
             boutiqueLedgerRepo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));
-            if(!CollectionUtils.isEmpty(boutiqueDetails.getShopImageUrls())) {
-                saveBoutiqueImages(boutiqueDetails.getShopImageUrls(), boutiqueDAO);
+            if(!CollectionUtils.isEmpty(boutiqueDetails.getShopImageReferenceIds())) {
+                saveBoutiqueReferences(boutiqueDetails.getShopImageReferenceIds(), boutiqueDAO);
             }
         } else {
             boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo
@@ -93,7 +93,7 @@ public class TailorService {
                 role,
                 request.getLanguage(),
                 request.getPhoneNumber(),
-                request.getProfilePicUrl(),
+                request.getProfilePicReferenceId(),
                 boutiqueDAO);
         tailorDAO = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
                         new CycleAvoidingMappingContext())),
@@ -144,9 +144,9 @@ public class TailorService {
         return false;
     }
 
-    private void saveBoutiqueImages(List<String> imageUrls, BoutiqueDAO boutique) {
-        for(String imageUrl : imageUrls) {
-            BoutiqueImagesDAO boutiqueImage = new BoutiqueImagesDAO(imageUrl, Boolean.TRUE, boutique);
+    private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
+        for(String imageReference : imageReferences) {
+            BoutiqueImagesDAO boutiqueImage = new BoutiqueImagesDAO(imageReference, Boolean.TRUE, boutique);
             boutiqueImagesRepo.save(mapper.boutiqueImagesImagesDAOToBoutiqueImages(boutiqueImage));
         }
     }

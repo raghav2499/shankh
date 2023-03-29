@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadImageResponse {
-    private String url;
+    private String referenceId;
+    private String shortLivedUrl;
 }

@@ -1,19 +1,18 @@
 package com.darzee.shankh.client;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.amazonaws.util.IOUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.IOException;
 import java.util.UUID;
 
 @Service
@@ -39,24 +38,30 @@ public class AmazonClient {
         this.s3client = new AmazonS3Client(credentials);
     }
 
-    public String uploadFile(File file, String fileName) {
-        String imagePath = bucketName + UUID.randomUUID().toString();
-        String fileUrl = endpointUrl + "/" + imagePath + "/" + fileName;
+    public ImmutablePair<String, String> uploadFile(File file, String fileName) {
         s3client.putObject(new PutObjectRequest(bucketName, fileName, file));
-        return fileUrl;
+        String referenceId = UUID.randomUUID().toString();
+        String shortLivedUrl = generateShortLivedUrl(bucketName, fileName);
+        return new ImmutablePair(referenceId, shortLivedUrl);
     }
 
-    public byte[] downloadFile(String url) throws Exception {
-        String [] fileNameArray = url.split("/");
-        String fileName = fileNameArray[fileNameArray.length -1];
-        String filePath = url.replace(fileName, "");
-        S3Object object = s3client.getObject(filePath, fileName);
-        S3ObjectInputStream objectContent = object.getObjectContent();
-        try {
-            return IOUtils.toByteArray(objectContent);
-        } catch (IOException e) {
-            throw new Exception("Failed to download file "+ e);
-        }
+    public String downloadFile(String fileName) {
+        return generateShortLivedUrl(bucketName, fileName);
+    }
+
+    private String generateShortLivedUrl(String bucketName, String fileName) {
+        java.util.Date expiration = new java.util.Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += 1000 * 60 * 60; // 1 hour
+        expiration.setTime(expTimeMillis);
+
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                new GeneratePresignedUrlRequest(bucketName, fileName)
+                        .withMethod(HttpMethod.GET)
+                        .withExpiration(expiration);
+
+        String shortLivedUrl = s3client.generatePresignedUrl(generatePresignedUrlRequest).toString();
+        return shortLivedUrl;
     }
 
 
