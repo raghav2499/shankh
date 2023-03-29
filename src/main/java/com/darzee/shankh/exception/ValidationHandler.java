@@ -4,6 +4,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @ControllerAdvice
 public class ValidationHandler extends ResponseEntityExceptionHandler {
@@ -21,13 +23,11 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
                                                                   HttpStatus status,
                                                                   WebRequest request) {
 
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) ->{
-
-            String fieldName = ((FieldError) error).getField();
-            String message = error.getDefaultMessage();
-            errors.put(fieldName, message);
-        });
-        return new ResponseEntity<Object>(errors, HttpStatus.BAD_REQUEST);
+        Map<String, String> response = new HashMap<>();
+        Optional<ObjectError> error = ex.getBindingResult().getAllErrors().stream().findFirst();
+        if(error.isPresent()) {
+            response.put("message", error.get().getDefaultMessage());
+        }
+        return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
     }
 }
