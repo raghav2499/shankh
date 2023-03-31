@@ -100,7 +100,7 @@ public class Measurement extends GenericEntity {
     @Column(name = "gown_length")
     private Double gownLength;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
 

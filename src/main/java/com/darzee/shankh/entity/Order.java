@@ -32,9 +32,11 @@ public class Order extends GenericEntity {
     private String specialInstructions;
 
     @Column(name = "order_type")
+    @Enumerated(EnumType.ORDINAL)
     private OrderType orderType;
 
     @Column(name = "OutfitType")
+    @Enumerated(EnumType.ORDINAL)
     private OutfitType OutfitType;
 
     @Column(name = "is_deleted")
@@ -47,15 +49,16 @@ public class Order extends GenericEntity {
     private Boolean isMeasurementOnPaper = Boolean.FALSE;
 
     @Column(name = "order_status")
+    @Enumerated(EnumType.ORDINAL)
     private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
     private List<Payments> payments;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
 

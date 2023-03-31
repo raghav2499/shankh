@@ -22,7 +22,7 @@ public class OrderAmount extends GenericEntity{
     @Column(name = "amount_recieved")
     private Double amountRecieved;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "order_id")
     private Order order;
 }

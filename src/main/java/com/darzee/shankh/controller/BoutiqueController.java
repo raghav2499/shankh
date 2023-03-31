@@ -16,7 +16,7 @@ public class BoutiqueController {
     @Autowired
     private BoutiqueService boutiqueService;
 
-    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)//can return 2xx or 4xx
+    @PutMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)//can return 2xx or 4xx
     public ResponseEntity addBoutiqueDetails(@Valid @RequestBody AddBoutiqueDetailsRequest request) {
         return boutiqueService.addBoutiqueDetails(request);
     }

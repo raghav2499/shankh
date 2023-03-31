@@ -23,7 +23,7 @@ public class BoutiqueImages extends GenericEntity {
     @Column(name = "is_valid")
     private Boolean isValid;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
 }

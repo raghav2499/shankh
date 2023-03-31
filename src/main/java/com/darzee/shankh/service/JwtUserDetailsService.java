@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -31,6 +32,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     private DaoEntityMapper mapper;
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Tailor> optionalTailor = tailorRepo.findByPhoneNumber(username);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();

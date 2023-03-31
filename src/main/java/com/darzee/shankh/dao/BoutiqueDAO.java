@@ -2,6 +2,7 @@ package com.darzee.shankh.dao;
 
 import com.darzee.shankh.enums.BoutiqueType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class BoutiqueDAO {
 
     private Long id;

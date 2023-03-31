@@ -15,6 +15,7 @@ import com.darzee.shankh.repo.OrderRepo;
 import com.darzee.shankh.repo.TailorRepo;
 import com.darzee.shankh.request.AddBoutiqueDetailsRequest;
 import com.darzee.shankh.response.GetBoutiqueDataResponse;
+import com.darzee.shankh.response.UpdateBoutiqueResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,13 +46,17 @@ public class BoutiqueService {
     @Transactional
     public ResponseEntity addBoutiqueDetails(AddBoutiqueDetailsRequest request) {
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(request.getBoutiqueId());
+        UpdateBoutiqueResponse response = new UpdateBoutiqueResponse();
         if (optionalBoutique.isPresent()) {
             BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.findById(request.getBoutiqueId()).get(),
                     new CycleAvoidingMappingContext());
             boutiqueDAO.setTailorCount(request.getTailorCount());
-            return new ResponseEntity<>(HttpStatus.OK);
+            boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
+            response.setMessage("Boutique details updated successfully");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        response.setMessage("Boutique not found");
+        return new ResponseEntity(response, HttpStatus.NOT_FOUND);
     }
 
     public ResponseEntity getBoutiqueData(String boutiqueIdString) {

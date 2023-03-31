@@ -35,16 +35,17 @@ public class Customer extends GenericEntity {
     private String lastName;
 
     @Column(name = "gender")
+    @Enumerated(EnumType.ORDINAL)
     private Gender gender;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "measurement_id")
     private Measurement measurement;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<Order> orders;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
 

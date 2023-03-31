@@ -39,6 +39,7 @@ public class Boutique extends GenericEntity {
     private Integer closedOrders = 0;
 
     @Column(name = "boutique_type", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
     private BoutiqueType boutiqueType;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
