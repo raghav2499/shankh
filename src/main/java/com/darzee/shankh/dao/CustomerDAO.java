@@ -17,18 +17,21 @@ public class CustomerDAO {
     private String firstName;
     private String lastName;
     private Gender gender;
+    private String imageReferenceId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private BoutiqueDAO boutique;
     private MeasurementDAO measurement;
     private List<OrderDAO> orders;
 
-    public CustomerDAO(Integer age, String phoneNumber, String firstName, String lastName, Gender gender, BoutiqueDAO boutiqueDAO) {
+    public CustomerDAO(Integer age, String phoneNumber, String firstName, String lastName, Gender gender,
+                       String imageReferenceId, BoutiqueDAO boutiqueDAO) {
         this.age = age;
         this.phoneNumber = phoneNumber;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
+        this.imageReferenceId = imageReferenceId;
         this.boutique = boutiqueDAO;
     }
 }

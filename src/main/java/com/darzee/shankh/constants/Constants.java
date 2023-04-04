@@ -11,4 +11,6 @@ public class Constants {
             OrderStatus.ORDER_READY_FOR_TRIAL);
 
     public static final List<OrderStatus> closedOrderStatusList = Arrays.asList(OrderStatus.ORDER_COMPLETED);
+    public static final Double CM_TO_INCH_FACTOR = 2.54;
+    public static final Integer MEASUREMENT_RESPONSE_TRUNCATION_LENGTH = 4;
 }

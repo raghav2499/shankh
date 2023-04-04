@@ -82,7 +82,7 @@ public class CustomerService {
                 lastName = nameArray[nameArray.length - 1];
             }
             CustomerDAO customerDAO = new CustomerDAO(request.getAge(), request.getPhoneNumber(), firstName, lastName,
-                    request.getGender(), boutiqueDAO);
+                    request.getGender(), request.getCustomerImageReferenceId(), boutiqueDAO);
             customerDAO = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customerDAO,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());

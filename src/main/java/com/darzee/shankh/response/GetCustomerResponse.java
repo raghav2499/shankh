@@ -24,4 +24,6 @@ public class GetCustomerResponse {
     private String lastName;
 
     private Gender gender;
+
+    private String imageUrl;
 }

@@ -38,6 +38,9 @@ public class Customer extends GenericEntity {
     @Enumerated(EnumType.ORDINAL)
     private Gender gender;
 
+    @Column(name = "image_reference_id")
+    private String imageReferenceId;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "measurement_id")
     private Measurement measurement;
