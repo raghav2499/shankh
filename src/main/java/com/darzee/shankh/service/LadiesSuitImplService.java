@@ -4,6 +4,7 @@ import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.response.MeasurementDetails;
+import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
 import org.springframework.stereotype.Service;
 
@@ -28,30 +29,35 @@ public class LadiesSuitImplService implements OutfitTypeService {
         measurementDAO.setAnkle(measurementDetails.getAnkle());
     }
 
+//    @Override
+//    public MeasurementDetails getMeasurementResponse(MeasurementDAO measurementDAO, MeasurementScale scale) {
+//        MeasurementDetails response = new MeasurementDetails();
+//        if(measurementDAO == null) {
+//            return response;
+//        }
+//        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
+//        response.setScale(scale.getScale());
+//        response.setKameezLength(CommonUtils.doubleToString(measurementDAO.getKameezLength()/dividingFactor));
+//        response.setShoulder(CommonUtils.doubleToString(measurementDAO.getShoulder()/dividingFactor));
+//        response.setUpperChest(CommonUtils.doubleToString(measurementDAO.getUpperChest()/dividingFactor));
+//        response.setBust(CommonUtils.doubleToString(measurementDAO.getBust()/dividingFactor));
+//        response.setWaist(CommonUtils.doubleToString(measurementDAO.getWaist()/dividingFactor));
+//        response.setSeat(CommonUtils.doubleToString(measurementDAO.getSeat()/dividingFactor));
+//        response.setArmHole(CommonUtils.doubleToString(measurementDAO.getArmHole()/dividingFactor));
+//        response.setSleeveLength(CommonUtils.doubleToString(measurementDAO.getSleeveLength()/dividingFactor));
+//        response.setSleeveCircumference(CommonUtils.doubleToString(measurementDAO.getSleeveCircumference()/dividingFactor));
+//        response.setFrontNeckDepth(CommonUtils.doubleToString(measurementDAO.getFrontNeckDepth()/dividingFactor));
+//        response.setBackNeckDepth(CommonUtils.doubleToString(measurementDAO.getBackNeckDepth()/dividingFactor));
+//        response.setSalwarLength(CommonUtils.doubleToString(measurementDAO.getSalwarLength()/dividingFactor));
+//        response.setSalwarHip(CommonUtils.doubleToString(measurementDAO.getSalwarHip()/dividingFactor));
+//        response.setKnee(CommonUtils.doubleToString(measurementDAO.getKnee()/dividingFactor));
+//        response.setAnkle(CommonUtils.doubleToString(measurementDAO.getAnkle()/dividingFactor));
+//        return response;
+//    }
+
     @Override
-    public MeasurementDetails getMeasurementResponse(MeasurementDAO measurementDAO, MeasurementScale scale) {
-        MeasurementDetails response = new MeasurementDetails();
-        if(measurementDAO == null) {
-            return response;
-        }
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
-        response.setScale(scale.getScale());
-        response.setKameezLength(CommonUtils.doubleToString(measurementDAO.getKameezLength()/dividingFactor));
-        response.setShoulder(CommonUtils.doubleToString(measurementDAO.getShoulder()/dividingFactor));
-        response.setUpperChest(CommonUtils.doubleToString(measurementDAO.getUpperChest()/dividingFactor));
-        response.setBust(CommonUtils.doubleToString(measurementDAO.getBust()/dividingFactor));
-        response.setWaist(CommonUtils.doubleToString(measurementDAO.getWaist()/dividingFactor));
-        response.setSeat(CommonUtils.doubleToString(measurementDAO.getSeat()/dividingFactor));
-        response.setArmHole(CommonUtils.doubleToString(measurementDAO.getArmHole()/dividingFactor));
-        response.setSleeveLength(CommonUtils.doubleToString(measurementDAO.getSleeveLength()/dividingFactor));
-        response.setSleeveCircumference(CommonUtils.doubleToString(measurementDAO.getSleeveCircumference()/dividingFactor));
-        response.setFrontNeckDepth(CommonUtils.doubleToString(measurementDAO.getFrontNeckDepth()/dividingFactor));
-        response.setBackNeckDepth(CommonUtils.doubleToString(measurementDAO.getBackNeckDepth()/dividingFactor));
-        response.setSalwarLength(CommonUtils.doubleToString(measurementDAO.getSalwarLength()/dividingFactor));
-        response.setSalwarHip(CommonUtils.doubleToString(measurementDAO.getSalwarHip()/dividingFactor));
-        response.setKnee(CommonUtils.doubleToString(measurementDAO.getKnee()/dividingFactor));
-        response.setAnkle(CommonUtils.doubleToString(measurementDAO.getAnkle()/dividingFactor));
-        return response;
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale) {
+        return null;
     }
 
     @Override
@@ -65,4 +71,5 @@ public class LadiesSuitImplService implements OutfitTypeService {
                 && measurement.getKnee() != null && measurement.getAnkle() != null;
 
     }
+
 }

@@ -4,6 +4,7 @@ import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.response.MeasurementDetails;
+import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +16,26 @@ public class UnderSkirtImplService implements OutfitTypeService{
         measurementDAO.setLength(measurementDetails.getLength());
     }
 
-    @Override
-    public MeasurementDetails getMeasurementResponse(MeasurementDAO measurementDAO, MeasurementScale scale) {
-        MeasurementDetails response = new MeasurementDetails();
-        if(measurementDAO == null) {
-            return response;
-        }
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
-        response.setScale(scale.getScale());
-        response.setWaist(CommonUtils.doubleToString(measurementDAO.getWaist()/dividingFactor));
-        response.setLength(CommonUtils.doubleToString(measurementDAO.getLength()/dividingFactor));
-        return response;
-    }
+//    @Override
+//    public MeasurementDetails getMeasurementResponse(MeasurementDAO measurementDAO, MeasurementScale scale) {
+//        MeasurementDetails response = new MeasurementDetails();
+//        if(measurementDAO == null) {
+//            return response;
+//        }
+//        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
+//        response.setScale(scale.getScale());
+//        response.setWaist(CommonUtils.doubleToString(measurementDAO.getWaist()/dividingFactor));
+//        response.setLength(CommonUtils.doubleToString(measurementDAO.getLength()/dividingFactor));
+//        return response;
+//    }
 
     @Override
     public boolean haveAllRequiredMeasurements(MeasurementDAO measurement) {
         return measurement.getWaist() != null && measurement.getLength() != null;
+    }
+
+    @Override
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale) {
+        return null;
     }
 }
