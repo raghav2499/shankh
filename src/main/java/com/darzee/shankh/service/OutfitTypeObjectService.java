@@ -2,7 +2,9 @@ package com.darzee.shankh.service;
 
 import com.darzee.shankh.enums.OutfitType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class OutfitTypeObjectService {
@@ -55,7 +57,7 @@ public class OutfitTypeObjectService {
             case UNDER_SKIRT:
                 return underSkirtImplService;
             default:
-                throw new Exception("Outfit Type not supported");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Outfit Type not supported");
         }
     }
 }

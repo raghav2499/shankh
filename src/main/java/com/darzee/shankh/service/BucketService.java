@@ -11,8 +11,10 @@ import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.s3utils.FileUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.util.List;
@@ -41,7 +43,7 @@ public class BucketService {
             file.delete();
             return new UploadImageResponse(fileUploadResult.getKey(), fileUploadResult.getValue());
         } catch (Exception e) {
-            throw new Exception("File upload failed with exception {}", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
         }
     }
 

@@ -27,16 +27,8 @@ public class DressImplService implements OutfitTypeService {
         measurementDAO.setAnkle(measurementDetails.getAnkle());
         measurementDAO.setLength(measurementDetails.getLength());
     }
-
     @Override
-    public boolean haveAllRequiredMeasurements(MeasurementDAO measurement) {
-        return measurement.getWaist() != null && measurement.getCalf() != null && measurement.getSeat() != null
-                && measurement.getAnkle() != null && measurement.getLength() != null;
-
-    }
-
-    @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale) {
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale, String view) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;

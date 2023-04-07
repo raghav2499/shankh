@@ -4,12 +4,14 @@ import com.darzee.shankh.service.JwtUserDetailsService;
 import com.darzee.shankh.utils.jwtutils.TokenManager;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -56,7 +58,7 @@ public class JwtFilter extends OncePerRequestFilter {
             } else {
                 System.out.println("Authentication failed for token "+ token
                         + " and username "+ userDetails.getUsername());
-                throw new Exception("Authetication failed. Please use valid token");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authetication failed. Please use valid token");
             }
         }
         filterChain.doFilter(request, response);

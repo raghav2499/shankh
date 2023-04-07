@@ -97,6 +97,12 @@ public class Measurement extends GenericEntity {
     @Column(name = "salwar_hip")
     private Double salwarHip;
 
+    @Column(name = "shirt_length")
+    private Double shirtLength;
+
+    @Column(name = "pant_length")
+    private Double pantLength;
+
     @Column(name = "gown_length")
     private Double gownLength;
 

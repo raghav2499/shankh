@@ -38,6 +38,8 @@ public class MeasurementDAO implements Serializable {
     private Double salwarLength;
     private Double salwarHip;
     private Double gownLength;
+    private Double shirtLength;
+    private Double pantLength;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private CustomerDAO customer;

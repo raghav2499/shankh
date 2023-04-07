@@ -20,7 +20,8 @@ public class MeasurementController {
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getMeasurementDetails(@RequestParam("customer_id") Long customerId,
                                                 @RequestParam("outfit_type") String outfitType,
-                                                @RequestParam(value = "scale", defaultValue = "cm") String scale) throws Exception {
-        return measurementService.getMeasurementDetails(customerId, outfitType, scale);
+                                                @RequestParam(value = "scale", defaultValue = "cm") String scale,
+                                                @RequestParam("view") String view) throws Exception {
+        return measurementService.getMeasurementDetails(customerId, outfitType, scale, view);
     }
 }

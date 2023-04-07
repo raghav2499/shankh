@@ -3,39 +3,55 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
+import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.response.MeasurementDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static com.darzee.shankh.constants.Constants.DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
+import static com.darzee.shankh.constants.Constants.ImageLinks.*;
+import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
+
 @Service
-public class UnderSkirtImplService implements OutfitTypeService{
+public class UnderSkirtImplService implements OutfitTypeService {
     @Override
     public void setMeasurementDetailsInObject(com.darzee.shankh.request.MeasurementDetails measurementDetails, MeasurementDAO measurementDAO) {
         measurementDAO.setWaist(measurementDetails.getWaist());
         measurementDAO.setLength(measurementDetails.getLength());
     }
-
-//    @Override
-//    public MeasurementDetails getMeasurementResponse(MeasurementDAO measurementDAO, MeasurementScale scale) {
-//        MeasurementDetails response = new MeasurementDetails();
-//        if(measurementDAO == null) {
-//            return response;
-//        }
-//        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
-//        response.setScale(scale.getScale());
-//        response.setWaist(CommonUtils.doubleToString(measurementDAO.getWaist()/dividingFactor));
-//        response.setLength(CommonUtils.doubleToString(measurementDAO.getLength()/dividingFactor));
-//        return response;
-//    }
-
     @Override
-    public boolean haveAllRequiredMeasurements(MeasurementDAO measurement) {
-        return measurement.getWaist() != null && measurement.getLength() != null;
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale, String view) {
+        OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
+        List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
+        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
+        Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
+
+        measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getWaist()).orElse(defaultValue)/dividingFactor)));
+        measurementDetailsResponseList.add(addLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getLength()).orElse(defaultValue)/dividingFactor)));
+
+        overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
+        overallMeasurementDetails.setOutfitImageLink(UNDER_SKIRT_OUTFIT_IMAGE_LINK);
+        overallMeasurementDetails.setOutfitType(OutfitType.UNDER_SKIRT.name());
+        return overallMeasurementDetails;
     }
 
-    @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale) {
-        return null;
+    private MeasurementDetails addWaist(String value) {
+        String imageLink = UNDER_SKIRT_WAIST_IMAGE_LINK;
+        String title = UNDER_SKIRT_WAIST_TITLE;
+        String index = "1";
+        return new MeasurementDetails(imageLink, title, value, index);
     }
+
+    private MeasurementDetails addLength(String value) {
+        String imageLink = UNDER_SKIRT_LENGTH_IMAGE_LINK;
+        String title = UNDER_SKIRT_LENGTH_TITLE;
+        String index = "2";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+
 }
