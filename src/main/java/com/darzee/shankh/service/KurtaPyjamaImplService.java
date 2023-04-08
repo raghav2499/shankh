@@ -72,7 +72,7 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(KURTA_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.KURTA_PYJAMA.name());
+        overallMeasurementDetails.setOutfitTypeHeading(MENS_KURTA_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 
@@ -89,7 +89,7 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(PYJAMA_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.KURTA_PYJAMA.name());
+        overallMeasurementDetails.setOutfitTypeHeading(MENS_PYJAMA_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 

@@ -44,7 +44,7 @@ public class PantImplService implements OutfitTypeService{
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(PANTS_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.PANTS.name());
+        overallMeasurementDetails.setOutfitTypeHeading(PANTS_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 

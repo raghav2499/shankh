@@ -36,7 +36,7 @@ public class UnderSkirtImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(UNDER_SKIRT_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.UNDER_SKIRT.name());
+        overallMeasurementDetails.setOutfitTypeHeading(UNDER_SHIRT_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 

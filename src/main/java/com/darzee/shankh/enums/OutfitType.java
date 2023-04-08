@@ -9,24 +9,24 @@ import java.util.Map;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum OutfitType {
 
-    @JsonProperty("Kurta Pyjama")
-    KURTA_PYJAMA("Kurta Pyjama"),
-    @JsonProperty("Dress")
-    DRESS("Dress"),
-    @JsonProperty("Saree Blouse")
-    SAREE_BLOUSE("Saree Blouse"),
-    @JsonProperty("Men's Suit")
-    MENS_SUIT("Men's Suit"),
-    @JsonProperty("Pants")
-    PANTS("Pants"),
-    @JsonProperty("Night Gown")
+    @JsonProperty("kurta_pyjama")
+    KURTA_PYJAMA("kurta_pyjama"),
+    @JsonProperty("dress")
+    DRESS("dress"),
+    @JsonProperty("saree_blouse")
+    SAREE_BLOUSE("saree_blouse"),
+    @JsonProperty("mens_suit")
+    MENS_SUIT("mens_suit"),
+    @JsonProperty("pants")
+    PANTS("pants"),
+    @JsonProperty("night_gown")
     EVENING_GOWN("Night Gown"),
-    @JsonProperty("Salwar Kameez")
-    LADIES_SUIT("Salwar Kameez"),
-    @JsonProperty("Shirt")
-    SHIRT("Shirt"),
-    @JsonProperty("Under Skirt")
-    UNDER_SKIRT("Under Skirt");
+    @JsonProperty("salwar_kameez")
+    LADIES_SUIT("salwar_kameez"),
+    @JsonProperty("shirt")
+    SHIRT("shirt"),
+    @JsonProperty("under_skirt")
+    UNDER_SKIRT("under_skirt");
     private String name;
 
     OutfitType(String name) {

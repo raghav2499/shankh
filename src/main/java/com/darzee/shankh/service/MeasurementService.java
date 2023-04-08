@@ -40,8 +40,8 @@ public class MeasurementService {
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         Optional<Customer> customer = customerRepo.findById(customerId);
         if (customer.isPresent()) {
-            Optional<Measurement> optionalMeasurement = Optional.ofNullable(measurementRepo.findByCustomerId(customerId));
-            MeasurementDAO measurementDAO = mapper.measurementObjectToDAO(optionalMeasurement.get(),
+            Measurement measurement = Optional.ofNullable(measurementRepo.findByCustomerId(customerId)).orElse(new Measurement());
+            MeasurementDAO measurementDAO = mapper.measurementObjectToDAO(measurement,
                     new CycleAvoidingMappingContext());
             MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
             OverallMeasurementDetails overallMeasurementDetails = outfitTypeService.setMeasurementDetails(measurementDAO, measurementScale, view);

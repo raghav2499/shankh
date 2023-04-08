@@ -62,7 +62,7 @@ public class MensSuitImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(MENS_SUIT_UPPER_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.MENS_SUIT.name());
+        overallMeasurementDetails.setOutfitTypeHeading(MENS_SUIT_TOP_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 
@@ -81,7 +81,7 @@ public class MensSuitImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(MENS_SUIT_LOWER_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.MENS_SUIT.name());
+        overallMeasurementDetails.setOutfitTypeHeading(MENS_SUIT_PANTS_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 

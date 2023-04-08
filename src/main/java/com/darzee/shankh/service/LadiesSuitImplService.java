@@ -69,7 +69,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(LADIES_SUIT_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.LADIES_SUIT.name());
+        overallMeasurementDetails.setOutfitTypeHeading(LADIES_SUIT_KAMEEZ_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 
@@ -86,7 +86,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(LADIES_SUIT_LOWER_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.LADIES_SUIT.name());
+        overallMeasurementDetails.setOutfitTypeHeading(LADIES_SUIT_SALWAR_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 

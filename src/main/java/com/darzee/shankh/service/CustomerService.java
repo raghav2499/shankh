@@ -70,7 +70,13 @@ public class CustomerService {
 
     public ResponseEntity createCustomer(CreateCustomerRequest request) {
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(request.getBoutiqueId());
+        CreateCustomerResponse response = new CreateCustomerResponse();
         if (optionalBoutique.isPresent()) {
+            Optional<Customer> existingCustomer = customerRepo.findByPhoneNumber(request.getPhoneNumber());
+            if(existingCustomer.isPresent()) {
+                response.setMessage("Customer already registered");
+                return new ResponseEntity(response, HttpStatus.OK);
+            }
             BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(),
                     new CycleAvoidingMappingContext());
             String name = request.getName();
@@ -86,11 +92,10 @@ public class CustomerService {
             customerDAO = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customerDAO,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
-            CreateCustomerResponse response = new CreateCustomerResponse(customerDAO.getId(), customerDAO.getFirstName(),
+            response = new CreateCustomerResponse(customerDAO.getId(), customerDAO.getFirstName(),
                     customerDAO.getLastName(), "Customer created successfully");
             return new ResponseEntity(response, HttpStatus.CREATED);
         }
-        CreateCustomerResponse response = new CreateCustomerResponse();
         response.setMessage("This boutique is not enrolled with us");
         return new ResponseEntity(response, HttpStatus.OK);
     }

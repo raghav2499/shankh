@@ -50,7 +50,7 @@ public class ShirtImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(SHIRT_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.SHIRT.name());
+        overallMeasurementDetails.setOutfitTypeHeading(SHIRT_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 

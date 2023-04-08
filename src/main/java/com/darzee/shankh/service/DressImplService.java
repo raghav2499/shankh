@@ -41,7 +41,7 @@ public class DressImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(DRESS_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.DRESS.name());
+        overallMeasurementDetails.setOutfitTypeHeading(DRESS_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 

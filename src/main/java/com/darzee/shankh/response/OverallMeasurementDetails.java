@@ -15,7 +15,7 @@ import java.util.List;
 public class OverallMeasurementDetails {
 
     private String message;
-    private String outfitType;
+    private String outfitTypeHeading;
     private String outfitImageLink;
     private List<MeasurementDetails> measurementDetailsList;
 

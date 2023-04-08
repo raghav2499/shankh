@@ -53,7 +53,7 @@ public class EveningGownImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(GOWN_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.EVENING_GOWN.name());
+        overallMeasurementDetails.setOutfitTypeHeading(NIGHT_GOWN_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 

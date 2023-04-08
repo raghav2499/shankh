@@ -56,7 +56,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         overallMeasurementDetails.setOutfitImageLink(BLOUSE_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitType(OutfitType.SAREE_BLOUSE.name());
+        overallMeasurementDetails.setOutfitTypeHeading(SAREE_BLOUSE_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
     }
 
