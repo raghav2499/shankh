@@ -3,7 +3,6 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
-import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.response.MeasurementDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.darzee.shankh.constants.Constants.*;
+import static com.darzee.shankh.constants.Constants.DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 import static com.darzee.shankh.constants.Constants.ImageLinks.*;
 import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
 

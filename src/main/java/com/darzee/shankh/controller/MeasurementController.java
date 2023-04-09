@@ -1,6 +1,5 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.service.MeasurementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
