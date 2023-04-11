@@ -4,6 +4,7 @@ import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.MeasurementView;
+import com.darzee.shankh.request.Measurements;
 import com.darzee.shankh.response.MeasurementDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
@@ -20,22 +21,42 @@ import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
 @Service
 public class LadiesSuitImplService implements OutfitTypeService {
     @Override
-    public void setMeasurementDetailsInObject(com.darzee.shankh.request.MeasurementDetails measurementDetails, MeasurementDAO measurementDAO) {
-        measurementDAO.setKameezLength(measurementDetails.getKameezLength());
-        measurementDAO.setShoulder(measurementDetails.getShoulder());
-        measurementDAO.setUpperChest(measurementDetails.getUpperChest());
-        measurementDAO.setBust(measurementDetails.getBust());
-        measurementDAO.setWaist(measurementDetails.getWaist());
-        measurementDAO.setSeat(measurementDetails.getSeat());
-        measurementDAO.setArmHole(measurementDetails.getArmHole());
-        measurementDAO.setSleeveLength(measurementDetails.getSleeveLength());
-        measurementDAO.setSleeveCircumference(measurementDetails.getSleeveCircumference());
-        measurementDAO.setFrontNeckDepth(measurementDetails.getFrontNeckDepth());
-        measurementDAO.setBackNeckDepth(measurementDetails.getBackNeckDepth());
-        measurementDAO.setSalwarLength(measurementDetails.getSalwarLength());
-        measurementDAO.setSalwarHip(measurementDetails.getSalwarHip());
-        measurementDAO.setKnee(measurementDetails.getKnee());
-        measurementDAO.setAnkle(measurementDetails.getAnkle());
+    public void setMeasurementDetailsInObject(Measurements measurementDetails, MeasurementDAO measurementDAO, MeasurementScale scale) {
+        Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
+        measurementDAO.setKameezLength(measurementDetails.getKameezLength()*multiplyingFactor);
+        measurementDAO.setShoulder(measurementDetails.getShoulder()*multiplyingFactor);
+        measurementDAO.setUpperChest(measurementDetails.getUpperChest()*multiplyingFactor);
+        measurementDAO.setBust(measurementDetails.getBust()*multiplyingFactor);
+        measurementDAO.setWaist(measurementDetails.getWaist()*multiplyingFactor);
+        measurementDAO.setSeat(measurementDetails.getSeat()*multiplyingFactor);
+        measurementDAO.setArmHole(measurementDetails.getArmHole()*multiplyingFactor);
+        measurementDAO.setSleeveLength(measurementDetails.getSleeveLength()*multiplyingFactor);
+        measurementDAO.setSleeveCircumference(measurementDetails.getSleeveCircumference()*multiplyingFactor);
+        measurementDAO.setFrontNeckDepth(measurementDetails.getFrontNeckDepth()*multiplyingFactor);
+        measurementDAO.setBackNeckDepth(measurementDetails.getBackNeckDepth()*multiplyingFactor);
+        measurementDAO.setSalwarHip(measurementDetails.getSalwarHip()*multiplyingFactor);
+        measurementDAO.setKnee(measurementDetails.getKnee()*multiplyingFactor);
+        measurementDAO.setSalwarLength(measurementDetails.getSalwarLength()*multiplyingFactor);
+        measurementDAO.setAnkle(measurementDetails.getAnkle()*multiplyingFactor);
+    }
+
+    @Override
+    public boolean haveMandatoryParams(Measurements measurementDetails) {
+        return measurementDetails.getKameezLength() != null &&
+                measurementDetails.getShoulder() != null &&
+                measurementDetails.getUpperChest() != null &&
+                measurementDetails.getBust() != null &&
+                measurementDetails.getWaist() != null &&
+                measurementDetails.getSeat() != null &&
+                measurementDetails.getArmHole() != null &&
+                measurementDetails.getSleeveLength() != null &&
+                measurementDetails.getSleeveCircumference() != null &&
+                measurementDetails.getFrontNeckDepth() != null &&
+                measurementDetails.getBackNeckDepth() != null &&
+                measurementDetails.getSalwarHip() != null &&
+                measurementDetails.getKnee() != null &&
+                measurementDetails.getSalwarLength() != null &&
+                measurementDetails.getAnkle() != null;
     }
 
     @Override
@@ -50,7 +71,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
 
     private OverallMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementDAO measurementDAO, MeasurementScale scale) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
+        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
 
@@ -74,7 +95,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
 
     private OverallMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementDAO measurementDAO, MeasurementScale scale) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
+        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
 

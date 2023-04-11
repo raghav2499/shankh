@@ -9,10 +9,11 @@ import javax.persistence.*;
 @Setter
 @Table(name = "order_amount")
 @Entity
+@SequenceGenerator(name = "order-amount-seq", sequenceName = "order_amount_seq", allocationSize = 1)
 public class OrderAmount extends GenericEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order-amount-seq")
     @Column(name = "id", nullable = false)
     private Long id;
 

@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
+import com.darzee.shankh.request.Measurements;
 import com.darzee.shankh.response.MeasurementDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
@@ -19,25 +20,37 @@ import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
 @Service
 public class SareeBlouseImplService implements OutfitTypeService {
     @Override
-    public void setMeasurementDetailsInObject(com.darzee.shankh.request.MeasurementDetails measurementDetails, MeasurementDAO measurementDAO) {
-        measurementDAO.setBlouseLength(measurementDetails.getBlouseLength());
-        measurementDAO.setUpperChest(measurementDetails.getUpperChest());
-        measurementDAO.setBust(measurementDetails.getBust());
-        measurementDAO.setBelowBust(measurementDetails.getBelowBust());
-        measurementDAO.setShoulder(measurementDetails.getShoulder());
-        measurementDAO.setArmHole(measurementDetails.getShoulder());
-        measurementDAO.setSleeveLength(measurementDetails.getSleeveLength());
-        measurementDAO.setSleeveCircumference(measurementDetails.getSleeveCircumference());
-        measurementDAO.setFrontNeckDepth(measurementDetails.getFrontNeckDepth());
-        measurementDAO.setBackNeckDepth(measurementDetails.getBackNeckDepth());
-        measurementDAO.setShoulderToApexLength(measurementDetails.getShoulderToApexLength());
+    public void setMeasurementDetailsInObject(Measurements measurementDetails, MeasurementDAO measurementDAO, MeasurementScale scale) {
+        Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
+        measurementDAO.setBlouseLength(measurementDetails.getBlouseLength()*multiplyingFactor);
+        measurementDAO.setBust(measurementDetails.getBust()*multiplyingFactor);
+        measurementDAO.setUpperChest(measurementDetails.getUpperChest()*multiplyingFactor);
+        measurementDAO.setBelowBust(measurementDetails.getBelowBust()*multiplyingFactor);
+        measurementDAO.setShoulder(measurementDetails.getShoulder()*multiplyingFactor);
+        measurementDAO.setArmHole(measurementDetails.getShoulder()*multiplyingFactor);
+        measurementDAO.setSleeveLength(measurementDetails.getSleeveLength()*multiplyingFactor);
+        measurementDAO.setSleeveCircumference(measurementDetails.getSleeveCircumference()*multiplyingFactor);
+        measurementDAO.setFrontNeckDepth(measurementDetails.getFrontNeckDepth()*multiplyingFactor);
+        measurementDAO.setShoulderToApexLength(measurementDetails.getShoulderToApexLength()*multiplyingFactor);
+        measurementDAO.setApexToApexLength(measurementDetails.getApexToApexLength()*multiplyingFactor);
+        measurementDAO.setBackNeckDepth(measurementDetails.getBackNeckDepth()*multiplyingFactor);
+        }
+
+    @Override
+    public boolean haveMandatoryParams(Measurements measurementDetails) {
+        return measurementDetails.getBlouseLength() != null && measurementDetails.getBust() != null &&
+                measurementDetails.getUpperChest() != null && measurementDetails.getBelowBust() != null &&
+                measurementDetails.getShoulder() != null && measurementDetails.getArmHole() != null &&
+                measurementDetails.getSleeveLength() != null && measurementDetails.getSleeveCircumference() != null &&
+                measurementDetails.getFrontNeckDepth() != null && measurementDetails.getShoulderToApexLength() != null &&
+                measurementDetails.getApexToApexLength() != null && measurementDetails.getBackNeckDepth() != null;
     }
 
     @Override
     public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale, String view) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
+        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 
         measurementDetailsResponseList.add(addBlouseLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBlouseLength()).orElse(defaultValue)/dividingFactor)));
@@ -50,7 +63,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
         measurementDetailsResponseList.add(addSleeveCircumference(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveCircumference()).orElse(defaultValue)/dividingFactor)));
         measurementDetailsResponseList.add(addFrontNeckDepth(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getFrontNeckDepth()).orElse(defaultValue)/dividingFactor)));
         measurementDetailsResponseList.add(addShoulderToApexLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShoulderToApexLength()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addApexToApexLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShoulderToApexLength()).orElse(defaultValue)/dividingFactor)));
+        measurementDetailsResponseList.add(addApexToApexLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getApexToApexLength()).orElse(defaultValue)/dividingFactor)));
         measurementDetailsResponseList.add(addBackNeckDepth(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBackNeckDepth()).orElse(defaultValue)/dividingFactor)));
 
         overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);

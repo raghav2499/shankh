@@ -1,17 +1,16 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.BoutiqueDAO;
-import com.darzee.shankh.dao.BoutiqueImagesDAO;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
+import com.darzee.shankh.dao.ObjectImagesDAO;
 import com.darzee.shankh.dao.TailorDAO;
+import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.Tailor;
+import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.enums.TailorRole;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.BoutiqueImagesRepo;
-import com.darzee.shankh.repo.BoutiqueLedgerRepo;
-import com.darzee.shankh.repo.BoutiqueRepo;
-import com.darzee.shankh.repo.TailorRepo;
+import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.ProfileUpdateRequest;
 import com.darzee.shankh.request.TailorLoginRequest;
 import com.darzee.shankh.request.TailorSignUpRequest;
@@ -61,7 +60,9 @@ public class TailorService {
     @Autowired
     private TokenManager tokenManager;
     @Autowired
-    private BoutiqueImagesRepo boutiqueImagesRepo;
+    private ObjectImagesRepo objectImagesRepo;
+    @Autowired
+    private CustomerRepo customerRepo;
 
     @Transactional
     public ResponseEntity tailorSignup(TailorSignUpRequest request) {
@@ -162,6 +163,15 @@ public class TailorService {
                 HttpStatus.OK);
     }
 
+    public ResponseEntity deleteProfile(String phoneNumber) {
+        Optional<Customer> customer = customerRepo.findByPhoneNumber(phoneNumber);
+        if(customer.isPresent()) {
+            customerRepo.delete(customer.get());
+            return new ResponseEntity("success", HttpStatus.OK);
+        }
+        return new ResponseEntity("No profile found", HttpStatus.OK);
+    }
+
     private Boolean isTailorAlreadySignedUp(String phoneNumber) {
         Optional<Tailor> tailor = tailorRepo.findByPhoneNumber(phoneNumber);
         if (tailor.isPresent()) {
@@ -172,8 +182,8 @@ public class TailorService {
 
     private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
         for (String imageReference : imageReferences) {
-            BoutiqueImagesDAO boutiqueImage = new BoutiqueImagesDAO(imageReference, Boolean.TRUE, boutique);
-            boutiqueImagesRepo.save(mapper.boutiqueImagesImagesDAOToBoutiqueImages(boutiqueImage));
+            ObjectImagesDAO boutiqueImage = new ObjectImagesDAO(imageReference, ImageEntityType.BOUTIQUE.getEntityType(), boutique.getId());
+            objectImagesRepo.save(mapper.boutiqueImagesImagesDAOToBoutiqueImages(boutiqueImage));
         }
     }
 }

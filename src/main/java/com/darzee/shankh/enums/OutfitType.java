@@ -33,6 +33,10 @@ public enum OutfitType {
         this.name = name;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
 
     public static Map<String, OutfitType> outfitEnumMap  = getOutfitEnumMap();
 

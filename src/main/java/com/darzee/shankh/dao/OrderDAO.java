@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderDAO {
     private Long id;
+
+    private String invoiceNo;
     private LocalDateTime trialDate;
     private LocalDateTime deliveryDate;
     private OutfitType outfitType;
@@ -26,17 +28,19 @@ public class OrderDAO {
     private String specialInstructions;
     private Boolean isDeleted = Boolean.FALSE;
     private String inspiration;
-    private Boolean isMeasurementOnPaper;
     private BoutiqueDAO boutique;
     private CustomerDAO customer;
-    public OrderDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, OutfitType outfitType, String specialInstructions, String inspiration,OrderType orderType, Boolean isMeasurementOnPaper, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
+
+    public OrderDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, OutfitType outfitType,
+                    String specialInstructions, String inspiration, OrderType orderType, String invoiceNo,
+                    BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
+        this.invoiceNo = invoiceNo;
         this.trialDate = trialDate;
         this.deliveryDate = deliveryDate;
         this.outfitType = outfitType;
         this.specialInstructions = specialInstructions;
         this.orderType = orderType;
         this.inspiration = inspiration;
-        this.isMeasurementOnPaper = isMeasurementOnPaper;
         this.boutique = boutiqueDAO;
         this.customer = customerDAO;
     }

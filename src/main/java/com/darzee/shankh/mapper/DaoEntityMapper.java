@@ -25,7 +25,6 @@ public interface DaoEntityMapper {
     OrderDAO orderObjectToDao(Order order, @Context CycleAvoidingMappingContext context);
 
     Order orderaDaoToObject(OrderDAO orderDAO, @Context CycleAvoidingMappingContext context);
-    Payments paymentDaoToObject(PaymentDAO paymentDAO, @Context CycleAvoidingMappingContext context);
     CustomerDAO customerObjectToDao(Customer customer, @Context CycleAvoidingMappingContext context);
 
     GetCustomerResponse customerDAOToGetCustomerResponse(CustomerDAO customerDAO, @Context CycleAvoidingMappingContext context);
@@ -39,16 +38,21 @@ public interface DaoEntityMapper {
     Measurement measurementDAOToObject(MeasurementDAO measurement, @Context CycleAvoidingMappingContext context);
 
     MeasurementDAO measurementObjectToDAO(Measurement measurement, @Context CycleAvoidingMappingContext context);
+
+    ObjectImages objectImageDAOToObjectImage(ObjectImagesDAO objectImages);
     @Mapping(source = "tailorDAO.id", target = "tailorId")
     @Mapping(source = "tailorDAO.name", target = "tailorName")
     @Mapping(source = "tailorDAO.boutique.id", target = "boutiqueId")
     TailorLoginResponse tailorDAOToLoginResponse(TailorDAO tailorDAO, String token);
 
-    BoutiqueImages boutiqueImagesImagesDAOToBoutiqueImages(BoutiqueImagesDAO boutiqueImagesDAO);
+    ObjectImages boutiqueImagesImagesDAOToBoutiqueImages(ObjectImagesDAO ObjectImagesDAO);
 
     ImageReferenceDAO imageReferenceToImageReferenceDAO(ImageReference imageReference);
     ImageReference imageReferenceDAOToImageReference(ImageReferenceDAO imageReferenceDAO);
 
+    OrderAmountDAO orderAmountObjectToOrderAmountDao(OrderAmount orderAmount, @Context CycleAvoidingMappingContext context);
+
+    OrderAmount orderAmountDaoToOrderAmountObject(OrderAmountDAO orderAmount, @Context CycleAvoidingMappingContext context);
 
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if(orderList == null) {

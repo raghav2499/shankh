@@ -35,4 +35,9 @@ public class TailorController {
                                         @Valid @RequestBody ProfileUpdateRequest request) {
         return tailorService.updateProfile(id, request);
     }
+
+    @DeleteMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity deleteProfile(@RequestParam("phone_number") String phoneNumber) {
+        return tailorService.deleteProfile(phoneNumber);
+    }
 }

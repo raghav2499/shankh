@@ -11,17 +11,18 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoutiqueImagesDAO {
+public class ObjectImagesDAO {
     private Long id;
     private String referenceId;
-    private Boolean isValid;
-    private BoutiqueDAO boutique;
+    private Boolean isValid = Boolean.TRUE;
+    private String entityType;
+    private Long entityId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public BoutiqueImagesDAO(String referenceId, Boolean isValid, BoutiqueDAO boutique) {
+    public ObjectImagesDAO(String referenceId, String entityType, Long entityId) {
         this.referenceId = referenceId;
-        this.isValid = isValid;
-        this.boutique = boutique;
+        this.entityId = entityId;
+        this.entityType = entityType;
     }
 }

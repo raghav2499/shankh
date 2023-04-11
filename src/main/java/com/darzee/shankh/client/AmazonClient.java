@@ -45,7 +45,7 @@ public class AmazonClient {
         return new ImmutablePair(referenceId, shortLivedUrl);
     }
 
-    public String downloadFile(String fileName) {
+    public String generateShortLivedUrl(String fileName) {
         return generateShortLivedUrl(bucketName, fileName);
     }
 

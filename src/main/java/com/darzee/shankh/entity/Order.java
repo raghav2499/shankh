@@ -22,6 +22,9 @@ public class Order extends GenericEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "invoice_no", nullable = false)
+    private String invoiceNo;
+
     @Column(name = "trial_date")
     private LocalDateTime trialDate;
 
@@ -45,9 +48,6 @@ public class Order extends GenericEntity {
     @Column(name = "inspiration")
     private String inspiration;
 
-    @Column(name = "measurement_on_paper")
-    private Boolean isMeasurementOnPaper = Boolean.FALSE;
-
     @Column(name = "order_status")
     @Enumerated(EnumType.ORDINAL)
     private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;
@@ -56,7 +56,7 @@ public class Order extends GenericEntity {
     private Boutique boutique;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
-    private List<Payments> payments;
+    private List<OrderAmount> orderAmounts;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

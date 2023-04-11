@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+
 @RestController
 @RequestMapping(value = "/order")
 public class OrderController {
-
 
     @Autowired
     private OrderService orderService;
@@ -24,7 +24,6 @@ public class OrderController {
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreateOrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) throws Exception {
         ResponseEntity<CreateOrderResponse> response = orderService.createNewOrder(request);
-        System.out.println("response is " + response.getBody());
         return response;
     }
 }

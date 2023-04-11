@@ -1,22 +1,32 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.CustomerDAO;
+import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
+import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueLedgerRepo;
 import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.repo.CustomerRepo;
+import com.darzee.shankh.repo.ImageReferenceRepo;
 import com.darzee.shankh.request.CreateCustomerRequest;
-import com.darzee.shankh.response.*;
+import com.darzee.shankh.response.CreateCustomerResponse;
+import com.darzee.shankh.response.CustomerDetails;
+import com.darzee.shankh.response.GetCustomerResponse;
+import com.darzee.shankh.response.GetCustomersResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +37,12 @@ public class CustomerService {
 
     @Autowired
     private CustomerRepo customerRepo;
+
+    @Autowired
+    private ImageReferenceRepo imageReferenceRepo;
+
+    @Autowired
+    private AmazonClient s3Client;
 
     @Autowired
     private DaoEntityMapper mapper;
@@ -43,19 +59,11 @@ public class CustomerService {
                         new CustomerDetails(customer.getFirstName()
                                 + " "
                                 + customer.getLastName(),
-                                customer.getPhoneNumber()))
+                                customer.getPhoneNumber(),
+                                getCustomerProfilePicLink(customer.getImageReferenceId())))
                 .collect(Collectors.toList());
-        Map<Character, List<CustomerDetails>> customerDetailsMap = customerDetails
-                .stream()
-                .collect(Collectors.groupingBy(customer -> customer.getFirstLetter()));
-        List<AlphabeticalCustomerDetails> alphabeticalCustomerDetails = new ArrayList<>(26);
-        for (Map.Entry<Character, List<CustomerDetails>> customerDetail : customerDetailsMap.entrySet()) {
-            AlphabeticalCustomerDetails alphabeticalCustomerDetail =
-                    new AlphabeticalCustomerDetails(customerDetail.getKey(), customerDetail.getValue());
-            alphabeticalCustomerDetails.add(alphabeticalCustomerDetail);
-        }
-        alphabeticalCustomerDetails.sort(Comparator.comparing(AlphabeticalCustomerDetails::getStartingLetter));
-        return new ResponseEntity(new GetCustomersResponse(alphabeticalCustomerDetails), HttpStatus.OK);
+
+        return new ResponseEntity(new GetCustomersResponse(customerDetails), HttpStatus.OK);
     }
 
     public ResponseEntity getCustomer(Long customerId) {
@@ -73,7 +81,7 @@ public class CustomerService {
         CreateCustomerResponse response = new CreateCustomerResponse();
         if (optionalBoutique.isPresent()) {
             Optional<Customer> existingCustomer = customerRepo.findByPhoneNumber(request.getPhoneNumber());
-            if(existingCustomer.isPresent()) {
+            if (existingCustomer.isPresent()) {
                 response.setMessage("Customer already registered");
                 return new ResponseEntity(response, HttpStatus.OK);
             }
@@ -98,6 +106,19 @@ public class CustomerService {
         }
         response.setMessage("This boutique is not enrolled with us");
         return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    private String getCustomerProfilePicLink(String customerImageReferenceId) {
+        if(StringUtils.isBlank(customerImageReferenceId)) {
+            return "";
+        }
+        Optional<ImageReference> optionalImageReference = imageReferenceRepo.findByReferenceId(customerImageReferenceId);
+        if(optionalImageReference.isPresent()) {
+            ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(optionalImageReference.get());
+            String fileName = imageReferenceDAO.getImageName();
+            return s3Client.generateShortLivedUrl(fileName);
+        }
+        return "";
     }
 
 

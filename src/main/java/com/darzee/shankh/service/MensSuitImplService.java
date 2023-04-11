@@ -4,6 +4,7 @@ import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.MeasurementView;
+import com.darzee.shankh.request.Measurements;
 import com.darzee.shankh.response.MeasurementDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
@@ -20,18 +21,36 @@ import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
 @Service
 public class MensSuitImplService implements OutfitTypeService {
     @Override
-    public void setMeasurementDetailsInObject(com.darzee.shankh.request.MeasurementDetails measurementDetails, MeasurementDAO measurementDAO) {
-        measurementDAO.setLength(measurementDetails.getLength());
-        measurementDAO.setNeck(measurementDetails.getNeck());
-        measurementDAO.setShoulder(measurementDetails.getShoulder());
-        measurementDAO.setChest(measurementDetails.getChest());
-        measurementDAO.setWaist(measurementDetails.getWaist());
-        measurementDAO.setSeat(measurementDetails.getSeat());
-        measurementDAO.setSleeveLength(measurementDetails.getSleeveLength());
-        measurementDAO.setSleeveCircumference(measurementDetails.getSleeveCircumference());
-        measurementDAO.setKnee(measurementDetails.getKnee());
-        measurementDAO.setBottom(measurementDetails.getBottom());
-        measurementDAO.setFly(measurementDetails.getFly());
+    public void setMeasurementDetailsInObject(Measurements measurementDetails, MeasurementDAO measurementDAO, MeasurementScale scale) {
+        Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
+        measurementDAO.setShirtLength(measurementDetails.getShirtLength()*multiplyingFactor);
+        measurementDAO.setNeck(measurementDetails.getNeck()*multiplyingFactor);
+        measurementDAO.setShoulder(measurementDetails.getShoulder()*multiplyingFactor);
+        measurementDAO.setChest(measurementDetails.getChest()*multiplyingFactor);
+        measurementDAO.setWaist(measurementDetails.getWaist()*multiplyingFactor);
+        measurementDAO.setSeat(measurementDetails.getSeat()*multiplyingFactor);
+        measurementDAO.setSleeveLength(measurementDetails.getSleeveLength()*multiplyingFactor);
+        measurementDAO.setSleeveCircumference(measurementDetails.getSleeveCircumference()*multiplyingFactor);
+        measurementDAO.setCalf(measurementDetails.getCalf()*multiplyingFactor);
+        measurementDAO.setBottom(measurementDetails.getBottom()*multiplyingFactor);
+        measurementDAO.setPantLength(measurementDetails.getPantLength()*multiplyingFactor);
+        measurementDAO.setFly(measurementDetails.getFly()*multiplyingFactor);
+    }
+
+    @Override
+    public boolean haveMandatoryParams(Measurements measurementDetails) {
+        return measurementDetails.getShirtLength() != null &&
+                measurementDetails.getNeck() != null &&
+                measurementDetails.getShoulder() != null &&
+                measurementDetails.getChest() != null &&
+                measurementDetails.getWaist() != null &&
+                measurementDetails.getSeat() != null &&
+                measurementDetails.getSleeveLength() != null &&
+                measurementDetails.getSleeveCircumference() != null &&
+                measurementDetails.getCalf() != null &&
+                measurementDetails.getBottom() != null &&
+                measurementDetails.getFly() != null &&
+                measurementDetails.getPantLength() != null;
     }
 
     @Override
@@ -46,7 +65,7 @@ public class MensSuitImplService implements OutfitTypeService {
 
     private OverallMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementDAO measurementDAO, MeasurementScale scale) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
+        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
 
@@ -67,7 +86,7 @@ public class MensSuitImplService implements OutfitTypeService {
 
     private OverallMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementDAO measurementDAO, MeasurementScale scale) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
+        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
 

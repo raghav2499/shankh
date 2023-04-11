@@ -53,7 +53,7 @@ public class BucketService {
                 imageReferenceRepo.findAllByReferenceIdIn(fileReferenceIds),
                 mapper::imageReferenceToImageReferenceDAO);
         List<String> shortLivedUrls = imageReferences.stream()
-                .map(imageReference -> client.downloadFile(imageReference.getImageName()))
+                .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName()))
                 .collect(Collectors.toList());
         return new DownloadImageResponse(shortLivedUrls);
 

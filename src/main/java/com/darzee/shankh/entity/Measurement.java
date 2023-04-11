@@ -106,6 +106,9 @@ public class Measurement extends GenericEntity {
     @Column(name = "gown_length")
     private Double gownLength;
 
+    @Column(name = "apex_to_apex_length")
+    private Double apexToApexLength;
+
     @OneToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;

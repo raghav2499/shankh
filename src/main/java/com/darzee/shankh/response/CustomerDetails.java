@@ -10,12 +10,11 @@ public class CustomerDetails {
     private String customerName;
     private String phoneNumber;
 
-    public CustomerDetails(String customerName, String phoneNumber) {
+    private String profilePicLink;
+
+    public CustomerDetails(String customerName, String phoneNumber, String profilePicLink) {
         this.customerName = customerName;
         this.phoneNumber = phoneNumber;
-    }
-
-    public Character getFirstLetter() {
-        return this.customerName.charAt(0);
+        this.profilePicLink = profilePicLink;
     }
 }

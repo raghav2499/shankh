@@ -5,12 +5,12 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-@Table(name = "shop_images")
+@Table(name = "object_images")
 @Entity
 @Getter
 @Setter
 @SequenceGenerator(name = "shop-images-seq", sequenceName = "shop_images_seq", allocationSize = 1)
-public class BoutiqueImages extends GenericEntity {
+public class ObjectImages extends GenericEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "shop-images-seq")
@@ -23,7 +23,9 @@ public class BoutiqueImages extends GenericEntity {
     @Column(name = "is_valid")
     private Boolean isValid;
 
-    @ManyToOne
-    @JoinColumn(name = "boutique_id")
-    private Boutique boutique;
+    @Column(name = "entity_type")
+    private String entityType;
+
+    @Column(name = "entity_id")
+    private Long entityId;
 }

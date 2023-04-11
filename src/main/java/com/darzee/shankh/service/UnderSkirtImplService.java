@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
+import com.darzee.shankh.request.Measurements;
 import com.darzee.shankh.response.MeasurementDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
@@ -19,15 +20,22 @@ import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
 @Service
 public class UnderSkirtImplService implements OutfitTypeService {
     @Override
-    public void setMeasurementDetailsInObject(com.darzee.shankh.request.MeasurementDetails measurementDetails, MeasurementDAO measurementDAO) {
-        measurementDAO.setWaist(measurementDetails.getWaist());
-        measurementDAO.setLength(measurementDetails.getLength());
+    public void setMeasurementDetailsInObject(Measurements measurementDetails, MeasurementDAO measurementDAO, MeasurementScale scale) {
+        Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
+        measurementDAO.setWaist(measurementDetails.getWaist()*multiplyingFactor);
+        measurementDAO.setLength(measurementDetails.getLength()*multiplyingFactor);
     }
+
+    @Override
+    public boolean haveMandatoryParams(Measurements measurementDetails) {
+        return measurementDetails.getWaist() != null && measurementDetails.getLength() != null;
+    }
+
     @Override
     public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale, String view) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_FACTOR : 1;
+        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 
         measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getWaist()).orElse(defaultValue)/dividingFactor)));
