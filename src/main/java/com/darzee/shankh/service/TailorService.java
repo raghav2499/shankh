@@ -164,9 +164,9 @@ public class TailorService {
     }
 
     public ResponseEntity deleteProfile(String phoneNumber) {
-        Optional<Customer> customer = customerRepo.findByPhoneNumber(phoneNumber);
-        if(customer.isPresent()) {
-            customerRepo.delete(customer.get());
+        Optional<Tailor> tailor = tailorRepo.findByPhoneNumber(phoneNumber);
+        if(tailor.isPresent()) {
+            tailorRepo.delete(tailor.get());
             return new ResponseEntity("success", HttpStatus.OK);
         }
         return new ResponseEntity("No profile found", HttpStatus.OK);
