@@ -89,8 +89,8 @@ public class OrderService {
     private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
         String invoiceNo = generateOrderInvoiceNo();
         OrderDAO orderDAO = new OrderDAO(orderDetails.getTrialDate(), orderDetails.getDeliveryDate(),
-                orderDetails.getOutfitType(), orderDetails.getSpecialInstructions(), orderDetails.getInspiration(),
-                orderDetails.getOrderType(), invoiceNo, boutiqueDAO, customerDAO);
+                OutfitType.getOutfitOrdinalEnumMap().get(orderDetails.getOutfitType()), orderDetails.getSpecialInstructions(),
+                orderDetails.getInspiration(), orderDetails.getOrderType(), invoiceNo, boutiqueDAO, customerDAO);
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
