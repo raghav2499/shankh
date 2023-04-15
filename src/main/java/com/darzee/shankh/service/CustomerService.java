@@ -60,7 +60,8 @@ public class CustomerService {
                                 + " "
                                 + customer.getLastName(),
                                 customer.getPhoneNumber(),
-                                getCustomerProfilePicLink(customer.getImageReferenceId())))
+                                getCustomerProfilePicLink(customer.getImageReferenceId()),
+                                customer.getId()))
                 .collect(Collectors.toList());
 
         return new ResponseEntity(new GetCustomersResponse(customerDetails), HttpStatus.OK);

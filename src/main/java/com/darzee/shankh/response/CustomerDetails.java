@@ -8,13 +8,16 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CustomerDetails {
     private String customerName;
+
+    private Long customerId;
     private String phoneNumber;
 
     private String profilePicLink;
 
-    public CustomerDetails(String customerName, String phoneNumber, String profilePicLink) {
+    public CustomerDetails(String customerName, String phoneNumber, String profilePicLink, Long customerId) {
         this.customerName = customerName;
         this.phoneNumber = phoneNumber;
         this.profilePicLink = profilePicLink;
+        this.customerId = customerId;
     }
 }
