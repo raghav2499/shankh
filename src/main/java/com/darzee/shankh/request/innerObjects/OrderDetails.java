@@ -24,7 +24,7 @@ public class OrderDetails {
     @NotNull(message = "delivery_date cannot be null")
     private LocalDateTime deliveryDate;
     @NotNull(message = "Either outfit_type is not present or is invalid")
-    private Long outfitType;
+    private Integer outfitType;
     @NotNull(message = "Either order_type is not present or is invalid")
     private OrderType orderType;
     private List<String> clothImageReferenceIds;
