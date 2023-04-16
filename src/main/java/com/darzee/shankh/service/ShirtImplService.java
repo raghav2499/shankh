@@ -3,8 +3,10 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
+import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.request.Measurements;
 import com.darzee.shankh.response.MeasurementDetails;
+import com.darzee.shankh.response.OutfitDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
 import org.springframework.stereotype.Service;
@@ -61,6 +63,13 @@ public class ShirtImplService implements OutfitTypeService {
         overallMeasurementDetails.setOutfitImageLink(SHIRT_OUTFIT_IMAGE_LINK);
         overallMeasurementDetails.setOutfitTypeHeading(SHIRT_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
+    }
+
+    @Override
+    public OutfitDetails getOutfitDetails() {
+        OutfitType outfitType = OutfitType.SHIRT;
+        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), Constants.OutfitType.SHIRT_TITLE,
+                Constants.OutfitType.OUTFIT_TYPE_SHIRT_LINK, 1);
     }
 
     private MeasurementDetails addLength(String value) {

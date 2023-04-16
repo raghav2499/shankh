@@ -4,8 +4,10 @@ import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.MeasurementView;
+import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.request.Measurements;
 import com.darzee.shankh.response.MeasurementDetails;
+import com.darzee.shankh.response.OutfitDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
 import org.springframework.stereotype.Service;
@@ -108,6 +110,12 @@ public class LadiesSuitImplService implements OutfitTypeService {
         overallMeasurementDetails.setOutfitImageLink(LADIES_SUIT_LOWER_IMAGE_LINK);
         overallMeasurementDetails.setOutfitTypeHeading(LADIES_SUIT_SALWAR_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
+    }
+    @Override
+    public OutfitDetails getOutfitDetails() {
+        OutfitType outfitType = OutfitType.LADIES_SUIT;
+        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), Constants.OutfitType.LADIES_SUIT_TITLE,
+                Constants.OutfitType.OUTFIT_TYPE_LADIES_SUIT_LINK, 2);
     }
 
     private MeasurementDetails addKameezLength(String value) {

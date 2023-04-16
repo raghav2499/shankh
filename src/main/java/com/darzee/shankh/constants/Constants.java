@@ -236,6 +236,28 @@ public class Constants {
         public static final String LADIES_SUIT_SALWAR_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Salwar+kameez/salwar/pajama_len.svg";
 
     }
+    public class OutfitType {
+        public static final String KURTA_PYJAMA_TITLE = "Men's Kurta Pajama";
+        public static final String DRESS_TITLE = "Dress";
+        public static final String SAREE_BLOUSE_TITLE = "Saree Blouse";
+        public static final String MENS_SUIT_TITLE = "Men's Suit";
+        public static final String PANTS_TITLE = "Pant";
+        public static final String NIGHT_GOWN_TITLE = "Night Gown";
+        public static final String LADIES_SUIT_TITLE = "Ladies Suit";
+        public static final String SHIRT_TITLE = "Shirt";
+        public static final String UNDER_SKIRT_TITLE = "Under Skirt";
+        public static final String OUTFIT_TYPE_KURTA_PYJAMA_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/Mens'+kurta.svg";
+        public static final String OUTFIT_TYPE_DRESS_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/dress.svg";
+        public static final String OUTFIT_TYPE_SAREE_BLOUSE_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/saree+blouse.svg";
+        public static final String OUTFIT_TYPE_MENS_SUIT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/mens+suit.svg";
+        public static final String OUTFIT_TYPE_PANT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/pants.svg";
+        public static final String OUTFIT_TYPE_NIGHT_GOWN_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/night+gown.svg";
+        public static final String OUTFIT_TYPE_LADIES_SUIT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/womens+suit.svg";
+        public static final String OUTFIT_TYPE_SHIRT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/shirt.svg";
+        public static final String OUTFIT_TYPE_UNDER_SKIRT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/underskirt.svg";
+
+
+    }
 
 
 }

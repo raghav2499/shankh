@@ -21,8 +21,8 @@ public enum OutfitType {
     PANTS("pants", 5),
     @JsonProperty("night_gown")
     EVENING_GOWN("night_gown", 6),
-    @JsonProperty("salwar_kameez")
-    LADIES_SUIT("salwar_kameez", 7),
+    @JsonProperty("ladies_suit")
+    LADIES_SUIT("ladies_suit", 7),
     @JsonProperty("shirt")
     SHIRT("shirt", 8),
     @JsonProperty("under_skirt")
@@ -37,6 +37,10 @@ public enum OutfitType {
 
     public String getName() {
         return this.name;
+    }
+
+    public Integer getOrdinal() {
+        return this.ordinal;
     }
 
 

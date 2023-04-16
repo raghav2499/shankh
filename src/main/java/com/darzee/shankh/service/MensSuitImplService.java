@@ -4,8 +4,10 @@ import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.MeasurementView;
+import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.request.Measurements;
 import com.darzee.shankh.response.MeasurementDetails;
+import com.darzee.shankh.response.OutfitDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
 import org.springframework.stereotype.Service;
@@ -82,6 +84,12 @@ public class MensSuitImplService implements OutfitTypeService {
         overallMeasurementDetails.setOutfitImageLink(MENS_SUIT_UPPER_OUTFIT_IMAGE_LINK);
         overallMeasurementDetails.setOutfitTypeHeading(MENS_SUIT_TOP_OUTFIT_TYPE_HEADING);
         return overallMeasurementDetails;
+    }
+    @Override
+    public OutfitDetails getOutfitDetails() {
+        OutfitType outfitType = OutfitType.MENS_SUIT;
+        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), Constants.OutfitType.MENS_SUIT_TITLE,
+                Constants.OutfitType.OUTFIT_TYPE_MENS_SUIT_LINK, 2);
     }
 
     private OverallMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementDAO measurementDAO, MeasurementScale scale) {
