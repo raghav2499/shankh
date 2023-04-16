@@ -4,7 +4,6 @@ import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
 import com.darzee.shankh.dao.ObjectImagesDAO;
 import com.darzee.shankh.dao.TailorDAO;
-import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.Tailor;
 import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.enums.TailorRole;

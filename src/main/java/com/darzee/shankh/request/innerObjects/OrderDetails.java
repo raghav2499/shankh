@@ -1,7 +1,6 @@
 package com.darzee.shankh.request.innerObjects;
 
 import com.darzee.shankh.enums.OrderType;
-import com.darzee.shankh.enums.OutfitType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
