@@ -18,7 +18,9 @@ import com.darzee.shankh.response.CreateCustomerResponse;
 import com.darzee.shankh.response.CustomerDetails;
 import com.darzee.shankh.response.GetCustomerResponse;
 import com.darzee.shankh.response.GetCustomersResponse;
+import com.darzee.shankh.utils.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +48,7 @@ public class CustomerService {
 
     @Autowired
     private DaoEntityMapper mapper;
+
     @Autowired
     private BoutiqueLedgerRepo boutiqueLedgerRepo;
 
@@ -56,9 +59,7 @@ public class CustomerService {
         List<CustomerDetails> customerDetails = boutiqueCustomers
                 .stream()
                 .map(customer ->
-                        new CustomerDetails(customer.getFirstName()
-                                + " "
-                                + customer.getLastName(),
+                        new CustomerDetails(CommonUtils.constructName(customer.getFirstName(), customer.getLastName()),
                                 customer.getPhoneNumber(),
                                 getCustomerProfilePicLink(customer.getImageReferenceId()),
                                 customer.getId()))
@@ -86,35 +87,32 @@ public class CustomerService {
                 response.setMessage("Customer already registered");
                 return new ResponseEntity(response, HttpStatus.OK);
             }
+
             BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(),
                     new CycleAvoidingMappingContext());
-            String name = request.getName();
-
-            String[] nameArray = name.split(" ");
-            String firstName = nameArray[0];
-            String lastName = null;
-            if (nameArray.length > 1) {
-                lastName = nameArray[nameArray.length - 1];
-            }
-            CustomerDAO customerDAO = new CustomerDAO(request.getAge(), request.getPhoneNumber(), firstName, lastName,
-                    request.getGender(), request.getCustomerImageReferenceId(), boutiqueDAO);
+            ImmutablePair<String, String> name = getCustomerNameFromRequest(request.getName());
+            CustomerDAO customerDAO = new CustomerDAO(request.getAge(), request.getPhoneNumber(), name.getKey(),
+                    name.getValue(), request.getGender(), request.getCustomerImageReferenceId(), boutiqueDAO);
             customerDAO = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customerDAO,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
-            response = new CreateCustomerResponse(customerDAO.getId(), customerDAO.getFirstName(),
-                    customerDAO.getLastName(), "Customer created successfully");
+
+            String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+            response = new CreateCustomerResponse(customerName, customerDAO.getPhoneNumber(), "",
+                    customerDAO.getId(), "Customer created successfully");
             return new ResponseEntity(response, HttpStatus.CREATED);
         }
+
         response.setMessage("This boutique is not enrolled with us");
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
     private String getCustomerProfilePicLink(String customerImageReferenceId) {
-        if(StringUtils.isBlank(customerImageReferenceId)) {
+        if (StringUtils.isBlank(customerImageReferenceId)) {
             return "";
         }
         Optional<ImageReference> optionalImageReference = imageReferenceRepo.findByReferenceId(customerImageReferenceId);
-        if(optionalImageReference.isPresent()) {
+        if (optionalImageReference.isPresent()) {
             ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(optionalImageReference.get());
             String fileName = imageReferenceDAO.getImageName();
             return s3Client.generateShortLivedUrl(fileName);
@@ -122,5 +120,15 @@ public class CustomerService {
         return "";
     }
 
+    private ImmutablePair<String, String> getCustomerNameFromRequest(String name) {
+
+        String[] nameArray = name.split(" ");
+        String firstName = nameArray[0];
+        String lastName = null;
+        if (nameArray.length > 1) {
+            lastName = nameArray[nameArray.length - 1];
+        }
+        return new ImmutablePair(firstName, lastName);
+    }
 
 }

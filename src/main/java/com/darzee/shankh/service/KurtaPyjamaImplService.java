@@ -5,11 +5,14 @@ import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.MeasurementView;
 import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.Measurements;
+import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.MeasurementDetails;
 import com.darzee.shankh.response.OutfitDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,24 +25,58 @@ import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
 
 @Service
 public class KurtaPyjamaImplService implements OutfitTypeService {
+
+    @Autowired
+    private DaoEntityMapper mapper;
+
     @Override
     public void setMeasurementDetailsInObject(Measurements measurementDetails, MeasurementDAO measurementDAO, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        measurementDAO.setKurtaLength(measurementDetails.getKurtaLength()*multiplyingFactor);
-        measurementDAO.setShoulder(measurementDetails.getShoulder()*multiplyingFactor);
-        measurementDAO.setUpperChest(measurementDetails.getUpperChest()*multiplyingFactor);
-        measurementDAO.setBust(measurementDetails.getBust()*multiplyingFactor);
-        measurementDAO.setWaist(measurementDetails.getWaist()*multiplyingFactor);
-        measurementDAO.setSeat(measurementDetails.getSeat()*multiplyingFactor);
-        measurementDAO.setArmHole(measurementDetails.getArmHole()*multiplyingFactor);
-        measurementDAO.setSleeveLength(measurementDetails.getSleeveLength()*multiplyingFactor);
-        measurementDAO.setSleeveCircumference(measurementDetails.getSleeveCircumference()*multiplyingFactor);
-        measurementDAO.setFrontNeckDepth(measurementDetails.getFrontNeckDepth()*multiplyingFactor);
-        measurementDAO.setBackNeckDepth(measurementDetails.getBackNeckDepth()*multiplyingFactor);
-        measurementDAO.setPyjamaLength(measurementDetails.getPyjamaLength()*multiplyingFactor);
-        measurementDAO.setPyjamaHip(measurementDetails.getPyjamaHip()*multiplyingFactor);
-        measurementDAO.setKnee(measurementDetails.getKnee()*multiplyingFactor);
-        measurementDAO.setAnkle(measurementDetails.getAnkle()*multiplyingFactor);
+        if (measurementDetails.getKurtaLength() != null) {
+            measurementDAO.setKurtaLength(measurementDetails.getKurtaLength() * multiplyingFactor);
+        }
+        if (measurementDetails.getShoulder() != null) {
+            measurementDAO.setShoulder(measurementDetails.getShoulder() * multiplyingFactor);
+        }
+        if (measurementDetails.getUpperChest() != null) {
+            measurementDAO.setUpperChest(measurementDetails.getUpperChest() * multiplyingFactor);
+        }
+        if (measurementDetails.getBust() != null) {
+            measurementDAO.setBust(measurementDetails.getBust() * multiplyingFactor);
+        }
+        if (measurementDetails.getWaist() != null) {
+            measurementDAO.setWaist(measurementDetails.getWaist() * multiplyingFactor);
+        }
+        if (measurementDetails.getSeat() != null) {
+            measurementDAO.setSeat(measurementDetails.getSeat() * multiplyingFactor);
+        }
+        if (measurementDetails.getArmHole() != null) {
+            measurementDAO.setArmHole(measurementDetails.getArmHole() * multiplyingFactor);
+        }
+        if (measurementDetails.getSleeveLength() != null) {
+            measurementDAO.setSleeveLength(measurementDetails.getSleeveLength() * multiplyingFactor);
+        }
+        if (measurementDetails.getSleeveCircumference() != null) {
+            measurementDAO.setSleeveCircumference(measurementDetails.getSleeveCircumference() * multiplyingFactor);
+        }
+        if (measurementDetails.getFrontNeckDepth() != null) {
+            measurementDAO.setFrontNeckDepth(measurementDetails.getFrontNeckDepth() * multiplyingFactor);
+        }
+        if (measurementDetails.getBackNeckDepth() != null) {
+            measurementDAO.setBackNeckDepth(measurementDetails.getBackNeckDepth() * multiplyingFactor);
+        }
+        if (measurementDetails.getPyjamaLength() != null) {
+            measurementDAO.setPyjamaLength(measurementDetails.getPyjamaLength() * multiplyingFactor);
+        }
+        if (measurementDetails.getPyjamaHip() != null) {
+            measurementDAO.setPyjamaHip(measurementDetails.getPyjamaHip() * multiplyingFactor);
+        }
+        if (measurementDetails.getKnee() != null) {
+            measurementDAO.setKnee(measurementDetails.getKnee() * multiplyingFactor);
+        }
+        if (measurementDetails.getAnkle() != null) {
+            measurementDAO.setAnkle(measurementDetails.getAnkle() * multiplyingFactor);
+        }
     }
 
     @Override
@@ -62,16 +99,21 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale, String viewString) {
-        MeasurementView view = Optional.ofNullable(MeasurementView.getEnumMap().get(Optional.ofNullable(viewString)))
-                .orElse(MeasurementView.TOP);
-        OverallMeasurementDetails overallMeasurementDetails  = MeasurementView.TOP.equals(view)
-                ? setMeasurementDetailsInObjectTop(measurementDAO, scale)
-                : setMeasurementDetailsInObjectBottom(measurementDAO, scale);
+    public boolean areMandatoryParamsSet(MeasurementDAO measurementDAO) {
+        Measurements measurements = mapper.measurementDaoToMeasurement(measurementDAO);
+        return haveMandatoryParams(measurements);
+    }
 
-
+    @Override
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale) {
+        OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
+        List<InnerMeasurementDetails>  innerMeasurementDetails = new ArrayList<>();
+        innerMeasurementDetails.add(setMeasurementDetailsInObjectTop(measurementDAO, scale));
+        innerMeasurementDetails.add(setMeasurementDetailsInObjectBottom(measurementDAO, scale));
+        overallMeasurementDetails.setInnerMeasurementDetails(innerMeasurementDetails);
         return overallMeasurementDetails;
     }
+
     @Override
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.KURTA_PYJAMA;
@@ -79,45 +121,45 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
                 Constants.OutfitType.OUTFIT_TYPE_KURTA_PYJAMA_LINK, 2);
     }
 
-    private OverallMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementDAO measurementDAO, MeasurementScale scale) {
-        OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
+    private InnerMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementDAO measurementDAO, MeasurementScale scale) {
+        InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
 
-        measurementDetailsResponseList.add(addKurtaLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getKurtaLength()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addShoulder(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShoulder()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addUpperChest(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getUpperChest()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addBust(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBust()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getWaist()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSeat()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addArmHole(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getArmHole()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addSleeveLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveLength()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addSleeveCircumference(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveCircumference()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addFrontNeckDepth(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getFrontNeckDepth()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addBackNeckDepth(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBackNeckDepth()).orElse(defaultValue)/dividingFactor)));
+        measurementDetailsResponseList.add(addKurtaLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getKurtaLength()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addShoulder(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShoulder()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addUpperChest(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getUpperChest()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addBust(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBust()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getWaist()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSeat()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addArmHole(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getArmHole()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addSleeveLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveLength()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addSleeveCircumference(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveCircumference()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addFrontNeckDepth(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getFrontNeckDepth()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addBackNeckDepth(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBackNeckDepth()).orElse(defaultValue) / dividingFactor)));
 
-        overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
-        overallMeasurementDetails.setOutfitImageLink(KURTA_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitTypeHeading(MENS_KURTA_OUTFIT_TYPE_HEADING);
-        return overallMeasurementDetails;
+        innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
+        innerMeasurementDetails.setOutfitImageLink(KURTA_OUTFIT_IMAGE_LINK);
+        innerMeasurementDetails.setOutfitTypeHeading(MENS_KURTA_OUTFIT_TYPE_HEADING);
+        return innerMeasurementDetails;
     }
 
-    private OverallMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementDAO measurementDAO, MeasurementScale scale) {
-        OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
+    private InnerMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementDAO measurementDAO, MeasurementScale scale) {
+        InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
 
-        measurementDetailsResponseList.add(addPyjamaLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPyjamaLength()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addPyjamaHip(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPyjamaHip()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addKnee(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getKnee()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addAnkle(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getAnkle()).orElse(defaultValue)/dividingFactor)));
+        measurementDetailsResponseList.add(addPyjamaLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPyjamaLength()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addPyjamaHip(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPyjamaHip()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addKnee(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getKnee()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addAnkle(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getAnkle()).orElse(defaultValue) / dividingFactor)));
 
-        overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
-        overallMeasurementDetails.setOutfitImageLink(PYJAMA_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitTypeHeading(MENS_PYJAMA_OUTFIT_TYPE_HEADING);
-        return overallMeasurementDetails;
+        innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
+        innerMeasurementDetails.setOutfitImageLink(PYJAMA_OUTFIT_IMAGE_LINK);
+        innerMeasurementDetails.setOutfitTypeHeading(MENS_PYJAMA_OUTFIT_TYPE_HEADING);
+        return innerMeasurementDetails;
     }
 
     private MeasurementDetails addKurtaLength(String value) {

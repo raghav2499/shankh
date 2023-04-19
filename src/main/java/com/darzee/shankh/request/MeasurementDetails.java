@@ -5,9 +5,15 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MeasurementDetails {
+    @NotNull(message = "customer_id is mandatory for saving measurement")
+    private Long customerId;
+    @NotNull(message = "outfit_type is mandatory for saving measurement")
+    private Integer outfitType;
     private MeasurementScale scale;
     private Measurements measurements;
 }

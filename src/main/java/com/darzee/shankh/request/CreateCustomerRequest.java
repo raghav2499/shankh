@@ -13,12 +13,14 @@ import javax.validation.constraints.Size;
 public class CreateCustomerRequest {
     private Integer age;
 
-    @NotNull(message = "Phone number is mandotaory for app sign up")
+    @NotNull(message = "Customer's phone number is mandatory ")
     @Size(min=10, max=10, message = "Invalid phone number")
     private String phoneNumber;
     private String countryCode;
+    @NotNull(message = "Customer's name is mandatory")
     private String name;
     private Gender gender;
     private String customerImageReferenceId;
+    @NotNull(message = "Boutique id is mandatory for creating customer")
     private Long boutiqueId;
 }

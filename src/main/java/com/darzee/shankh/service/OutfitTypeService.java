@@ -10,7 +10,9 @@ public interface OutfitTypeService {
     public void setMeasurementDetailsInObject(Measurements measurementDetails, MeasurementDAO measurementDAO, MeasurementScale scale);
 
     public boolean haveMandatoryParams(Measurements measurementDetails);
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale, String view);
+
+    public boolean areMandatoryParamsSet(MeasurementDAO measurementDAO);
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale);
 
     public OutfitDetails getOutfitDetails();
 }

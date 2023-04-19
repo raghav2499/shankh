@@ -7,20 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@AllArgsConstructor
-@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OverallMeasurementDetails {
-
+@NoArgsConstructor
+@AllArgsConstructor
+public class CreateMeasurementResponse {
     private String message;
-    private List<InnerMeasurementDetails> innerMeasurementDetails;
-
-
-    public OverallMeasurementDetails(String message) {
-        this.message = message;
-    }
+    private Long customerId;
+    private Long measurementId;
 }

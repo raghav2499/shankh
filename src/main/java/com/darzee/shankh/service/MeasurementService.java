@@ -1,15 +1,18 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.dao.CustomerDAO;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.Measurement;
 import com.darzee.shankh.enums.MeasurementScale;
-import com.darzee.shankh.enums.MeasurementView;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.CustomerRepo;
 import com.darzee.shankh.repo.MeasurementRepo;
+import com.darzee.shankh.request.MeasurementDetails;
+import com.darzee.shankh.request.Measurements;
+import com.darzee.shankh.response.CreateMeasurementResponse;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,34 +35,66 @@ public class MeasurementService {
     @Autowired
     private CustomerRepo customerRepo;
 
-    public ResponseEntity getMeasurementDetails(Long customerId, String outfitTypeString, String scale, String view)
+    public ResponseEntity getMeasurementDetails(Long customerId, String outfitTypeString, String scale)
             throws Exception {
-        validateGetMeasurementRequestParams(outfitTypeString, scale, view);
+        validateGetMeasurementRequestParams(outfitTypeString, scale);
 
         OutfitType outfitType = OutfitType.getOutfitEnumMap().get(outfitTypeString);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         Optional<Customer> customer = customerRepo.findById(customerId);
+        OverallMeasurementDetails overallMeasurementDetails = null;
         if (customer.isPresent()) {
             Measurement measurement = Optional.ofNullable(measurementRepo.findByCustomerId(customerId)).orElse(new Measurement());
             MeasurementDAO measurementDAO = mapper.measurementObjectToDAO(measurement,
                     new CycleAvoidingMappingContext());
             MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
-            OverallMeasurementDetails overallMeasurementDetails = outfitTypeService.setMeasurementDetails(measurementDAO, measurementScale, view);
-            overallMeasurementDetails.setMessage("Measurement details fetched sucessfully");
+            overallMeasurementDetails = outfitTypeService.setMeasurementDetails(measurementDAO, measurementScale);
+            overallMeasurementDetails.setMessage(getMeasurementDetailsMessage(outfitTypeService.areMandatoryParamsSet(measurementDAO)));
             return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);
         }
 
-        OverallMeasurementDetails response = new OverallMeasurementDetails("customer_id is invalid");
-        return new ResponseEntity(response, HttpStatus.OK);
+        overallMeasurementDetails = new OverallMeasurementDetails("customer_id is invalid");
+        return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);
     }
 
-    private void validateGetMeasurementRequestParams(String outfitTypeString, String scale, String view) {
-        if(!OutfitType.getOutfitEnumMap().containsKey(outfitTypeString)) {
+    public ResponseEntity setMeasurementDetails(MeasurementDetails measurementDetails) throws Exception {
+        Measurements measurements = measurementDetails.getMeasurements();
+        Optional<Customer> optionalCustomer = customerRepo.findById(measurementDetails.getCustomerId());
+        if (optionalCustomer.isPresent()) {
+            CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
+            MeasurementDAO measurementDAO = Optional.ofNullable(customerDAO.getMeasurement()).orElse(new MeasurementDAO());
+            OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(measurementDetails.getOutfitType());
+            OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
+            outfitTypeService.setMeasurementDetailsInObject(measurements, measurementDAO, measurementDetails.getScale());
+            measurementDAO.setCustomer(customerDAO);
+            measurementDAO = mapper.measurementObjectToDAO(measurementRepo.save(mapper.measurementDAOToObject(measurementDAO,
+                            new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext());
+            CreateMeasurementResponse response = generateCreateMeasurementResponse(measurementDAO, customerDAO.getId());
+
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer id is invalid");
+    }
+
+    private String getMeasurementDetailsMessage(boolean haveMandatoryParamsSet) {
+        String message = haveMandatoryParamsSet
+                ? "Measurement details fetched sucessfully"
+                : "Measurement details not found";
+        return message;
+    }
+
+    private void validateGetMeasurementRequestParams(String outfitTypeString, String scale) {
+        if (!OutfitType.getOutfitEnumMap().containsKey(outfitTypeString)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Outfit Type not supported");
         } else if (scale != null && !MeasurementScale.getEnumMap().containsKey(scale)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Measurement Scale");
-        } else if (view != null && !MeasurementView.getEnumMap().containsKey(view)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Measurement View");
         }
+    }
+
+    private CreateMeasurementResponse generateCreateMeasurementResponse(MeasurementDAO measurementDAO, Long customerId) {
+        String successMessage = "Measurement details saved successfully";
+        CreateMeasurementResponse response = new CreateMeasurementResponse(successMessage, customerId, measurementDAO.getId());
+        return response;
     }
 }

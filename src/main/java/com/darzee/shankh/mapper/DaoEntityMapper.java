@@ -2,6 +2,7 @@ package com.darzee.shankh.mapper;
 
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.*;
+import com.darzee.shankh.request.Measurements;
 import com.darzee.shankh.response.GetCustomerResponse;
 import com.darzee.shankh.response.TailorLoginResponse;
 import org.mapstruct.Context;
@@ -38,6 +39,8 @@ public interface DaoEntityMapper {
     Measurement measurementDAOToObject(MeasurementDAO measurement, @Context CycleAvoidingMappingContext context);
 
     MeasurementDAO measurementObjectToDAO(Measurement measurement, @Context CycleAvoidingMappingContext context);
+
+    Measurements measurementDaoToMeasurement(MeasurementDAO measurementDAO);
 
     ObjectImages objectImageDAOToObjectImage(ObjectImagesDAO objectImages);
     @Mapping(source = "tailorDAO.id", target = "tailorId")

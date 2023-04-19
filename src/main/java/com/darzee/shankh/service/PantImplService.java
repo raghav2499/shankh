@@ -4,14 +4,18 @@ import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.Measurements;
+import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.MeasurementDetails;
 import com.darzee.shankh.response.OutfitDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,16 +24,32 @@ import static com.darzee.shankh.constants.Constants.ImageLinks.*;
 import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
 
 @Service
-public class PantImplService implements OutfitTypeService{
+public class PantImplService implements OutfitTypeService {
+
+    @Autowired
+    private DaoEntityMapper mapper;
+
     @Override
     public void setMeasurementDetailsInObject(Measurements measurementDetails, MeasurementDAO measurementDAO, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        measurementDAO.setWaist(measurementDetails.getWaist()*multiplyingFactor);
-        measurementDAO.setSeat(measurementDetails.getSeat()*multiplyingFactor);
-        measurementDAO.setCalf(measurementDetails.getCalf()*multiplyingFactor);
-        measurementDAO.setBottom(measurementDetails.getBottom()*multiplyingFactor);
-        measurementDAO.setLength(measurementDetails.getLength()*multiplyingFactor);
-        measurementDAO.setFly(measurementDetails.getFly()*multiplyingFactor);
+        if (measurementDetails.getWaist() != null) {
+            measurementDAO.setWaist(measurementDetails.getWaist() * multiplyingFactor);
+        }
+        if (measurementDetails.getSeat() != null) {
+            measurementDAO.setSeat(measurementDetails.getSeat() * multiplyingFactor);
+        }
+        if (measurementDetails.getCalf() != null) {
+            measurementDAO.setCalf(measurementDetails.getCalf() * multiplyingFactor);
+        }
+        if (measurementDetails.getBottom() != null) {
+            measurementDAO.setBottom(measurementDetails.getBottom() * multiplyingFactor);
+        }
+        if (measurementDetails.getLength() != null) {
+            measurementDAO.setLength(measurementDetails.getLength() * multiplyingFactor);
+        }
+        if (measurementDetails.getFly() != null) {
+            measurementDAO.setFly(measurementDetails.getFly() * multiplyingFactor);
+        }
     }
 
     @Override
@@ -40,24 +60,33 @@ public class PantImplService implements OutfitTypeService{
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale, String view) {
+    public boolean areMandatoryParamsSet(MeasurementDAO measurementDAO) {
+        Measurements measurements = mapper.measurementDaoToMeasurement(measurementDAO);
+        return haveMandatoryParams(measurements);
+    }
+
+    @Override
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
+        InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 
-        measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getWaist()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSeat()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addCalf(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getCalf()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addBottom(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottom()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPantLength()).orElse(defaultValue)/dividingFactor)));
-        measurementDetailsResponseList.add(addFly(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getFly()).orElse(defaultValue)/dividingFactor)));
+        measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getWaist()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSeat()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addCalf(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getCalf()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addBottom(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottom()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPantLength()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addFly(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getFly()).orElse(defaultValue) / dividingFactor)));
 
-        overallMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
-        overallMeasurementDetails.setOutfitImageLink(PANTS_OUTFIT_IMAGE_LINK);
-        overallMeasurementDetails.setOutfitTypeHeading(PANTS_OUTFIT_TYPE_HEADING);
+        innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
+        innerMeasurementDetails.setOutfitImageLink(PANTS_OUTFIT_IMAGE_LINK);
+        innerMeasurementDetails.setOutfitTypeHeading(PANTS_OUTFIT_TYPE_HEADING);
+        overallMeasurementDetails.setInnerMeasurementDetails(Arrays.asList(innerMeasurementDetails));
         return overallMeasurementDetails;
     }
+
     @Override
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.PANTS;

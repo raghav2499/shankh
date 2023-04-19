@@ -57,7 +57,6 @@ public class OrderService {
     public ResponseEntity createNewOrder(CreateOrderRequest request) throws Exception {
         OrderDetails orderDetails = request.getOrderDetails();
         OrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
-        MeasurementDetails measurementDetails = request.getMeasurementDetails();
         Optional<Customer> optionalCustomer = customerRepo.findById(orderDetails.getCustomerId());
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(orderDetails.getBoutiqueId());
         if (optionalCustomer.isPresent() && optionalBoutique.isPresent()) {
@@ -66,12 +65,7 @@ public class OrderService {
 
             OrderDAO orderDAO = setOrderSpecificDetails(orderDetails, boutiqueDAO, customerDAO);
             OrderAmountDAO orderAmountDAO = setOrderAmountSpecificDetails(orderAmountDetails, orderDAO);
-            MeasurementDAO measurementDAO = setMeasurementSpecificDetails(measurementDetails, customerDAO, orderDAO.getOutfitType());
 
-            if (customerDAO.getMeasurement() == null) {
-                customerDAO.setMeasurement(measurementDAO);
-                customerRepo.save(mapper.customerDaoToObject(customerDAO, new CycleAvoidingMappingContext()));
-            }
             boutiqueDAO.setActiveOrders(boutiqueDAO.getActiveOrders() + 1);
             boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
 
@@ -112,23 +106,6 @@ public class OrderService {
                 new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         return orderAmountDAO;
-    }
-
-    private MeasurementDAO setMeasurementSpecificDetails(MeasurementDetails measurementDetails, CustomerDAO customerDAO,
-                                                        OutfitType outfitType) throws Exception {
-        Measurements measurements = measurementDetails.getMeasurements();
-        MeasurementDAO measurementDAO = Optional.ofNullable(customerDAO.getMeasurement()).orElse(new MeasurementDAO());
-        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-        if (outfitTypeService.haveMandatoryParams(measurements)) {
-            outfitTypeService.setMeasurementDetailsInObject(measurements, measurementDAO, measurementDetails.getScale());
-            measurementDAO.setCustomer(customerDAO);
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some mandatory params for this outfit type are missing");
-        }
-        measurementDAO = mapper.measurementObjectToDAO(measurementRepo.save(mapper.measurementDAOToObject(measurementDAO,
-                        new CycleAvoidingMappingContext())),
-                new CycleAvoidingMappingContext());
-        return measurementDAO;
     }
 
     private BoutiqueLedgerDAO setBoutiqueLedgerSpecificDetails(OrderAmountDAO orderAmountDAO, Long boutiqueId) {
