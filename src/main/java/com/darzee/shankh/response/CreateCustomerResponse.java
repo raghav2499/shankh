@@ -11,11 +11,6 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
 public class CreateCustomerResponse extends CustomerDetails {
-
-    private String customerName;
-    private Long customerId;
-    private String phoneNumber;
-    private String profilePicLink;
     public String message;
 
     public CreateCustomerResponse(String customerName, String phoneNumber, String profilePicLink, Long customerId,
