@@ -84,7 +84,10 @@ public class CustomerService {
         if (optionalBoutique.isPresent()) {
             Optional<Customer> existingCustomer = customerRepo.findByPhoneNumber(request.getPhoneNumber());
             if (existingCustomer.isPresent()) {
-                response.setMessage("Customer already registered");
+                CustomerDAO customerDAO = mapper.customerObjectToDao(existingCustomer.get(), new CycleAvoidingMappingContext());
+                String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+                response = new CreateCustomerResponse(customerName, customerDAO.getPhoneNumber(), "",
+                        customerDAO.getId(),"Customer already registered");
                 return new ResponseEntity(response, HttpStatus.OK);
             }
 
