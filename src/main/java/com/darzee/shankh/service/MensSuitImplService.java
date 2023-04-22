@@ -98,6 +98,7 @@ public class MensSuitImplService implements OutfitTypeService {
         List<InnerMeasurementDetails> innerMeasurementDetails = new ArrayList<>();
         innerMeasurementDetails.add(setMeasurementDetailsInObjectTop(measurementDAO, scale));
         innerMeasurementDetails.add(setMeasurementDetailsInObjectBottom(measurementDAO, scale));
+        overallMeasurementDetails.setInnerMeasurementDetails(innerMeasurementDetails);
         return overallMeasurementDetails;
     }
 
