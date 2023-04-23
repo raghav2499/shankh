@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -29,6 +30,16 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
             response.put("message", error.get().getDefaultMessage());
         }
         return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
+    }
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
+                                                                    HttpHeaders headers,
+                                                                    HttpStatus status,
+                                                                    WebRequest request) {
+        Map<String, String> response = new HashMap<>();
+        String message = ex.getMessage();
+            response.put("message", message);
+        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
     }
 
     @Override

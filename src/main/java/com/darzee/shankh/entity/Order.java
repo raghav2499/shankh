@@ -38,7 +38,7 @@ public class Order extends GenericEntity {
     @Enumerated(EnumType.ORDINAL)
     private OrderType orderType;
 
-    @Column(name = "OutfitType")
+    @Column(name = "outfit_type")
     @Enumerated(EnumType.ORDINAL)
     private OutfitType OutfitType;
 
@@ -51,6 +51,9 @@ public class Order extends GenericEntity {
     @Column(name = "order_status")
     @Enumerated(EnumType.ORDINAL)
     private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;
+
+    @Column(name = "is_priority_order")
+    private Boolean isPriorityOrder = Boolean.FALSE;
     @ManyToOne
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;

@@ -14,4 +14,8 @@ public enum OrderType {
     OrderType(String orderType) {
         this.orderType = orderType;
     }
+
+    public String getName() {
+        return this.orderType;
+    }
 }

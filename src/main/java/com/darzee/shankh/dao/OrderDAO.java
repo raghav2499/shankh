@@ -30,6 +30,7 @@ public class OrderDAO {
     private String inspiration;
     private BoutiqueDAO boutique;
     private CustomerDAO customer;
+    private OrderAmountDAO orderAmountDAO;
 
     public OrderDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, OutfitType outfitType,
                     String specialInstructions, String inspiration, OrderType orderType, String invoiceNo,

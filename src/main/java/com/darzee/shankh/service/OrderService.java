@@ -3,27 +3,29 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
+import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.CreateOrderRequest;
-import com.darzee.shankh.request.MeasurementDetails;
-import com.darzee.shankh.request.Measurements;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.OrderDetails;
 import com.darzee.shankh.response.CreateOrderResponse;
+import com.darzee.shankh.response.OrderDetailResponse;
 import com.darzee.shankh.utils.CommonUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,9 @@ public class OrderService {
 
     @Autowired
     private DaoEntityMapper mapper;
+
+    @Autowired
+    private FilterOrderService filterOrderService;
 
     @Autowired
     private OrderRepo orderRepo;
@@ -46,6 +51,7 @@ public class OrderService {
 
     @Autowired
     private OutfitTypeObjectService outfitTypeObjectService;
+
     @Autowired
     private MeasurementRepo measurementRepo;
     @Autowired
@@ -80,6 +86,23 @@ public class OrderService {
         return new ResponseEntity<>(failureResponse, HttpStatus.OK);
     }
 
+    public ResponseEntity<List<OrderDetailResponse>> getOrder(Map<String, Object> paramsMap) {
+        Specification<Order> orderSpecification = OrderSpecificationClause.getSpecificationBasedOnFilters(paramsMap);
+        Pageable pagingCriteria = filterOrderService.getPagingCriteria(paramsMap);
+        List<Order> orderDetails = orderRepo.findAll(orderSpecification, pagingCriteria).getContent();
+        List<OrderDAO> orderDAOList = orderDetails.stream()
+                .map(order -> mapper.orderObjectToDao(order, new CycleAvoidingMappingContext()))
+                .collect(Collectors.toList());
+        List<OrderDetailResponse> orderDetailsList = orderDAOList.stream()
+                .map(order -> getOrderDetails(order))
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(orderDetailsList, HttpStatus.OK);
+    }
+
+    private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
+        return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO, orderDAO.getOrderAmountDAO());
+    }
+
     private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
         String invoiceNo = generateOrderInvoiceNo();
         OrderDAO orderDAO = new OrderDAO(orderDetails.getTrialDate(), orderDetails.getDeliveryDate(),
@@ -91,7 +114,7 @@ public class OrderService {
         Long orderId = orderDAO.getId();
         List<String> clothImageReferenceIds = orderDetails.getClothImageReferenceIds();
         List<ObjectImagesDAO> objectImagesDAOList = clothImageReferenceIds.stream()
-                .map(clothImageReferenceId -> new ObjectImagesDAO(clothImageReferenceId, ImageEntityType.ORDER.getEntityType(),orderId))
+                .map(clothImageReferenceId -> new ObjectImagesDAO(clothImageReferenceId, ImageEntityType.ORDER.getEntityType(), orderId))
                 .collect(Collectors.toList());
         objectImagesRepo.saveAll(CommonUtils.mapList(objectImagesDAOList, mapper::objectImageDAOToObjectImage));
         return orderDAO;
@@ -103,7 +126,7 @@ public class OrderService {
                 advanceRecieved, orderDAO);
         orderAmountDAO.setOrderDAO(orderDAO);
         orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
-                new CycleAvoidingMappingContext())),
+                        new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         return orderAmountDAO;
     }
@@ -115,7 +138,7 @@ public class OrderService {
         Double pendingOrderAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
         boutiqueLedgerDAO.addOrderAmountToBoutiqueLedger(pendingOrderAmount, orderAmountDAO.getAmountRecieved());
         boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(boutiqueLedgerRepo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
-                new CycleAvoidingMappingContext())),
+                        new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         return boutiqueLedgerDAO;
 

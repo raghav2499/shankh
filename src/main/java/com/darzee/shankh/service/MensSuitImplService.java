@@ -3,7 +3,6 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.enums.MeasurementScale;
-import com.darzee.shankh.enums.MeasurementView;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.Measurements;

@@ -19,4 +19,8 @@ public enum OrderStatus {
     OrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
+
+    public String getName() {
+        return this.orderStatus;
+    }
 }
