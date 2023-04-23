@@ -18,11 +18,11 @@ public class OrderDetails {
     @NotNull(message = "boutique_id cannot be null")
     private Long boutiqueId;
     private Boolean isPriorityOrder;
-    @NotNull(message = "trail_date cannot be null")
+    @NotNull(message = "trial_date cannot be null")
     private LocalDateTime trialDate;
     @NotNull(message = "delivery_date cannot be null")
     private LocalDateTime deliveryDate;
-    @NotNull(message = "Either outfit_type is not present or is invalid")
+    @NotNull(message = "outfit_type cannot be null")
     private Integer outfitType;
     @NotNull(message = "Either order_type is not present or is invalid")
     private OrderType orderType;

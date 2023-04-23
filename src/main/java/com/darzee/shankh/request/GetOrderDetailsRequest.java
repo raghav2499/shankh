@@ -1,5 +1,8 @@
 package com.darzee.shankh.request;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -8,21 +11,24 @@ import java.util.stream.Collectors;
 
 import static com.darzee.shankh.constants.Constants.*;
 import static com.darzee.shankh.enums.OrderFilter.*;
+import static com.darzee.shankh.enums.OrderSort.DELIVERY_DATE;
+import static com.darzee.shankh.enums.OrderSort.TRIAL_DATE;
 
 public class GetOrderDetailsRequest {
 
-    public static Map<String, Object> getParamsMap(Long boutiqueId, String statusList, Boolean urgent, String sortKey,
-                                                   Integer count, Integer offset) {
+    public static Map<String, Object> getPagingAndSortCriteria(String sortKey, Integer count, Integer offset) {
         Map<String, Object> finalParamsMap = new HashMap<>();
-        setFilter(finalParamsMap, boutiqueId, statusList, urgent);
         setSortingCriteria(finalParamsMap, sortKey);
         setPagingCriteria(finalParamsMap, count, offset);
         return finalParamsMap;
     }
 
-    private static void setFilter(Map<String, Object> paramsMap, Long boutiqueId, String statuses, Boolean urgent) {
+
+
+    public static Map<String, Object> getFilterMap(Long boutiqueId, String statuses, Boolean priorityOrdersOnly) {
+        Map<String, Object> filterMap = new HashMap<>();
         if (boutiqueId != null) {
-            paramsMap.put(BOUTIQUE_ID.getFilterName(), boutiqueId);
+            filterMap.put(BOUTIQUE_ID.getFilterName(), boutiqueId);
         }
         if (statuses != null) {
             List<Integer> statusList = Arrays.asList(statuses.trim()
@@ -30,16 +36,28 @@ public class GetOrderDetailsRequest {
                     .stream()
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
-            paramsMap.put(STATUS.getFilterName(), statusList);
+            filterMap.put(STATUS.getFilterName(), statusList);
         }
-        if (urgent != null) {
-            paramsMap.put(URGENT.getFilterName(), urgent);
+        if (priorityOrdersOnly != null) {
+            filterMap.put(PRIORITY_ORDERS_ONLY.getFilterName(), priorityOrdersOnly);
         }
+        return filterMap;
     }
 
-    private static void setSortingCriteria(Map<String, Object> paramsMap, String sortKey) {
+    private static void setSortingCriteria(Map<String, Object> paramsMap, String requestSortKey) {
         String parasmMapSortKey = PARAMS_MAP_SORT_KEY;
-        paramsMap.put(parasmMapSortKey, sortKey);
+        String paramsSortValue = "";
+        switch(requestSortKey) {
+            case "trial_date":
+                paramsSortValue = TRIAL_DATE.getOrderSortString();
+                break;
+            case "delivery_date":
+                paramsSortValue = DELIVERY_DATE.getOrderSortString();
+                break;
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorting is not supported for " + requestSortKey);
+        }
+        paramsMap.put(parasmMapSortKey, paramsSortValue);
     }
 
     private static void setPagingCriteria(Map<String, Object> paramsMap, Integer count, Integer offset) {

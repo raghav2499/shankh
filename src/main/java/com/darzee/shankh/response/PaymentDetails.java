@@ -19,8 +19,10 @@ public class PaymentDetails {
     private Double balanceDue;
 
     PaymentDetails(OrderAmountDAO orderAmountDAO) {
-        this.totalAmount = orderAmountDAO.getTotalAmount();
-        this.advanceReceived = orderAmountDAO.getAmountRecieved();
-        this.balanceDue = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
+        if(orderAmountDAO != null) {
+            this.totalAmount = orderAmountDAO.getTotalAmount();
+            this.advanceReceived = orderAmountDAO.getAmountRecieved();
+            this.balanceDue = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
+        }
     }
 }

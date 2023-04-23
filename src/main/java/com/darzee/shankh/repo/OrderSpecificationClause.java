@@ -1,11 +1,13 @@
 package com.darzee.shankh.repo;
 
+import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.enums.OrderFilter;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,22 +16,21 @@ import java.util.Map;
 public class OrderSpecificationClause {
 
     public static Specification<Order> findOrderByStatuses(List<Integer> statusList) {
-
-        return (root, cq, cb) -> root.get("status").in(statusList);
+        return (root, cq, cb) -> root.get("orderStatus").in(statusList);
     }
 
     public static Specification<Order> findOrderByBoutiqueId(Long boutiqueId) {
-
-        return (root, cq, cb) -> root.get("boutique_id").in(boutiqueId);
+        return (root, cq, cb) -> {
+            Join<Order, Boutique> boutique = root.join("boutique");
+            return cb.equal(boutique.get("id"), boutiqueId);
+        };
     }
 
     public static Specification<Order> findPriorityOrders(Boolean fetchPriorityOrders) {
-
-        return (root, cq, cb) -> root.get("is_priority_order").in(fetchPriorityOrders);
+        return (root, cq, cb) -> cb.equal(root.get("isPriorityOrder"), fetchPriorityOrders);
     }
 
     public static Specification<Order> getSpecificationBasedOnFilters(Map<String, Object> paramsMap) {
-
         return (root, cq, cb) -> {
 
             List<Predicate> predicateList = new ArrayList<>();
@@ -58,7 +59,7 @@ public class OrderSpecificationClause {
                 return findOrderByStatuses((List<Integer>) value);
             case BOUTIQUE_ID:
                 return findOrderByBoutiqueId((Long) value);
-            case URGENT:
+            case PRIORITY_ORDERS_ONLY:
                 return findPriorityOrders((Boolean) value);
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We've not started grouping on " + filter);

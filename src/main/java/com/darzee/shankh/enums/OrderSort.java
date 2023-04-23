@@ -5,9 +5,9 @@ import java.util.Map;
 
 public enum OrderSort {
 
-    TRIAL_DATE("trial_date"),
+    TRIAL_DATE("trialDate"),
 
-    DELIVERY_DATE("delivery_date");
+    DELIVERY_DATE("deliveryDate");
 
     private String orderSortString;
 

@@ -28,7 +28,9 @@ public class CustomerDetails {
     }
 
     CustomerDetails(CustomerDAO customerDAO) {
-        this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
-        this.phoneNumber = customerDAO.getPhoneNumber();
+        if(customerDAO != null) {
+            this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+            this.phoneNumber = customerDAO.getPhoneNumber();
+        }
     }
 }

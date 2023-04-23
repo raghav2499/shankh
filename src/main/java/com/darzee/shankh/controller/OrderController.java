@@ -31,11 +31,12 @@ public class OrderController {
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<OrderDetailResponse>> getOrder(@RequestParam(name = "boutique_id") Long boutiqueId,
                                                               @RequestParam(name = "status_list") String statusList,
-                                                              @RequestParam(name = "urgent", required = false) Boolean urgent,
+                                                              @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
                                                               @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
                                                               @RequestParam(name = "count", required = false, defaultValue = "500") Integer count,
                                                               @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset) {
-        Map<String, Object> paramsMap = GetOrderDetailsRequest.getParamsMap(boutiqueId, statusList, urgent, sortKey, count, offset);
-        return orderService.getOrder(paramsMap);
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, statusList, priorityOrdersOnly);
+        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingAndSortCriteria(sortKey, count, offset);
+        return orderService.getOrder(filterMap, pagingCriteriaMap);
     }
 }

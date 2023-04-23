@@ -5,8 +5,8 @@ import java.util.Arrays;
 public enum OrderFilter {
 
     STATUS("status"),
-    BOUTIQUE_ID("boutique_id"),
-    URGENT("priority_orders_only");
+    BOUTIQUE_ID("boutiqueId"),
+    PRIORITY_ORDERS_ONLY("priorityOrdersOnly");
 
     OrderFilter(String filterName) {
         this.filterName = filterName;

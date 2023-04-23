@@ -22,8 +22,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,7 +62,7 @@ public class OrderService {
     private ObjectImagesRepo objectImagesRepo;
 
     @Transactional
-    public ResponseEntity createNewOrder(CreateOrderRequest request) throws Exception {
+    public ResponseEntity createNewOrder(CreateOrderRequest request) {
         OrderDetails orderDetails = request.getOrderDetails();
         OrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
         Optional<Customer> optionalCustomer = customerRepo.findById(orderDetails.getCustomerId());
@@ -86,11 +88,11 @@ public class OrderService {
         return new ResponseEntity<>(failureResponse, HttpStatus.OK);
     }
 
-    public ResponseEntity<List<OrderDetailResponse>> getOrder(Map<String, Object> paramsMap) {
-        Specification<Order> orderSpecification = OrderSpecificationClause.getSpecificationBasedOnFilters(paramsMap);
-        Pageable pagingCriteria = filterOrderService.getPagingCriteria(paramsMap);
+    public ResponseEntity<List<OrderDetailResponse>> getOrder(Map<String, Object> filterMap, Map<String, Object> pagingSortingMap) {
+        Specification<Order> orderSpecification = OrderSpecificationClause.getSpecificationBasedOnFilters(filterMap);
+        Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingSortingMap);
         List<Order> orderDetails = orderRepo.findAll(orderSpecification, pagingCriteria).getContent();
-        List<OrderDAO> orderDAOList = orderDetails.stream()
+        List<OrderDAO> orderDAOList = Optional.ofNullable(orderDetails).orElse(new ArrayList<>()).stream()
                 .map(order -> mapper.orderObjectToDao(order, new CycleAvoidingMappingContext()))
                 .collect(Collectors.toList());
         List<OrderDetailResponse> orderDetailsList = orderDAOList.stream()
@@ -105,9 +107,13 @@ public class OrderService {
 
     private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
         String invoiceNo = generateOrderInvoiceNo();
+        OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(orderDetails.getOutfitType());
+        if (outfitType == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid outfit type");
+        }
         OrderDAO orderDAO = new OrderDAO(orderDetails.getTrialDate(), orderDetails.getDeliveryDate(),
-                OutfitType.getOutfitOrdinalEnumMap().get(orderDetails.getOutfitType()), orderDetails.getSpecialInstructions(),
-                orderDetails.getInspiration(), orderDetails.getOrderType(), invoiceNo, boutiqueDAO, customerDAO);
+                outfitType, orderDetails.getSpecialInstructions(), orderDetails.getInspiration(),
+                orderDetails.getOrderType(), invoiceNo, boutiqueDAO, customerDAO);
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
