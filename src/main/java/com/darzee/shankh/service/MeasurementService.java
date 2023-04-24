@@ -77,6 +77,14 @@ public class MeasurementService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer id is invalid");
     }
 
+    public MeasurementDAO createCustomerMeasurement(CustomerDAO customerDAO) {
+        MeasurementDAO measurementDAO = new MeasurementDAO(customerDAO);
+        measurementDAO = mapper.measurementObjectToDAO(measurementRepo.save(mapper.measurementDAOToObject(measurementDAO,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
+        return measurementDAO;
+    }
+
     private String getMeasurementDetailsMessage(boolean haveMandatoryParamsSet) {
         String message = haveMandatoryParamsSet
                 ? "Measurement details fetched sucessfully"

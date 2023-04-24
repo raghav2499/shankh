@@ -1,6 +1,8 @@
 package com.darzee.shankh.dao;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -8,6 +10,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class MeasurementDAO implements Serializable {
     private Long id;
     private Double waist;
@@ -44,4 +48,8 @@ public class MeasurementDAO implements Serializable {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private CustomerDAO customer;
+
+    public MeasurementDAO(CustomerDAO customer) {
+        this.customer = customer;
+    }
 }
