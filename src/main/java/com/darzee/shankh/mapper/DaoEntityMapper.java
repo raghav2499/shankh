@@ -57,6 +57,8 @@ public interface DaoEntityMapper {
 
     OrderAmount orderAmountDaoToOrderAmountObject(OrderAmountDAO orderAmount, @Context CycleAvoidingMappingContext context);
 
+    ObjectImagesDAO objectImagesToObjectImagesDAO(ObjectImages objectImages);
+
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if(orderList == null) {
             return null;

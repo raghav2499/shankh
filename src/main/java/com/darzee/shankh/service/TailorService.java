@@ -16,6 +16,7 @@ import com.darzee.shankh.request.TailorSignUpRequest;
 import com.darzee.shankh.request.TailorSignUpRequest.BoutiqueDetails;
 import com.darzee.shankh.response.ProfileUpdateResponse;
 import com.darzee.shankh.response.TailorLoginResponse;
+import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.jwtutils.TokenManager;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,8 @@ public class TailorService {
     public ResponseEntity tailorSignup(TailorSignUpRequest request) {
         boolean isAdminSignupRequest = request.getBoutiqueDetails().getBoutiqueReferenceId() == null ? true : false;
         BoutiqueDAO boutiqueDAO = null;
-        if (isTailorAlreadySignedUp(request.getPhoneNumber())) {
+        String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
+        if (isTailorAlreadySignedUp(phoneNumber)) {
             TailorLoginResponse tailorLoginResponse = new TailorLoginResponse("User already exists. Please login");
             return new ResponseEntity(tailorLoginResponse, HttpStatus.OK);
         }
@@ -96,7 +98,7 @@ public class TailorService {
         TailorDAO tailorDAO = new TailorDAO(request.getTailorName(),
                 role,
                 request.getLanguage(),
-                request.getPhoneNumber(),
+                phoneNumber,
                 request.getProfilePicReferenceId(),
                 boutiqueDAO);
         tailorDAO = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
@@ -120,7 +122,7 @@ public class TailorService {
      * @return
      */
     public ResponseEntity tailorLogin(TailorLoginRequest request) {
-        String phoneNumber = request.getPhoneNumber();
+        String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
         try {
             //todo : check how and where it checks to authenticate the request
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(phoneNumber,

@@ -2,6 +2,7 @@ package com.darzee.shankh.controller;
 
 import com.darzee.shankh.request.CreateOrderRequest;
 import com.darzee.shankh.request.GetOrderDetailsRequest;
+import com.darzee.shankh.request.UpdateOrderRequest;
 import com.darzee.shankh.response.CreateOrderResponse;
 import com.darzee.shankh.response.OrderDetailResponse;
 import com.darzee.shankh.service.OrderService;
@@ -38,5 +39,11 @@ public class OrderController {
         Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, statusList, priorityOrdersOnly);
         Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingAndSortCriteria(sortKey, count, offset);
         return orderService.getOrder(filterMap, pagingCriteriaMap);
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateOrder(@PathVariable Long orderId,
+                                      @RequestBody UpdateOrderRequest request) {
+        return orderService.updateOrder(orderId, request);
     }
 }

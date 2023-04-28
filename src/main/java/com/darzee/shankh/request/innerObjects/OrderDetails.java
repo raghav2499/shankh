@@ -1,5 +1,6 @@
 package com.darzee.shankh.request.innerObjects;
 
+import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.enums.OrderType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

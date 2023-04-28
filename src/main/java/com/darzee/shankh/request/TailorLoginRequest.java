@@ -15,6 +15,6 @@ import javax.validation.constraints.Size;
 public class TailorLoginRequest {
 
     @NotNull
-    @Size(min=10, max=10, message = "Invalid phone number")
+    @Size(min=10, max=13, message = "Invalid phone number")
     private String phoneNumber;
 }

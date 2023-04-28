@@ -1,17 +1,16 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.BoutiqueDAO;
-import com.darzee.shankh.dao.CustomerDAO;
-import com.darzee.shankh.dao.ImageReferenceDAO;
-import com.darzee.shankh.dao.MeasurementDAO;
+import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.ImageReference;
+import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.CreateCustomerRequest;
+import com.darzee.shankh.request.UpdateCustomerRequest;
 import com.darzee.shankh.response.CreateCustomerResponse;
 import com.darzee.shankh.response.CustomerDetails;
 import com.darzee.shankh.response.GetCustomerResponse;
@@ -23,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +34,9 @@ public class CustomerService {
 
     @Autowired
     private MeasurementService measurementService;
+
+    @Autowired
+    private ObjectImagesService objectImagesService;
 
     @Autowired
     private BoutiqueRepo boutiqueRepo;
@@ -54,6 +57,8 @@ public class CustomerService {
     private BoutiqueLedgerRepo boutiqueLedgerRepo;
     @Autowired
     private MeasurementRepo measurementRepo;
+    @Autowired
+    private ObjectImagesRepo objectImagesRepo;
 
     public ResponseEntity getCustomers(Long boutiqueId) {
         List<CustomerDAO> boutiqueCustomers =
@@ -64,7 +69,7 @@ public class CustomerService {
                 .map(customer ->
                         new CustomerDetails(CommonUtils.constructName(customer.getFirstName(), customer.getLastName()),
                                 customer.getPhoneNumber(),
-                                getCustomerProfilePicLink(customer.getImageReferenceId()),
+                                getCustomerProfilePicLink(objectImagesService.getCustomerImageReferenceId(customer.getId())),
                                 customer.getId()))
                 .collect(Collectors.toList());
 
@@ -85,7 +90,8 @@ public class CustomerService {
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(request.getBoutiqueId());
         CreateCustomerResponse response = new CreateCustomerResponse();
         if (optionalBoutique.isPresent()) {
-            Optional<Customer> existingCustomer = customerRepo.findByPhoneNumber(request.getPhoneNumber());
+            String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
+            Optional<Customer> existingCustomer = customerRepo.findByPhoneNumber(phoneNumber);
             if (existingCustomer.isPresent()) {
                 CustomerDAO customerDAO = mapper.customerObjectToDao(existingCustomer.get(), new CycleAvoidingMappingContext());
                 String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
@@ -97,12 +103,16 @@ public class CustomerService {
             BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(),
                     new CycleAvoidingMappingContext());
             ImmutablePair<String, String> name = getCustomerNameFromRequest(request.getName());
-            CustomerDAO customerDAO = new CustomerDAO(request.getAge(), request.getPhoneNumber(), name.getKey(),
-                    name.getValue(), request.getGender(), request.getCustomerImageReferenceId(), boutiqueDAO);
+
+            CustomerDAO customerDAO = new CustomerDAO(request.getAge(), phoneNumber, name.getKey(),
+                    name.getValue(), request.getGender(), boutiqueDAO);
             customerDAO = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customerDAO,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
 
+            if (request.getCustomerImageReferenceId() != null) {
+                saveCustomerImages(customerDAO, request.getCustomerImageReferenceId());
+            }
 
             MeasurementDAO measurementDAO = measurementService.createCustomerMeasurement(customerDAO);
             customerDAO.setMeasurement(measurementDAO);
@@ -117,6 +127,42 @@ public class CustomerService {
         }
         response.setMessage("This boutique is not enrolled with us");
         return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity updateCustomer(Long customerId, UpdateCustomerRequest request) {
+        Optional<Customer> optionalCustomer = customerRepo.findById(customerId);
+        Long boutiqueId = request.getBoutiqueId();
+        if (optionalCustomer.isPresent()) {
+            CustomerDAO customer = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
+
+            if (request.getPhoneNumber() != null) {
+                String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
+                List<Customer> customerWithSameNumber = customerRepo.findAllByBoutiqueIdAndPhoneNumber(boutiqueId, phoneNumber);
+                if (customerWithSameNumber != null && customerWithSameNumber.size() > 0) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Sorry! Customer with same phone number is already registered with this boutique");
+                }
+                customer.setPhoneNumber(phoneNumber);
+            }
+
+            if (request.getName() != null) {
+                ImmutablePair<String, String> destructedName = getCustomerNameFromRequest(request.getName());
+                customer.setFirstName(destructedName.getLeft());
+                customer.setLastName(destructedName.getRight());
+            }
+
+            customer = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customer,
+                            new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext());
+            String customerName = CommonUtils.constructName(customer.getFirstName(), customer.getLastName());
+            CreateCustomerResponse response = new CreateCustomerResponse(customerName, customer.getPhoneNumber(),
+                    "", customer.getId(),
+                    "Customer updated successfully");
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        return new ResponseEntity(
+                "Sorry! Customer with this ID is not registered with us",
+                HttpStatus.BAD_REQUEST);
     }
 
     private String getCustomerProfilePicLink(String customerImageReferenceId) {
@@ -141,6 +187,13 @@ public class CustomerService {
             lastName = nameArray[nameArray.length - 1];
         }
         return new ImmutablePair(firstName, lastName);
+    }
+
+    private void saveCustomerImages(CustomerDAO customerDAO, String imageReferenceId) {
+        ObjectImagesDAO customerImages = new ObjectImagesDAO(imageReferenceId,
+                ImageEntityType.CUSTOMER.getEntityType(),
+                customerDAO.getId());
+        objectImagesRepo.save(mapper.objectImageDAOToObjectImage(customerImages));
     }
 
 }

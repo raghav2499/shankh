@@ -2,6 +2,7 @@ package com.darzee.shankh.controller;
 
 import com.darzee.shankh.repo.CustomerRepo;
 import com.darzee.shankh.request.CreateCustomerRequest;
+import com.darzee.shankh.request.UpdateCustomerRequest;
 import com.darzee.shankh.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -34,4 +35,9 @@ public class CustomerController {
         return customerService.createCustomer(request);
     }
 
+    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity createCustomer(@PathVariable("id") Long customerId,
+                                         @RequestBody @Valid UpdateCustomerRequest request) {
+        return customerService.updateCustomer(customerId, request);
+    }
 }

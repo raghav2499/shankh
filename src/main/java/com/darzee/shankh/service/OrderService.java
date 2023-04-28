@@ -10,8 +10,11 @@ import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.CreateOrderRequest;
+import com.darzee.shankh.request.UpdateOrderRequest;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.OrderDetails;
+import com.darzee.shankh.request.innerObjects.UpdateOrderAmountDetails;
+import com.darzee.shankh.request.innerObjects.UpdateOrderDetails;
 import com.darzee.shankh.response.CreateOrderResponse;
 import com.darzee.shankh.response.OrderDetailResponse;
 import com.darzee.shankh.utils.CommonUtils;
@@ -53,6 +56,9 @@ public class OrderService {
 
     @Autowired
     private OutfitTypeObjectService outfitTypeObjectService;
+
+    @Autowired
+    private OrderStateMachineService orderStateMachineService;
 
     @Autowired
     private MeasurementRepo measurementRepo;
@@ -99,6 +105,81 @@ public class OrderService {
                 .map(order -> getOrderDetails(order))
                 .collect(Collectors.toList());
         return new ResponseEntity<>(orderDetailsList, HttpStatus.OK);
+    }
+
+    public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {
+        Optional<Order> optionalOrder = orderRepo.findById(orderId);
+        if (optionalOrder.isPresent()) {
+            OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
+            OrderAmountDAO orderAmountDAO = order.getOrderAmountDAO();
+            UpdateOrderDetails orderDetails = request.getOrderDetails();
+            UpdateOrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
+            if (orderDetails != null) {
+                order = updateOrderDetails(orderDetails, order);
+            }
+            if (orderAmountDetails != null) {
+                orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO);
+            }
+            CreateOrderResponse response = new CreateOrderResponse("Order updated successfully",
+                    order.getInvoiceNo(), order.getOutfitType().getName(), order.getTrialDate().toString(),
+                    order.getDeliveryDate().toString(), orderAmountDAO.getTotalAmount().toString(),
+                    orderAmountDAO.getAmountRecieved().toString());
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
+    }
+
+    private OrderDAO updateOrderDetails(UpdateOrderDetails orderDetails, OrderDAO order) {
+        if (orderDetails.getStatus() != null) {
+            if (orderStateMachineService.isTransitionAllowed(order.getOrderStatus(), orderDetails.getStatus())) {
+                order.setOrderStatus(orderDetails.getStatus());
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "State transition from " + order.getOrderStatus() + " to " + orderDetails.getStatus()
+                                + " is not allowed");
+            }
+        }
+        if (orderDetails.getTrialDate() != null) {
+            order.setTrialDate(orderDetails.getTrialDate());
+        }
+        if (orderDetails.getDeliveryDate() != null) {
+            order.setDeliveryDate(orderDetails.getDeliveryDate());
+        }
+        if (orderDetails.getIsPriorityOrder() != null) {
+            order.setIsPriorityOrder(orderDetails.getIsPriorityOrder());
+        }
+        if (orderDetails.getInspiration() != null) {
+            order.setInspiration(orderDetails.getInspiration());
+        }
+        if (orderDetails.getSpecialInstructions() != null) {
+            order.setSpecialInstructions(orderDetails.getSpecialInstructions());
+        }
+        order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
+        return order;
+    }
+
+    private OrderAmountDAO updateOrderAmountDetails(UpdateOrderAmountDetails orderAmountDetails,
+                                                    OrderAmountDAO orderAmount) {
+        Double totalAmount = Optional.ofNullable(orderAmountDetails.getTotalOrderAmount())
+                .orElse(orderAmount.getTotalAmount());
+        Double advancePayment = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount())
+                .orElse(orderAmount.getAmountRecieved());
+        if (advancePayment > totalAmount) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Amount paid is greater than total amount. Amount Paid "
+                            + advancePayment
+                            + " and total amount "
+                            + totalAmount);
+        }
+        orderAmount.setTotalAmount(totalAmount);
+        orderAmount.setAmountRecieved(advancePayment);
+        orderAmount = mapper.orderAmountObjectToOrderAmountDao(
+                orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmount,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
+        return orderAmount;
     }
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {

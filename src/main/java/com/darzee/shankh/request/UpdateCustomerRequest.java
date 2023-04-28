@@ -1,6 +1,5 @@
 package com.darzee.shankh.request;
 
-import com.darzee.shankh.enums.Gender;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
@@ -10,16 +9,14 @@ import javax.validation.constraints.Size;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CreateCustomerRequest {
+public class UpdateCustomerRequest {
     private Integer age;
 
-    @NotNull(message = "Customer's phone number is mandatory ")
     @Size(min=10, max=13, message = "Invalid phone number")
     private String phoneNumber;
-    @NotNull(message = "Customer's name is mandatory")
+
     private String name;
-    private Gender gender;
-    private String customerImageReferenceId;
-    @NotNull(message = "Boutique id is mandatory for creating customer")
+
+    @NotNull(message = "Boutique id is mandatory for updating customer")
     private Long boutiqueId;
 }

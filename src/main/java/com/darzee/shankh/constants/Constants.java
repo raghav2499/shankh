@@ -263,5 +263,7 @@ public class Constants {
     public static final String PARAMS_MAP_COUNT_KEY = "count";
     public static final String PARAMS_MAP_OFFSET_KEY = "offset";
 
+    public static final List<String> PHONE_NUMBER_POLLUTERS = Arrays.asList("+91", "0");
+
 
 }

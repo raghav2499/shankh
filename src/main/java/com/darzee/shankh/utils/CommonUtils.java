@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class CommonUtils {
 
@@ -28,4 +29,14 @@ public class CommonUtils {
         return (Optional.ofNullable(firstName).orElse("") + " " + Optional.ofNullable(lastName).orElse("")).trim();
     }
 
+    public static String sanitisePhoneNumber(String phoneNumber) {
+        if(phoneNumber == null) {
+            return phoneNumber;
+        }
+        String sanitisedString = Stream.of(phoneNumber)
+                .map(s -> s.replaceAll("^\\+91|^0", "")) // Remove leading +91 or 0
+                .findFirst()
+                .orElse("");
+        return sanitisedString;
+    }
 }
