@@ -79,7 +79,7 @@ public class OrderService {
 
             OrderDAO orderDAO = setOrderSpecificDetails(orderDetails, boutiqueDAO, customerDAO);
             OrderAmountDAO orderAmountDAO = setOrderAmountSpecificDetails(orderAmountDetails, orderDAO);
-            orderDAO.setOrderAmountDAO(orderAmountDAO);
+            orderDAO.setOrderAmount(orderAmountDAO);
             orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
 
             boutiqueDAO.setActiveOrders(boutiqueDAO.getActiveOrders() + 1);
@@ -187,7 +187,7 @@ public class OrderService {
     }
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
-        return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO, orderDAO.getOrderAmountDAO());
+        return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO, orderDAO.getOrderAmount());
     }
 
     private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
@@ -215,7 +215,7 @@ public class OrderService {
         Double advanceRecieved = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(0d);
         OrderAmountDAO orderAmountDAO = new OrderAmountDAO(orderAmountDetails.getTotalOrderAmount(),
                 advanceRecieved, orderDAO);
-        orderAmountDAO.setOrderDAO(orderDAO);
+        orderAmountDAO.setOrder(orderDAO);
         orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());

@@ -13,11 +13,11 @@ public class OrderAmountDAO {
     private Long id;
     private Double totalAmount;
     private Double amountRecieved;
-    private OrderDAO orderDAO;
+    private OrderDAO order;
 
     public OrderAmountDAO(Double totalAmount, Double amountRecieved, OrderDAO orderDAO) {
         this.totalAmount = totalAmount;
         this.amountRecieved = amountRecieved;
-        this.orderDAO = orderDAO;
+        this.order = orderDAO;
     }
 }

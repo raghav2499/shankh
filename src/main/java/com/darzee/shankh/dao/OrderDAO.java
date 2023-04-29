@@ -5,7 +5,9 @@ import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderDAO {
     private Long id;
 
@@ -30,7 +34,7 @@ public class OrderDAO {
     private String inspiration;
     private BoutiqueDAO boutique;
     private CustomerDAO customer;
-    private OrderAmountDAO orderAmountDAO;
+    private OrderAmountDAO orderAmount;
 
     public OrderDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, OutfitType outfitType,
                     String specialInstructions, String inspiration, OrderType orderType, String invoiceNo,
