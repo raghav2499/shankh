@@ -91,7 +91,7 @@ public class CustomerService {
         CreateCustomerResponse response = new CreateCustomerResponse();
         if (optionalBoutique.isPresent()) {
             String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
-            Optional<Customer> existingCustomer = customerRepo.findByPhoneNumber(phoneNumber);
+            Optional<Customer> existingCustomer = customerRepo.findByBoutiqueIdAndPhoneNumber(optionalBoutique.get().getId(), phoneNumber);
             if (existingCustomer.isPresent()) {
                 CustomerDAO customerDAO = mapper.customerObjectToDao(existingCustomer.get(), new CycleAvoidingMappingContext());
                 String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
@@ -137,8 +137,8 @@ public class CustomerService {
 
             if (request.getPhoneNumber() != null) {
                 String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
-                List<Customer> customerWithSameNumber = customerRepo.findAllByBoutiqueIdAndPhoneNumber(boutiqueId, phoneNumber);
-                if (customerWithSameNumber != null && customerWithSameNumber.size() > 0) {
+                Optional<Customer> customerWithSameNumber = customerRepo.findByBoutiqueIdAndPhoneNumber(boutiqueId, phoneNumber);
+                if (customerWithSameNumber.isPresent()) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Sorry! Customer with same phone number is already registered with this boutique");
                 }
