@@ -151,6 +151,10 @@ public class CustomerService {
                 customer.setLastName(destructedName.getRight());
             }
 
+            if(request.getAge() != null) {
+                customer.setAge(request.getAge());
+            }
+
             customer = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customer,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
