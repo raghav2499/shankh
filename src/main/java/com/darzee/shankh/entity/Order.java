@@ -58,8 +58,9 @@ public class Order extends GenericEntity {
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
-    private List<OrderAmount> orderAmounts;
+    @OneToOne
+    @JoinColumn(name = "order_amount_id")
+    private OrderAmount orderAmount;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

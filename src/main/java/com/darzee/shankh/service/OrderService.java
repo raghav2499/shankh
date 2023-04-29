@@ -79,6 +79,8 @@ public class OrderService {
 
             OrderDAO orderDAO = setOrderSpecificDetails(orderDetails, boutiqueDAO, customerDAO);
             OrderAmountDAO orderAmountDAO = setOrderAmountSpecificDetails(orderAmountDetails, orderDAO);
+            orderDAO.setOrderAmountDAO(orderAmountDAO);
+            orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
 
             boutiqueDAO.setActiveOrders(boutiqueDAO.getActiveOrders() + 1);
             boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
@@ -111,7 +113,9 @@ public class OrderService {
         Optional<Order> optionalOrder = orderRepo.findById(orderId);
         if (optionalOrder.isPresent()) {
             OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
-            OrderAmountDAO orderAmountDAO = order.getOrderAmountDAO();
+            OrderAmountDAO orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(
+                    orderAmountRepo.findByOrderId(order.getId()),
+                    new CycleAvoidingMappingContext());
             UpdateOrderDetails orderDetails = request.getOrderDetails();
             UpdateOrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
             if (orderDetails != null) {
