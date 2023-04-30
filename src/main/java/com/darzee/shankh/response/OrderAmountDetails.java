@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class PaymentDetails {
+public class OrderAmountDetails {
     private Double totalAmount;
     private Double advanceReceived;
     private Double balanceDue;
 
-    PaymentDetails(OrderAmountDAO orderAmountDAO) {
+    OrderAmountDetails(OrderAmountDAO orderAmountDAO) {
         if(orderAmountDAO != null) {
             this.totalAmount = orderAmountDAO.getTotalAmount();
             this.advanceReceived = orderAmountDAO.getAmountRecieved();

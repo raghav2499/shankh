@@ -23,7 +23,7 @@ public class OrderDetailResponse {
     private String orderType;
     private String trialDate;
     private String deliveryDate;
-    private PaymentDetails paymentDetails;
+    private OrderAmountDetails orderAmountDetails;
 
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, OrderAmountDAO orderAmount) {
         this.customerDetails = new CustomerDetails(customer);
@@ -31,6 +31,6 @@ public class OrderDetailResponse {
         this.isPriorityOrder = order.getIsPriorityOrder();
         this.orderType = order.getOrderType().getName();
         this.trialDate = order.getTrialDate().toString();
-        this.paymentDetails = new PaymentDetails(orderAmount);
+        this.orderAmountDetails = new OrderAmountDetails(orderAmount);
     }
 }
