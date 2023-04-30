@@ -146,7 +146,7 @@ public class OrderService {
                 order.setOrderStatus(targetStatus);
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "State transition from " + order.getOrderStatus() + " to " + orderDetails.getStatus()
+                        "State transition from " + order.getOrderStatus() + " to " + targetStatus
                                 + " is not allowed");
             }
         }

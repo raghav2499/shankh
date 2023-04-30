@@ -33,11 +33,9 @@ public enum OrderStatus {
     public static Map<Integer, OrderStatus> getOrderTypeEnumOrdinalMap() {
         Map<Integer, OrderStatus> orderOrdinalEnumMap = new HashMap<>();
         orderOrdinalEnumMap.put(STITCHING_NOT_STARTED.ordinal, STITCHING_NOT_STARTED);
-        orderOrdinalEnumMap.put(STITCHING_NOT_STARTED.ordinal, STITCHING_NOT_STARTED);
-        orderOrdinalEnumMap.put(STITCHING_NOT_STARTED.ordinal, STITCHING_NOT_STARTED);
-        orderOrdinalEnumMap.put(STITCHING_NOT_STARTED.ordinal, STITCHING_NOT_STARTED);
+        orderOrdinalEnumMap.put(STITCHING_IN_PROGRESS.ordinal, STITCHING_IN_PROGRESS);
+        orderOrdinalEnumMap.put(ORDER_READY_FOR_TRIAL.ordinal, ORDER_READY_FOR_TRIAL);
+        orderOrdinalEnumMap.put(ORDER_COMPLETED.ordinal, ORDER_COMPLETED);
         return orderOrdinalEnumMap;
     }
-
-
 }
