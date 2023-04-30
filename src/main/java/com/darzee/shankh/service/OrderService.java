@@ -5,6 +5,7 @@ import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -135,8 +136,14 @@ public class OrderService {
 
     private OrderDAO updateOrderDetails(UpdateOrderDetails orderDetails, OrderDAO order) {
         if (orderDetails.getStatus() != null) {
-            if (orderStateMachineService.isTransitionAllowed(order.getOrderStatus(), orderDetails.getStatus())) {
-                order.setOrderStatus(orderDetails.getStatus());
+            Integer targetStatusOrdinal = orderDetails.getStatus();
+            OrderStatus targetStatus = OrderStatus.getOrderTypeEnumOrdinalMap().get(targetStatusOrdinal);
+            if(targetStatus == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Status " + targetStatusOrdinal + " is not valid status");
+            }
+            if (orderStateMachineService.isTransitionAllowed(order.getOrderStatus(), targetStatus)) {
+                order.setOrderStatus(targetStatus);
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "State transition from " + order.getOrderStatus() + " to " + orderDetails.getStatus()
