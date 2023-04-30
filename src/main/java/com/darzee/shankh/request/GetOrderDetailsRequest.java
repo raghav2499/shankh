@@ -1,5 +1,6 @@
 package com.darzee.shankh.request;
 
+import com.darzee.shankh.enums.OrderStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,7 +25,11 @@ public class GetOrderDetailsRequest {
     }
 
 
-
+    /**
+     * Status ordinal mapping saved in DB, and the one known to clients is different. So status enum is judged from
+     * the one in request, and then is mapped to corresponding DB ordinal
+     * @return
+     */
     public static Map<String, Object> getFilterMap(Long boutiqueId, String statuses, Boolean priorityOrdersOnly) {
         Map<String, Object> filterMap = new HashMap<>();
         if (boutiqueId != null) {
@@ -35,6 +40,8 @@ public class GetOrderDetailsRequest {
                             .split(","))
                     .stream()
                     .map(Integer::parseInt)
+                    .map(requestOrdinal -> OrderStatus.getOrderTypeEnumOrdinalMap().get(requestOrdinal))
+                    .map(orderStatus -> orderStatus.ordinal())
                     .collect(Collectors.toList());
             filterMap.put(STATUS.getFilterName(), statusList);
         }
