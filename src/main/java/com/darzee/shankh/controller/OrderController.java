@@ -34,7 +34,7 @@ public class OrderController {
                                                               @RequestParam(name = "status_list") String statusList,
                                                               @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
                                                               @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
-                                                              @RequestParam(name = "count", required = false, defaultValue = "500") Integer countPerPage,
+                                                              @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                               @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
         Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, statusList, priorityOrdersOnly);
         Integer offset = (pageCount - 1) * countPerPage;
