@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 public class OrderDetailResponse {
 
     private CustomerDetails customerDetails;
+
+    private Long orderId;
     private String orderStatus;
     private Boolean isPriorityOrder;
     private String orderType;
@@ -27,6 +29,7 @@ public class OrderDetailResponse {
 
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, OrderAmountDAO orderAmount) {
         this.customerDetails = new CustomerDetails(customer);
+        this.orderId = order.getId();
         this.orderStatus = order.getOrderStatus().getName();
         this.isPriorityOrder = order.getIsPriorityOrder();
         this.orderType = order.getOrderType().getName();

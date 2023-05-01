@@ -34,10 +34,11 @@ public class OrderController {
                                                               @RequestParam(name = "status_list") String statusList,
                                                               @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
                                                               @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
-                                                              @RequestParam(name = "count", required = false, defaultValue = "500") Integer count,
-                                                              @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset) {
+                                                              @RequestParam(name = "count", required = false, defaultValue = "500") Integer countPerPage,
+                                                              @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
         Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, statusList, priorityOrdersOnly);
-        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingAndSortCriteria(sortKey, count, offset);
+        Integer offset = (pageCount - 1) * countPerPage;
+        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingAndSortCriteria(sortKey, countPerPage, offset);
         return orderService.getOrder(filterMap, pagingCriteriaMap);
     }
 

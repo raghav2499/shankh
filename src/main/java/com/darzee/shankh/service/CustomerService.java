@@ -1,7 +1,10 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.*;
+import com.darzee.shankh.dao.BoutiqueDAO;
+import com.darzee.shankh.dao.CustomerDAO;
+import com.darzee.shankh.dao.ImageReferenceDAO;
+import com.darzee.shankh.dao.MeasurementDAO;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.ImageReference;
@@ -24,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -151,7 +155,7 @@ public class CustomerService {
                 customer.setLastName(destructedName.getRight());
             }
 
-            if(request.getAge() != null) {
+            if (request.getAge() != null) {
                 customer.setAge(request.getAge());
             }
 
@@ -194,10 +198,9 @@ public class CustomerService {
     }
 
     private void saveCustomerImages(CustomerDAO customerDAO, String imageReferenceId) {
-        ObjectImagesDAO customerImages = new ObjectImagesDAO(imageReferenceId,
+        objectImagesService.saveObjectImages(Arrays.asList(imageReferenceId),
                 ImageEntityType.CUSTOMER.getEntityType(),
                 customerDAO.getId());
-        objectImagesRepo.save(mapper.objectImageDAOToObjectImage(customerImages));
     }
 
 }

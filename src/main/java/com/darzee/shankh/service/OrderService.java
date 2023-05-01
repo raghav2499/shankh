@@ -18,7 +18,7 @@ import com.darzee.shankh.request.innerObjects.UpdateOrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.UpdateOrderDetails;
 import com.darzee.shankh.response.CreateOrderResponse;
 import com.darzee.shankh.response.OrderDetailResponse;
-import com.darzee.shankh.utils.CommonUtils;
+import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -60,6 +60,9 @@ public class OrderService {
 
     @Autowired
     private OrderStateMachineService orderStateMachineService;
+
+    @Autowired
+    private ObjectImagesService objectImagesService;
 
     @Autowired
     private MeasurementRepo measurementRepo;
@@ -138,7 +141,7 @@ public class OrderService {
         if (orderDetails.getStatus() != null) {
             Integer targetStatusOrdinal = orderDetails.getStatus();
             OrderStatus targetStatus = OrderStatus.getOrderTypeEnumOrdinalMap().get(targetStatusOrdinal);
-            if(targetStatus == null) {
+            if (targetStatus == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Status " + targetStatusOrdinal + " is not valid status");
             }
@@ -164,6 +167,14 @@ public class OrderService {
         }
         if (orderDetails.getSpecialInstructions() != null) {
             order.setSpecialInstructions(orderDetails.getSpecialInstructions());
+        }
+        if (!Collections.isEmpty(orderDetails.getClothImageReferenceIds())) {
+            Long orderId = order.getId();
+            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.ORDER.getEntityType(),
+                    orderId);
+            objectImagesService.saveObjectImages(orderDetails.getClothImageReferenceIds(),
+                    ImageEntityType.ORDER.getEntityType(),
+                    orderId);
         }
         order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order,
                         new CycleAvoidingMappingContext())),
@@ -211,10 +222,9 @@ public class OrderService {
                 new CycleAvoidingMappingContext());
         Long orderId = orderDAO.getId();
         List<String> clothImageReferenceIds = orderDetails.getClothImageReferenceIds();
-        List<ObjectImagesDAO> objectImagesDAOList = clothImageReferenceIds.stream()
-                .map(clothImageReferenceId -> new ObjectImagesDAO(clothImageReferenceId, ImageEntityType.ORDER.getEntityType(), orderId))
-                .collect(Collectors.toList());
-        objectImagesRepo.saveAll(CommonUtils.mapList(objectImagesDAOList, mapper::objectImageDAOToObjectImage));
+        objectImagesService.saveObjectImages(clothImageReferenceIds,
+                ImageEntityType.ORDER.getEntityType(),
+                orderId);
         return orderDAO;
     }
 

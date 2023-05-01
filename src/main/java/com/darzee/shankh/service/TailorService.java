@@ -2,7 +2,6 @@ package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
-import com.darzee.shankh.dao.ObjectImagesDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Tailor;
 import com.darzee.shankh.enums.ImageEntityType;
@@ -56,6 +55,9 @@ public class TailorService {
 
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
+
+    @Autowired
+    private ObjectImagesService objectImagesService;
 
     @Autowired
     private TokenManager tokenManager;
@@ -182,9 +184,8 @@ public class TailorService {
     }
 
     private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
-        for (String imageReference : imageReferences) {
-            ObjectImagesDAO boutiqueImage = new ObjectImagesDAO(imageReference, ImageEntityType.BOUTIQUE.getEntityType(), boutique.getId());
-            objectImagesRepo.save(mapper.boutiqueImagesImagesDAOToBoutiqueImages(boutiqueImage));
-        }
+        objectImagesService.saveObjectImages(imageReferences,
+                ImageEntityType.BOUTIQUE.getEntityType(),
+                boutique.getId());
     }
 }
