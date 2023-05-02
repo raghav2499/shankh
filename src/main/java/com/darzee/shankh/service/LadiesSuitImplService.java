@@ -157,7 +157,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
     @Override
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.LADIES_SUIT;
-        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), Constants.OutfitType.LADIES_SUIT_TITLE,
+        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
                 Constants.OutfitType.OUTFIT_TYPE_LADIES_SUIT_LINK, 2);
     }
 

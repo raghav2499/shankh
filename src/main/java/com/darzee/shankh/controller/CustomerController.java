@@ -36,7 +36,7 @@ public class CustomerController {
     }
 
     @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity createCustomer(@PathVariable("id") Long customerId,
+    public ResponseEntity updateCustomer(@PathVariable("id") Long customerId,
                                          @RequestBody @Valid UpdateCustomerRequest request) {
         return customerService.updateCustomer(customerId, request);
     }

@@ -117,7 +117,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
     @Override
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.SAREE_BLOUSE;
-        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), Constants.OutfitType.SAREE_BLOUSE_TITLE,
+        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
                 Constants.OutfitType.OUTFIT_TYPE_SAREE_BLOUSE_LINK, 1);
     }
 

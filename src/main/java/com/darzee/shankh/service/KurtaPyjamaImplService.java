@@ -116,7 +116,7 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
     @Override
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.KURTA_PYJAMA;
-        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), Constants.OutfitType.KURTA_PYJAMA_TITLE,
+        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
                 Constants.OutfitType.OUTFIT_TYPE_KURTA_PYJAMA_LINK, 2);
     }
 

@@ -99,7 +99,7 @@ public class ShirtImplService implements OutfitTypeService {
     @Override
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.SHIRT;
-        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), Constants.OutfitType.SHIRT_TITLE,
+        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
                 Constants.OutfitType.OUTFIT_TYPE_SHIRT_LINK, 1);
     }
 

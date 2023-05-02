@@ -114,7 +114,7 @@ public class EveningGownImplService implements OutfitTypeService {
     @Override
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.EVENING_GOWN;
-        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), Constants.OutfitType.NIGHT_GOWN_TITLE,
+        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
                 Constants.OutfitType.OUTFIT_TYPE_NIGHT_GOWN_LINK, 1);
     }
 

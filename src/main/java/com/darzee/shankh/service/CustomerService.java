@@ -73,7 +73,7 @@ public class CustomerService {
                 .map(customer ->
                         new CustomerDetails(CommonUtils.constructName(customer.getFirstName(), customer.getLastName()),
                                 customer.getPhoneNumber(),
-                                getCustomerProfilePicLink(objectImagesService.getCustomerImageReferenceId(customer.getId())),
+                                getCustomerProfilePicLink(customer.getId()),
                                 customer.getId()))
                 .collect(Collectors.toList());
 
@@ -171,6 +171,14 @@ public class CustomerService {
         return new ResponseEntity(
                 "Sorry! Customer with this ID is not registered with us",
                 HttpStatus.BAD_REQUEST);
+    }
+
+    public String getCustomerProfilePicLink(Long customerId) {
+        String customerImageReferenceId = objectImagesService.getCustomerImageReferenceId(customerId);
+        if(customerImageReferenceId != null) {
+            return getCustomerProfilePicLink(customerImageReferenceId);
+        }
+        return null;
     }
 
     private String getCustomerProfilePicLink(String customerImageReferenceId) {

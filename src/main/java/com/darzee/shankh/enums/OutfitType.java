@@ -10,29 +10,32 @@ import java.util.Map;
 public enum OutfitType {
 
     @JsonProperty("kurta_pyjama")
-    KURTA_PYJAMA("kurta_pyjama", 1),
+    KURTA_PYJAMA("kurta_pyjama", 1, "Kurta Pajama"),
     @JsonProperty("dress")
-    DRESS("dress", 2),
+    DRESS("dress", 2, "Dress"),
     @JsonProperty("saree_blouse")
-    SAREE_BLOUSE("saree_blouse", 3),
+    SAREE_BLOUSE("saree_blouse", 3, "Saree Blouse"),
     @JsonProperty("mens_suit")
-    MENS_SUIT("mens_suit", 4),
+    MENS_SUIT("mens_suit", 4, "Men's Suit"),
     @JsonProperty("pants")
-    PANTS("pants", 5),
+    PANTS("pants", 5, "Pants"),
     @JsonProperty("night_gown")
-    EVENING_GOWN("night_gown", 6),
+    EVENING_GOWN("night_gown", 6, "Night Gown"),
     @JsonProperty("ladies_suit")
-    LADIES_SUIT("ladies_suit", 7),
+    LADIES_SUIT("ladies_suit", 7, "Ladies Suit"),
     @JsonProperty("shirt")
-    SHIRT("shirt", 8),
+    SHIRT("shirt", 8, "Shirt"),
     @JsonProperty("under_skirt")
-    UNDER_SKIRT("under_skirt", 9);
+    UNDER_SKIRT("under_skirt", 9, "Under Skirt");
     private String name;
     private Integer ordinal;
 
-    OutfitType(String name, Integer ordinal) {
+    private String displayString;
+
+    OutfitType(String name, Integer ordinal, String displayString) {
         this.name = name;
         this.ordinal = ordinal;
+        this.displayString = displayString;
     }
 
     public String getName() {
@@ -41,6 +44,10 @@ public enum OutfitType {
 
     public Integer getOrdinal() {
         return this.ordinal;
+    }
+
+    public String getDisplayString() {
+        return this.displayString;
     }
 
 

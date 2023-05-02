@@ -1,6 +1,7 @@
 package com.darzee.shankh.response;
 
 import com.darzee.shankh.dao.CustomerDAO;
+import com.darzee.shankh.service.CustomerService;
 import com.darzee.shankh.utils.CommonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -15,6 +17,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerDetails {
+
+    @Autowired
+    private CustomerService customerService;
+
     private String customerName;
     private Long customerId;
     private String phoneNumber;
@@ -31,6 +37,7 @@ public class CustomerDetails {
         if(customerDAO != null) {
             this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
             this.phoneNumber = customerDAO.getPhoneNumber();
+            this.profilePicLink = customerService.getCustomerProfilePicLink(customerDAO.getId());
         }
     }
 }

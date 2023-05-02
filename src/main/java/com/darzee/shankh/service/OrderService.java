@@ -205,7 +205,7 @@ public class OrderService {
     }
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
-        return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO, orderDAO.getOrderAmount());
+        return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO);
     }
 
     private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
