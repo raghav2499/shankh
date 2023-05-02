@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -18,8 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @NoArgsConstructor
 public class CustomerDetails {
 
-    @Autowired
-    private CustomerService customerService;
+    private CustomerService customerService = new CustomerService();
 
     private String customerName;
     private Long customerId;
