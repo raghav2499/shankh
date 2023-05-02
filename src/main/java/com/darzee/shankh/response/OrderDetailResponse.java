@@ -30,7 +30,7 @@ public class OrderDetailResponse {
     private String deliveryDate;
     private String customerImageLink;
 
-    public OrderDetailResponse(CustomerDAO customer, OrderDAO order) {
+    public OrderDetailResponse(CustomerDAO customer, OrderDAO order, String customerProfilePicLnk) {
         this.customerDetails = new CustomerDetails(customer);
         this.orderId = order.getId();
         this.orderStatus = order.getOrderStatus().getDisplayString();
@@ -38,6 +38,7 @@ public class OrderDetailResponse {
         this.outfitType = order.getOutfitType().getDisplayString();
         this.trialDate = order.getTrialDate().toString();
         this.deliveryDate = order.getDeliveryDate().toString();
+        this.customerImageLink = customerProfilePicLnk;
 
     }
 }

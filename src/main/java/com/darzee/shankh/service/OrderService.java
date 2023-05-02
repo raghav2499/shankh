@@ -45,6 +45,9 @@ public class OrderService {
     private FilterOrderService filterOrderService;
 
     @Autowired
+    private CustomerService customerService;
+
+    @Autowired
     private OrderRepo orderRepo;
 
     @Autowired
@@ -205,7 +208,8 @@ public class OrderService {
     }
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
-        return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO);
+        String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
+        return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO, customerProfilePicLink);
     }
 
     private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {

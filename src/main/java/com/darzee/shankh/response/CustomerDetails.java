@@ -19,8 +19,6 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 public class CustomerDetails {
 
-    private CustomerService customerService = new CustomerService();
-
     private String customerName;
     private Long customerId;
     private String phoneNumber;
@@ -37,7 +35,6 @@ public class CustomerDetails {
         if(customerDAO != null) {
             this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
             this.phoneNumber = customerDAO.getPhoneNumber();
-            this.profilePicLink = customerService.getCustomerProfilePicLink(customerDAO.getId());
         }
     }
 }
