@@ -28,17 +28,14 @@ public class OrderDetailResponse {
     private String outfitType;
     private String trialDate;
     private String deliveryDate;
-    private String customerImageLink;
 
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, String customerProfilePicLnk) {
-        this.customerDetails = new CustomerDetails(customer);
+        this.customerDetails = new CustomerDetails(customer, customerProfilePicLnk);
         this.orderId = order.getId();
         this.orderStatus = order.getOrderStatus().getDisplayString();
         this.isPriorityOrder = Optional.ofNullable(order.getIsPriorityOrder()).orElse(Boolean.FALSE);
         this.outfitType = order.getOutfitType().getDisplayString();
         this.trialDate = order.getTrialDate().toString();
         this.deliveryDate = order.getDeliveryDate().toString();
-        this.customerImageLink = customerProfilePicLnk;
-
     }
 }

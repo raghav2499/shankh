@@ -31,10 +31,11 @@ public class CustomerDetails {
         this.customerId = customerId;
     }
 
-    CustomerDetails(CustomerDAO customerDAO) {
+    CustomerDetails(CustomerDAO customerDAO, String customerProfilePicLink) {
         if(customerDAO != null) {
             this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
             this.phoneNumber = customerDAO.getPhoneNumber();
+            this.profilePicLink = customerProfilePicLink;
         }
     }
 }
