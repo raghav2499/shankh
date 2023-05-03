@@ -178,7 +178,7 @@ public class CustomerService {
         if(customerImageReferenceId != null) {
             return getCustomerProfilePicLink(customerImageReferenceId);
         }
-        return null;
+        return "";
     }
 
     private String getCustomerProfilePicLink(String customerImageReferenceId) {

@@ -4,6 +4,7 @@ import com.darzee.shankh.request.CreateOrderRequest;
 import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
 import com.darzee.shankh.response.CreateOrderResponse;
+import com.darzee.shankh.response.GetOrderResponse;
 import com.darzee.shankh.response.OrderDetailResponse;
 import com.darzee.shankh.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +31,12 @@ public class OrderController {
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<OrderDetailResponse>> getOrder(@RequestParam(name = "boutique_id") Long boutiqueId,
-                                                              @RequestParam(name = "status_list") String statusList,
-                                                              @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
-                                                              @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
-                                                              @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
-                                                              @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
+    public ResponseEntity<GetOrderResponse> getOrder(@RequestParam(name = "boutique_id") Long boutiqueId,
+                                                     @RequestParam(name = "status_list") String statusList,
+                                                     @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
+                                                     @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
+                                                     @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
+                                                     @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
         Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, statusList, priorityOrdersOnly);
         Integer offset = (pageCount - 1) * countPerPage;
         Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingAndSortCriteria(sortKey, countPerPage, offset);

@@ -17,6 +17,7 @@ import com.darzee.shankh.request.innerObjects.OrderDetails;
 import com.darzee.shankh.request.innerObjects.UpdateOrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.UpdateOrderDetails;
 import com.darzee.shankh.response.CreateOrderResponse;
+import com.darzee.shankh.response.GetOrderResponse;
 import com.darzee.shankh.response.OrderDetailResponse;
 import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -103,7 +104,7 @@ public class OrderService {
         return new ResponseEntity<>(failureResponse, HttpStatus.OK);
     }
 
-    public ResponseEntity<List<OrderDetailResponse>> getOrder(Map<String, Object> filterMap, Map<String, Object> pagingSortingMap) {
+    public ResponseEntity<GetOrderResponse> getOrder(Map<String, Object> filterMap, Map<String, Object> pagingSortingMap) {
         Specification<Order> orderSpecification = OrderSpecificationClause.getSpecificationBasedOnFilters(filterMap);
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingSortingMap);
         List<Order> orderDetails = orderRepo.findAll(orderSpecification, pagingCriteria).getContent();
@@ -113,7 +114,8 @@ public class OrderService {
         List<OrderDetailResponse> orderDetailsList = orderDAOList.stream()
                 .map(order -> getOrderDetails(order))
                 .collect(Collectors.toList());
-        return new ResponseEntity<>(orderDetailsList, HttpStatus.OK);
+        GetOrderResponse response = new GetOrderResponse(orderDetailsList);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {
