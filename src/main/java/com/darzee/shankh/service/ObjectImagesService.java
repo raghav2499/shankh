@@ -6,6 +6,7 @@ import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.ObjectImagesRepo;
 import com.darzee.shankh.utils.CommonUtils;
+import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,22 @@ public class ObjectImagesService {
         if (optionalCustomerImage.isPresent()) {
             ObjectImagesDAO customerImage = mapper.objectImagesToObjectImagesDAO(optionalCustomerImage.get());
             return customerImage.getReferenceId();
+        }
+        return null;
+    }
+
+    @Nullable
+    public List<String> getClothReferenceIds(Long orderId) {
+        List<ObjectImages> clothImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(orderId,
+                ImageEntityType.ORDER.getEntityType(),
+                Boolean.TRUE);
+        if (!Collections.isEmpty(clothImages)) {
+            List<ObjectImagesDAO> clothImagesDAO = CommonUtils.mapList(clothImages,
+                    mapper::objectImagesToObjectImagesDAO);
+            List<String> clothImagesReferenceIds = clothImagesDAO.stream()
+                    .map(clothImage -> clothImage.getReferenceId())
+                    .collect(Collectors.toList());
+            return clothImagesReferenceIds;
         }
         return null;
     }

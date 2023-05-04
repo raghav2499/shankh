@@ -6,10 +6,7 @@ import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.Measurements;
-import com.darzee.shankh.response.InnerMeasurementDetails;
-import com.darzee.shankh.response.MeasurementDetails;
-import com.darzee.shankh.response.OutfitDetails;
-import com.darzee.shankh.response.OverallMeasurementDetails;
+import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,6 +65,26 @@ public class SareeBlouseImplService implements OutfitTypeService {
         if (measurementDetails.getBackNeckDepth() != null) {
             measurementDAO.setBackNeckDepth(measurementDetails.getBackNeckDepth() * multiplyingFactor);
         }
+    }
+
+    @Override
+    public OutfitMeasurementDetails extractMeasurementDetails(MeasurementDAO measurementDAO) {
+        OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
+
+        outfitMeasurementDetails.setBlouseLength(measurementDAO.getBlouseLength());
+        outfitMeasurementDetails.setBust(measurementDAO.getBust());
+        outfitMeasurementDetails.setUpperChest(measurementDAO.getUpperChest());
+        outfitMeasurementDetails.setBelowBust(measurementDAO.getBelowBust());
+        outfitMeasurementDetails.setShoulder(measurementDAO.getShoulder());
+        outfitMeasurementDetails.setArmHole(measurementDAO.getArmHole());
+        outfitMeasurementDetails.setSleeveLength(measurementDAO.getSleeveLength());
+        outfitMeasurementDetails.setSleeveCircumference(measurementDAO.getSleeveCircumference());
+        outfitMeasurementDetails.setFrontNeckDepth(measurementDAO.getFrontNeckDepth());
+        outfitMeasurementDetails.setShoulderToApexLength(measurementDAO.getShoulderToApexLength());
+        outfitMeasurementDetails.setApexToApexLength(measurementDAO.getApexToApexLength());
+        outfitMeasurementDetails.setBackNeckDepth(measurementDAO.getBackNeckDepth());
+
+        return outfitMeasurementDetails;
     }
 
     @Override

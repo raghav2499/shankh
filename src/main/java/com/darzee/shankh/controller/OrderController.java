@@ -5,7 +5,6 @@ import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
 import com.darzee.shankh.response.CreateOrderResponse;
 import com.darzee.shankh.response.GetOrderResponse;
-import com.darzee.shankh.response.OrderDetailResponse;
 import com.darzee.shankh.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Map;
 
 
@@ -41,6 +39,12 @@ public class OrderController {
         Integer offset = (pageCount - 1) * countPerPage;
         Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingAndSortCriteria(sortKey, countPerPage, offset);
         return orderService.getOrder(filterMap, pagingCriteriaMap);
+    }
+
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getOrderDetails(@PathVariable("id") Long orderId) throws Exception {
+        return orderService.getOrderDetails(orderId);
     }
 
     @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

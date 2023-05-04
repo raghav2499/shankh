@@ -6,10 +6,7 @@ import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.Measurements;
-import com.darzee.shankh.response.InnerMeasurementDetails;
-import com.darzee.shankh.response.MeasurementDetails;
-import com.darzee.shankh.response.OutfitDetails;
-import com.darzee.shankh.response.OverallMeasurementDetails;
+import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +47,20 @@ public class PantImplService implements OutfitTypeService {
         if (measurementDetails.getFly() != null) {
             measurementDAO.setFly(measurementDetails.getFly() * multiplyingFactor);
         }
+    }
+
+    @Override
+    public OutfitMeasurementDetails extractMeasurementDetails(MeasurementDAO measurementDAO) {
+        OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
+
+        outfitMeasurementDetails.setWaist(measurementDAO.getWaist());
+        outfitMeasurementDetails.setSeat(measurementDAO.getSeat());
+        outfitMeasurementDetails.setCalf(measurementDAO.getCalf());
+        outfitMeasurementDetails.setBottom(measurementDAO.getBottom());
+        outfitMeasurementDetails.setLength(measurementDAO.getLength());
+        outfitMeasurementDetails.setFly(measurementDAO.getFly());
+
+        return outfitMeasurementDetails;
     }
 
     @Override

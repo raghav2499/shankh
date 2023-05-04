@@ -1,8 +1,10 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
+import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.enums.OrderStatus;
@@ -19,6 +21,8 @@ import com.darzee.shankh.request.innerObjects.UpdateOrderDetails;
 import com.darzee.shankh.response.CreateOrderResponse;
 import com.darzee.shankh.response.GetOrderResponse;
 import com.darzee.shankh.response.OrderDetailResponse;
+import com.darzee.shankh.response.OutfitMeasurementDetails;
+import com.darzee.shankh.utils.CommonUtils;
 import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +76,15 @@ public class OrderService {
     private MeasurementRepo measurementRepo;
     @Autowired
     private BoutiqueLedgerRepo boutiqueLedgerRepo;
+
     @Autowired
     private ObjectImagesRepo objectImagesRepo;
+
+    @Autowired
+    private ImageReferenceRepo imageReferenceRepo;
+
+    @Autowired
+    private AmazonClient s3Client;
 
     @Transactional
     public ResponseEntity createNewOrder(CreateOrderRequest request) {
@@ -116,6 +127,26 @@ public class OrderService {
                 .collect(Collectors.toList());
         GetOrderResponse response = new GetOrderResponse(orderDetailsList);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity getOrderDetails(Long orderId) throws Exception {
+        Optional<Order> optionalOrder = orderRepo.findById(orderId);
+        if (optionalOrder.isPresent()) {
+            OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
+            OrderAmountDAO orderAmount = order.getOrderAmount();
+            OutfitType outfitType = order.getOutfitType();
+            CustomerDAO customer = order.getCustomer();
+            MeasurementDAO measurementDAO = customer.getMeasurement();
+            OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
+            OutfitMeasurementDetails measurementDetails = outfitTypeService.extractMeasurementDetails(measurementDAO);
+            List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
+            List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
+            String message = "Details fetched succesfully";
+            OrderDetailResponse response = new OrderDetailResponse(customer, order, measurementDetails,
+                    orderAmount, clothImageUrlLinks, message);
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
     }
 
     public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {
@@ -256,6 +287,22 @@ public class OrderService {
                 new CycleAvoidingMappingContext());
         return boutiqueLedgerDAO;
 
+    }
+
+    private List<String> getClothProfilePicLink(List<String> clothImageReferenceId) {
+        if (Collections.isEmpty(clothImageReferenceId)) {
+            return null;
+        }
+        List<ImageReference> clothImageReferences = imageReferenceRepo.findAllByReferenceIdIn(clothImageReferenceId);
+        if (!Collections.isEmpty(clothImageReferences)) {
+            List<ImageReferenceDAO> imageReferenceDAOs = CommonUtils.mapList(clothImageReferences,
+                    mapper::imageReferenceToImageReferenceDAO);
+            List<String> clothImageFileNames = imageReferenceDAOs.stream()
+                    .map(imageRef -> imageRef.getImageName())
+                    .collect(Collectors.toList());
+            return s3Client.generateShortLivedUrls(clothImageFileNames);
+        }
+        return null;
     }
 
     private String generateOrderInvoiceNo() {

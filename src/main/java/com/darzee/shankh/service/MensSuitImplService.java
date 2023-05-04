@@ -6,10 +6,7 @@ import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.Measurements;
-import com.darzee.shankh.response.InnerMeasurementDetails;
-import com.darzee.shankh.response.MeasurementDetails;
-import com.darzee.shankh.response.OutfitDetails;
-import com.darzee.shankh.response.OverallMeasurementDetails;
+import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,6 +64,25 @@ public class MensSuitImplService implements OutfitTypeService {
         if (measurementDetails.getFly() != null) {
             measurementDAO.setFly(measurementDetails.getFly() * multiplyingFactor);
         }
+    }
+
+    @Override
+    public OutfitMeasurementDetails extractMeasurementDetails(MeasurementDAO measurementDAO) {
+        OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
+
+        outfitMeasurementDetails.setShirtLength(measurementDAO.getShirtLength());
+        outfitMeasurementDetails.setNeck(measurementDAO.getNeck());
+        outfitMeasurementDetails.setShoulder(measurementDAO.getShoulder());
+        outfitMeasurementDetails.setChest(measurementDAO.getChest());
+        outfitMeasurementDetails.setWaist(measurementDAO.getWaist());
+        outfitMeasurementDetails.setSeat(measurementDAO.getSeat());
+        outfitMeasurementDetails.setSleeveLength(measurementDAO.getSleeveLength());
+        outfitMeasurementDetails.setSleeveCircumference(measurementDAO.getSleeveCircumference());
+        outfitMeasurementDetails.setCalf(measurementDAO.getCalf());
+        outfitMeasurementDetails.setBottom(measurementDAO.getBottom());
+        outfitMeasurementDetails.setFly(measurementDAO.getFly());
+        outfitMeasurementDetails.setPantLength(measurementDAO.getPantLength());
+        return outfitMeasurementDetails;
     }
 
     @Override

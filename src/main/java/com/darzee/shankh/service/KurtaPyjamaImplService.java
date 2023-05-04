@@ -6,10 +6,7 @@ import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.Measurements;
-import com.darzee.shankh.response.InnerMeasurementDetails;
-import com.darzee.shankh.response.MeasurementDetails;
-import com.darzee.shankh.response.OutfitDetails;
-import com.darzee.shankh.response.OverallMeasurementDetails;
+import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,6 +73,29 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
         if (measurementDetails.getAnkle() != null) {
             measurementDAO.setAnkle(measurementDetails.getAnkle() * multiplyingFactor);
         }
+    }
+
+    @Override
+    public OutfitMeasurementDetails extractMeasurementDetails(MeasurementDAO measurementDAO) {
+        OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
+
+        outfitMeasurementDetails.setKurtaLength(measurementDAO.getKurtaLength());
+        outfitMeasurementDetails.setShoulder(measurementDAO.getShoulder());
+        outfitMeasurementDetails.setUpperChest(measurementDAO.getUpperChest());
+        outfitMeasurementDetails.setBust(measurementDAO.getBust());
+        outfitMeasurementDetails.setWaist(measurementDAO.getWaist());
+        outfitMeasurementDetails.setSeat(measurementDAO.getSeat());
+        outfitMeasurementDetails.setArmHole(measurementDAO.getArmHole());
+        outfitMeasurementDetails.setSleeveLength(measurementDAO.getSleeveLength());
+        outfitMeasurementDetails.setSleeveCircumference(measurementDAO.getSleeveCircumference());
+        outfitMeasurementDetails.setFrontNeckDepth(measurementDAO.getFrontNeckDepth());
+        outfitMeasurementDetails.setBackNeckDepth(measurementDAO.getBackNeckDepth());
+        outfitMeasurementDetails.setPyjamaLength(measurementDAO.getPyjamaLength());
+        outfitMeasurementDetails.setPyjamaHip(measurementDAO.getPyjamaHip());
+        outfitMeasurementDetails.setKnee(measurementDAO.getKnee());
+        outfitMeasurementDetails.setAnkle(measurementDAO.getAnkle());
+
+        return outfitMeasurementDetails;
     }
 
     @Override

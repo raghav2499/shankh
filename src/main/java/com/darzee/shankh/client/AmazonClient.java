@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -47,6 +49,15 @@ public class AmazonClient {
 
     public String generateShortLivedUrl(String fileName) {
         return generateShortLivedUrl(bucketName, fileName);
+    }
+
+    public List<String> generateShortLivedUrls(List<String> fileNames) {
+        List<String> urlList = new ArrayList<>(fileNames.size());
+        for(String fileName : fileNames) {
+            String url = generateShortLivedUrl(bucketName, fileName);
+            urlList.add(url);
+        }
+        return urlList;
     }
 
     private String generateShortLivedUrl(String bucketName, String fileName) {
