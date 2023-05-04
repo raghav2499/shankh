@@ -291,7 +291,7 @@ public class OrderService {
 
     private List<String> getClothProfilePicLink(List<String> clothImageReferenceId) {
         if (Collections.isEmpty(clothImageReferenceId)) {
-            return null;
+            return new ArrayList<>();
         }
         List<ImageReference> clothImageReferences = imageReferenceRepo.findAllByReferenceIdIn(clothImageReferenceId);
         if (!Collections.isEmpty(clothImageReferences)) {
@@ -302,7 +302,7 @@ public class OrderService {
                     .collect(Collectors.toList());
             return s3Client.generateShortLivedUrls(clothImageFileNames);
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private String generateOrderInvoiceNo() {
