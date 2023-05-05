@@ -26,7 +26,7 @@ public class OrderDAO {
     private OutfitType outfitType;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Boolean isPriorityOrder;
+    private Boolean isPriorityOrder = Boolean.FALSE;
     private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;
     private OrderType orderType;
     private String specialInstructions;

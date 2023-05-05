@@ -50,6 +50,7 @@ public class MeasurementService {
             MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
             overallMeasurementDetails = outfitTypeService.setMeasurementDetails(measurementDAO, measurementScale);
             overallMeasurementDetails.setMessage(getMeasurementDetailsMessage(outfitTypeService.areMandatoryParamsSet(measurementDAO)));
+            overallMeasurementDetails.setMeasurementUpdatedAt(measurementDAO.getUpdatedAt());
             return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);
         }
 

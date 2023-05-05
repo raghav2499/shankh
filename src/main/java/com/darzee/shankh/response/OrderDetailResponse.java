@@ -23,6 +23,8 @@ public class OrderDetailResponse {
     private String orderStatus;
     private Boolean isPriorityOrder;
     private String outfitType;
+
+    private Integer outfitTypeIndex;
     private String trialDate;
     private String deliveryDate;
     private String inspiration;
@@ -52,6 +54,7 @@ public class OrderDetailResponse {
         this.orderStatus = order.getOrderStatus().getDisplayString();
         this.isPriorityOrder = Optional.ofNullable(order.getIsPriorityOrder()).orElse(Boolean.FALSE);
         this.outfitType = order.getOutfitType().getDisplayString();
+        this.outfitTypeIndex = order.getOutfitType().getOrdinal();
         this.trialDate = order.getTrialDate().toString();
         this.deliveryDate = order.getDeliveryDate().toString();
         this.type = order.getOrderType().getDisplayName();

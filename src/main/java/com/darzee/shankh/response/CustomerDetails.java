@@ -42,6 +42,7 @@ public class CustomerDetails {
         if(customerDAO != null) {
             this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
             this.phoneNumber = customerDAO.getPhoneNumber();
+            this.customerId = customerDAO.getId();
             this.age = customerDAO.getAge();
         }
     }
