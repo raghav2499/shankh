@@ -3,7 +3,6 @@ package com.darzee.shankh.mapper;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.*;
 import com.darzee.shankh.request.Measurements;
-import com.darzee.shankh.response.GetCustomerResponse;
 import com.darzee.shankh.response.TailorLoginResponse;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -27,8 +26,6 @@ public interface DaoEntityMapper {
 
     Order orderaDaoToObject(OrderDAO orderDAO, @Context CycleAvoidingMappingContext context);
     CustomerDAO customerObjectToDao(Customer customer, @Context CycleAvoidingMappingContext context);
-
-    GetCustomerResponse customerDAOToGetCustomerResponse(CustomerDAO customerDAO, @Context CycleAvoidingMappingContext context);
 
     Customer customerDaoToObject(CustomerDAO customerDAO, @Context CycleAvoidingMappingContext context);
 
