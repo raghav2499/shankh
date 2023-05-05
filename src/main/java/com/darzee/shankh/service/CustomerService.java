@@ -16,7 +16,6 @@ import com.darzee.shankh.request.CreateCustomerRequest;
 import com.darzee.shankh.request.UpdateCustomerRequest;
 import com.darzee.shankh.response.CreateCustomerResponse;
 import com.darzee.shankh.response.CustomerDetails;
-import com.darzee.shankh.response.GetCustomerResponse;
 import com.darzee.shankh.response.GetCustomersResponse;
 import com.darzee.shankh.utils.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +34,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
-
     @Autowired
     private MeasurementService measurementService;
 
@@ -59,8 +57,10 @@ public class CustomerService {
 
     @Autowired
     private BoutiqueLedgerRepo boutiqueLedgerRepo;
+
     @Autowired
     private MeasurementRepo measurementRepo;
+
     @Autowired
     private ObjectImagesRepo objectImagesRepo;
 
@@ -84,10 +84,10 @@ public class CustomerService {
         Optional<Customer> optionalCustomer = customerRepo.findById(customerId);
         if (optionalCustomer.isPresent()) {
             CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
-            GetCustomerResponse response = mapper.customerDAOToGetCustomerResponse(customerDAO, new CycleAvoidingMappingContext());
-            return new ResponseEntity(response, HttpStatus.OK);
+            CustomerDetails customerDetails = new CustomerDetails(customerDAO);
+            return new ResponseEntity(customerDetails, HttpStatus.OK);
         }
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Customer id");
     }
 
     public ResponseEntity createCustomer(CreateCustomerRequest request) {
@@ -175,7 +175,7 @@ public class CustomerService {
 
     public String getCustomerProfilePicLink(Long customerId) {
         String customerImageReferenceId = objectImagesService.getCustomerImageReferenceId(customerId);
-        if(customerImageReferenceId != null) {
+        if (customerImageReferenceId != null) {
             return getCustomerProfilePicLink(customerImageReferenceId);
         }
         return "";
