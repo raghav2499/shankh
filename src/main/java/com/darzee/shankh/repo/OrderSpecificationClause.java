@@ -1,6 +1,7 @@
 package com.darzee.shankh.repo;
 
 import com.darzee.shankh.entity.Boutique;
+import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.enums.OrderFilter;
 import org.springframework.data.jpa.domain.Specification;
@@ -32,7 +33,10 @@ public class OrderSpecificationClause {
     }
 
     public static Specification<Order> findCustomerOrders(Long customerId) {
-        return (root, cq, cb) -> cb.equal(root.get("customerId"), customerId);
+        return (root, cq, cb) -> {
+            Join<Order, Customer> customer = root.join("customer");
+            return cb.equal(customer.get("id"), customerId);
+        };
     }
 
     public static Specification<Order> findOrdersByDeliveryDateFrom(LocalDateTime deliveryDateFrom) {
