@@ -32,6 +32,7 @@ public class OrderDAO {
     private String specialInstructions;
     private Boolean isDeleted = Boolean.FALSE;
     private String inspiration;
+    private Long customerId;
     private BoutiqueDAO boutique;
     private CustomerDAO customer;
     private OrderAmountDAO orderAmount;

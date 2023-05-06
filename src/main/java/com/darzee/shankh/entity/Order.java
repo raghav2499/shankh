@@ -53,6 +53,10 @@ public class Order extends GenericEntity {
 
     @Column(name = "is_priority_order")
     private Boolean isPriorityOrder = Boolean.FALSE;
+
+    @Column(name ="customer_id")
+    private Long customerId;
+
     @ManyToOne
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
