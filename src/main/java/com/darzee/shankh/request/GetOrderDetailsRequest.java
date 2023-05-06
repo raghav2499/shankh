@@ -33,7 +33,7 @@ public class GetOrderDetailsRequest {
      * @return
      */
     public static Map<String, Object> getFilterMap(Long boutiqueId, String statuses, Boolean priorityOrdersOnly,
-                                                   Long customerId, LocalDateTime deliveryDateFrom, LocalDateTime deliveryDateTill) {
+                                                   Long customerId, String deliveryDateFrom, String deliveryDateTill) {
         Map<String, Object> filterMap = new HashMap<>();
         if (boutiqueId != null) {
             filterMap.put(BOUTIQUE_ID.getFilterName(), boutiqueId);
@@ -55,10 +55,10 @@ public class GetOrderDetailsRequest {
             filterMap.put(CUSTOMER_ID.getFilterName(), customerId);
         }
         if (deliveryDateFrom != null) {
-            filterMap.put(DELIVERY_DATE_FROM.getFilterName(), deliveryDateFrom);
+            filterMap.put(DELIVERY_DATE_FROM.getFilterName(), LocalDateTime.parse(deliveryDateFrom));
         }
         if (deliveryDateTill != null) {
-            filterMap.put(DELIVERY_DATE_TILL.getFilterName(), deliveryDateTill);
+            filterMap.put(DELIVERY_DATE_TILL.getFilterName(), LocalDateTime.parse(deliveryDateTill));
         }
         return filterMap;
     }
