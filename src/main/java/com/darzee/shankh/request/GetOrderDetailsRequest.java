@@ -4,6 +4,7 @@ import com.darzee.shankh.enums.OrderStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -28,9 +29,11 @@ public class GetOrderDetailsRequest {
     /**
      * Status ordinal mapping saved in DB, and the one known to clients is different. So status enum is judged from
      * the one in request, and then is mapped to corresponding DB ordinal
+     *
      * @return
      */
-    public static Map<String, Object> getFilterMap(Long boutiqueId, String statuses, Boolean priorityOrdersOnly) {
+    public static Map<String, Object> getFilterMap(Long boutiqueId, String statuses, Boolean priorityOrdersOnly,
+                                                   Long customerId, LocalDateTime deliveryDateFrom, LocalDateTime deliveryDateTill) {
         Map<String, Object> filterMap = new HashMap<>();
         if (boutiqueId != null) {
             filterMap.put(BOUTIQUE_ID.getFilterName(), boutiqueId);
@@ -48,13 +51,22 @@ public class GetOrderDetailsRequest {
         if (priorityOrdersOnly != null) {
             filterMap.put(PRIORITY_ORDERS_ONLY.getFilterName(), priorityOrdersOnly);
         }
+        if (customerId != null) {
+            filterMap.put(CUSTOMER_ID.getFilterName(), customerId);
+        }
+        if (deliveryDateFrom != null) {
+            filterMap.put(DELIVERY_DATE_FROM.getFilterName(), deliveryDateFrom);
+        }
+        if (deliveryDateTill != null) {
+            filterMap.put(DELIVERY_DATE_TILL.getFilterName(), deliveryDateTill);
+        }
         return filterMap;
     }
 
     private static void setSortingCriteria(Map<String, Object> paramsMap, String requestSortKey) {
         String parasmMapSortKey = PARAMS_MAP_SORT_KEY;
         String paramsSortValue = "";
-        switch(requestSortKey) {
+        switch (requestSortKey) {
             case "trial_date":
                 paramsSortValue = TRIAL_DATE.getOrderSortString();
                 break;

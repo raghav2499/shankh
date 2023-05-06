@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 
@@ -31,11 +32,15 @@ public class OrderController {
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetOrderResponse> getOrder(@RequestParam(name = "boutique_id") Long boutiqueId,
                                                      @RequestParam(name = "status_list") String statusList,
+                                                     @RequestParam(name = "customer_id", required = false) Long customerId,
+                                                     @RequestParam(name = "delivery_date_from", required = false) LocalDateTime deliveryDateFrom,
+                                                     @RequestParam(name = "delivery_date_till", required = false) LocalDateTime deliveryDateTill,
                                                      @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
                                                      @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
                                                      @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                      @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
-        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, statusList, priorityOrdersOnly);
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, statusList, priorityOrdersOnly,
+                customerId, deliveryDateFrom, deliveryDateTill);
         Integer offset = (pageCount - 1) * countPerPage;
         Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingAndSortCriteria(sortKey, countPerPage, offset);
         return orderService.getOrder(filterMap, pagingCriteriaMap);

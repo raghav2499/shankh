@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,18 @@ public class OrderSpecificationClause {
 
     public static Specification<Order> findPriorityOrders(Boolean fetchPriorityOrders) {
         return (root, cq, cb) -> cb.equal(root.get("isPriorityOrder"), fetchPriorityOrders);
+    }
+
+    public static Specification<Order> findCustomerOrders(Long customerId) {
+        return (root, cq, cb) -> cb.equal(root.get("customerId"), customerId);
+    }
+
+    public static Specification<Order> findOrdersByDeliveryDateFrom(LocalDateTime deliveryDateFrom) {
+        return (root, cq, cb) -> cb.greaterThanOrEqualTo(root.get("deliveryDate"), deliveryDateFrom);
+    }
+
+    public static Specification<Order> findOrdersByDeliveryDateTill(LocalDateTime deliveryDateTill) {
+        return (root, cq, cb) -> cb.lessThanOrEqualTo(root.get("deliveryDate"), deliveryDateTill);
     }
 
     public static Specification<Order> getSpecificationBasedOnFilters(Map<String, Object> paramsMap) {
@@ -61,6 +74,12 @@ public class OrderSpecificationClause {
                 return findOrderByBoutiqueId((Long) value);
             case PRIORITY_ORDERS_ONLY:
                 return findPriorityOrders((Boolean) value);
+            case CUSTOMER_ID:
+                return findCustomerOrders((Long) value);
+            case DELIVERY_DATE_FROM:
+                return findOrdersByDeliveryDateFrom((LocalDateTime) value);
+            case DELIVERY_DATE_TILL:
+                return findOrdersByDeliveryDateTill((LocalDateTime) value);
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We've not started grouping on " + filter);
         }
