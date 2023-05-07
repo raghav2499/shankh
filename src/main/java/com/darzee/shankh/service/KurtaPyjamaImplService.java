@@ -137,7 +137,7 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.KURTA_PYJAMA;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                Constants.OutfitType.OUTFIT_TYPE_KURTA_PYJAMA_LINK, 2);
+                outfitType.getImageLink(), 2);
     }
 
     private InnerMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementDAO measurementDAO, MeasurementScale scale) {

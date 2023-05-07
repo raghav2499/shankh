@@ -113,7 +113,7 @@ public class ShirtImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.SHIRT;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                Constants.OutfitType.OUTFIT_TYPE_SHIRT_LINK, 1);
+                outfitType.getImageLink(), 1);
     }
 
     private MeasurementDetails addLength(String value) {

@@ -142,7 +142,7 @@ public class MensSuitImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.MENS_SUIT;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                Constants.OutfitType.OUTFIT_TYPE_MENS_SUIT_LINK, 2);
+                outfitType.getImageLink(), 2);
     }
 
     private InnerMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementDAO measurementDAO, MeasurementScale scale) {

@@ -16,9 +16,9 @@ public class MeasurementController {
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getMeasurementDetails(@RequestParam("customer_id") Long customerId,
-                                                @RequestParam("outfit_type") String outfitType,
+                                                @RequestParam("outfit_type") Integer outfitTypeIndex,
                                                 @RequestParam(value = "scale", defaultValue = "cm") String scale) throws Exception {
-        return measurementService.getMeasurementDetails(customerId, outfitType, scale);
+        return measurementService.getMeasurementDetails(customerId, outfitTypeIndex, scale);
     }
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)

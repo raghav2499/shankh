@@ -35,11 +35,11 @@ public class MeasurementService {
     @Autowired
     private CustomerRepo customerRepo;
 
-    public ResponseEntity getMeasurementDetails(Long customerId, String outfitTypeString, String scale)
+    public ResponseEntity getMeasurementDetails(Long customerId, Integer outfitTypeIndex, String scale)
             throws Exception {
-        validateGetMeasurementRequestParams(outfitTypeString, scale);
+        validateGetMeasurementRequestParams(outfitTypeIndex, scale);
 
-        OutfitType outfitType = OutfitType.getOutfitEnumMap().get(outfitTypeString);
+        OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         Optional<Customer> customer = customerRepo.findById(customerId);
         OverallMeasurementDetails overallMeasurementDetails = null;
@@ -93,8 +93,8 @@ public class MeasurementService {
         return message;
     }
 
-    private void validateGetMeasurementRequestParams(String outfitTypeString, String scale) {
-        if (!OutfitType.getOutfitEnumMap().containsKey(outfitTypeString)) {
+    private void validateGetMeasurementRequestParams(Integer outfitTypeIndex, String scale) {
+        if (!OutfitType.getOutfitOrdinalEnumMap().containsKey(outfitTypeIndex)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Outfit Type not supported");
         } else if (scale != null && !MeasurementScale.getEnumMap().containsKey(scale)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Measurement Scale");

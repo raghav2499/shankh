@@ -178,7 +178,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.LADIES_SUIT;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                Constants.OutfitType.OUTFIT_TYPE_LADIES_SUIT_LINK, 2);
+                outfitType.getImageLink(), 2);
     }
 
     private MeasurementDetails addKameezLength(String value) {

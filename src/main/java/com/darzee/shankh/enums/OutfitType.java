@@ -6,36 +6,41 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.darzee.shankh.constants.Constants.OutfitType.*;
+
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum OutfitType {
 
     @JsonProperty("kurta_pyjama")
-    KURTA_PYJAMA("kurta_pyjama", 1, "Kurta Pajama"),
+    KURTA_PYJAMA("kurta_pyjama", 1, "Kurta Pajama", OUTFIT_TYPE_KURTA_PYJAMA_LINK),
     @JsonProperty("dress")
-    DRESS("dress", 2, "Dress"),
+    DRESS("dress", 2, "Dress", OUTFIT_TYPE_DRESS_LINK),
     @JsonProperty("saree_blouse")
-    SAREE_BLOUSE("saree_blouse", 3, "Saree Blouse"),
+    SAREE_BLOUSE("saree_blouse", 3, "Saree Blouse", OUTFIT_TYPE_SAREE_BLOUSE_LINK),
     @JsonProperty("mens_suit")
-    MENS_SUIT("mens_suit", 4, "Men's Suit"),
+    MENS_SUIT("mens_suit", 4, "Men's Suit", OUTFIT_TYPE_MENS_SUIT_LINK),
     @JsonProperty("pants")
-    PANTS("pants", 5, "Pants"),
+    PANTS("pants", 5, "Pants", OUTFIT_TYPE_PANT_LINK),
     @JsonProperty("night_gown")
-    EVENING_GOWN("night_gown", 6, "Night Gown"),
+    EVENING_GOWN("night_gown", 6, "Night Gown", OUTFIT_TYPE_NIGHT_GOWN_LINK),
     @JsonProperty("ladies_suit")
-    LADIES_SUIT("ladies_suit", 7, "Ladies Suit"),
+    LADIES_SUIT("ladies_suit", 7, "Ladies Suit", OUTFIT_TYPE_NIGHT_GOWN_LINK),
     @JsonProperty("shirt")
-    SHIRT("shirt", 8, "Shirt"),
+    SHIRT("shirt", 8, "Shirt", OUTFIT_TYPE_SHIRT_LINK),
     @JsonProperty("under_skirt")
-    UNDER_SKIRT("under_skirt", 9, "Under Skirt");
+    UNDER_SKIRT("under_skirt", 9, "Under Skirt", OUTFIT_TYPE_UNDER_SKIRT_LINK);
     private String name;
     private Integer ordinal;
 
     private String displayString;
 
-    OutfitType(String name, Integer ordinal, String displayString) {
+    private String imageLink;
+
+    OutfitType(String name, Integer ordinal, String displayString, String imageLink) {
         this.name = name;
         this.ordinal = ordinal;
         this.displayString = displayString;
+        this.imageLink = imageLink;
     }
 
     public String getName() {
@@ -50,9 +55,13 @@ public enum OutfitType {
         return this.displayString;
     }
 
+    public String getImageLink() {
+        return this.imageLink;
+    }
 
-    public static Map<String, OutfitType> outfitEnumMap  = getOutfitEnumMap();
-    public static Map<Integer, OutfitType> outfitOrdinalEnumMap  = getOutfitOrdinalEnumMap();
+
+    public static Map<String, OutfitType> outfitEnumMap = getOutfitEnumMap();
+    public static Map<Integer, OutfitType> outfitOrdinalEnumMap = getOutfitOrdinalEnumMap();
 
     public static Map<String, OutfitType> getOutfitEnumMap() {
         Map<String, OutfitType> outfitEnumMap = new HashMap<>();

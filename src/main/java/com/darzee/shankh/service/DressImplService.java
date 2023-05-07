@@ -97,7 +97,7 @@ public class DressImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.DRESS;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                Constants.OutfitType.OUTFIT_TYPE_DRESS_LINK, 1);
+                outfitType.getImageLink(), 1);
     }
 
     private MeasurementDetails addWaist(String value) {

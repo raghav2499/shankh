@@ -31,6 +31,8 @@ public class OrderDetailResponse {
     private String specialInstructions;
     private String type;
     private List<String> clothImagesLink;
+
+    private String outfitTypeImageLink;
     private OutfitMeasurementDetails measurementDetails;
     private OrderAmountDetails orderAmountDetails;
     private CustomerDetails customerDetails;
@@ -41,6 +43,7 @@ public class OrderDetailResponse {
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, String customerProfilePicLnk,
                                OrderAmountDAO orderAmountDAO) {
         this.customerDetails = new CustomerDetails(customer, customerProfilePicLnk);
+        this.orderAmountDetails = new OrderAmountDetails(orderAmountDAO);
         this.orderId = order.getId();
         this.orderStatus = order.getOrderStatus().getDisplayString();
         this.isPriorityOrder = Optional.ofNullable(order.getIsPriorityOrder()).orElse(Boolean.FALSE);
@@ -48,7 +51,7 @@ public class OrderDetailResponse {
         this.trialDate = order.getTrialDate().toString();
         this.deliveryDate = order.getDeliveryDate().toString();
         this.outfitTypeIndex = order.getOutfitType().getOrdinal();
-        this.orderAmountDetails = new OrderAmountDetails(orderAmountDAO);
+        this.outfitTypeImageLink = order.getOutfitType().getImageLink();
     }
 
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, OutfitMeasurementDetails outfitMeasurementDetails,

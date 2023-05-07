@@ -78,7 +78,7 @@ public class UnderSkirtImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.UNDER_SKIRT;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                Constants.OutfitType.OUTFIT_TYPE_UNDER_SKIRT_LINK, 1);
+                outfitType.getImageLink(), 1);
     }
 
     private MeasurementDetails addWaist(String value) {

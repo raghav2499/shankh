@@ -129,7 +129,7 @@ public class EveningGownImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.EVENING_GOWN;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                Constants.OutfitType.OUTFIT_TYPE_NIGHT_GOWN_LINK, 1);
+                outfitType.getImageLink(), 1);
     }
 
     private MeasurementDetails addGownLength(String value) {
