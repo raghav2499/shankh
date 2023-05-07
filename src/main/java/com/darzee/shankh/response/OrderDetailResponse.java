@@ -61,6 +61,7 @@ public class OrderDetailResponse {
         this.isPriorityOrder = Optional.ofNullable(order.getIsPriorityOrder()).orElse(Boolean.FALSE);
         this.outfitType = order.getOutfitType().getDisplayString();
         this.outfitTypeIndex = order.getOutfitType().getOrdinal();
+        this.outfitTypeImageLink = order.getOutfitType().getImageLink();
         this.trialDate = order.getTrialDate().toString();
         this.deliveryDate = order.getDeliveryDate().toString();
         this.type = order.getOrderType().getDisplayName();
