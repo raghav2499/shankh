@@ -242,7 +242,7 @@ public class OrderService {
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
-        return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO, customerProfilePicLink);
+        return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO, customerProfilePicLink, orderDAO.getOrderAmount());
     }
 
     private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {

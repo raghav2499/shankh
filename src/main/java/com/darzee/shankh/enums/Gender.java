@@ -14,4 +14,8 @@ public enum Gender {
     Gender(String genderString) {
         this.gender = genderString;
     }
+
+    public String getString() {
+        return this.gender;
+    }
 }
