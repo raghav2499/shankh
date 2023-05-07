@@ -47,6 +47,7 @@ public class OrderDetailResponse {
         this.outfitType = order.getOutfitType().getDisplayString();
         this.trialDate = order.getTrialDate().toString();
         this.deliveryDate = order.getDeliveryDate().toString();
+        this.outfitTypeIndex = order.getOutfitType().getOrdinal();
         this.orderAmountDetails = new OrderAmountDetails(orderAmountDAO);
     }
 
