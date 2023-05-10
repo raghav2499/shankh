@@ -71,10 +71,7 @@ public class CustomerService {
         List<CustomerDetails> customerDetails = boutiqueCustomers
                 .stream()
                 .map(customer ->
-                        new CustomerDetails(CommonUtils.constructName(customer.getFirstName(), customer.getLastName()),
-                                customer.getPhoneNumber(),
-                                getCustomerProfilePicLink(customer.getId()),
-                                customer.getId()))
+                        new CustomerDetails(customer, getCustomerProfilePicLink(customer.getId())))
                 .collect(Collectors.toList());
 
         return new ResponseEntity(new GetCustomersResponse(customerDetails), HttpStatus.OK);

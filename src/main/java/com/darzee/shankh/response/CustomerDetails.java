@@ -37,6 +37,7 @@ public class CustomerDetails {
             this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.profilePicLink = customerProfilePicLink;
+            this.age = customerDAO.getAge();
             this.gender = customerDAO.getGender().getString();
         }
     }
