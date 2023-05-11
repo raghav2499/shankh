@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @SequenceGenerator(name = "order-seq", sequenceName = "order_seq", allocationSize = 1)
-public class Order extends GenericEntity {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order-seq")
@@ -53,6 +53,12 @@ public class Order extends GenericEntity {
 
     @Column(name = "is_priority_order")
     private Boolean isPriorityOrder = Boolean.FALSE;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "boutique_id")

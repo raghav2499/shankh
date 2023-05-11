@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 
@@ -56,5 +55,10 @@ public class OrderController {
     public ResponseEntity updateOrder(@PathVariable("id") Long orderId,
                                       @RequestBody UpdateOrderRequest request) {
         return orderService.updateOrder(orderId, request);
+    }
+
+    @GetMapping(value = "/{id}/invoice", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getInvoice(@PathVariable("id") Long orderId) {
+        return orderService.generateInvoice(orderId);
     }
 }

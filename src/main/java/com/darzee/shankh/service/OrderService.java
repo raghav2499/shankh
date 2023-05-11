@@ -23,6 +23,7 @@ import com.darzee.shankh.response.GetOrderResponse;
 import com.darzee.shankh.response.OrderDetailResponse;
 import com.darzee.shankh.response.OutfitMeasurementDetails;
 import com.darzee.shankh.utils.CommonUtils;
+import com.darzee.shankh.utils.pdfutils.BillGenerator;
 import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +73,12 @@ public class OrderService {
 
     @Autowired
     private ObjectImagesService objectImagesService;
+
+    @Autowired
+    private BucketService bucketService;
+
+    @Autowired
+    private BillGenerator billGenerator;
 
     @Autowired
     private MeasurementRepo measurementRepo;
@@ -171,6 +179,22 @@ public class OrderService {
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
+    }
+
+    public String generateInvoice(Long orderId) {
+        Optional<Order> order = orderRepo.findById(orderId);
+        if (order.isPresent()) {
+            OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
+            CustomerDAO customerDAO = orderDAO.getCustomer();
+            String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+            OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+            BoutiqueDAO boutique = orderDAO.getBoutique();
+            File bill = billGenerator.generateBill(customerName, customerDAO.getPhoneNumber(), orderDAO, orderAmountDAO, boutique);
+            String fileUploadUrl = bucketService.tempUploadFile(bill);
+            bill.delete();
+            return fileUploadUrl;
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order id");
     }
 
     private OrderDAO updateOrderDetails(UpdateOrderDetails orderDetails, OrderDAO order) {

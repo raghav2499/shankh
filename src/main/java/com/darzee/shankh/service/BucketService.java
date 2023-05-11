@@ -58,4 +58,10 @@ public class BucketService {
         return new DownloadImageResponse(shortLivedUrls);
 
     }
+
+    public String tempUploadFile(File file) {
+        String fileName = "sample_bill";
+        ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, fileName);
+        return fileUploadResult.getValue();
+    }
 }

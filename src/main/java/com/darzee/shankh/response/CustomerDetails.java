@@ -39,6 +39,7 @@ public class CustomerDetails {
             this.profilePicLink = customerProfilePicLink;
             this.age = customerDAO.getAge();
             this.gender = customerDAO.getGender().getString();
+            this.customerId = customerDAO.getId();
         }
     }
 
