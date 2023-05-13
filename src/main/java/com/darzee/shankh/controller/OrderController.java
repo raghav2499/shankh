@@ -51,7 +51,7 @@ public class OrderController {
         return orderService.getOrderDetails(orderId);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateOrder(@PathVariable("id") Long orderId,
                                       @RequestBody UpdateOrderRequest request) {
         return orderService.updateOrder(orderId, request);

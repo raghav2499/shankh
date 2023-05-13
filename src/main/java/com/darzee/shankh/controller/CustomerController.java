@@ -35,7 +35,7 @@ public class CustomerController {
         return customerService.createCustomer(request);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateCustomer(@PathVariable("id") Long customerId,
                                          @RequestBody @Valid UpdateCustomerRequest request) {
         return customerService.updateCustomer(customerId, request);
