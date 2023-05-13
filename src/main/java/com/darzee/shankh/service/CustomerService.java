@@ -136,7 +136,7 @@ public class CustomerService {
         if (optionalCustomer.isPresent()) {
             CustomerDAO customer = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
 
-            if (request.getPhoneNumber() != null) {
+            if (customer.isPhoneNumberUpdated(request.getPhoneNumber())) {
                 String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
                 Optional<Customer> customerWithSameNumber = customerRepo.findByBoutiqueIdAndPhoneNumber(boutiqueId, phoneNumber);
                 if (customerWithSameNumber.isPresent()) {
@@ -148,11 +148,15 @@ public class CustomerService {
 
             if (request.getName() != null) {
                 ImmutablePair<String, String> destructedName = getCustomerNameFromRequest(request.getName());
-                customer.setFirstName(destructedName.getLeft());
-                customer.setLastName(destructedName.getRight());
+                if (customer.isFirstNameUpdated(destructedName.getLeft())) {
+                    customer.setFirstName(destructedName.getLeft());
+                }
+                if (customer.isLastNameUpdated(destructedName.getRight())) {
+                    customer.setLastName(destructedName.getRight());
+                }
             }
 
-            if (request.getAge() != null) {
+            if (customer.isAgeUpdated(request.getAge())) {
                 customer.setAge(request.getAge());
             }
 

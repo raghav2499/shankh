@@ -99,8 +99,8 @@
         <tbody>
             <tr>
                 <td>1</td>
-                <td><span id="${outfitType}"></span></td>
-                <td><span id="${expectedDeliveryDate}"></span></td>
+                <td><span th:text="${outfitType}"></span></td>
+                <td><span th:text="${expectedDeliveryDate}"></span></td>
                 <td><span th:text="${totalAmount}"></span></td>
             </tr>
         </tbody>

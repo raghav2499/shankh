@@ -24,7 +24,7 @@ public class OrderController {
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreateOrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) throws Exception {
-        ResponseEntity<CreateOrderResponse> response = orderService.createNewOrder(request);
+        ResponseEntity<CreateOrderResponse> response = orderService.createOrderAndGenerateInvoice(request);
         return response;
     }
 
@@ -59,6 +59,6 @@ public class OrderController {
 
     @GetMapping(value = "/{id}/invoice", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getInvoice(@PathVariable("id") Long orderId) {
-        return orderService.generateInvoice(orderId);
+        return orderService.getOrderInvoiceLink(orderId);
     }
 }

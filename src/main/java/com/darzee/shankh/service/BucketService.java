@@ -11,6 +11,7 @@ import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.s3utils.FileUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +32,9 @@ public class BucketService {
 
     @Autowired
     private DaoEntityMapper mapper;
+
+    @Value("invoice/")
+    private String invoiceDirectory;
 
     public UploadImageResponse uploadPhoto(MultipartFile multipartFile) throws Exception {
         try {
@@ -59,9 +63,14 @@ public class BucketService {
 
     }
 
-    public String tempUploadFile(File file) {
-        String fileName = "sample_bill";
-        ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, fileName);
+    public String uploadInvoice(File file, Long orderId) {
+        String fileName = "bill" + orderId;
+        ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, invoiceDirectory + fileName);
         return fileUploadResult.getValue();
+    }
+
+    public String getInvoiceShortLivedLink(Long orderId) {
+        String fileLocation = invoiceDirectory + "bill" + orderId;
+        return client.generateShortLivedUrl(fileLocation);
     }
 }

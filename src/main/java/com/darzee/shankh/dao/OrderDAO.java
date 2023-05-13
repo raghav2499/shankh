@@ -50,4 +50,29 @@ public class OrderDAO {
         this.customer = customerDAO;
     }
 
+    public boolean isTrialDateUpdated(LocalDateTime value) {
+        return value != null && !value.equals(this.getTrialDate());
+    }
+
+    public boolean isDeliveryDateUpdated(LocalDateTime value) {
+        return value != null && !value.equals(this.getDeliveryDate());
+    }
+
+    public boolean areSpecialInstructionsUpdated(String value) {
+        return value != null && !value.equals(this.getSpecialInstructions());
+    }
+
+    public boolean isInspirationUpdated(String value) {
+        return value != null && !value.equals(this.getInspiration());
+    }
+
+
+    public boolean isPriorityUpdated(Boolean value) {
+        return value != null && !value.equals(this.getIsPriorityOrder());
+    }
+
+    public boolean isOrderStatusUpdated(Integer value) {
+        return value != null && !value.equals(this.getOrderStatus().getOrdinal());
+    }
+
 }

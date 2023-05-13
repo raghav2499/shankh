@@ -35,6 +35,9 @@ public enum OrderStatus {
         return this.orderStatus;
     }
 
+    public Integer getOrdinal() {
+        return this.ordinal;
+    }
     public String getDisplayString() {
         return this.displayString;
     }

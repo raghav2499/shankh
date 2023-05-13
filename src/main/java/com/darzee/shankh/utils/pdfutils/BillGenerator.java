@@ -62,7 +62,7 @@ public class BillGenerator {
             context.setVariable("orderInvoiceNo", order.getInvoiceNo());
             context.setVariable("totalAmount", orderAmount.getTotalAmount());
             context.setVariable("amountPaid", orderAmount.getAmountRecieved());
-            context.setVariable("balanceDue", orderAmount.getTotalAmount() - orderAmount.getAmountRecieved());
+            context.setVariable("balanceDue", orderAmount.getTotalAmount()  - orderAmount.getAmountRecieved());
 
             // Process the HTML template with the Thymeleaf template engine
             String processedHtml = templateEngine.process("bill_template", context);

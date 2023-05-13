@@ -5,6 +5,8 @@ import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -55,9 +57,11 @@ public class Order {
     private Boolean isPriorityOrder = Boolean.FALSE;
 
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @ManyToOne

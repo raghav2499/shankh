@@ -26,7 +26,7 @@ public class AmazonClient {
     private String endpointUrl;
 
     @Value("${amazonProperties.s3.bucketName}")
-    private String bucketName;
+    private String privateBucketName;
 
     @Value("${amazonProperties.s3.accessKey}")
     private String accessKey;
@@ -41,20 +41,20 @@ public class AmazonClient {
     }
 
     public ImmutablePair<String, String> uploadFile(File file, String fileName) {
-        s3client.putObject(new PutObjectRequest(bucketName, fileName, file));
+        s3client.putObject(new PutObjectRequest(privateBucketName, fileName, file));
         String referenceId = UUID.randomUUID().toString();
-        String shortLivedUrl = generateShortLivedUrl(bucketName, fileName);
+        String shortLivedUrl = generateShortLivedUrl(privateBucketName, fileName);
         return new ImmutablePair(referenceId, shortLivedUrl);
     }
 
     public String generateShortLivedUrl(String fileName) {
-        return generateShortLivedUrl(bucketName, fileName);
+        return generateShortLivedUrl(privateBucketName, fileName);
     }
 
     public List<String> generateShortLivedUrls(List<String> fileNames) {
         List<String> urlList = new ArrayList<>(fileNames.size());
         for(String fileName : fileNames) {
-            String url = generateShortLivedUrl(bucketName, fileName);
+            String url = generateShortLivedUrl(privateBucketName, fileName);
             urlList.add(url);
         }
         return urlList;

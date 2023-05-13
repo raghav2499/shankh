@@ -12,12 +12,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CreateOrderResponse {
+public class OrderSummary {
+    private Long orderId;
 
-    private String message;
-    public OrderSummary orderSummary;
+    private String invoiceNo;
 
-    public CreateOrderResponse(String message) {
-        this.message = message;
-    }
+    private String outfitType;
+
+    private String trialDate;
+
+    private String deliveryDate;
+
+    private String totalOrderAmount;
+
+    private String orderAdvanceRecieved;
 }

@@ -32,4 +32,21 @@ public class CustomerDAO {
         this.gender = gender;
         this.boutique = boutiqueDAO;
     }
+
+    public boolean isPhoneNumberUpdated(String value) {
+        return value != null && !this.phoneNumber.equals(value);
+    }
+
+    public boolean isFirstNameUpdated(String value) {
+        return value != null && !this.firstName.equals(value);
+    }
+    public boolean isLastNameUpdated(String value) {
+        return value != null && !this.lastName.equals(value);
+    }
+
+    public boolean isAgeUpdated(Integer value) {
+        return value != null && !this.age.equals(value);
+    }
+
+
 }
