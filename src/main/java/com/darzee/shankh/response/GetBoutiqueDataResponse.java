@@ -13,9 +13,9 @@ public class GetBoutiqueDataResponse {
         public Double amountRecieved;
         public Double pendingAmount;
 
-        private Integer closedOrderCount;
+        public Integer closedOrderCount;
 
-        private Integer activeOrderCount;
+        public Integer activeOrderCount;
 
         public LedgerData(Double amountRecieved, Double pendingAmount, Integer activeOrderCount,
                           Integer closedOrderCount) {
