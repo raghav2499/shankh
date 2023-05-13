@@ -120,8 +120,6 @@ public class OrderService {
 
             boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
 
-            boutiqueLedgerService.setBoutiqueLedgerAmountSpecificDetails(orderAmountDAO, boutiqueDAO.getId());
-
             return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(), orderDAO.getOutfitType().getName(),
                     orderDAO.getTrialDate().toString(), orderDAO.getDeliveryDate().toString(),
                     orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString());
