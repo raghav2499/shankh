@@ -13,10 +13,10 @@ public class BoutiqueLedgerDAO {
     private Double monthlyPendingAmount = 0d;
     private Double totalAmountRecieved = 0d;
     private Double totalPendingAmount = 0d;
-    private Integer monthlyActiveOrders;
-    private Integer monthlyClosedOrders;
-    private Integer totalActiveOrders;
-    private Integer totalClosedOrders;
+    private Integer monthlyActiveOrders = 0;
+    private Integer monthlyClosedOrders = 0;
+    private Integer totalActiveOrders = 0;
+    private Integer totalClosedOrders = 0;
 
     public BoutiqueLedgerDAO(Long boutiqueId) {
         this.boutiqueId = boutiqueId;

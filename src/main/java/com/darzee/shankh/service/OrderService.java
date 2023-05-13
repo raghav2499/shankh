@@ -3,10 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.*;
-import com.darzee.shankh.entity.Boutique;
-import com.darzee.shankh.entity.Customer;
-import com.darzee.shankh.entity.ImageReference;
-import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.entity.*;
 import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.enums.OutfitType;
@@ -123,7 +120,7 @@ public class OrderService {
 
             boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
 
-            boutiqueLedgerService.setBoutiqueLedgerSpecificDetails(orderAmountDAO, boutiqueDAO.getId());
+            boutiqueLedgerService.setBoutiqueLedgerAmountSpecificDetails(orderAmountDAO, boutiqueDAO.getId());
 
             return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(), orderDAO.getOutfitType().getName(),
                     orderDAO.getTrialDate().toString(), orderDAO.getDeliveryDate().toString(),
@@ -180,8 +177,10 @@ public class OrderService {
                 order = updateOrderDetails(orderDetails, order);
             }
             if (orderAmountDetails != null) {
-                orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order.getId());
+                orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order.getId(),
+                        order.getBoutique().getId());
             }
+
             OrderSummary orderSummary = new OrderSummary(order.getId(), order.getInvoiceNo(),
                     order.getOutfitType().getName(), order.getTrialDate().toString(), order.getDeliveryDate().toString(),
                     orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString());
@@ -216,7 +215,7 @@ public class OrderService {
             }
             if (orderStateMachineService.isTransitionAllowed(order.getOrderStatus(), targetStatus)) {
                 order.setOrderStatus(targetStatus);
-                updateLedgerDataIfApplicable(order.getOrderStatus(), order.getBoutique().getId());
+                updateLedgerIfApplicable(order);
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "State transition from " + order.getOrderStatus() + " to " + targetStatus + " is not allowed");
             }
@@ -245,12 +244,13 @@ public class OrderService {
         return order;
     }
 
-    private OrderAmountDAO updateOrderAmountDetails(UpdateOrderAmountDetails orderAmountDetails, OrderAmountDAO orderAmount, Long orderId) {
+    private OrderAmountDAO updateOrderAmountDetails(UpdateOrderAmountDetails orderAmountDetails,
+                                                    OrderAmountDAO orderAmount, Long orderId, Long boutiqueId) {
         Double totalAmount = Optional.ofNullable(orderAmountDetails.getTotalOrderAmount()).orElse(orderAmount.getTotalAmount());
         Double advancePayment = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(orderAmount.getAmountRecieved());
 
-        if (orderAmount.getTotalAmount().equals(orderAmountDetails.getTotalOrderAmount())
-                && orderAmount.getAmountRecieved().equals(orderAmountDetails.getAdvanceOrderAmount())) {
+        if (orderAmount.getTotalAmount().equals(totalAmount)
+                && orderAmount.getAmountRecieved().equals(advancePayment)) {
             return orderAmount;
         }
 
@@ -258,10 +258,14 @@ public class OrderService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount paid is greater than total amount. Amount Paid " + advancePayment + " and total amount " + totalAmount);
         }
 
+        Double deltaTotalAmount = totalAmount - orderAmount.getTotalAmount();
+        Double deltaPendingAmount = (totalAmount - advancePayment)
+                - (orderAmount.getTotalAmount() - orderAmount.getAmountRecieved());
         orderAmount.setTotalAmount(totalAmount);
         orderAmount.setAmountRecieved(advancePayment);
         orderAmount = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmount, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
+        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(deltaPendingAmount, deltaTotalAmount, boutiqueId);
         generateInvoice(orderId);
 
         return orderAmount;
@@ -311,12 +315,18 @@ public class OrderService {
         return RandomStringUtils.randomAlphanumeric(6);
     }
 
-    private void updateLedgerDataIfApplicable(OrderStatus orderStatus, Long boutiqueId) {
+    private void updateLedgerIfApplicable(OrderDAO order) {
+        OrderStatus orderStatus = order.getOrderStatus();
+        Long boutiqueId = order.getBoutique().getId();
+        OrderAmountDAO orderAmountDAO = order.getOrderAmount();
+        Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
         if (Constants.ACTIVE_ORDER_STATUS_LIST.contains(orderStatus)) {
-            boutiqueLedgerService.incrementActiveOrders(boutiqueId);
+            boutiqueLedgerService.updateBoutiqueLedgerOnStatusActivation(pendingAmount,
+                    orderAmountDAO.getAmountRecieved(), boutiqueId);
         }
-        if(Constants.CLOSED_ORDER_STATUS_LIST.contains(orderStatus)) {
-            boutiqueLedgerService.incrementClosedOrders(boutiqueId);
+        if (Constants.CLOSED_ORDER_STATUS_LIST.contains(orderStatus)) {
+            boutiqueLedgerService.updateBoutiqueLedgerOnStatusClosure(pendingAmount,
+                    orderAmountDAO.getAmountRecieved(), boutiqueId);
         }
     }
 }
