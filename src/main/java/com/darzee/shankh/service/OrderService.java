@@ -210,15 +210,17 @@ public class OrderService {
     private OrderDAO updateOrderDetails(UpdateOrderDetails orderDetails, OrderDAO order) {
         if (order.isOrderStatusUpdated(orderDetails.getStatus())) {
             Integer targetStatusOrdinal = orderDetails.getStatus();
+            OrderStatus initialStatus = order.getOrderStatus();
             OrderStatus targetStatus = OrderStatus.getOrderTypeEnumOrdinalMap().get(targetStatusOrdinal);
             if (targetStatus == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status " + targetStatusOrdinal + " is not valid status");
             }
             if (orderStateMachineService.isTransitionAllowed(order.getOrderStatus(), targetStatus)) {
                 order.setOrderStatus(targetStatus);
-                updateLedgerIfApplicable(order);
+                updateLedgerIfApplicable(order, initialStatus);
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "State transition from " + order.getOrderStatus() + " to " + targetStatus + " is not allowed");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "State transition from "
+                        + order.getOrderStatus() + " to " + targetStatus + " is not allowed");
             }
         }
         if (order.isTrialDateUpdated(orderDetails.getTrialDate())) {
@@ -316,18 +318,28 @@ public class OrderService {
         return RandomStringUtils.randomAlphanumeric(6);
     }
 
-    private void updateLedgerIfApplicable(OrderDAO order) {
-        OrderStatus orderStatus = order.getOrderStatus();
+    private void updateLedgerIfApplicable(OrderDAO order, OrderStatus initialStatus) {
+        OrderStatus currentStatus = order.getOrderStatus();
         Long boutiqueId = order.getBoutique().getId();
         OrderAmountDAO orderAmountDAO = order.getOrderAmount();
         Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
-        if (Constants.ACTIVE_ORDER_STATUS_LIST.contains(orderStatus)) {
+        if (isOrderActivated(currentStatus, initialStatus)) {
             boutiqueLedgerService.updateBoutiqueLedgerOnStatusActivation(pendingAmount,
                     orderAmountDAO.getAmountRecieved(), boutiqueId);
         }
-        if (Constants.CLOSED_ORDER_STATUS_LIST.contains(orderStatus)) {
+        if (isOrderClosed(currentStatus, initialStatus)) {
             boutiqueLedgerService.updateBoutiqueLedgerOnStatusClosure(pendingAmount,
                     orderAmountDAO.getAmountRecieved(), boutiqueId);
         }
+    }
+
+    private boolean isOrderActivated(OrderStatus currentStatus, OrderStatus initialStatus) {
+        return Constants.ACTIVE_ORDER_STATUS_LIST.contains(currentStatus)
+                && !Constants.ACTIVE_ORDER_STATUS_LIST.contains(initialStatus);
+    }
+
+    private boolean isOrderClosed(OrderStatus currentStatus, OrderStatus initialStatus) {
+        return Constants.CLOSED_ORDER_STATUS_LIST.contains(currentStatus)
+                && !Constants.CLOSED_ORDER_STATUS_LIST.contains(initialStatus);
     }
 }

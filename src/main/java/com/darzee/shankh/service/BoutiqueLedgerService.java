@@ -1,7 +1,6 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
-import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.entity.BoutiqueLedger;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -39,14 +38,6 @@ public class BoutiqueLedgerService {
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique Ledger for this id doesn't exist");
-    }
-
-    public BoutiqueLedgerDAO setBoutiqueLedgerAmountSpecificDetails(OrderAmountDAO orderAmountDAO, Long boutiqueId) {
-        BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
-        Double pendingOrderAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
-        boutiqueLedgerDAO.addOrderAmountToBoutiqueLedger(pendingOrderAmount, orderAmountDAO.getAmountRecieved());
-        boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-        return boutiqueLedgerDAO;
     }
 
     public BoutiqueLedgerDAO updateBoutiqueLedgerOnStatusActivation(Double pendingAmount, Double recievedAmount, Long boutiqueId) {
