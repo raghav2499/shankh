@@ -1,6 +1,7 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
+import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
@@ -80,7 +81,7 @@ public class OrderService {
     @Autowired
     private MeasurementRepo measurementRepo;
     @Autowired
-    private BoutiqueLedgerRepo boutiqueLedgerRepo;
+    private BoutiqueLedgerService boutiqueLedgerService;
 
     @Autowired
     private ObjectImagesRepo objectImagesRepo;
@@ -120,10 +121,9 @@ public class OrderService {
             orderDAO.setOrderAmount(orderAmountDAO);
             orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
 
-            boutiqueDAO.setActiveOrders(boutiqueDAO.getActiveOrders() + 1);
             boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
 
-            setBoutiqueLedgerSpecificDetails(orderAmountDAO, boutiqueDAO.getId());
+            boutiqueLedgerService.setBoutiqueLedgerSpecificDetails(orderAmountDAO, boutiqueDAO.getId());
 
             return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(), orderDAO.getOutfitType().getName(),
                     orderDAO.getTrialDate().toString(), orderDAO.getDeliveryDate().toString(),
@@ -161,10 +161,14 @@ public class OrderService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
     }
 
-    public String getOrderInvoiceLink(Long orderId) {
-        return bucketService.getInvoiceShortLivedLink(orderId);
+    public ResponseEntity getOrderInvoiceLink(Long orderId) {
+        String link = bucketService.getInvoiceShortLivedLink(orderId);
+        link = link.trim();
+        GetInvoiceResponse response = new GetInvoiceResponse(link);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    @Transactional
     public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {
         Optional<Order> optionalOrder = orderRepo.findById(orderId);
         if (optionalOrder.isPresent()) {
@@ -212,6 +216,7 @@ public class OrderService {
             }
             if (orderStateMachineService.isTransitionAllowed(order.getOrderStatus(), targetStatus)) {
                 order.setOrderStatus(targetStatus);
+                updateLedgerDataIfApplicable(order.getOrderStatus(), order.getBoutique().getId());
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "State transition from " + order.getOrderStatus() + " to " + targetStatus + " is not allowed");
             }
@@ -244,7 +249,7 @@ public class OrderService {
         Double totalAmount = Optional.ofNullable(orderAmountDetails.getTotalOrderAmount()).orElse(orderAmount.getTotalAmount());
         Double advancePayment = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(orderAmount.getAmountRecieved());
 
-        if(orderAmount.getTotalAmount().equals(orderAmountDetails.getTotalOrderAmount())
+        if (orderAmount.getTotalAmount().equals(orderAmountDetails.getTotalOrderAmount())
                 && orderAmount.getAmountRecieved().equals(orderAmountDetails.getAdvanceOrderAmount())) {
             return orderAmount;
         }
@@ -289,16 +294,6 @@ public class OrderService {
         return orderAmountDAO;
     }
 
-    private BoutiqueLedgerDAO setBoutiqueLedgerSpecificDetails(OrderAmountDAO orderAmountDAO, Long boutiqueId) {
-
-        BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(boutiqueLedgerRepo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
-        Double pendingOrderAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
-        boutiqueLedgerDAO.addOrderAmountToBoutiqueLedger(pendingOrderAmount, orderAmountDAO.getAmountRecieved());
-        boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(boutiqueLedgerRepo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-        return boutiqueLedgerDAO;
-
-    }
-
     private List<String> getClothProfilePicLink(List<String> clothImageReferenceId) {
         if (Collections.isEmpty(clothImageReferenceId)) {
             return new ArrayList<>();
@@ -314,5 +309,14 @@ public class OrderService {
 
     private String generateOrderInvoiceNo() {
         return RandomStringUtils.randomAlphanumeric(6);
+    }
+
+    private void updateLedgerDataIfApplicable(OrderStatus orderStatus, Long boutiqueId) {
+        if (Constants.ACTIVE_ORDER_STATUS_LIST.contains(orderStatus)) {
+            boutiqueLedgerService.incrementActiveOrders(boutiqueId);
+        }
+        if(Constants.CLOSED_ORDER_STATUS_LIST.contains(orderStatus)) {
+            boutiqueLedgerService.incrementClosedOrders(boutiqueId);
+        }
     }
 }

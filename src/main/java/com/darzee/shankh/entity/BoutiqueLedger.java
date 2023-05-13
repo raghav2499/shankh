@@ -24,15 +24,21 @@ public class BoutiqueLedger extends GenericEntity{
     @Column(name = "monthly_pending_amount")
     private Double monthlyPendingAmount;
 
-    @Column(name = "weekly_amount_recieved")
-    private Double weeklyAmountRecieved;
-
-    @Column(name = "weekly_pending_amount")
-    private Double weeklyPendingAmount;
-
     @Column(name = "total_amount_recieved")
     private Double totalAmountRecieved;
 
     @Column(name = "total_pending_amount")
     private Double totalPendingAmount;
+
+    @Column(name = "monthly_active_orders")
+    private Integer monthlyActiveOrders;
+
+    @Column(name = "monthly_closed_orders")
+    private Integer monthlyClosedOrders;
+
+    @Column(name = "total_active_orders")
+    private Integer totalActiveOrders;
+
+    @Column(name = "total_closed_orders")
+    private Integer totalClosedOrders;
 }

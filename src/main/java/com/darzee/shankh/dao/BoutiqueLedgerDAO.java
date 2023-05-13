@@ -11,10 +11,12 @@ public class BoutiqueLedgerDAO {
     private Long boutiqueId;
     private Double monthlyAmountRecieved = 0d;
     private Double monthlyPendingAmount = 0d;
-    private Double weeklyAmountRecieved = 0d;
-    private Double weeklyPendingAmount = 0d;
     private Double totalAmountRecieved = 0d;
     private Double totalPendingAmount = 0d;
+    private Integer monthlyActiveOrders;
+    private Integer monthlyClosedOrders;
+    private Integer totalActiveOrders;
+    private Integer totalClosedOrders;
 
     public BoutiqueLedgerDAO(Long boutiqueId) {
         this.boutiqueId = boutiqueId;
@@ -23,9 +25,19 @@ public class BoutiqueLedgerDAO {
     public void addOrderAmountToBoutiqueLedger(Double pendingAmount, Double amountRecieved) {
         this.setTotalAmountRecieved(this.getTotalAmountRecieved() + amountRecieved);
         this.setMonthlyAmountRecieved(this.getMonthlyAmountRecieved() + amountRecieved);
-        this.setWeeklyAmountRecieved(this.getWeeklyAmountRecieved() + amountRecieved);
         this.setTotalPendingAmount(this.getTotalPendingAmount() + pendingAmount);
         this.setMonthlyPendingAmount(this.getMonthlyPendingAmount() + pendingAmount);
-        this.setWeeklyPendingAmount(this.getWeeklyPendingAmount() + pendingAmount);
+    }
+
+    public void incrementActiveOrdersInLedger() {
+        this.setMonthlyActiveOrders(this.getMonthlyActiveOrders() + 1);
+        this.setTotalActiveOrders(this.getTotalActiveOrders() + 1);
+    }
+
+    public void incrementClosedOrdersInLedger() {
+        this.setMonthlyClosedOrders(this.getMonthlyClosedOrders() + 1);
+        this.setTotalClosedOrders(this.getTotalClosedOrders() + 1);
+        this.setMonthlyActiveOrders(this.getMonthlyActiveOrders() - 1);
+        this.setTotalActiveOrders(this.getTotalActiveOrders() - 1);
     }
 }

@@ -58,7 +58,7 @@ public class OrderController {
     }
 
     @GetMapping(value = "/{id}/invoice", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getInvoice(@PathVariable("id") Long orderId) {
+    public ResponseEntity getInvoice(@PathVariable("id") Long orderId) {
         return orderService.getOrderInvoiceLink(orderId);
     }
 }

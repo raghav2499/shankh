@@ -32,12 +32,6 @@ public class Boutique extends GenericEntity {
     @Column(name = "tailor_count")
     private Integer tailorCount;
 
-    @Column(name = "active_orders")
-    private Integer activeOrders = 0;
-
-    @Column(name = "closed_orders")
-    private Integer closedOrders = 0;
-
     @Column(name = "boutique_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private BoutiqueType boutiqueType;

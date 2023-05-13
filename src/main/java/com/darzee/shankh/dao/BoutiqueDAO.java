@@ -20,8 +20,6 @@ public class BoutiqueDAO {
     private LocalDateTime updatedAt;
     private BoutiqueType boutiqueType;
     private Integer tailorCount;
-    private Integer activeOrders = 0;
-    private Integer closedOrders = 0;
     private List<TailorDAO> tailors;
     private List<CustomerDAO> customers;
     private List<OrderDAO> orders;

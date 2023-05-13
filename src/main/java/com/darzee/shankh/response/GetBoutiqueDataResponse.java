@@ -6,8 +6,6 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GetBoutiqueDataResponse {
-
-    private LedgerData weeklyLedgerData;
     private LedgerData monthlyLedgerData;
     private LedgerData overallLedgerData;
 
@@ -15,26 +13,25 @@ public class GetBoutiqueDataResponse {
         public Double amountRecieved;
         public Double pendingAmount;
 
-        public LedgerData(Double amountRecieved, Double pendingAmount) {
+        private Integer closedOrderCount;
+
+        private Integer activeOrderCount;
+
+        public LedgerData(Double amountRecieved, Double pendingAmount, Integer activeOrderCount,
+                          Integer closedOrderCount) {
             this.amountRecieved = amountRecieved;
             this.pendingAmount = pendingAmount;
+            this.activeOrderCount = activeOrderCount;
+            this.closedOrderCount = closedOrderCount;
         }
     }
 
-    private Integer closedOrderCount;
-    private Integer activeOrderCount;
-    private String ownerTailorName;
-
-    public void setMonthlyLedgerData(Double amountRecieved, Double pendingAmount) {
-        this.monthlyLedgerData =  new LedgerData(amountRecieved, pendingAmount);
+    public void setMonthlyLedgerData(Double amountRecieved, Double pendingAmount, Integer activeOrder, Integer closedOrder) {
+        this.monthlyLedgerData =  new LedgerData(amountRecieved, pendingAmount, activeOrder, closedOrder);
     }
 
-    public void setWeeklyLedgerData(Double amountRecieved, Double pendingAmount) {
-        this.weeklyLedgerData = new LedgerData(amountRecieved, pendingAmount);
-    }
-
-    public void setOverallLedgerData(Double amountRecieved, Double pendingAmount) {
-        this.overallLedgerData = new LedgerData(amountRecieved, pendingAmount);
+    public void setOverallLedgerData(Double amountRecieved, Double pendingAmount, Integer activeOrder, Integer closedOrder) {
+        this.overallLedgerData = new LedgerData(amountRecieved, pendingAmount, activeOrder, closedOrder);
     }
 
 }

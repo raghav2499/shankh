@@ -6,11 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Constants {
-    public static final List<OrderStatus> activeOrderStatusList = Arrays.asList(OrderStatus.STITCHING_NOT_STARTED,
-            OrderStatus.STITCHING_IN_PROGRESS,
-            OrderStatus.ORDER_READY_FOR_TRIAL);
+    public static final List<OrderStatus> ACTIVE_ORDER_STATUS_LIST = Arrays.asList(OrderStatus.STITCHING_IN_PROGRESS,
+            OrderStatus.ORDER_READY_FOR_TRIAL,
+            OrderStatus.ORDER_COMPLETED);
 
-    public static final List<OrderStatus> closedOrderStatusList = Arrays.asList(OrderStatus.ORDER_COMPLETED);
+        public static final List<OrderStatus> CLOSED_ORDER_STATUS_LIST = Arrays.asList(OrderStatus.ORDER_DELIVERED);
     public static final Double CM_TO_INCH_DIVIDING_FACTOR = 2.54;
     public static final Double INCH_TO_CM_MULTIPLYING_FACTOR = 2.54;
     public static final Double DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE = 10d;
