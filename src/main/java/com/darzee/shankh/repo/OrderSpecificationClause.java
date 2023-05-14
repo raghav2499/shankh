@@ -47,6 +47,10 @@ public class OrderSpecificationClause {
         return (root, cq, cb) -> cb.lessThanOrEqualTo(root.get("deliveryDate"), deliveryDateTill);
     }
 
+    public static Specification<Order> findNonDeletedOrders() {
+        return (root, cq, cb) -> cb.equal(root.get("is_deleted"), false);
+    }
+
     public static Specification<Order> getSpecificationBasedOnFilters(Map<String, Object> paramsMap) {
         return (root, cq, cb) -> {
 
@@ -58,7 +62,8 @@ public class OrderSpecificationClause {
                     predicateList.add(specification.toPredicate(root, cq, cb));
                 }
             });
-
+            Specification<Order> defaultSpecification = findNonDeletedOrders();
+            predicateList.add(defaultSpecification.toPredicate(root, cq, cb));
             return cb.and(predicateList.toArray(new Predicate[0]));
         };
     }

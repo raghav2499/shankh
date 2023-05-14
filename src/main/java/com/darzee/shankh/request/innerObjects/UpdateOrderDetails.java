@@ -24,4 +24,6 @@ public class UpdateOrderDetails {
     private String specialInstructions;
 
     private List<String> clothImageReferenceIds;
+
+    private Boolean deleteOrder;
 }

@@ -269,6 +269,10 @@ public class OrderService {
         if (order.areSpecialInstructionsUpdated(orderDetails.getSpecialInstructions())) {
             order.setSpecialInstructions(orderDetails.getSpecialInstructions());
         }
+
+        if(Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
+            order.setIsDeleted(Boolean.TRUE);
+        }
         if (!Collections.isEmpty(orderDetails.getClothImageReferenceIds())) {
             Long orderId = order.getId();
             objectImagesService.invalidateExistingReferenceIds(ImageEntityType.ORDER.getEntityType(), orderId);
