@@ -26,7 +26,7 @@ public class BoutiqueController {
     }
 
 
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getBoutiqueDetails(@PathVariable("id") Long id) {
         return boutiqueService.getBoutiqueDetails(id);
     }
