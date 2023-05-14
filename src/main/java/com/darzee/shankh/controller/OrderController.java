@@ -2,6 +2,7 @@ package com.darzee.shankh.controller;
 
 import com.darzee.shankh.request.CreateOrderRequest;
 import com.darzee.shankh.request.GetOrderDetailsRequest;
+import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
 import com.darzee.shankh.response.CreateOrderResponse;
 import com.darzee.shankh.response.GetOrderResponse;
@@ -9,6 +10,7 @@ import com.darzee.shankh.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -55,6 +57,12 @@ public class OrderController {
     public ResponseEntity updateOrder(@PathVariable("id") Long orderId,
                                       @RequestBody UpdateOrderRequest request) {
         return orderService.updateOrder(orderId, request);
+    }
+
+    @PostMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity recievePayment(@PathVariable("id") Long orderId,
+                                         @Validated @RequestBody RecievePaymentRequest request) {
+        return orderService.recieveOrderPayment(orderId, request);
     }
 
     @GetMapping(value = "/{id}/invoice", produces = MediaType.APPLICATION_JSON_VALUE)

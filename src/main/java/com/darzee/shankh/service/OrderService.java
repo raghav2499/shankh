@@ -14,6 +14,7 @@ import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.CreateOrderRequest;
+import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.OrderDetails;
@@ -191,6 +192,29 @@ public class OrderService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
     }
 
+    @Transactional
+    public ResponseEntity recieveOrderPayment(Long orderId, RecievePaymentRequest request) {
+        Optional<Order> order = orderRepo.findById(orderId);
+        if(order.isPresent()) {
+            OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
+            OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+            Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
+            Double amountRecieved = request.getAmount();
+            if(amountRecieved > pendingAmount) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount recieved is greater than pending order amount");
+            }
+            
+            orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() + amountRecieved);
+            orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, 
+                    new CycleAvoidingMappingContext()));
+            
+            boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(-amountRecieved, 
+                    amountRecieved, 
+                    orderDAO.getBoutique().getId());
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Order Id");
+    }
+
     public String generateInvoice(Long orderId) {
         Optional<Order> order = orderRepo.findById(orderId);
         if (order.isPresent()) {
@@ -295,9 +319,14 @@ public class OrderService {
 
     private OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
         Double advanceRecieved = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(0d);
-        OrderAmountDAO orderAmountDAO = new OrderAmountDAO(orderAmountDetails.getTotalOrderAmount(), advanceRecieved, orderDAO);
+        Double totalOrderAmount = orderAmountDetails.getTotalOrderAmount();
+        OrderAmountDAO orderAmountDAO = new OrderAmountDAO(totalOrderAmount, advanceRecieved, orderDAO);
         orderAmountDAO.setOrder(orderDAO);
-        orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, 
+                new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
+        Double pendingAmount = totalOrderAmount - advanceRecieved;
+        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(pendingAmount, totalOrderAmount, orderDAO.getBoutique().getId());
         return orderAmountDAO;
     }
 
@@ -322,14 +351,11 @@ public class OrderService {
         OrderStatus currentStatus = order.getOrderStatus();
         Long boutiqueId = order.getBoutique().getId();
         OrderAmountDAO orderAmountDAO = order.getOrderAmount();
-        Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
         if (isOrderActivated(currentStatus, initialStatus)) {
-            boutiqueLedgerService.updateBoutiqueLedgerOnStatusActivation(pendingAmount,
-                    orderAmountDAO.getAmountRecieved(), boutiqueId);
+            boutiqueLedgerService.updateBoutiqueLedgerOnStatusActivation(boutiqueId);
         }
         if (isOrderClosed(currentStatus, initialStatus)) {
-            boutiqueLedgerService.updateBoutiqueLedgerOnStatusClosure(pendingAmount,
-                    orderAmountDAO.getAmountRecieved(), boutiqueId);
+            boutiqueLedgerService.updateBoutiqueLedgerOnStatusClosure(boutiqueId);
         }
     }
 

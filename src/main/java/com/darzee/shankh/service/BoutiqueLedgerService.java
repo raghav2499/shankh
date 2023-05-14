@@ -40,11 +40,11 @@ public class BoutiqueLedgerService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique Ledger for this id doesn't exist");
     }
 
-    public BoutiqueLedgerDAO updateBoutiqueLedgerOnStatusActivation(Double pendingAmount, Double recievedAmount, Long boutiqueId) {
+    public BoutiqueLedgerDAO updateBoutiqueLedgerOnStatusActivation(Long boutiqueId) {
         BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
         if (boutiqueLedger != null) {
             BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
-            updateBoutiqueLedgerAmountDetails(pendingAmount, recievedAmount, boutiqueLedgerDAO);
+//            updateBoutiqueLedgerAmountDetails(pendingAmount, recievedAmount, boutiqueLedgerDAO);
             incrementActiveOrders(boutiqueLedgerDAO);
             boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
                     new CycleAvoidingMappingContext())),
@@ -55,7 +55,7 @@ public class BoutiqueLedgerService {
     }
 
 
-    public BoutiqueLedgerDAO updateBoutiqueLedgerOnStatusClosure(Double pendingAmount, Double recievedAmount, Long boutiqueId) {
+    public BoutiqueLedgerDAO updateBoutiqueLedgerOnStatusClosure(Long boutiqueId) {
         BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
         if (boutiqueLedger != null) {
             BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
@@ -82,13 +82,6 @@ public class BoutiqueLedgerService {
             return boutiqueLedgerDAO;
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
-    }
-
-
-    private BoutiqueLedgerDAO updateBoutiqueLedgerAmountDetails(Double deltaPendingAmount, Double deltaAmountRecieved,
-                                                                BoutiqueLedgerDAO boutiqueLedgerDAO) {
-        boutiqueLedgerDAO.addOrderAmountToBoutiqueLedger(deltaPendingAmount, deltaAmountRecieved);
-        return boutiqueLedgerDAO;
     }
 
     private void incrementActiveOrders(BoutiqueLedgerDAO ledgerDAO) {
