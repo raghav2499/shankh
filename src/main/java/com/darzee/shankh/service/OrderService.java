@@ -195,22 +195,29 @@ public class OrderService {
     @Transactional
     public ResponseEntity recieveOrderPayment(Long orderId, RecievePaymentRequest request) {
         Optional<Order> order = orderRepo.findById(orderId);
-        if(order.isPresent()) {
+        if (order.isPresent()) {
             OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
             OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
             Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
             Double amountRecieved = request.getAmount();
-            if(amountRecieved > pendingAmount) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount recieved is greater than pending order amount");
+            if (amountRecieved > pendingAmount) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Amount recieved is greater than pending order amount");
             }
-            
+
             orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() + amountRecieved);
-            orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, 
+            orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
                     new CycleAvoidingMappingContext()));
-            
-            boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(-amountRecieved, 
-                    amountRecieved, 
+
+            boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(-amountRecieved,
+                    amountRecieved,
                     orderDAO.getBoutique().getId());
+            String message = "Order payment recorded successfully";
+            Double pendingAmountLeft = pendingAmount - amountRecieved;
+            RecievePaymentResponse response = new RecievePaymentResponse(message,
+                    orderId,
+                    pendingAmountLeft);
+            return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Order Id");
     }
@@ -322,8 +329,8 @@ public class OrderService {
         Double totalOrderAmount = orderAmountDetails.getTotalOrderAmount();
         OrderAmountDAO orderAmountDAO = new OrderAmountDAO(totalOrderAmount, advanceRecieved, orderDAO);
         orderAmountDAO.setOrder(orderDAO);
-        orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, 
-                new CycleAvoidingMappingContext())),
+        orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
+                        new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         Double pendingAmount = totalOrderAmount - advanceRecieved;
         boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(pendingAmount, totalOrderAmount, orderDAO.getBoutique().getId());
