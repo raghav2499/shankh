@@ -48,7 +48,7 @@ public class OrderSpecificationClause {
     }
 
     public static Specification<Order> findNonDeletedOrders() {
-        return (root, cq, cb) -> cb.equal(root.get("is_deleted"), false);
+        return (root, cq, cb) -> cb.equal(root.get("isDeleted"), false);
     }
 
     public static Specification<Order> getSpecificationBasedOnFilters(Map<String, Object> paramsMap) {
