@@ -21,11 +21,15 @@ public class BoutiqueController {
     private BoutiqueLedgerService boutiqueLedgerService;
 
     @PutMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity addBoutiqueDetails(@Valid @RequestBody AddBoutiqueDetailsRequest request) {
-        return boutiqueService.addBoutiqueDetails(request);
+    public ResponseEntity updateBoutique(@Valid @RequestBody AddBoutiqueDetailsRequest request) {
+        return boutiqueService.updateBoutiqueDetails(request);
     }
 
 
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getBoutiqueDetails(@PathVariable("id") Long id) {
+        return boutiqueService.getBoutiqueDetails(id);
+    }
     @GetMapping(value = "/{id}/ledger", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getLedgerData(@PathVariable("id") String id) {
         return boutiqueLedgerService.getLedgerData(id);

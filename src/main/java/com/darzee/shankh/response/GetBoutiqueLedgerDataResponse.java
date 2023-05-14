@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GetBoutiqueDataResponse {
+public class GetBoutiqueLedgerDataResponse {
     private LedgerData monthlyLedgerData;
     private LedgerData overallLedgerData;
 

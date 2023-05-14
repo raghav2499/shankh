@@ -1,6 +1,7 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.BoutiqueDAO;
+import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -8,12 +9,14 @@ import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.repo.OrderRepo;
 import com.darzee.shankh.repo.TailorRepo;
 import com.darzee.shankh.request.AddBoutiqueDetailsRequest;
+import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
 import com.darzee.shankh.response.UpdateBoutiqueResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -32,7 +35,7 @@ public class BoutiqueService {
     private OrderRepo orderRepo;
 
     @Transactional
-    public ResponseEntity addBoutiqueDetails(AddBoutiqueDetailsRequest request) {
+    public ResponseEntity updateBoutiqueDetails(AddBoutiqueDetailsRequest request) {
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(request.getBoutiqueId());
         UpdateBoutiqueResponse response = new UpdateBoutiqueResponse();
         if (optionalBoutique.isPresent()) {
@@ -45,6 +48,17 @@ public class BoutiqueService {
         }
         response.setMessage("Boutique not found");
         return new ResponseEntity(response, HttpStatus.NOT_FOUND);
+    }
+
+    public ResponseEntity getBoutiqueDetails(Long boutiqueId) {
+        Optional<Boutique> boutique = boutiqueRepo.findById(boutiqueId);
+        if(boutique.isPresent()) {
+            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(boutique.get(), new CycleAvoidingMappingContext());
+            TailorDAO tailorDAO = boutiqueDAO.getAdminTailor();
+            GetBoutiqueDetailsResponse response = new GetBoutiqueDetailsResponse(boutiqueDAO, tailorDAO);
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique id");
     }
 
     //todo : check if there's no boutique with same reference id

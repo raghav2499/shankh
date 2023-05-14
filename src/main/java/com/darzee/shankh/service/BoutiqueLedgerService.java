@@ -5,7 +5,7 @@ import com.darzee.shankh.entity.BoutiqueLedger;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueLedgerRepo;
-import com.darzee.shankh.response.GetBoutiqueDataResponse;
+import com.darzee.shankh.response.GetBoutiqueLedgerDataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class BoutiqueLedgerService {
         if (boutiqueLedger != null) {
             BoutiqueLedgerDAO boutiqueLedgerObject = mapper.boutiqueLedgerObjectToDAO(boutiqueLedger,
                     new CycleAvoidingMappingContext());
-            GetBoutiqueDataResponse response = new GetBoutiqueDataResponse();
+            GetBoutiqueLedgerDataResponse response = new GetBoutiqueLedgerDataResponse();
             response.setMonthlyLedgerData(boutiqueLedgerObject.getMonthlyAmountRecieved(),
                     boutiqueLedgerObject.getMonthlyPendingAmount(), boutiqueLedgerObject.getMonthlyActiveOrders(),
                     boutiqueLedgerObject.getMonthlyClosedOrders());
