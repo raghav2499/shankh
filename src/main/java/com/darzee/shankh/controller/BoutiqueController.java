@@ -25,6 +25,7 @@ public class BoutiqueController {
         return boutiqueService.addBoutiqueDetails(request);
     }
 
+
     @GetMapping(value = "/{id}/ledger", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getLedgerData(@PathVariable("id") String id) {
         return boutiqueLedgerService.getLedgerData(id);

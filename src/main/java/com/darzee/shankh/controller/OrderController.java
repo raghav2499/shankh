@@ -59,7 +59,7 @@ public class OrderController {
         return orderService.updateOrder(orderId, request);
     }
 
-    @PostMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/recieve_payment" , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity recievePayment(@PathVariable("id") Long orderId,
                                          @Validated @RequestBody RecievePaymentRequest request) {
         return orderService.recieveOrderPayment(orderId, request);
