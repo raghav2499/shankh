@@ -1,6 +1,5 @@
 package com.darzee.shankh.entity;
 
-import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.enums.BoutiqueType;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,9 +26,6 @@ public class Boutique extends GenericEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
-    private List<Tailor> tailors;
-
     @Column(name = "tailor_count")
     private Integer tailorCount;
 
@@ -39,7 +35,7 @@ public class Boutique extends GenericEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "admin_tailor_id")
-    private TailorDAO adminTailor;
+    private Tailor adminTailor;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
     private List<Order> orders = new ArrayList<>();

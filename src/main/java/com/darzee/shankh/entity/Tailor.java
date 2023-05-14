@@ -37,7 +37,7 @@ public class Tailor extends GenericEntity {
     @Column(name = "profile_pic_reference_id")
     private String profilePicReferenceId;
 
-    @ManyToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
 
