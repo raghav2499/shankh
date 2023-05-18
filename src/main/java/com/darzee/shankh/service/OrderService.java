@@ -54,6 +54,9 @@ public class OrderService {
     private CustomerService customerService;
 
     @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
     private OrderRepo orderRepo;
 
     @Autowired
@@ -179,7 +182,7 @@ public class OrderService {
                 order = updateOrderDetails(orderDetails, order);
             }
             if (orderAmountDetails != null) {
-                orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order.getId(),
+                orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order,
                         order.getBoutique().getId());
             }
 
@@ -272,6 +275,8 @@ public class OrderService {
 
         if(Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
             order.setIsDeleted(Boolean.TRUE);
+            boutiqueLedgerService.handleBoutiqueLedgerForDeletedOrder(order.getBoutique().getId(),
+                    order.getOrderAmount());
         }
         if (!Collections.isEmpty(orderDetails.getClothImageReferenceIds())) {
             Long orderId = order.getId();
@@ -283,7 +288,7 @@ public class OrderService {
     }
 
     private OrderAmountDAO updateOrderAmountDetails(UpdateOrderAmountDetails orderAmountDetails,
-                                                    OrderAmountDAO orderAmount, Long orderId, Long boutiqueId) {
+                                                    OrderAmountDAO orderAmount, OrderDAO order, Long boutiqueId) {
         Double totalAmount = Optional.ofNullable(orderAmountDetails.getTotalOrderAmount()).orElse(orderAmount.getTotalAmount());
         Double advancePayment = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(orderAmount.getAmountRecieved());
 
@@ -303,8 +308,14 @@ public class OrderService {
         orderAmount.setAmountRecieved(advancePayment);
         orderAmount = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmount, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
+        if(deltaPendingAmount > 0) {
+            paymentService.updateAdvancePayment(order, advancePayment);
+        }
+
         boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(deltaPendingAmount, deltaTotalAmount, boutiqueId);
-        generateInvoice(orderId);
+
+        generateInvoice(order.getId());
+
 
         return orderAmount;
     }

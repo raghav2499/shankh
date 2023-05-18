@@ -10,6 +10,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "orders")
 @Entity
@@ -75,5 +77,8 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
+    private List<Payment> payment = new ArrayList<>();
 
 }

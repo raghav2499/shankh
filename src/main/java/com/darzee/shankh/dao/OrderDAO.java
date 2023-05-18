@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,6 +36,7 @@ public class OrderDAO {
     private BoutiqueDAO boutique;
     private CustomerDAO customer;
     private OrderAmountDAO orderAmount;
+    private List<PaymentDAO> payment;
 
     public OrderDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, OutfitType outfitType,
                     String specialInstructions, String inspiration, OrderType orderType, String invoiceNo,

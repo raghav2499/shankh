@@ -25,6 +25,7 @@ public interface DaoEntityMapper {
     OrderDAO orderObjectToDao(Order order, @Context CycleAvoidingMappingContext context);
 
     Order orderaDaoToObject(OrderDAO orderDAO, @Context CycleAvoidingMappingContext context);
+
     CustomerDAO customerObjectToDao(Customer customer, @Context CycleAvoidingMappingContext context);
 
     Customer customerDaoToObject(CustomerDAO customerDAO, @Context CycleAvoidingMappingContext context);
@@ -40,6 +41,7 @@ public interface DaoEntityMapper {
     Measurements measurementDaoToMeasurement(MeasurementDAO measurementDAO);
 
     ObjectImages objectImageDAOToObjectImage(ObjectImagesDAO objectImages);
+
     @Mapping(source = "tailorDAO.id", target = "tailorId")
     @Mapping(source = "tailorDAO.name", target = "tailorName")
     @Mapping(source = "tailorDAO.boutique.id", target = "boutiqueId")
@@ -48,6 +50,7 @@ public interface DaoEntityMapper {
     ObjectImages boutiqueImagesImagesDAOToBoutiqueImages(ObjectImagesDAO ObjectImagesDAO);
 
     ImageReferenceDAO imageReferenceToImageReferenceDAO(ImageReference imageReference);
+
     ImageReference imageReferenceDAOToImageReference(ImageReferenceDAO imageReferenceDAO);
 
     OrderAmountDAO orderAmountObjectToOrderAmountDao(OrderAmount orderAmount, @Context CycleAvoidingMappingContext context);
@@ -56,12 +59,16 @@ public interface DaoEntityMapper {
 
     ObjectImagesDAO objectImagesToObjectImagesDAO(ObjectImages objectImages);
 
+    Payment paymentDAOToPayment(PaymentDAO paymentDAO, @Context CycleAvoidingMappingContext context);
+
+    PaymentDAO paymentToPaymentDAO(Payment payment, @Context CycleAvoidingMappingContext context);
+
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
-        if(orderList == null) {
+        if (orderList == null) {
             return null;
         }
         List<OrderDAO> orderDAOList = new ArrayList<>();
-        for(Order order : orderList) {
+        for (Order order : orderList) {
             OrderDAO orderDAO = orderObjectToDao(order, context);
             orderDAOList.add(orderDAO);
         }
@@ -70,11 +77,11 @@ public interface DaoEntityMapper {
 
     default List<CustomerDAO> customerObjectListToDAOList(List<Customer> customerList,
                                                           @Context CycleAvoidingMappingContext context) {
-        if(customerList == null) {
+        if (customerList == null) {
             return null;
         }
         List<CustomerDAO> customerDAOList = new ArrayList<>();
-        for(Customer customer : customerList) {
+        for (Customer customer : customerList) {
             CustomerDAO customerDAO = customerObjectToDao(customer, context);
             customerDAOList.add(customerDAO);
         }
@@ -82,11 +89,11 @@ public interface DaoEntityMapper {
     }
 
     default List<Order> orderDAOListToObjectList(List<OrderDAO> orderDAOList, @Context CycleAvoidingMappingContext context) {
-        if(orderDAOList == null) {
+        if (orderDAOList == null) {
             return null;
         }
         List<Order> orderList = new ArrayList<>();
-        for(OrderDAO orderDAO : orderDAOList) {
+        for (OrderDAO orderDAO : orderDAOList) {
             Order order = orderaDaoToObject(orderDAO, context);
             orderList.add(order);
         }
