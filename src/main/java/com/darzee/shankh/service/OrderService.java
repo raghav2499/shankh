@@ -278,7 +278,7 @@ public class OrderService {
             order.setSpecialInstructions(orderDetails.getSpecialInstructions());
         }
 
-        if(Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
+        if (Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
             order.setIsDeleted(Boolean.TRUE);
             boutiqueLedgerService.handleBoutiqueLedgerForDeletedOrder(order.getBoutique().getId(),
                     order.getOrderAmount());
@@ -295,10 +295,10 @@ public class OrderService {
     private OrderAmountDAO updateOrderAmountDetails(UpdateOrderAmountDetails orderAmountDetails,
                                                     OrderAmountDAO orderAmount, OrderDAO order, Long boutiqueId) {
         Double totalAmount = Optional.ofNullable(orderAmountDetails.getTotalOrderAmount()).orElse(orderAmount.getTotalAmount());
-        Double advancePayment = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(orderAmount.getAmountRecieved());
-
+        Double advancePayment = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(0d);
+        Double advancePaid = getAdvancePaid(order);
         if (orderAmount.getTotalAmount().equals(totalAmount)
-                && orderAmount.getAmountRecieved().equals(advancePayment)) {
+                && advancePaid.equals(advancePayment)) {
             return orderAmount;
         }
 
@@ -313,7 +313,7 @@ public class OrderService {
         orderAmount.setAmountRecieved(advancePayment);
         orderAmount = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmount, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
-        if(deltaPendingAmount > 0) {
+        if (advancePaid != advancePayment) {
             paymentService.updateAdvancePayment(order, advancePayment);
         }
 
@@ -323,6 +323,15 @@ public class OrderService {
 
 
         return orderAmount;
+    }
+
+    private Double getAdvancePaid(OrderDAO orderDAO) {
+        Double advancePaid = 0d;
+        advancePaid = orderDAO.getPayment().stream()
+                .filter(paymentDAO -> Boolean.TRUE.equals(paymentDAO.getIsAdvancePayment()))
+                .mapToDouble(PaymentDAO::getAmount)
+                .sum();
+        return advancePaid;
     }
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
@@ -356,7 +365,7 @@ public class OrderService {
         boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(pendingAmount, advanceRecieved,
                 orderDAO.getBoutique().getId());
 
-        if(advanceRecieved > 0) {
+        if (advanceRecieved > 0) {
             paymentService.recordPayment(advanceRecieved, PaymentMode.CASH, Boolean.TRUE, orderDAO);
         }
         return orderAmountDAO;
