@@ -32,11 +32,10 @@ public class PaymentDAO {
 
     public PaymentDAO(Double amount, PaymentMode paymentMode, Boolean isAdvancePayment,
                       OrderDAO order) {
-        PaymentDAO paymentDAO = new PaymentDAO();
-        paymentDAO.setPaymentDate(paymentDate);
-        paymentDAO.setPaymentMode(paymentMode);
-        paymentDAO.setAmount(amount);
-        paymentDAO.setIsAdvancePayment(isAdvancePayment);
-        paymentDAO.setOrder(order);
+        this.setPaymentDate(paymentDate);
+        this.setPaymentMode(paymentMode);
+        this.setAmount(amount);
+        this.setIsAdvancePayment(isAdvancePayment);
+        this.setOrder(order);
     }
 }
