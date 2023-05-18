@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ObjectImagesRepo extends JpaRepository<ObjectImages, Long> {
 
-    Optional<ObjectImages> findByEntityIdAndEntityTypeAndIsValid(Long entityId, String entityType, Boolean isValid);
+    Optional<ObjectImages> findByEntityIdAndEntityTypeAndIsValid(Long entityId, String entityType, boolean isValid);
 
-    List<ObjectImages> findAllByEntityIdAndEntityTypeAndIsValid(Long entityId, String entityType, Boolean isValid);
+    List<ObjectImages> findAllByEntityIdAndEntityTypeAndIsValid(Long entityId, String entityType, boolean isValid);
 }

@@ -50,8 +50,6 @@ public class BoutiqueService {
     private OrderRepo orderRepo;
     @Autowired
     private BoutiqueLedgerRepo boutiqueLedgerRepo;
-    @Autowired
-    private ObjectImagesRepo objectImagesRepo;
 
     public BoutiqueDAO createNewBoutique(BoutiqueDetails boutiqueDetails) {
         String boutiqueReferenceId = generateUniqueBoutiqueReferenceId();
