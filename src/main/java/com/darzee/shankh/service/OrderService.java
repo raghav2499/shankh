@@ -10,6 +10,7 @@ import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.enums.PaymentMode;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
@@ -217,6 +218,9 @@ public class OrderService {
                     orderDAO.getBoutique().getId());
             String message = "Order payment recorded successfully";
             Double pendingAmountLeft = pendingAmount - amountRecieved;
+
+            PaymentMode paymentMode = PaymentMode.getPaymentTypeEnumOrdinalMap().get(request.getPaymentMode());
+            paymentService.recordPayment(amountRecieved, paymentMode, Boolean.FALSE, orderDAO);
             RecievePaymentResponse response = new RecievePaymentResponse(message,
                     orderId,
                     pendingAmountLeft);
@@ -348,7 +352,12 @@ public class OrderService {
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         Double pendingAmount = totalOrderAmount - advanceRecieved;
-        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(pendingAmount, advanceRecieved, orderDAO.getBoutique().getId());
+        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(pendingAmount, advanceRecieved,
+                orderDAO.getBoutique().getId());
+
+        if(advanceRecieved > 0) {
+            paymentService.recordPayment(advanceRecieved, PaymentMode.CASH, Boolean.TRUE, orderDAO);
+        }
         return orderAmountDAO;
     }
 

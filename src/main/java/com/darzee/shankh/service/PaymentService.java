@@ -23,6 +23,14 @@ public class PaymentService {
 
     @Autowired
     private DaoEntityMapper mapper;
+    public PaymentDAO recordPayment(Double amount, PaymentMode paymentMode, Boolean isAdvancePayment,
+                                    OrderDAO order) {
+        PaymentDAO paymentDAO = new PaymentDAO(amount, paymentMode, isAdvancePayment, order);
+        paymentDAO = mapper.paymentToPaymentDAO(paymentRepo.save(mapper.paymentDAOToPayment(paymentDAO,
+                new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
+        return paymentDAO;
+    }
 
     public PaymentDAO updateAdvancePayment(OrderDAO order, Double finalAmount) {
         List<Payment> orderPayments = paymentRepo.findAllByOrderId(order.getId());
