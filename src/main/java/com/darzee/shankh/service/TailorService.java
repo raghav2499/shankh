@@ -94,7 +94,7 @@ public class TailorService {
                 new CycleAvoidingMappingContext());
 
         if (request.getProfilePicReferenceId() != null) {
-            saveTailorReference(request.getProfilePicReferenceId(), tailorDAO.getId());
+            boutiqueService.saveTailorReference(request.getProfilePicReferenceId(), tailorDAO.getId());
         }
 
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(tailorDAO.getPhoneNumber());
@@ -152,10 +152,4 @@ public class TailorService {
         return false;
     }
 
-    private void saveTailorReference(String imageReference, Long tailorId) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.TAILOR.getEntityType(), tailorId);
-        objectImagesService.saveObjectImages(Arrays.asList(imageReference),
-                ImageEntityType.TAILOR.getEntityType(),
-                tailorId);
-    }
 }

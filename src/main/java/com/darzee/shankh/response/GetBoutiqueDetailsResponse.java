@@ -19,6 +19,8 @@ public class GetBoutiqueDetailsResponse {
     private String boutiqueName;
     private Integer tailorCount;
 
+    private Integer language;
+
     private List<String> shopImageUrls;
     private String adminTailorName;
     private String adminTailorPhoneNumber;
@@ -37,6 +39,7 @@ public class GetBoutiqueDetailsResponse {
             this.adminTailorName = tailorDAO.getName();
             this.adminTailorPhoneNumber = tailorDAO.getPhoneNumber();
             this.adminTailorProfilePicUrl = adminTailorImageUrl;
+            this.language = tailorDAO.getLanguage().getOrdinal();
         }
     }
 

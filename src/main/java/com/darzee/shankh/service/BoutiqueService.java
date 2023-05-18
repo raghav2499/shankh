@@ -5,12 +5,10 @@ import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.enums.BoutiqueType;
 import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.Language;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.BoutiqueLedgerRepo;
-import com.darzee.shankh.repo.BoutiqueRepo;
-import com.darzee.shankh.repo.OrderRepo;
-import com.darzee.shankh.repo.TailorRepo;
+import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.BoutiqueDetails;
 import com.darzee.shankh.request.UpdateBoutiqueDetails;
 import com.darzee.shankh.request.UpdateTailorRequest;
@@ -26,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +50,8 @@ public class BoutiqueService {
     private OrderRepo orderRepo;
     @Autowired
     private BoutiqueLedgerRepo boutiqueLedgerRepo;
+    @Autowired
+    private ObjectImagesRepo objectImagesRepo;
 
     public BoutiqueDAO createNewBoutique(BoutiqueDetails boutiqueDetails) {
         String boutiqueReferenceId = generateUniqueBoutiqueReferenceId();
@@ -74,9 +75,11 @@ public class BoutiqueService {
             BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(),
                     new CycleAvoidingMappingContext());
             TailorDAO adminTailor = boutiqueDAO.getAdminTailor();
+
             if (boutiqueDAO.isNameUpdated(request.getName())) {
                 boutiqueDAO.setName(request.getName());
             }
+
             if (boutiqueDAO.isBoutiqueTypeUpdated(request.getBoutiqueType())) {
                 BoutiqueType updatedBoutiqueType = BoutiqueType.getOrdinalEnumMap().get(request.getBoutiqueType());
                 if (updatedBoutiqueType == null) {
@@ -84,8 +87,13 @@ public class BoutiqueService {
                 }
                 boutiqueDAO.setBoutiqueType(updatedBoutiqueType);
             }
+
             if (boutiqueDAO.isTailorCountUpdated(request.getTailorCount())) {
                 boutiqueDAO.setTailorCount(request.getTailorCount());
+            }
+
+            if(!Collections.isEmpty(request.getBoutiqueImageReferenceId())) {
+                saveBoutiqueReferences(request.getBoutiqueImageReferenceId(), boutiqueDAO);
             }
 
             if (request.getTailor() != null) {
@@ -150,11 +158,25 @@ public class BoutiqueService {
         if (tailorDAO.isPhoneNumberUpdated(request.getPhoneNumber())) {
             tailorDAO.setPhoneNumber(request.getPhoneNumber());
         }
+        if(tailorDAO.isLanguageUpdated(request.getLanguage())) {
+            Language updatedLanguage = Language.getOrdinalEnumMap().get(request.getLanguage());
+            tailorDAO.setLanguage(updatedLanguage);
+        }
+        if(request.getTailorProfilePicReferenceId() != null) {
+            saveTailorReference(request.getTailorProfilePicReferenceId(), tailorDAO.getId());
+        }
         TailorDAO updatedTailor = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
 
         return updatedTailor;
+    }
+
+    public void saveTailorReference(String imageReference, Long tailorId) {
+        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.TAILOR.getEntityType(), tailorId);
+        objectImagesService.saveObjectImages(Arrays.asList(imageReference),
+                ImageEntityType.TAILOR.getEntityType(),
+                tailorId);
     }
 
 }

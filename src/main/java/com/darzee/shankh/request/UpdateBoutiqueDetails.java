@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -15,6 +16,7 @@ public class UpdateBoutiqueDetails {
     private Integer boutiqueType;
     private String name;
     private Integer tailorCount;
+    private List<String> boutiqueImageReferenceId;
 
     @Valid
     private UpdateTailorRequest tailor;
