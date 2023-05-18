@@ -3,12 +3,14 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Boutique;
+import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.repo.OrderRepo;
 import com.darzee.shankh.repo.TailorRepo;
 import com.darzee.shankh.request.AddBoutiqueDetailsRequest;
+import com.darzee.shankh.request.BoutiqueDetails;
 import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
 import com.darzee.shankh.response.UpdateBoutiqueResponse;
 import io.jsonwebtoken.lang.Collections;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
@@ -41,6 +44,20 @@ public class BoutiqueService {
 
     @Autowired
     private OrderRepo orderRepo;
+
+    public BoutiqueDAO createNewBoutique(BoutiqueDetails boutiqueDetails) {
+        String boutiqueReferenceId = generateUniqueBoutiqueReferenceId();
+        BoutiqueDAO boutiqueDAO = new BoutiqueDAO(boutiqueDetails.getBoutiqueName(),
+                boutiqueDetails.getBoutiqueType(),
+                boutiqueReferenceId);
+        boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
+        if (!CollectionUtils.isEmpty(boutiqueDetails.getShopImageReferenceIds())) {
+            saveBoutiqueReferences(boutiqueDetails.getShopImageReferenceIds(), boutiqueDAO);
+        }
+        return boutiqueDAO;
+    }
 
     @Transactional
     public ResponseEntity updateBoutiqueDetails(AddBoutiqueDetailsRequest request) {
@@ -82,6 +99,12 @@ public class BoutiqueService {
             return new ArrayList<>();
         }
         return boutiqueImages;
+    }
+
+    private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
+        objectImagesService.saveObjectImages(imageReferences,
+                ImageEntityType.BOUTIQUE.getEntityType(),
+                boutique.getId());
     }
 
 }

@@ -9,7 +9,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -29,21 +28,4 @@ public class TailorSignUpRequest {
     private String profilePicReferenceId;
 
     private BoutiqueDetails boutiqueDetails;
-
-    @Data
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    @Validated
-    public class BoutiqueDetails {
-
-        private String boutiqueReferenceId;
-
-        @NotNull(message = "Boutique name is mandatory for sign up request")
-        private String boutiqueName;
-
-        @NotNull(message = "Boutique type is mandatory for sign up request")
-        private String boutiqueType;
-
-        @JsonProperty("shop_images_url")//todo: rename this variable to shop_image_reference_ids
-        private List<String> shopImageReferenceIds;
-    }
 }

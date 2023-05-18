@@ -4,15 +4,14 @@ import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Tailor;
-import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.enums.TailorRole;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
+import com.darzee.shankh.request.BoutiqueDetails;
 import com.darzee.shankh.request.ProfileUpdateRequest;
 import com.darzee.shankh.request.TailorLoginRequest;
 import com.darzee.shankh.request.TailorSignUpRequest;
-import com.darzee.shankh.request.TailorSignUpRequest.BoutiqueDetails;
 import com.darzee.shankh.response.ProfileUpdateResponse;
 import com.darzee.shankh.response.TailorLoginResponse;
 import com.darzee.shankh.utils.CommonUtils;
@@ -26,11 +25,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -77,17 +74,7 @@ public class TailorService {
         }
         if (isAdminSignupRequest) {
             BoutiqueDetails boutiqueDetails = request.getBoutiqueDetails();
-            String boutiqueReferenceId = boutiqueService.generateUniqueBoutiqueReferenceId();
-            boutiqueDAO = new BoutiqueDAO(boutiqueDetails.getBoutiqueName(),
-                    boutiqueDetails.getBoutiqueType(),
-                    boutiqueReferenceId);
-            boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
-                            new CycleAvoidingMappingContext())),
-                    new CycleAvoidingMappingContext());
-            if (!CollectionUtils.isEmpty(boutiqueDetails.getShopImageReferenceIds())) {
-                saveBoutiqueReferences(boutiqueDetails.getShopImageReferenceIds(), boutiqueDAO);
-            }
-
+            boutiqueDAO = boutiqueService.createNewBoutique(boutiqueDetails);
             BoutiqueLedgerDAO boutiqueLedgerDAO = new BoutiqueLedgerDAO(boutiqueDAO.getId());
             boutiqueLedgerRepo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));
         } else {
@@ -184,11 +171,5 @@ public class TailorService {
             return true;
         }
         return false;
-    }
-
-    private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
-        objectImagesService.saveObjectImages(imageReferences,
-                ImageEntityType.BOUTIQUE.getEntityType(),
-                boutique.getId());
     }
 }
