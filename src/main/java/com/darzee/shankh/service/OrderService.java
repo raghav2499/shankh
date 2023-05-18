@@ -348,7 +348,7 @@ public class OrderService {
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         Double pendingAmount = totalOrderAmount - advanceRecieved;
-        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(pendingAmount, totalOrderAmount, orderDAO.getBoutique().getId());
+        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(pendingAmount, advanceRecieved, orderDAO.getBoutique().getId());
         return orderAmountDAO;
     }
 
