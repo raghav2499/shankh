@@ -84,12 +84,12 @@ public class TailorService {
             boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
+            if (!CollectionUtils.isEmpty(boutiqueDetails.getShopImageReferenceIds())) {
+                saveBoutiqueReferences(boutiqueDetails.getShopImageReferenceIds(), boutiqueDAO);
+            }
 
             BoutiqueLedgerDAO boutiqueLedgerDAO = new BoutiqueLedgerDAO(boutiqueDAO.getId());
             boutiqueLedgerRepo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));
-            if(!CollectionUtils.isEmpty(boutiqueDetails.getShopImageReferenceIds())) {
-                saveBoutiqueReferences(boutiqueDetails.getShopImageReferenceIds(), boutiqueDAO);
-            }
         } else {
             boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo
                             .findByBoutiqueReferenceId(request.getBoutiqueDetails().getBoutiqueReferenceId()),
@@ -120,6 +120,7 @@ public class TailorService {
 
     /**
      * Validate tailor and generate token
+     *
      * @param request
      * @return
      */
@@ -146,19 +147,21 @@ public class TailorService {
 
     public ResponseEntity updateProfile(Long tailorId, ProfileUpdateRequest request) {
         Optional<Tailor> optionalTailor = tailorRepo.findById(tailorId);
-        if(!optionalTailor.isPresent()) {
+        if (!optionalTailor.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This is not a valid tailor");
         }
         TailorDAO tailorDAO = mapper.tailorObjectToDao(optionalTailor.get(), new CycleAvoidingMappingContext());
-        if(!StringUtils.isBlank(request.getTailorName())) {
+        if (!StringUtils.isBlank(request.getTailorName())) {
             tailorDAO.setName(request.getTailorName());
-        } if(!StringUtils.isBlank(request.getPhoneNumber())) {
+        }
+        if (!StringUtils.isBlank(request.getPhoneNumber())) {
             tailorDAO.setPhoneNumber(request.getPhoneNumber());
-        } if(!StringUtils.isBlank(request.getTailorProfilePicReferenceId())) {
+        }
+        if (!StringUtils.isBlank(request.getTailorProfilePicReferenceId())) {
             tailorDAO.setProfilePicReferenceId(request.getTailorProfilePicReferenceId());
         }
         TailorDAO updatedTailor = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
-                new CycleAvoidingMappingContext())),
+                        new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         return new ResponseEntity(new ProfileUpdateResponse("Profile updated successfully",
                 updatedTailor.getName(),
@@ -168,7 +171,7 @@ public class TailorService {
 
     public ResponseEntity deleteProfile(String phoneNumber) {
         Optional<Tailor> tailor = tailorRepo.findByPhoneNumber(phoneNumber);
-        if(tailor.isPresent()) {
+        if (tailor.isPresent()) {
             tailorRepo.delete(tailor.get());
             return new ResponseEntity("success", HttpStatus.OK);
         }

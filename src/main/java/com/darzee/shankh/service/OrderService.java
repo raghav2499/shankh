@@ -321,7 +321,6 @@ public class OrderService {
 
         generateInvoice(order.getId());
 
-
         return orderAmount;
     }
 

@@ -38,6 +38,21 @@ public class ObjectImagesService {
     }
 
     @Nullable
+    public List<String> getBoutiqueImageReferenceId(Long boutiqueId) {
+        List<ObjectImages> boutiqueImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(boutiqueId,
+                ImageEntityType.BOUTIQUE.getEntityType(),
+                Boolean.TRUE);
+        if (!Collections.isEmpty(boutiqueImages)) {
+            List<ObjectImagesDAO> boutiqueImagesDAO = CommonUtils.mapList(boutiqueImages, mapper::objectImagesToObjectImagesDAO);
+            List<String> referenceIds = boutiqueImagesDAO.stream()
+                    .map(boutiqueImage -> boutiqueImage.getReferenceId())
+                    .collect(Collectors.toList());
+            return referenceIds;
+        }
+        return null;
+    }
+
+    @Nullable
     public List<String> getClothReferenceIds(Long orderId) {
         List<ObjectImages> clothImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(orderId,
                 ImageEntityType.ORDER.getEntityType(),
@@ -68,7 +83,7 @@ public class ObjectImagesService {
     public void saveObjectImages(List<String> imageReferences, String entityType, Long entityId) {
         List<ObjectImagesDAO> objectImagesDAOList = imageReferences
                 .stream()
-                .map(clothImageReferenceId -> new ObjectImagesDAO(clothImageReferenceId, entityType, entityId))
+                .map(imageReferenceId -> new ObjectImagesDAO(imageReferenceId, entityType, entityId))
                 .collect(Collectors.toList());
         repo.saveAll(CommonUtils.mapList(objectImagesDAOList, mapper::objectImageDAOToObjectImage));
     }

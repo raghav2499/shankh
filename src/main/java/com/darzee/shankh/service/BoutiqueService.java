@@ -11,6 +11,7 @@ import com.darzee.shankh.repo.TailorRepo;
 import com.darzee.shankh.request.AddBoutiqueDetailsRequest;
 import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
 import com.darzee.shankh.response.UpdateBoutiqueResponse;
+import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,18 +20,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class BoutiqueService {
 
     @Autowired
+    private ObjectImagesService objectImagesService;
+
+    @Autowired
     private BoutiqueRepo boutiqueRepo;
 
     @Autowired
     private DaoEntityMapper mapper;
+
     @Autowired
     private TailorRepo tailorRepo;
+
     @Autowired
     private OrderRepo orderRepo;
 
@@ -52,10 +60,12 @@ public class BoutiqueService {
 
     public ResponseEntity getBoutiqueDetails(Long boutiqueId) {
         Optional<Boutique> boutique = boutiqueRepo.findById(boutiqueId);
-        if(boutique.isPresent()) {
+        if (boutique.isPresent()) {
             BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(boutique.get(), new CycleAvoidingMappingContext());
             TailorDAO tailorDAO = boutiqueDAO.getAdminTailor();
-            GetBoutiqueDetailsResponse response = new GetBoutiqueDetailsResponse(boutiqueDAO, tailorDAO);
+            List<String> shopImageReferenceIds = getBoutiqueImagesReferenceIds(boutiqueId);
+            GetBoutiqueDetailsResponse response = new GetBoutiqueDetailsResponse(boutiqueDAO, tailorDAO,
+                    shopImageReferenceIds);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique id");
@@ -66,5 +76,12 @@ public class BoutiqueService {
         return RandomStringUtils.randomAlphanumeric(6);
     }
 
+    private List<String> getBoutiqueImagesReferenceIds(Long boutiqueId) {
+        List<String> boutiqueImages = objectImagesService.getBoutiqueImageReferenceId(boutiqueId);
+        if (Collections.isEmpty(boutiqueImages)) {
+            return new ArrayList<>();
+        }
+        return boutiqueImages;
+    }
 
 }
