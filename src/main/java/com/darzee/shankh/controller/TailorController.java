@@ -1,6 +1,5 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.request.ProfileUpdateRequest;
 import com.darzee.shankh.request.TailorLoginRequest;
 import com.darzee.shankh.request.TailorSignUpRequest;
 import com.darzee.shankh.service.TailorService;
@@ -28,12 +27,6 @@ public class TailorController {
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity tailorSignUp(@Valid @RequestBody TailorSignUpRequest request) {
         return tailorService.tailorSignup(request);
-    }
-
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateProfile(@PathVariable("id") Long id,
-                                        @Valid @RequestBody ProfileUpdateRequest request) {
-        return tailorService.updateProfile(id, request);
     }
 
     @DeleteMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)

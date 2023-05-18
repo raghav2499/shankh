@@ -2,6 +2,7 @@ package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.ImageReferenceDAO;
+import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.ImageReferenceRepo;
 import com.darzee.shankh.request.DownloadImageRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,7 +62,26 @@ public class BucketService {
                 .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName()))
                 .collect(Collectors.toList());
         return new DownloadImageResponse(shortLivedUrls);
+    }
 
+    public List<String> getShortLivedUrls(List<String> imageReferenceIds) {
+        List<ImageReferenceDAO> imageReferences = CommonUtils.mapList(
+                imageReferenceRepo.findAllByReferenceIdIn(imageReferenceIds),
+                mapper::imageReferenceToImageReferenceDAO);
+        List<String> shortLivedUrls = imageReferences.stream()
+                .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName()))
+                .collect(Collectors.toList());
+        return shortLivedUrls;
+    }
+
+    public String getShortLivedUrl(String imageReferenceId) {
+        Optional<ImageReference> imageReference = imageReferenceRepo.findByReferenceId(imageReferenceId);
+        if(imageReference.isPresent()) {
+            ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(imageReference.get());
+            String shortLivedUrl = client.generateShortLivedUrl(imageReferenceDAO.getImageName());
+            return shortLivedUrl;
+        }
+        return null;
     }
 
     public String uploadInvoice(File file, Long orderId) {

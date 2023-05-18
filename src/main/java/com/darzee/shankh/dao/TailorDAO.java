@@ -18,16 +18,21 @@ public class TailorDAO {
     private Language language;
     private TailorRole role;
     private String phoneNumber;
-    private String profilePicReferenceId;
     private BoutiqueDAO boutique;
 
-    public TailorDAO(String name, TailorRole role, Language language, String phoneNumber, String profilePicReferenceId, BoutiqueDAO boutique) {
+    public TailorDAO(String name, TailorRole role, Language language, String phoneNumber, BoutiqueDAO boutique) {
         this.name = name;
         this.role = role;
         this.language = language;
         this.boutique = boutique;
         this.phoneNumber = phoneNumber;
-        this.profilePicReferenceId = profilePicReferenceId;
+    }
+
+    public boolean isNameUpdated(String value) {
+        return value != null & !this.name.equals(value);
+    }
+    public boolean isPhoneNumberUpdated(String value) {
+        return value != null & !this.phoneNumber.equals(value);
     }
 
 }

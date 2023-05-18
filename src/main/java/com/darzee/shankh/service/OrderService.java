@@ -89,9 +89,6 @@ public class OrderService {
     private BoutiqueLedgerService boutiqueLedgerService;
 
     @Autowired
-    private ObjectImagesRepo objectImagesRepo;
-
-    @Autowired
     private ImageReferenceRepo imageReferenceRepo;
 
     @Autowired

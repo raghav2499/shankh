@@ -34,6 +34,9 @@ public class BoutiqueService {
     private ObjectImagesService objectImagesService;
 
     @Autowired
+    private BucketService bucketService;
+
+    @Autowired
     private BoutiqueRepo boutiqueRepo;
 
     @Autowired
@@ -81,8 +84,17 @@ public class BoutiqueService {
             BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(boutique.get(), new CycleAvoidingMappingContext());
             TailorDAO tailorDAO = boutiqueDAO.getAdminTailor();
             List<String> shopImageReferenceIds = getBoutiqueImagesReferenceIds(boutiqueId);
+            String adminTailorImageReferenceId = objectImagesService.getTailorImageReferenceId(boutiqueDAO.getAdminTailor().getId());
+            List<String> shopImageUrls = new ArrayList<>();
+            String adminTailorImageUrl = null;
+            if (!Collections.isEmpty(shopImageReferenceIds)) {
+                shopImageUrls = bucketService.getShortLivedUrls(shopImageReferenceIds);
+            }
+            if (adminTailorImageReferenceId != null) {
+                adminTailorImageUrl = bucketService.getShortLivedUrl(adminTailorImageReferenceId);
+            }
             GetBoutiqueDetailsResponse response = new GetBoutiqueDetailsResponse(boutiqueDAO, tailorDAO,
-                    shopImageReferenceIds);
+                    shopImageUrls, adminTailorImageUrl);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique id");
@@ -102,6 +114,7 @@ public class BoutiqueService {
     }
 
     private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
+        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.BOUTIQUE.getEntityType(), boutique.getId());
         objectImagesService.saveObjectImages(imageReferences,
                 ImageEntityType.BOUTIQUE.getEntityType(),
                 boutique.getId());

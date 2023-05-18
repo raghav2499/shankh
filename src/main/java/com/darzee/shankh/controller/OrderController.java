@@ -55,7 +55,7 @@ public class OrderController {
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateOrder(@PathVariable("id") Long orderId,
-                                      @RequestBody UpdateOrderRequest request) {
+                                      @Valid @RequestBody UpdateOrderRequest request) {
         return orderService.updateOrder(orderId, request);
     }
 

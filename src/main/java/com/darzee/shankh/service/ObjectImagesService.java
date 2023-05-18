@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,18 @@ public class ObjectImagesService {
         if (optionalCustomerImage.isPresent()) {
             ObjectImagesDAO customerImage = mapper.objectImagesToObjectImagesDAO(optionalCustomerImage.get());
             return customerImage.getReferenceId();
+        }
+        return null;
+    }
+
+    @Nullable
+    public String getTailorImageReferenceId(Long tailorId) {
+        Optional<ObjectImages> optionalTailorImage = repo.findByEntityIdAndEntityTypeAndIsValid(tailorId,
+                ImageEntityType.TAILOR.getEntityType(),
+                Boolean.TRUE);
+        if (optionalTailorImage.isPresent()) {
+            ObjectImagesDAO tailorImage = mapper.objectImagesToObjectImagesDAO(optionalTailorImage.get());
+            return tailorImage.getReferenceId();
         }
         return null;
     }
@@ -83,6 +96,7 @@ public class ObjectImagesService {
     public void saveObjectImages(List<String> imageReferences, String entityType, Long entityId) {
         List<ObjectImagesDAO> objectImagesDAOList = imageReferences
                 .stream()
+                .filter(imageReference -> Boolean.FALSE.equals(StringUtils.isEmpty(imageReference)))
                 .map(imageReferenceId -> new ObjectImagesDAO(imageReferenceId, entityType, entityId))
                 .collect(Collectors.toList());
         repo.saveAll(CommonUtils.mapList(objectImagesDAOList, mapper::objectImageDAOToObjectImage));

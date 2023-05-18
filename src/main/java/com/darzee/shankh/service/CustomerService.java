@@ -61,9 +61,6 @@ public class CustomerService {
     @Autowired
     private MeasurementRepo measurementRepo;
 
-    @Autowired
-    private ObjectImagesRepo objectImagesRepo;
-
     public ResponseEntity getCustomers(Long boutiqueId) {
         List<CustomerDAO> boutiqueCustomers =
                 mapper.customerObjectListToDAOList(customerRepo.findAllByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
@@ -207,6 +204,7 @@ public class CustomerService {
     }
 
     private void saveCustomerImages(CustomerDAO customerDAO, String imageReferenceId) {
+        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
         objectImagesService.saveObjectImages(Arrays.asList(imageReferenceId),
                 ImageEntityType.CUSTOMER.getEntityType(),
                 customerDAO.getId());

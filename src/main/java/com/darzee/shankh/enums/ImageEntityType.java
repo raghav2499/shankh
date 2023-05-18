@@ -12,7 +12,11 @@ public enum ImageEntityType {
     ORDER("order"),
 
     @JsonProperty("customer")
-    CUSTOMER("customer");
+    CUSTOMER("customer"),
+
+    @JsonProperty("tailor")
+    TAILOR("tailor");
+
     private String entityType;
 
     ImageEntityType(String entityType) {

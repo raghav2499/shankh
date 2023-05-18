@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/storage")
 public class BucketController {
@@ -21,7 +23,7 @@ public class BucketController {
     }
 
     @GetMapping("/downloadFile")
-    public DownloadImageResponse getFiles(@RequestBody DownloadImageRequest request) throws Exception {
+    public DownloadImageResponse getFiles(@Valid @RequestBody DownloadImageRequest request) throws Exception {
         return bucketService.getFileUrls(request);
     }
 }

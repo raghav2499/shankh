@@ -7,6 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/measurement")
 public class MeasurementController {
@@ -22,7 +24,7 @@ public class MeasurementController {
     }
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity saveMeasurementDetails(@RequestBody MeasurementDetails measurementDetails) throws Exception {
+    public ResponseEntity saveMeasurementDetails(@RequestBody @Valid MeasurementDetails measurementDetails) throws Exception {
         return measurementService.setMeasurementDetails(measurementDetails);
     }
 }

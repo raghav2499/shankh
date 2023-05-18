@@ -19,24 +19,24 @@ public class GetBoutiqueDetailsResponse {
     private String boutiqueName;
     private Integer tailorCount;
 
-    private List<String> shopImageReferences;
+    private List<String> shopImageUrls;
     private String adminTailorName;
     private String adminTailorPhoneNumber;
     private Integer boutiqueType;
-    private String adminTailorProfilePicReferenceId;
+    private String adminTailorProfilePicUrl;
 
 
     public GetBoutiqueDetailsResponse(BoutiqueDAO boutiqueDAO, TailorDAO tailorDAO,
-                                      List<String> shopImageReferences) {
+                                      List<String> shopImageUrls, String adminTailorImageUrl) {
         this.boutiqueId = boutiqueDAO.getId();
         this.boutiqueName = boutiqueDAO.getName();
         this.tailorCount = boutiqueDAO.getTailorCount();
         this.boutiqueType = boutiqueDAO.getBoutiqueType().getOrdinal();
-        this.shopImageReferences = shopImageReferences;
+        this.shopImageUrls = shopImageUrls;
         if (tailorDAO != null) {
             this.adminTailorName = tailorDAO.getName();
             this.adminTailorPhoneNumber = tailorDAO.getPhoneNumber();
-            this.adminTailorProfilePicReferenceId = tailorDAO.getProfilePicReferenceId();
+            this.adminTailorProfilePicUrl = adminTailorImageUrl;
         }
     }
 }

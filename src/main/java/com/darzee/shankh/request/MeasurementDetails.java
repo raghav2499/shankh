@@ -4,11 +4,13 @@ import com.darzee.shankh.enums.MeasurementScale;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@Validated
 public class MeasurementDetails {
     @NotNull(message = "customer_id is mandatory for saving measurement")
     private Long customerId;
