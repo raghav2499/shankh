@@ -13,7 +13,6 @@ import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.repo.CustomerRepo;
 import com.darzee.shankh.repo.TailorRepo;
 import com.darzee.shankh.request.BoutiqueDetails;
-import com.darzee.shankh.request.ProfileUpdateRequest;
 import com.darzee.shankh.request.TailorLoginRequest;
 import com.darzee.shankh.request.TailorSignUpRequest;
 import com.darzee.shankh.response.TailorLoginResponse;
@@ -27,7 +26,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
@@ -135,25 +133,6 @@ public class TailorService {
         TailorLoginResponse response = mapper.tailorDAOToLoginResponse(tailorDAO, loginToken);
         response.setMessage("Tailor logged in successfully");
         return new ResponseEntity(response, HttpStatus.OK);
-    }
-
-    public TailorDAO updateProfile(Long tailorId, ProfileUpdateRequest request) {
-        Optional<Tailor> optionalTailor = tailorRepo.findById(tailorId);
-        if (!optionalTailor.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin tailor_id for this boutique is invalid");
-        }
-        TailorDAO tailorDAO = mapper.tailorObjectToDao(optionalTailor.get(), new CycleAvoidingMappingContext());
-        if (tailorDAO.isNameUpdated(request.getTailorName())) {
-            tailorDAO.setName(request.getTailorName());
-        }
-        if (tailorDAO.isPhoneNumberUpdated(request.getPhoneNumber())) {
-            tailorDAO.setPhoneNumber(request.getPhoneNumber());
-        }
-        TailorDAO updatedTailor = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
-                        new CycleAvoidingMappingContext())),
-                new CycleAvoidingMappingContext());
-
-        return updatedTailor;
     }
 
     public ResponseEntity deleteProfile(String phoneNumber) {

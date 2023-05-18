@@ -29,4 +29,15 @@ public class BoutiqueDAO {
         this.boutiqueType = BoutiqueType.getEnumMap().get(boutiqueType);
         this.boutiqueReferenceId = boutiqueReferenceId;
     }
+
+    public boolean isNameUpdated(String value) {
+        return value != null && !this.name.equals(value);
+    }
+
+    public boolean isBoutiqueTypeUpdated(Integer boutiqueOrdinal) {
+        return boutiqueOrdinal != null && !this.boutiqueType.getOrdinal().equals(boutiqueOrdinal);
+    }
+    public boolean isTailorCountUpdated(Integer value) {
+        return value != null && value != this.tailorCount;
+    }
 }

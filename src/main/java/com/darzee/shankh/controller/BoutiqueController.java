@@ -1,6 +1,7 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.request.AddBoutiqueDetailsRequest;
+import com.darzee.shankh.repo.BoutiqueRepo;
+import com.darzee.shankh.request.UpdateBoutiqueDetails;
 import com.darzee.shankh.service.BoutiqueLedgerService;
 import com.darzee.shankh.service.BoutiqueService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,13 @@ public class BoutiqueController {
 
     @Autowired
     private BoutiqueLedgerService boutiqueLedgerService;
+    @Autowired
+    private BoutiqueRepo boutiqueRepo;
 
-    @PutMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateBoutique(@Valid @RequestBody AddBoutiqueDetailsRequest request) {
-        return boutiqueService.updateBoutiqueDetails(request);
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateBoutique(@PathVariable("id") Long boutiqueId,
+                                         @Valid @RequestBody UpdateBoutiqueDetails request) {
+        return boutiqueService.updateBoutiqueDetails(boutiqueId, request);
     }
 
 
@@ -30,6 +34,7 @@ public class BoutiqueController {
     public ResponseEntity getBoutiqueDetails(@PathVariable("id") Long id) {
         return boutiqueService.getBoutiqueDetails(id);
     }
+
     @GetMapping(value = "/{id}/ledger", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getLedgerData(@PathVariable("id") String id) {
         return boutiqueLedgerService.getLedgerData(id);

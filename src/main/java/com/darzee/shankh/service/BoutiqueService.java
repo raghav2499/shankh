@@ -3,16 +3,18 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Boutique;
+import com.darzee.shankh.enums.BoutiqueType;
 import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
+import com.darzee.shankh.repo.BoutiqueLedgerRepo;
 import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.repo.OrderRepo;
 import com.darzee.shankh.repo.TailorRepo;
-import com.darzee.shankh.request.AddBoutiqueDetailsRequest;
 import com.darzee.shankh.request.BoutiqueDetails;
+import com.darzee.shankh.request.UpdateBoutiqueDetails;
+import com.darzee.shankh.request.UpdateTailorRequest;
 import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
-import com.darzee.shankh.response.UpdateBoutiqueResponse;
 import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,8 @@ public class BoutiqueService {
 
     @Autowired
     private OrderRepo orderRepo;
+    @Autowired
+    private BoutiqueLedgerRepo boutiqueLedgerRepo;
 
     public BoutiqueDAO createNewBoutique(BoutiqueDetails boutiqueDetails) {
         String boutiqueReferenceId = generateUniqueBoutiqueReferenceId();
@@ -63,19 +67,38 @@ public class BoutiqueService {
     }
 
     @Transactional
-    public ResponseEntity updateBoutiqueDetails(AddBoutiqueDetailsRequest request) {
-        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(request.getBoutiqueId());
-        UpdateBoutiqueResponse response = new UpdateBoutiqueResponse();
+    public ResponseEntity updateBoutiqueDetails(Long boutiqueId, UpdateBoutiqueDetails request) {
+        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(boutiqueId);
+        GetBoutiqueDetailsResponse response = null;
         if (optionalBoutique.isPresent()) {
-            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.findById(request.getBoutiqueId()).get(),
+            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(),
                     new CycleAvoidingMappingContext());
-            boutiqueDAO.setTailorCount(request.getTailorCount());
-            boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
-            response.setMessage("Boutique details updated successfully");
+            TailorDAO adminTailor = boutiqueDAO.getAdminTailor();
+            if (boutiqueDAO.isNameUpdated(request.getName())) {
+                boutiqueDAO.setName(request.getName());
+            }
+            if (boutiqueDAO.isBoutiqueTypeUpdated(request.getBoutiqueType())) {
+                BoutiqueType updatedBoutiqueType = BoutiqueType.getOrdinalEnumMap().get(request.getBoutiqueType());
+                if (updatedBoutiqueType == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique type");
+                }
+                boutiqueDAO.setBoutiqueType(updatedBoutiqueType);
+            }
+            if (boutiqueDAO.isTailorCountUpdated(request.getTailorCount())) {
+                boutiqueDAO.setTailorCount(request.getTailorCount());
+            }
+
+            if (request.getTailor() != null) {
+                adminTailor = updateAdminTailorProfile(adminTailor, request.getTailor());
+            }
+
+            boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
+                            new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext());
+            response = new GetBoutiqueDetailsResponse(boutiqueDAO, adminTailor);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        response.setMessage("Boutique not found");
-        return new ResponseEntity(response, HttpStatus.NOT_FOUND);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique_id");
     }
 
     public ResponseEntity getBoutiqueDetails(Long boutiqueId) {
@@ -118,6 +141,20 @@ public class BoutiqueService {
         objectImagesService.saveObjectImages(imageReferences,
                 ImageEntityType.BOUTIQUE.getEntityType(),
                 boutique.getId());
+    }
+
+    public TailorDAO updateAdminTailorProfile(TailorDAO tailorDAO, UpdateTailorRequest request) {
+        if (tailorDAO.isNameUpdated(request.getTailorName())) {
+            tailorDAO.setName(request.getTailorName());
+        }
+        if (tailorDAO.isPhoneNumberUpdated(request.getPhoneNumber())) {
+            tailorDAO.setPhoneNumber(request.getPhoneNumber());
+        }
+        TailorDAO updatedTailor = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
+
+        return updatedTailor;
     }
 
 }
