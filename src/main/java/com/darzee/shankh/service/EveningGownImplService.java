@@ -88,7 +88,9 @@ public class EveningGownImplService implements OutfitTypeService {
                 measurementDetails.getSleeveLength() != null &&
                 measurementDetails.getSleeveCircumference() != null &&
                 measurementDetails.getFrontNeckDepth() != null &&
-                measurementDetails.getBackNeckDepth() != null;
+                measurementDetails.getBackNeckDepth() != null &&
+                measurementDetails.getGownLength() != null &&
+                measurementDetails.getSeat() != null;
     }
 
     @Override
@@ -107,6 +109,7 @@ public class EveningGownImplService implements OutfitTypeService {
 
 
         measurementDetailsResponseList.add(addGownLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getGownLength()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveLength()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addShoulder(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShoulder()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addUpperChest(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getUpperChest()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addBust(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBackNeckDepth()).orElse(defaultValue) / dividingFactor)));
@@ -167,38 +170,45 @@ public class EveningGownImplService implements OutfitTypeService {
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
+    private MeasurementDetails addSeat(String value) {
+        String imageLink = GOWN_SEAT_IMAGE_LINK;
+        String title = GOWN_SEAT_TITLE;
+        String index = "6";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+
     private MeasurementDetails addArmHole(String value) {
         String imageLink = GOWN_ARMHOLE_IMAGE_LINK;
         String title = GOWN_ARMHOLE_TITLE;
-        String index = "6";
+        String index = "7";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addSleeveLength(String value) {
         String imageLink = GOWN_SLEEVE_LENGTH_IMAGE_LINK;
         String title = GOWN_SLEEVE_LENGTH_TITLE;
-        String index = "7";
+        String index = "8";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addSleeveCircumference(String value) {
         String imageLink = GOWN_SLEEVE_CIRCUMFERENCE_IMAGE_LINK;
         String title = GOWN_SLEEVE_CIRCUM_TITLE;
-        String index = "8";
+        String index = "9";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addFrontNeckDepth(String value) {
         String imageLink = GOWN_FRONT_NECK_DEPTH_IMAGE_LINK;
         String title = GOWN_FRONT_NECK_TITLE;
-        String index = "9";
+        String index = "10";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addBackNeckDepth(String value) {
         String imageLink = GOWN_BACK_NECK_DEPTH_IMAGE_LINK;
         String title = GOWN_BACK_NECK_DEPTH_TITLE;
-        String index = "10";
+        String index = "11";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
