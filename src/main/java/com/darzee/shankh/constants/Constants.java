@@ -226,7 +226,7 @@ public class Constants {
         public static final String LADIES_SUIT_UPPER_CHEST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Salwar+kameez/kameze/ng_upperchest.svg";
         public static final String LADIES_SUIT_BUST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Salwar+kameez/kameze/ng_bust.svg";
         public static final String LADIES_SUIT_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Salwar+kameez/kameze/ng_waist.svg";
-        public static final String LADIES_SUIT_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NightGown/ng_backneck.svg";
+        public static final String LADIES_SUIT_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NightGown/ng_seat.svg";
         public static final String LADIES_SUIT_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Salwar+kameez/kameze/ng_armhole.svg";
         public static final String LADIES_SUIT_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Salwar+kameez/kameze/ng_slevelen.svg";
         public static final String LADIES_SUIT_SLEEVE_CIRCUM_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Salwar+kameez/kameze/ng_slevcircum.svg";
