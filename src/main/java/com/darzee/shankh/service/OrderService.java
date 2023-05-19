@@ -7,10 +7,7 @@ import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.Order;
-import com.darzee.shankh.enums.ImageEntityType;
-import com.darzee.shankh.enums.OrderStatus;
-import com.darzee.shankh.enums.OutfitType;
-import com.darzee.shankh.enums.PaymentMode;
+import com.darzee.shankh.enums.*;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
@@ -277,8 +274,9 @@ public class OrderService {
 
         if (Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
             order.setIsDeleted(Boolean.TRUE);
+            OrderStage orderStage = getOrderStage(order.getOrderStatus());
             boutiqueLedgerService.handleBoutiqueLedgerForDeletedOrder(order.getBoutique().getId(),
-                    order.getOrderAmount());
+                    order.getOrderAmount(), orderStage);
         }
         if (!Collections.isEmpty(orderDetails.getClothImageReferenceIds())) {
             Long orderId = order.getId();
@@ -404,5 +402,14 @@ public class OrderService {
     private boolean isOrderClosed(OrderStatus currentStatus, OrderStatus initialStatus) {
         return Constants.CLOSED_ORDER_STATUS_LIST.contains(currentStatus)
                 && !Constants.CLOSED_ORDER_STATUS_LIST.contains(initialStatus);
+    }
+
+    private OrderStage getOrderStage(OrderStatus status) {
+        if (Constants.ACTIVE_ORDER_STATUS_LIST.contains(status)) {
+            return OrderStage.ACTIVE;
+        } else if (Constants.CLOSED_ORDER_STATUS_LIST.contains(status)) {
+            return OrderStage.CLOSED;
+        }
+        return OrderStage.OTHER;
     }
 }

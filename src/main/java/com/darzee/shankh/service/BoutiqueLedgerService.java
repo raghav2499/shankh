@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
 import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.entity.BoutiqueLedger;
+import com.darzee.shankh.enums.OrderStage;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueLedgerRepo;
@@ -77,17 +78,32 @@ public class BoutiqueLedgerService {
             BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId),
                     new CycleAvoidingMappingContext());
             boutiqueLedgerDAO.addOrderAmountToBoutiqueLedger(deltaPendingAmount, deltaAmountRecieved);
-            boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
-                            new CycleAvoidingMappingContext())),
-                    new CycleAvoidingMappingContext());
             return boutiqueLedgerDAO;
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
     }
 
-    public BoutiqueLedgerDAO handleBoutiqueLedgerForDeletedOrder(Long boutiqueId, OrderAmountDAO orderAmountDAO) {
+    public BoutiqueLedgerDAO handleBoutiqueLedgerForDeletedOrder(Long boutiqueId, OrderAmountDAO orderAmountDAO, OrderStage orderStage) {
         Double pendingOrderAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
-        return updateBoutiqueLedgerAmountDetails(-pendingOrderAmount, -orderAmountDAO.getAmountRecieved(), boutiqueId);
+        BoutiqueLedgerDAO boutiqueLedgerDAO = updateBoutiqueLedgerAmountDetails(-pendingOrderAmount,
+                -orderAmountDAO.getAmountRecieved(),
+                boutiqueId);
+
+        boutiqueLedgerDAO = updateOrderCountInBoutiqueLedger(boutiqueLedgerDAO, orderStage);
+
+        boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
+        return boutiqueLedgerDAO;
+    }
+
+    private BoutiqueLedgerDAO updateOrderCountInBoutiqueLedger(BoutiqueLedgerDAO ledger, OrderStage orderStage) {
+        if (OrderStage.ACTIVE.equals(orderStage)) {
+            ledger.decrementActiveOrderCount();
+        } else if (OrderStage.CLOSED.equals(orderStage)) {
+            ledger.decrementClosedOrderCount();
+        }
+        return ledger;
     }
 
     private void incrementActiveOrders(BoutiqueLedgerDAO ledgerDAO) {
