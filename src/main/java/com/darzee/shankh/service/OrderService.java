@@ -120,7 +120,7 @@ public class OrderService {
             orderDAO.setOrderAmount(orderAmountDAO);
             orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
 
-            boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
+//            boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
 
             return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(), orderDAO.getOutfitType().getName(),
                     orderDAO.getTrialDate().toString(), orderDAO.getDeliveryDate().toString(),
@@ -290,22 +290,25 @@ public class OrderService {
     private OrderAmountDAO updateOrderAmountDetails(UpdateOrderAmountDetails orderAmountDetails,
                                                     OrderAmountDAO orderAmount, OrderDAO order, Long boutiqueId) {
         Double totalAmount = Optional.ofNullable(orderAmountDetails.getTotalOrderAmount()).orElse(orderAmount.getTotalAmount());
-        Double advancePayment = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(0d);
         Double advancePaid = getAdvancePaid(order);
+        Double totalAmountPaid = getTotalAmountPaid(order);
+        Double advancePayment = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(advancePaid);
         if (orderAmount.getTotalAmount().equals(totalAmount)
                 && advancePaid.equals(advancePayment)) {
             return orderAmount;
         }
 
-        if (advancePayment > totalAmount) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount paid is greater than total amount. Amount Paid " + advancePayment + " and total amount " + totalAmount);
-        }
-
         Double deltaTotalAmount = totalAmount - orderAmount.getTotalAmount();
-        Double deltaPendingAmount = (totalAmount - advancePayment)
-                - (orderAmount.getTotalAmount() - orderAmount.getAmountRecieved());
+        Double amountPaidAfterThisUpdate = totalAmountPaid + (advancePayment - advancePaid);
+
+        if (amountPaidAfterThisUpdate > deltaTotalAmount) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount paid is greater than total amount. Amount Paid "
+                    + advancePayment
+                    + " and total amount " + totalAmount);
+        }
+        Double deltaPendingAmount = (totalAmount - advancePayment) - (orderAmount.getTotalAmount() - advancePaid);
         orderAmount.setTotalAmount(totalAmount);
-        orderAmount.setAmountRecieved(advancePayment);
+        orderAmount.setAmountRecieved(amountPaidAfterThisUpdate);
         orderAmount = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmount, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
         if (advancePaid != advancePayment) {
@@ -328,6 +331,14 @@ public class OrderService {
         return advancePaid;
     }
 
+    private Double getTotalAmountPaid(OrderDAO orderDAO) {
+        Double totalAmountPaid = 0d;
+        totalAmountPaid = orderDAO.getPayment().stream()
+                .mapToDouble(PaymentDAO::getAmount)
+                .sum();
+        return totalAmountPaid;
+    }
+
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
         return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO, customerProfilePicLink, orderDAO.getOrderAmount());
@@ -339,7 +350,9 @@ public class OrderService {
         if (outfitType == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid outfit type");
         }
-        OrderDAO orderDAO = new OrderDAO(orderDetails.getTrialDate(), orderDetails.getDeliveryDate(), outfitType, orderDetails.getSpecialInstructions(), orderDetails.getInspiration(), orderDetails.getOrderType(), invoiceNo, boutiqueDAO, customerDAO);
+        OrderDAO orderDAO = new OrderDAO(orderDetails.getTrialDate(), orderDetails.getDeliveryDate(), outfitType, orderDetails.getSpecialInstructions(),
+                orderDetails.getInspiration(), orderDetails.getOrderType(), invoiceNo,
+                boutiqueDAO, customerDAO);
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         Long orderId = orderDAO.getId();
         List<String> clothImageReferenceIds = orderDetails.getClothImageReferenceIds();
