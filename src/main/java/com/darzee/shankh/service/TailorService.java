@@ -98,7 +98,7 @@ public class TailorService {
         }
         if (TailorRole.ADMIN.equals(role)) {
             boutiqueDAO.setAdminTailor(tailorDAO);
-            boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext());
+            boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
         }
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(tailorDAO.getPhoneNumber());
         String loginToken = tokenManager.generateJwtToken(userDetails);
