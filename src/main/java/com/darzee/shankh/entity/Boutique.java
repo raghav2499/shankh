@@ -33,7 +33,7 @@ public class Boutique extends GenericEntity {
     @Enumerated(EnumType.ORDINAL)
     private BoutiqueType boutiqueType;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "admin_tailor_id")
     private Tailor adminTailor;
 

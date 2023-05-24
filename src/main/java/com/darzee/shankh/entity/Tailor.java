@@ -34,7 +34,7 @@ public class Tailor extends GenericEntity {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
 

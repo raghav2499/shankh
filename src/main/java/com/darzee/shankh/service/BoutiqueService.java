@@ -162,7 +162,7 @@ public class BoutiqueService {
             tailorDAO.setLanguage(updatedLanguage);
         }
         if(request.getTailorProfilePicReferenceId() != null) {
-            saveTailorReference(request.getTailorProfilePicReferenceId(), tailorDAO.getId());
+            saveTailorImageReference(request.getTailorProfilePicReferenceId(), tailorDAO.getId());
         }
         TailorDAO updatedTailor = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
                         new CycleAvoidingMappingContext())),
@@ -171,7 +171,7 @@ public class BoutiqueService {
         return updatedTailor;
     }
 
-    public void saveTailorReference(String imageReference, Long tailorId) {
+    public void saveTailorImageReference(String imageReference, Long tailorId) {
         objectImagesService.invalidateExistingReferenceIds(ImageEntityType.TAILOR.getEntityType(), tailorId);
         objectImagesService.saveObjectImages(Arrays.asList(imageReference),
                 ImageEntityType.TAILOR.getEntityType(),

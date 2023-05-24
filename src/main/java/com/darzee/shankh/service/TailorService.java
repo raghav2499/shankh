@@ -94,9 +94,12 @@ public class TailorService {
                 new CycleAvoidingMappingContext());
 
         if (request.getProfilePicReferenceId() != null) {
-            boutiqueService.saveTailorReference(request.getProfilePicReferenceId(), tailorDAO.getId());
+            boutiqueService.saveTailorImageReference(request.getProfilePicReferenceId(), tailorDAO.getId());
         }
-
+        if (TailorRole.ADMIN.equals(role)) {
+            boutiqueDAO.setAdminTailor(tailorDAO);
+            boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext());
+        }
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(tailorDAO.getPhoneNumber());
         String loginToken = tokenManager.generateJwtToken(userDetails);
 
