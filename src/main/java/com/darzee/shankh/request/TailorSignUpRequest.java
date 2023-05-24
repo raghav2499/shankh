@@ -1,6 +1,5 @@
 package com.darzee.shankh.request;
 
-import com.darzee.shankh.enums.Language;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -22,7 +21,7 @@ public class TailorSignUpRequest {
     @Size(min=10, max=10, message = "Invalid phone number")
     private String phoneNumber;
 
-    private Language language;
+    private Integer language;
 
     @JsonProperty("profile_pic_url")//todo : rename this variable to profile_pic_reference_id
     private String profilePicReferenceId;

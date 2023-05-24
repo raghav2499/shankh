@@ -45,4 +45,8 @@ public enum BoutiqueType {
         return this.ordinal;
     }
 
+    public String getName() {
+        return this.boutiqueType;
+    }
+
 }

@@ -53,8 +53,9 @@ public class BoutiqueService {
 
     public BoutiqueDAO createNewBoutique(BoutiqueDetails boutiqueDetails) {
         String boutiqueReferenceId = generateUniqueBoutiqueReferenceId();
+        BoutiqueType boutiqueType = BoutiqueType.getOrdinalEnumMap().get(boutiqueDetails.getBoutiqueType());
         BoutiqueDAO boutiqueDAO = new BoutiqueDAO(boutiqueDetails.getBoutiqueName(),
-                boutiqueDetails.getBoutiqueType(),
+                boutiqueType.getName(),
                 boutiqueReferenceId);
         boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
                         new CycleAvoidingMappingContext())),

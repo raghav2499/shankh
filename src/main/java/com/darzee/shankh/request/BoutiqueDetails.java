@@ -20,7 +20,7 @@ public class BoutiqueDetails {
     private String boutiqueName;
 
     @NotNull(message = "Boutique type is mandatory for sign up request")
-    private String boutiqueType;
+    private Integer boutiqueType;
 
     @JsonProperty("shop_images_url")//todo: rename this variable to shop_image_reference_ids
     private List<String> shopImageReferenceIds;

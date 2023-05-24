@@ -4,7 +4,7 @@ import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Tailor;
-import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.Language;
 import com.darzee.shankh.enums.TailorRole;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -28,7 +28,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -84,9 +83,10 @@ public class TailorService {
         }
 
         TailorRole role = isAdminSignupRequest ? TailorRole.ADMIN : TailorRole.EMPLOYEE;
+        Language language = Language.getOrdinalEnumMap().get(request.getLanguage());
         TailorDAO tailorDAO = new TailorDAO(request.getTailorName(),
                 role,
-                request.getLanguage(),
+                language,
                 phoneNumber,
                 boutiqueDAO);
         tailorDAO = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
