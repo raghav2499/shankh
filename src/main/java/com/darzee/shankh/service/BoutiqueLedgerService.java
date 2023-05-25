@@ -78,6 +78,9 @@ public class BoutiqueLedgerService {
             BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId),
                     new CycleAvoidingMappingContext());
             boutiqueLedgerDAO.addOrderAmountToBoutiqueLedger(deltaPendingAmount, deltaAmountRecieved);
+            boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
+                            new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext());
             return boutiqueLedgerDAO;
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
