@@ -350,9 +350,9 @@ public class OrderService {
         if (outfitType == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid outfit type");
         }
-        OrderDAO orderDAO = new OrderDAO(orderDetails.getTrialDate(), orderDetails.getDeliveryDate(), outfitType, orderDetails.getSpecialInstructions(),
-                orderDetails.getInspiration(), orderDetails.getOrderType(), invoiceNo,
-                boutiqueDAO, customerDAO);
+        OrderDAO orderDAO = new OrderDAO(orderDetails.getTrialDate(), orderDetails.getDeliveryDate(), outfitType,
+                orderDetails.getSpecialInstructions(), orderDetails.getInspiration(), orderDetails.getOrderType(),
+                orderDetails.getIsPriorityOrder(), invoiceNo, boutiqueDAO, customerDAO);
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         Long orderId = orderDAO.getId();
         List<String> clothImageReferenceIds = orderDetails.getClothImageReferenceIds();

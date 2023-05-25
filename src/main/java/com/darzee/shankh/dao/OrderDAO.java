@@ -39,14 +39,15 @@ public class OrderDAO {
     private List<PaymentDAO> payment;
 
     public OrderDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, OutfitType outfitType,
-                    String specialInstructions, String inspiration, OrderType orderType, String invoiceNo,
-                    BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
+                    String specialInstructions, String inspiration, OrderType orderType, Boolean isPriorityOrder,
+                    String invoiceNo, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
         this.invoiceNo = invoiceNo;
         this.trialDate = trialDate;
         this.deliveryDate = deliveryDate;
         this.outfitType = outfitType;
         this.specialInstructions = specialInstructions;
         this.orderType = orderType;
+        this.isPriorityOrder = isPriorityOrder;
         this.inspiration = inspiration;
         this.boutique = boutiqueDAO;
         this.customer = customerDAO;
