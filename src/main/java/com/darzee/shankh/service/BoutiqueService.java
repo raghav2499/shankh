@@ -1,6 +1,5 @@
 package com.darzee.shankh.service;
 
-import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Boutique;
@@ -16,9 +15,7 @@ import com.darzee.shankh.repo.TailorRepo;
 import com.darzee.shankh.request.BoutiqueDetails;
 import com.darzee.shankh.request.UpdateBoutiqueDetails;
 import com.darzee.shankh.request.UpdateTailorRequest;
-import com.darzee.shankh.response.CustomerDashboard;
 import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
-import com.darzee.shankh.response.LedgerDashboardData;
 import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +26,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -134,7 +130,7 @@ public class BoutiqueService {
                 adminTailorImageUrl = bucketService.getShortLivedUrl(adminTailorImageReferenceId);
             }
             GetBoutiqueDetailsResponse response = new GetBoutiqueDetailsResponse(boutiqueDAO, tailorDAO,
-                    shopImageUrls, adminTailorImageUrl);
+                    shopImageReferenceIds, shopImageUrls, adminTailorImageReferenceId, adminTailorImageUrl);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique id");

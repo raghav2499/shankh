@@ -132,8 +132,13 @@ public class OrderService {
         Specification<Order> orderSpecification = OrderSpecificationClause.getSpecificationBasedOnFilters(filterMap);
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingSortingMap);
         List<Order> orderDetails = orderRepo.findAll(orderSpecification, pagingCriteria).getContent();
-        List<OrderDAO> orderDAOList = Optional.ofNullable(orderDetails).orElse(new ArrayList<>()).stream().map(order -> mapper.orderObjectToDao(order, new CycleAvoidingMappingContext())).collect(Collectors.toList());
-        List<OrderDetailResponse> orderDetailsList = orderDAOList.stream().map(order -> getOrderDetails(order)).collect(Collectors.toList());
+        List<OrderDAO> orderDAOList = Optional.ofNullable(orderDetails).orElse(new ArrayList<>())
+                .stream()
+                .map(order -> mapper.orderObjectToDao(order, new CycleAvoidingMappingContext()))
+                .collect(Collectors.toList());
+        List<OrderDetailResponse> orderDetailsList = orderDAOList.stream()
+                .map(order -> getOrderDetails(order))
+                .collect(Collectors.toList());
         GetOrderResponse response = new GetOrderResponse(orderDetailsList);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -151,7 +156,8 @@ public class OrderService {
             List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
             List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
             String message = "Details fetched succesfully";
-            OrderDetailResponse response = new OrderDetailResponse(customer, order, measurementDetails, orderAmount, clothImageUrlLinks, message);
+            OrderDetailResponse response = new OrderDetailResponse(customer, order, measurementDetails, orderAmount,
+                    clothImagesReferenceIds, clothImageUrlLinks, message);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");

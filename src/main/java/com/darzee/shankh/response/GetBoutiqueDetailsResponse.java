@@ -21,23 +21,28 @@ public class GetBoutiqueDetailsResponse {
 
     private Integer language;
 
+    private List<String> shopImagesRefId;
     private List<String> shopImageUrls;
     private String adminTailorName;
     private String adminTailorPhoneNumber;
+
+    private String adminTailorRefId;
     private Integer boutiqueType;
     private String adminTailorProfilePicUrl;
 
 
-    public GetBoutiqueDetailsResponse(BoutiqueDAO boutiqueDAO, TailorDAO tailorDAO,
-                                      List<String> shopImagesUrl, String adminTailorImageUrl) {
+    public GetBoutiqueDetailsResponse(BoutiqueDAO boutiqueDAO, TailorDAO tailorDAO, List<String> shopImagesRefId,
+                                      List<String> shopImagesUrl, String adminTailorRefId, String adminTailorImageUrl) {
         this.boutiqueId = boutiqueDAO.getId();
         this.boutiqueName = boutiqueDAO.getName();
         this.tailorCount = boutiqueDAO.getTailorCount();
         this.boutiqueType = boutiqueDAO.getBoutiqueType().getOrdinal();
+        this.shopImagesRefId = shopImagesRefId;
         this.shopImageUrls = shopImagesUrl;
         if (tailorDAO != null) {
             this.adminTailorName = tailorDAO.getName();
             this.adminTailorPhoneNumber = tailorDAO.getPhoneNumber();
+            this.adminTailorRefId = adminTailorRefId;
             this.adminTailorProfilePicUrl = adminTailorImageUrl;
             this.language = tailorDAO.getLanguage().getOrdinal();
         }

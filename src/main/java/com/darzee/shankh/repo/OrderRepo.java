@@ -17,7 +17,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             "WHERE ord.boutique_id = :boutiqueId " +
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +
-            "GROUP BY DATE_TRUNC('week', ord.created_at)", nativeQuery = true)
+            "GROUP BY DATE_TRUNC('week', ord.created_at) ORDER BY DATE_TRUNC('week', ord.created_at)", nativeQuery = true)
     List<Object[]> getTotalAmountByWeek(
             @Param("boutiqueId") Long boutiqueId,
             @Param("startDate") LocalDate startDate,

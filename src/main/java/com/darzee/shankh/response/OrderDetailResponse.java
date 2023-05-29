@@ -30,6 +30,8 @@ public class OrderDetailResponse {
     private String inspiration;
     private String specialInstructions;
     private String type;
+
+    private List<String> clothImageRefIds;
     private List<String> clothImagesLink;
 
     private String outfitTypeImageLink;
@@ -55,7 +57,7 @@ public class OrderDetailResponse {
     }
 
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, OutfitMeasurementDetails outfitMeasurementDetails,
-                               OrderAmountDAO orderAmountDAO, List<String> clothImagesLink, String message) {
+                               OrderAmountDAO orderAmountDAO, List<String> clothImageRefIds, List<String> clothImagesLink, String message) {
         this.orderId = order.getId();
         this.orderStatus = order.getOrderStatus().getDisplayString();
         this.isPriorityOrder = Optional.ofNullable(order.getIsPriorityOrder()).orElse(Boolean.FALSE);
@@ -67,6 +69,7 @@ public class OrderDetailResponse {
         this.type = order.getOrderType().getDisplayName();
         this.inspiration = order.getInspiration();
         this.specialInstructions = order.getSpecialInstructions();
+        this.clothImageRefIds = clothImageRefIds;
         this.clothImagesLink = clothImagesLink;
         this.orderAmountDetails = new OrderAmountDetails(orderAmountDAO);
         this.customerDetails = new CustomerDetails(customer);
