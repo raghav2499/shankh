@@ -15,6 +15,7 @@ import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.CreateCustomerRequest;
 import com.darzee.shankh.request.UpdateCustomerRequest;
 import com.darzee.shankh.response.CreateCustomerResponse;
+import com.darzee.shankh.response.CustomerDashboard;
 import com.darzee.shankh.response.CustomerDetails;
 import com.darzee.shankh.response.GetCustomersResponse;
 import com.darzee.shankh.utils.CommonUtils;
@@ -26,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -80,6 +82,16 @@ public class CustomerService {
             CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
             CustomerDetails customerDetails = new CustomerDetails(customerDAO);
             return new ResponseEntity(customerDetails, HttpStatus.OK);
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Customer id");
+    }
+
+    public CustomerDetails getCustomerDetails(Long customerId) {
+        Optional<Customer> optionalCustomer = customerRepo.findById(customerId);
+        if (optionalCustomer.isPresent()) {
+            CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
+            CustomerDetails customerDetails = new CustomerDetails(customerDAO);
+            return customerDetails;
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Customer id");
     }
@@ -179,6 +191,15 @@ public class CustomerService {
         return "";
     }
 
+    public CustomerDashboard getCustomerDashboardDetails(Long boutiqueId, int month, int year) {
+        LocalDateTime monthStart = LocalDateTime.of(year, month, 1, 0, 0, 0);
+        LocalDateTime nextMonthStart = monthStart.plusMonths(1);
+        Integer totalCustomerCount = customerRepo.countByBoutiqueId(boutiqueId);
+        Integer newlyAddedCustomers = customerRepo.countByBoutiqueIdAndCreatedAtAfterAndCreatedAtBefore(boutiqueId, monthStart, nextMonthStart);
+        CustomerDashboard customerDashboard = new CustomerDashboard(totalCustomerCount, newlyAddedCustomers);
+        return customerDashboard;
+    }
+
     private String getCustomerProfilePicLink(String customerImageReferenceId) {
         if (StringUtils.isBlank(customerImageReferenceId)) {
             return "";
@@ -209,5 +230,6 @@ public class CustomerService {
                 ImageEntityType.CUSTOMER.getEntityType(),
                 customerDAO.getId());
     }
+
 
 }

@@ -30,8 +30,8 @@ public class BoutiqueLedgerDAO {
     }
 
     public void decrementActiveOrderCount() {
-        this.setTotalActiveOrders(this.getTotalActiveOrders() - 1);
-        this.setMonthlyActiveOrders(this.getMonthlyActiveOrders() - 1);
+        this.setTotalActiveOrders(Math.max(this.getTotalActiveOrders() - 1, 0));
+        this.setMonthlyActiveOrders(Math.max(this.getMonthlyActiveOrders() - 1, 0));
     }
 
     public void decrementClosedOrderCount() {
@@ -49,5 +49,12 @@ public class BoutiqueLedgerDAO {
         this.setTotalClosedOrders(this.getTotalClosedOrders() + 1);
         this.setMonthlyActiveOrders(this.getMonthlyActiveOrders() - 1);
         this.setTotalActiveOrders(this.getTotalActiveOrders() - 1);
+    }
+
+    public void resetMonthlyDetailsInLedger() {
+        this.setMonthlyAmountRecieved(0d);
+        this.setMonthlyAmountRecieved(0d);
+        this.setMonthlyActiveOrders(0);
+        this.setMonthlyClosedOrders(0);
     }
 }

@@ -3,8 +3,11 @@ package com.darzee.shankh.entity;
 import com.darzee.shankh.enums.Gender;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Table(name = "customer")
@@ -12,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @SequenceGenerator(name = "customer-seq", sequenceName = "customer_seq", allocationSize = 1)
-public class Customer extends GenericEntity {
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer-seq")
@@ -37,6 +40,14 @@ public class Customer extends GenericEntity {
     @Column(name = "gender")
     @Enumerated(EnumType.ORDINAL)
     private Gender gender;
+
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "measurement_id")

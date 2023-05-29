@@ -33,6 +33,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.io.File;
+import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -190,6 +192,50 @@ public class OrderService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
     }
 
+
+    public SalesDashboard getWeekWiseSales(Long boutiqueId, int month, int year) {
+        LocalDate monthStart = LocalDate.of(year, month, 1);
+        LocalDate nextMonthStart = monthStart.plusMonths(1);
+        List<Object[]> weekwiseSalesData = orderRepo.getTotalAmountByWeek(boutiqueId, monthStart, nextMonthStart);
+        List<Double> weeklySalesAmount = weekwiseSalesData.stream()
+                .map(weeklySalesData -> (Double) weeklySalesData[0])
+                .collect(Collectors.toList());
+        return new SalesDashboard(weeklySalesAmount);
+    }
+
+    public List<OrderTypeDashboardData> getOrderTypeWiseSales(Long boutiqueId, int month, int year) {
+        LocalDate monthStart = LocalDate.of(year, month, 1);
+        LocalDate nextMonthStart = monthStart.plusMonths(1);
+        List<Object[]> orderTypeWiseSalesData = orderRepo.getTotalAmountByOrderType(boutiqueId, monthStart, nextMonthStart);
+        List<OrderTypeDashboardData> orderTypeDashboardData = new ArrayList<>();
+        for (Object[] orderTypeSalesData : orderTypeWiseSalesData) {
+            Integer orderTypeDbOrdinal = (Integer) orderTypeSalesData[1];
+            OrderType orderType = OrderType.values()[orderTypeDbOrdinal];
+            OrderTypeDashboardData orderTypeData = new OrderTypeDashboardData(orderType.getDisplayName(),
+                    (Double) orderTypeSalesData[0]);
+            orderTypeDashboardData.add(orderTypeData);
+        }
+        return orderTypeDashboardData;
+    }
+
+    public List<TopCustomerData> getTopCustomerData(Long boutiqueId, int month, int year) {
+        LocalDate monthStart = LocalDate.of(year, month, 1);
+        LocalDate nextMonthStart = monthStart.plusMonths(1);
+        List<Object[]> topCustomerSalesDetails = orderRepo.getTopCustomersByTotalAmount(boutiqueId, monthStart, nextMonthStart);
+        List<TopCustomerData> topCustomerDataList = new ArrayList<>(2);
+        for (Object[] customerSalesDetails : topCustomerSalesDetails) {
+            Long customerId = ((BigInteger) customerSalesDetails[1]).longValue();
+            Double salesByCustomer = (Double) customerSalesDetails[0];
+            CustomerDetails customerDetails = customerService.getCustomerDetails(customerId);
+            TopCustomerData topCustomerData = new TopCustomerData(customerDetails.getCustomerName(),
+                    customerDetails.getPhoneNumber(),
+                    salesByCustomer);
+            topCustomerDataList.add(topCustomerData);
+        }
+        return topCustomerDataList;
+    }
+
+
     @Transactional
     public ResponseEntity recieveOrderPayment(Long orderId, RecievePaymentRequest request) {
         Optional<Order> order = orderRepo.findById(orderId);
@@ -240,6 +286,7 @@ public class OrderService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order id");
     }
 
+    @Transactional
     private OrderDAO updateOrderDetails(UpdateOrderDetails orderDetails, OrderDAO order) {
         if (order.isOrderStatusUpdated(orderDetails.getStatus())) {
             Integer targetStatusOrdinal = orderDetails.getStatus();
@@ -275,8 +322,7 @@ public class OrderService {
         if (Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
             order.setIsDeleted(Boolean.TRUE);
             OrderStage orderStage = getOrderStage(order.getOrderStatus());
-            boutiqueLedgerService.handleBoutiqueLedgerForDeletedOrder(order.getBoutique().getId(),
-                    order.getOrderAmount(), orderStage);
+            resetOrderAmountForDeletedOrders(order, orderStage);
         }
         if (!Collections.isEmpty(orderDetails.getClothImageReferenceIds())) {
             Long orderId = order.getId();
@@ -287,6 +333,7 @@ public class OrderService {
         return order;
     }
 
+    @Transactional
     private OrderAmountDAO updateOrderAmountDetails(UpdateOrderAmountDetails orderAmountDetails,
                                                     OrderAmountDAO orderAmount, OrderDAO order, Long boutiqueId) {
         Double totalAmount = Optional.ofNullable(orderAmountDetails.getTotalOrderAmount()).orElse(orderAmount.getTotalAmount());
@@ -378,6 +425,21 @@ public class OrderService {
         return orderAmountDAO;
     }
 
+    @Transactional
+    private void resetOrderAmountForDeletedOrders(OrderDAO orderDAO, OrderStage orderStage) {
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        Double pendingOrderAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
+        Double amountRecieved = orderAmountDAO.getAmountRecieved();
+        orderAmountDAO.setAmountRecieved(0d);
+        orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
+        paymentService.recordPayment(-amountRecieved, PaymentMode.CASH, Boolean.FALSE, orderDAO);
+        boutiqueLedgerService.handleBoutiqueLedgerForDeletedOrder(orderDAO.getBoutique().getId(),
+                pendingOrderAmount,
+                amountRecieved,
+                orderStage);
+    }
+
+
     private List<String> getClothProfilePicLink(List<String> clothImageReferenceId) {
         if (Collections.isEmpty(clothImageReferenceId)) {
             return new ArrayList<>();
@@ -395,6 +457,7 @@ public class OrderService {
         return RandomStringUtils.randomAlphanumeric(6);
     }
 
+    @Transactional
     private void updateLedgerIfApplicable(OrderDAO order, OrderStatus initialStatus) {
         OrderStatus currentStatus = order.getOrderStatus();
         Long boutiqueId = order.getBoutique().getId();

@@ -23,11 +23,12 @@ public class PaymentService {
 
     @Autowired
     private DaoEntityMapper mapper;
+
     public PaymentDAO recordPayment(Double amount, PaymentMode paymentMode, Boolean isAdvancePayment,
                                     OrderDAO order) {
         PaymentDAO paymentDAO = new PaymentDAO(amount, paymentMode, isAdvancePayment, order);
         paymentDAO = mapper.paymentToPaymentDAO(paymentRepo.save(mapper.paymentDAOToPayment(paymentDAO,
-                new CycleAvoidingMappingContext())),
+                        new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         return paymentDAO;
     }
@@ -54,9 +55,12 @@ public class PaymentService {
 
     public PaymentDAO reversePayment(PaymentDAO paymentDAO, Double finalPaymentAmount, Boolean isAdvancePayment) {
         PaymentDAO reversePayment = PaymentDAO.reversePayment(paymentDAO);
-        PaymentDAO finalPayment = new PaymentDAO(finalPaymentAmount, paymentDAO.getPaymentMode(), isAdvancePayment, paymentDAO.getOrder());
         paymentRepo.save(mapper.paymentDAOToPayment(reversePayment, new CycleAvoidingMappingContext()));
-        paymentRepo.save(mapper.paymentDAOToPayment(finalPayment, new CycleAvoidingMappingContext()));
-        return finalPayment;
+        if (finalPaymentAmount > 0) {
+            PaymentDAO finalPayment = new PaymentDAO(finalPaymentAmount, paymentDAO.getPaymentMode(), isAdvancePayment, paymentDAO.getOrder());
+            paymentRepo.save(mapper.paymentDAOToPayment(finalPayment, new CycleAvoidingMappingContext()));
+            return finalPayment;
+        }
+        return null;
     }
 }

@@ -63,6 +63,10 @@ public interface DaoEntityMapper {
 
     PaymentDAO paymentToPaymentDAO(Payment payment, @Context CycleAvoidingMappingContext context);
 
+    BoutiqueLedgerSnapshot boutiqueLedgerSnapshotDAOToSnapshot(BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotDAO);
+
+    BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotToSnapshotDAO(BoutiqueLedgerSnapshot boutiqueLedgerSnapshotDAO);
+
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if (orderList == null) {
             return null;

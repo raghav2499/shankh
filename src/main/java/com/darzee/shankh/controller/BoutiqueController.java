@@ -4,6 +4,7 @@ import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.request.UpdateBoutiqueDetails;
 import com.darzee.shankh.service.BoutiqueLedgerService;
 import com.darzee.shankh.service.BoutiqueService;
+import com.darzee.shankh.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ public class BoutiqueController {
 
     @Autowired
     private BoutiqueService boutiqueService;
+
+    @Autowired
+    private DashboardService dashboardService;
 
     @Autowired
     private BoutiqueLedgerService boutiqueLedgerService;
@@ -38,6 +42,19 @@ public class BoutiqueController {
     @GetMapping(value = "/{id}/ledger", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getLedgerData(@PathVariable("id") String id) {
         return boutiqueLedgerService.getLedgerData(id);
+    }
+
+    @GetMapping(value = "/{id}/report", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getBoutiqueReport(@PathVariable("id") String id,
+                                            @RequestParam("month") Integer month,
+                                            @RequestParam("year") Integer year) {
+        return dashboardService.getReportData(id, month, year);
+    }
+
+
+    @PostMapping(value = "/{id}/ledger/reset", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity resetBoutiqueLedgerData(@PathVariable("id") String boutiqueId) {
+        return boutiqueLedgerService.resetBoutiqueLedgerData(boutiqueId);
     }
 
 }

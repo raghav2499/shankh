@@ -1,37 +1,22 @@
 package com.darzee.shankh.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetBoutiqueLedgerDataResponse {
-    private LedgerData monthlyLedgerData;
-    private LedgerData overallLedgerData;
+    private LedgerDashboardData monthlyLedgerDashboardData;
+    private LedgerDashboardData overallLedgerDashboardData;
 
-    public class LedgerData {
-        public Double amountRecieved;
-        public Double pendingAmount;
-
-        public Integer closedOrderCount;
-
-        public Integer activeOrderCount;
-
-        public LedgerData(Double amountRecieved, Double pendingAmount, Integer activeOrderCount,
-                          Integer closedOrderCount) {
-            this.amountRecieved = amountRecieved;
-            this.pendingAmount = pendingAmount;
-            this.activeOrderCount = activeOrderCount;
-            this.closedOrderCount = closedOrderCount;
-        }
+    public void setMonthlyLedgerDashboardData(Double amountRecieved, Double pendingAmount, Integer activeOrder, Integer closedOrder) {
+        this.monthlyLedgerDashboardData =  new LedgerDashboardData(amountRecieved, pendingAmount, activeOrder, closedOrder);
     }
 
-    public void setMonthlyLedgerData(Double amountRecieved, Double pendingAmount, Integer activeOrder, Integer closedOrder) {
-        this.monthlyLedgerData =  new LedgerData(amountRecieved, pendingAmount, activeOrder, closedOrder);
-    }
-
-    public void setOverallLedgerData(Double amountRecieved, Double pendingAmount, Integer activeOrder, Integer closedOrder) {
-        this.overallLedgerData = new LedgerData(amountRecieved, pendingAmount, activeOrder, closedOrder);
+    public void setOverallLedgerDashboardData(Double amountRecieved, Double pendingAmount, Integer activeOrder, Integer closedOrder) {
+        this.overallLedgerDashboardData = new LedgerDashboardData(amountRecieved, pendingAmount, activeOrder, closedOrder);
     }
 
 }

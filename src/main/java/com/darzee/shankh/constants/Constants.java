@@ -2,6 +2,7 @@ package com.darzee.shankh.constants;
 
 import com.darzee.shankh.enums.OrderStatus;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class Constants {
     public static final Double INCH_TO_CM_MULTIPLYING_FACTOR = 2.54;
     public static final Double DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE = 10d;
 
-    public static final Integer MEASUREMENT_RESPONSE_TRUNCATION_LENGTH = 4;
+    public static final LocalDate REPORTING_START_DATE = LocalDate.of(2023,5,1);
 
     public class MeasurementTitles {
         public static final String DRESS_WAIST_TITLE = "Waist";
