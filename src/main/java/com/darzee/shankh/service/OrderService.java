@@ -197,8 +197,8 @@ public class OrderService {
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate nextMonthStart = monthStart.plusMonths(1);
         List<Object[]> weekwiseSalesData = orderRepo.getTotalAmountByWeek(boutiqueId, monthStart, nextMonthStart);
-        List<Double> weeklySalesAmount = weekwiseSalesData.stream()
-                .map(weeklySalesData -> (Double) weeklySalesData[0])
+        List<WeekwiseSalesSplit> weeklySalesAmount = weekwiseSalesData.stream()
+                .map(weeklySalesData -> new WeekwiseSalesSplit((Double) weeklySalesData[0], (String) weeklySalesData[1]))
                 .collect(Collectors.toList());
         return new SalesDashboard(weeklySalesAmount);
     }

@@ -12,11 +12,12 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SalesDashboard {
 
-    public List<Double> weeklySales;
+    public List<WeekwiseSalesSplit> weeklySales;
     public Double totalSales;
 
-    public SalesDashboard(List<Double> weeklySales) {
+    public SalesDashboard(List<WeekwiseSalesSplit> weeklySales) {
         this.weeklySales = weeklySales;
-        this.totalSales = weeklySales.stream().reduce(0d, (a, b) -> a + b);
+        this.totalSales = weeklySales.stream().map(sales -> sales.getTotalSales())
+                .reduce(0d, (a, b) -> a + b);
     }
 }
