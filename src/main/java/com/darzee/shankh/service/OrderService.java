@@ -35,10 +35,7 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -198,7 +195,7 @@ public class OrderService {
         LocalDate nextMonthStart = monthStart.plusMonths(1);
         List<Object[]> weekwiseSalesData = orderRepo.getTotalAmountByWeek(boutiqueId, monthStart, nextMonthStart);
         List<WeekwiseSalesSplit> weeklySalesAmount = weekwiseSalesData.stream()
-                .map(weeklySalesData -> new WeekwiseSalesSplit((Double) weeklySalesData[0], (String) weeklySalesData[1]))
+                .map(weeklySalesData -> new WeekwiseSalesSplit((Double) weeklySalesData[0], (Date) weeklySalesData[1]))
                 .collect(Collectors.toList());
         return new SalesDashboard(weeklySalesAmount);
     }

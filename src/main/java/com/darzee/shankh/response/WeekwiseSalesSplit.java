@@ -5,15 +5,17 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class WeekwiseSalesSplit {
 
-    String weekStartDate;
+    Date weekStartDate;
     Double totalSales;
 
-    public WeekwiseSalesSplit(Double totalSales, String weekStartDate) {
+    public WeekwiseSalesSplit(Double totalSales, Date weekStartDate) {
         this.weekStartDate = weekStartDate;
         this.totalSales = totalSales;
     }
