@@ -210,12 +210,22 @@ public class OrderService {
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate nextMonthStart = monthStart.plusMonths(1);
         List<Object[]> orderTypeWiseSalesData = orderRepo.getTotalAmountByOrderType(boutiqueId, monthStart, nextMonthStart);
-        List<OrderTypeDashboardData> orderTypeDashboardData = new ArrayList<>();
-        for (Object[] orderTypeSalesData : orderTypeWiseSalesData) {
-            Integer orderTypeDbOrdinal = (Integer) orderTypeSalesData[1];
+        Map<OrderType, Double> orderTypeAmountMap = new HashMap<>(OrderType.values().length);
+        for (Object[] orderTypeSales : orderTypeWiseSalesData) {
+            Integer orderTypeDbOrdinal = (Integer) orderTypeSales[1];
             OrderType orderType = OrderType.values()[orderTypeDbOrdinal];
-            OrderTypeDashboardData orderTypeData = new OrderTypeDashboardData(orderType.getDisplayName(),
-                    (Double) orderTypeSalesData[0]);
+            orderTypeAmountMap.put(orderType, (Double) orderTypeSales[0]);
+        }
+        List<OrderTypeDashboardData> orderTypeDashboardData = new ArrayList<>();
+        for (OrderType orderType : OrderType.values()) {
+            OrderTypeDashboardData orderTypeData = null;
+            if (orderTypeAmountMap.containsKey(orderType)) {
+                orderTypeData = new OrderTypeDashboardData(orderType.getDisplayName(),
+                        orderTypeAmountMap.get(orderType));
+            } else {
+                orderTypeData = new OrderTypeDashboardData(orderType.getDisplayName(),
+                        0d);
+            }
             orderTypeDashboardData.add(orderTypeData);
         }
         return orderTypeDashboardData;
