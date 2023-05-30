@@ -17,5 +17,6 @@ public class TopCustomerData {
     private String customerName;
     private String customerPhoneNumber;
     private Double salesByCustomer;
+    private String customerProfilePicLink;
 
 }

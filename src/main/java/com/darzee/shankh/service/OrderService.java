@@ -240,9 +240,11 @@ public class OrderService {
             Long customerId = ((BigInteger) customerSalesDetails[1]).longValue();
             Double salesByCustomer = (Double) customerSalesDetails[0];
             CustomerDetails customerDetails = customerService.getCustomerDetails(customerId);
+            String customerProfilePicLink = customerService.getCustomerProfilePicLink(customerId);
             TopCustomerData topCustomerData = new TopCustomerData(customerDetails.getCustomerName(),
                     customerDetails.getPhoneNumber(),
-                    salesByCustomer);
+                    salesByCustomer,
+                    customerProfilePicLink);
             topCustomerDataList.add(topCustomerData);
         }
         return topCustomerDataList;
