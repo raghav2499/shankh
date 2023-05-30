@@ -44,16 +44,17 @@ public class PaymentService {
                     .collect(Collectors.toList());
             if (!Collections.isEmpty(advancePayments)) {
                 advancePayments.sort(Comparator.comparing((payment -> payment.getId())));
-                finalPayment = reversePayment(advancePayments.get(advancePayments.size() - 1),
+                finalPayment = reversePaymentAndUpdateAmount(advancePayments.get(advancePayments.size() - 1),
                         finalAmount, Boolean.TRUE);
                 return finalPayment;
             }
         }
         finalPayment = new PaymentDAO(finalAmount, PaymentMode.CASH, Boolean.TRUE, order);
+        paymentRepo.save(mapper.paymentDAOToPayment(finalPayment, new CycleAvoidingMappingContext()));
         return finalPayment;
     }
 
-    public PaymentDAO reversePayment(PaymentDAO paymentDAO, Double finalPaymentAmount, Boolean isAdvancePayment) {
+    public PaymentDAO reversePaymentAndUpdateAmount(PaymentDAO paymentDAO, Double finalPaymentAmount, Boolean isAdvancePayment) {
         PaymentDAO reversePayment = PaymentDAO.reversePayment(paymentDAO);
         paymentRepo.save(mapper.paymentDAOToPayment(reversePayment, new CycleAvoidingMappingContext()));
         if (finalPaymentAmount > 0) {
