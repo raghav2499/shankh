@@ -363,9 +363,9 @@ public class OrderService {
         Double deltaTotalAmount = totalAmount - orderAmount.getTotalAmount();
         Double amountPaidAfterThisUpdate = totalAmountPaid + (advancePayment - advancePaid);
 
-        if (amountPaidAfterThisUpdate > deltaTotalAmount) {
+        if (amountPaidAfterThisUpdate > totalAmount) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount paid is greater than total amount. Amount Paid "
-                    + advancePayment
+                    + amountPaidAfterThisUpdate
                     + " and total amount " + totalAmount);
         }
         Double deltaPendingAmount = (totalAmount - advancePayment) - (orderAmount.getTotalAmount() - advancePaid);
