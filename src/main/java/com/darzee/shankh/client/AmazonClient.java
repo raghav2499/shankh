@@ -63,7 +63,7 @@ public class AmazonClient {
     private String generateShortLivedUrl(String bucketName, String fileName) {
         java.util.Date expiration = new java.util.Date();
         long expTimeMillis = expiration.getTime();
-        expTimeMillis += 1000 * 60 * 60; // 1 hour
+        expTimeMillis += 1000 * 60 * 60 * 15; // 15 hour
         expiration.setTime(expTimeMillis);
 
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
