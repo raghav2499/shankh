@@ -108,7 +108,8 @@ public class BoutiqueService {
             boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
-            response = new GetBoutiqueDetailsResponse(boutiqueDAO, adminTailor);
+
+            response = generateBoutiqueDetailResponse(boutiqueDAO, adminTailor);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique_id");
@@ -119,18 +120,8 @@ public class BoutiqueService {
         if (boutique.isPresent()) {
             BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(boutique.get(), new CycleAvoidingMappingContext());
             TailorDAO tailorDAO = boutiqueDAO.getAdminTailor();
-            List<String> shopImageReferenceIds = getBoutiqueImagesReferenceIds(boutiqueId);
-            String adminTailorImageReferenceId = objectImagesService.getTailorImageReferenceId(boutiqueDAO.getAdminTailor().getId());
-            List<String> shopImageUrls = new ArrayList<>();
-            String adminTailorImageUrl = null;
-            if (!Collections.isEmpty(shopImageReferenceIds)) {
-                shopImageUrls = bucketService.getShortLivedUrls(shopImageReferenceIds);
-            }
-            if (adminTailorImageReferenceId != null) {
-                adminTailorImageUrl = bucketService.getShortLivedUrl(adminTailorImageReferenceId);
-            }
-            GetBoutiqueDetailsResponse response = new GetBoutiqueDetailsResponse(boutiqueDAO, tailorDAO,
-                    shopImageReferenceIds, shopImageUrls, adminTailorImageReferenceId, adminTailorImageUrl);
+
+            GetBoutiqueDetailsResponse response = generateBoutiqueDetailResponse(boutiqueDAO, tailorDAO);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique id");
@@ -154,6 +145,23 @@ public class BoutiqueService {
         objectImagesService.saveObjectImages(imageReferences,
                 ImageEntityType.BOUTIQUE.getEntityType(),
                 boutique.getId());
+    }
+
+    private GetBoutiqueDetailsResponse generateBoutiqueDetailResponse(BoutiqueDAO boutiqueDAO, TailorDAO tailorDAO) {
+        List<String> shopImageReferenceIds = getBoutiqueImagesReferenceIds(boutiqueDAO.getId());
+        String adminTailorImageReferenceId = objectImagesService.getTailorImageReferenceId(boutiqueDAO.getAdminTailor().getId());
+
+        List<String> shopImageUrls = new ArrayList<>();
+        String adminTailorImageUrl = null;
+        if (!Collections.isEmpty(shopImageReferenceIds)) {
+            shopImageUrls = bucketService.getShortLivedUrls(shopImageReferenceIds);
+        }
+        if (adminTailorImageReferenceId != null) {
+            adminTailorImageUrl = bucketService.getShortLivedUrl(adminTailorImageReferenceId);
+        }
+        GetBoutiqueDetailsResponse response = new GetBoutiqueDetailsResponse(boutiqueDAO, tailorDAO,
+                shopImageReferenceIds, shopImageUrls, adminTailorImageReferenceId, adminTailorImageUrl);
+        return response;
     }
 
     public TailorDAO updateAdminTailorProfile(TailorDAO tailorDAO, UpdateTailorRequest request) {
