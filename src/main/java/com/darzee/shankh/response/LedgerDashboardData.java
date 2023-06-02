@@ -1,27 +1,21 @@
 package com.darzee.shankh.response;
 
 import com.darzee.shankh.dao.BoutiqueLedgerSnapshotDAO;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@NoArgsConstructor
+@AllArgsConstructor
 public class LedgerDashboardData {
-    public Double amountRecieved;
-    public Double pendingAmount;
+    public Double amountRecieved = 0d;
+    public Double pendingAmount = 0d;
 
-    public Integer closedOrderCount;
+    public Integer closedOrderCount = 0;
 
-    public Integer activeOrderCount;
-
-    public LedgerDashboardData(Double amountRecieved, Double pendingAmount, Integer activeOrderCount,
-                               Integer closedOrderCount) {
-        this.amountRecieved = amountRecieved;
-        this.pendingAmount = pendingAmount;
-        this.activeOrderCount = activeOrderCount;
-        this.closedOrderCount = closedOrderCount;
-    }
+    public Integer activeOrderCount = 0;
 
     public LedgerDashboardData(BoutiqueLedgerSnapshotDAO ledgerSnapshot) {
         this.amountRecieved = ledgerSnapshot.getAmountRecieved();;

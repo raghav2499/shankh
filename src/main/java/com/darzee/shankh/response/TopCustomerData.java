@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TopCustomerData {
 
+    private Long customerId;
     private String customerName;
     private String customerPhoneNumber;
     private Double salesByCustomer;

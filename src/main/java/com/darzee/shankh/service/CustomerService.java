@@ -80,7 +80,8 @@ public class CustomerService {
         Optional<Customer> optionalCustomer = customerRepo.findById(customerId);
         if (optionalCustomer.isPresent()) {
             CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
-            CustomerDetails customerDetails = new CustomerDetails(customerDAO);
+            String profilePicLink = getCustomerProfilePicLink(customerDAO.getId());
+            CustomerDetails customerDetails = new CustomerDetails(customerDAO, profilePicLink);
             return new ResponseEntity(customerDetails, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Customer id");

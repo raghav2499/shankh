@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,9 +15,9 @@ public class BoutiqueReportResponse {
 
     String message;
 
-    LedgerDashboardData ledgerDashboardData;
-    CustomerDashboard customerDashboard;
-    List<TopCustomerData> topCustomerData;
+    LedgerDashboardData ledgerDashboardData = new LedgerDashboardData();
+    CustomerDashboard customerDashboard = new CustomerDashboard();
+    List<TopCustomerData> topCustomerData = new ArrayList<>();
     SalesDashboard weekwiseSalesSplit;
     List<OrderTypeDashboardData> orderTypeSalesSplit;
 

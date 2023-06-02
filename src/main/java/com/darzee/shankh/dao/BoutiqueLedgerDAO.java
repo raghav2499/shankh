@@ -52,7 +52,7 @@ public class BoutiqueLedgerDAO {
     }
 
     public void resetMonthlyDetailsInLedger() {
-        this.setMonthlyAmountRecieved(0d);
+        this.setMonthlyPendingAmount(0d);
         this.setMonthlyAmountRecieved(0d);
         this.setMonthlyActiveOrders(0);
         this.setMonthlyClosedOrders(0);
