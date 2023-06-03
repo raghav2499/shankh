@@ -73,10 +73,14 @@ public class ShirtImplService implements OutfitTypeService {
 
     @Override
     public boolean haveMandatoryParams(Measurements measurementDetails) {
-        return measurementDetails.getShirtLength() != null && measurementDetails.getNeck() != null
-                && measurementDetails.getShoulder() != null && measurementDetails.getChest() != null
-                && measurementDetails.getWaist() != null && measurementDetails.getSeat() != null
-                && measurementDetails.getSleeveLength() != null && measurementDetails.getSleeveCircumference() != null;
+        return measurementDetails.getShirtLength() != null &&
+                measurementDetails.getNeck() != null &&
+                measurementDetails.getShoulder() != null &&
+                measurementDetails.getChest() != null &&
+                measurementDetails.getWaist() != null &&
+                measurementDetails.getSeat() != null &&
+                measurementDetails.getSleeveLength() != null &&
+                measurementDetails.getSleeveCircumference() != null;
     }
 
     @Override
@@ -93,7 +97,7 @@ public class ShirtImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 
-        measurementDetailsResponseList.add(addLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShirtLength()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addShirtLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShirtLength()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addNeck(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getNeck()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addShoulder(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShoulder()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addChest(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getChest()).orElse(defaultValue) / dividingFactor)));
@@ -116,7 +120,7 @@ public class ShirtImplService implements OutfitTypeService {
                 outfitType.getImageLink(), 1);
     }
 
-    private MeasurementDetails addLength(String value) {
+    private MeasurementDetails addShirtLength(String value) {
         String imageLink = SHIRT_LENGTH_IMAGE_LINK;
         String title = SHIRT_LENGTH_TITLE;
         String index = "1";

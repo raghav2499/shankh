@@ -1,2 +1,2 @@
-boutique_ledger query : select sum(total_amount-amount_recieved) as pending_amount, sum(amount_recieved),boutique_id from order_amount inner join orders on orders.id=order_amount.order_id where is_deleted = false group by orders.boutique_id order by boutique_id;
+boutique_ledger query : select sum(total_amount-amount_recieved) as pending_amount, sum(amount_recieved) as amount_recieved ,boutique_id from order_amount inner join orders on orders.id=order_amount.order_id where is_deleted = false and orders.boutique_id = 16 group by orders.boutique_id ;
 boutique_ledger_reset : update boutique_ledger set total_pending_amount = 0, total_amount_recieved = 0, monthly_pending_amount = 0, monthly_amount_recieved = 0 where boutique_id = 12;

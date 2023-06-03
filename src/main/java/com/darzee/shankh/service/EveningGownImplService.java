@@ -44,6 +44,9 @@ public class EveningGownImplService implements OutfitTypeService {
         if (measurementDetails.getWaist() != null) {
             measurementDAO.setWaist(measurementDetails.getWaist() * multiplyingFactor);
         }
+        if (measurementDetails.getSeat() != null) {
+            measurementDAO.setSeat(measurementDetails.getSeat() * multiplyingFactor);
+        }
         if (measurementDetails.getArmHole() != null) {
             measurementDAO.setArmHole(measurementDetails.getArmHole() * multiplyingFactor);
         }
@@ -65,10 +68,12 @@ public class EveningGownImplService implements OutfitTypeService {
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementDAO measurementDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
 
+        outfitMeasurementDetails.setGownLength(measurementDAO.getGownLength());
         outfitMeasurementDetails.setShoulder(measurementDAO.getShoulder());
         outfitMeasurementDetails.setUpperChest(measurementDAO.getUpperChest());
         outfitMeasurementDetails.setBust(measurementDAO.getBust());
         outfitMeasurementDetails.setWaist(measurementDAO.getWaist());
+        outfitMeasurementDetails.setSeat(measurementDAO.getSeat());
         outfitMeasurementDetails.setArmHole(measurementDAO.getArmHole());
         outfitMeasurementDetails.setSleeveLength(measurementDAO.getSleeveLength());
         outfitMeasurementDetails.setSleeveCircumference(measurementDAO.getSleeveCircumference());
@@ -80,17 +85,17 @@ public class EveningGownImplService implements OutfitTypeService {
 
     @Override
     public boolean haveMandatoryParams(Measurements measurementDetails) {
-        return measurementDetails.getShoulder() != null &&
+        return measurementDetails.getGownLength() != null &&
+                measurementDetails.getShoulder() != null &&
                 measurementDetails.getUpperChest() != null &&
                 measurementDetails.getBust() != null &&
                 measurementDetails.getWaist() != null &&
+                measurementDetails.getSeat() != null &&
                 measurementDetails.getArmHole() != null &&
                 measurementDetails.getSleeveLength() != null &&
                 measurementDetails.getSleeveCircumference() != null &&
                 measurementDetails.getFrontNeckDepth() != null &&
-                measurementDetails.getBackNeckDepth() != null &&
-                measurementDetails.getGownLength() != null &&
-                measurementDetails.getSeat() != null;
+                measurementDetails.getBackNeckDepth() != null;
     }
 
     @Override
@@ -111,10 +116,10 @@ public class EveningGownImplService implements OutfitTypeService {
         measurementDetailsResponseList.add(addGownLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getGownLength()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addShoulder(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShoulder()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addUpperChest(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getUpperChest()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addBust(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBackNeckDepth()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addBust(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBust()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getWaist()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveLength()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addArmHole(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBackNeckDepth()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSeat()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addArmHole(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getArmHole()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addSleeveLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveLength()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addSleeveCircumference(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveCircumference()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addFrontNeckDepth(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getFrontNeckDepth()).orElse(defaultValue) / dividingFactor)));

@@ -32,11 +32,11 @@ public class DressImplService implements OutfitTypeService {
         if (measurementDetails.getWaist() != null) {
             measurementDAO.setWaist(measurementDetails.getWaist() * multiplyingFactor);
         }
-        if (measurementDetails.getCalf() != null) {
-            measurementDAO.setCalf(measurementDetails.getCalf() * multiplyingFactor);
-        }
         if (measurementDetails.getSeat() != null) {
             measurementDAO.setSeat(measurementDetails.getSeat() * multiplyingFactor);
+        }
+        if (measurementDetails.getCalf() != null) {
+            measurementDAO.setCalf(measurementDetails.getCalf() * multiplyingFactor);
         }
         if (measurementDetails.getAnkle() != null) {
             measurementDAO.setAnkle(measurementDetails.getAnkle() * multiplyingFactor);
@@ -51,8 +51,8 @@ public class DressImplService implements OutfitTypeService {
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementDAO measurementDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
         outfitMeasurementDetails.setWaist(measurementDAO.getWaist());
-        outfitMeasurementDetails.setCalf(measurementDAO.getCalf());
         outfitMeasurementDetails.setSeat(measurementDAO.getSeat());
+        outfitMeasurementDetails.setCalf(measurementDAO.getCalf());
         outfitMeasurementDetails.setAnkle(measurementDAO.getAnkle());
         outfitMeasurementDetails.setLength(measurementDAO.getLength());
         return outfitMeasurementDetails;
@@ -61,8 +61,8 @@ public class DressImplService implements OutfitTypeService {
     @Override
     public boolean haveMandatoryParams(Measurements measurementDetails) {
         return measurementDetails.getWaist() != null &&
-                measurementDetails.getCalf() != null &&
                 measurementDetails.getSeat() != null &&
+                measurementDetails.getCalf() != null &&
                 measurementDetails.getAnkle() != null &&
                 measurementDetails.getLength() != null;
     }

@@ -89,12 +89,18 @@ public class SareeBlouseImplService implements OutfitTypeService {
 
     @Override
     public boolean haveMandatoryParams(Measurements measurementDetails) {
-        return measurementDetails.getBlouseLength() != null && measurementDetails.getBust() != null &&
-                measurementDetails.getUpperChest() != null && measurementDetails.getBelowBust() != null &&
-                measurementDetails.getShoulder() != null && measurementDetails.getArmHole() != null &&
-                measurementDetails.getSleeveLength() != null && measurementDetails.getSleeveCircumference() != null &&
-                measurementDetails.getFrontNeckDepth() != null && measurementDetails.getShoulderToApexLength() != null &&
-                measurementDetails.getApexToApexLength() != null && measurementDetails.getBackNeckDepth() != null;
+        return measurementDetails.getBlouseLength() != null &&
+                measurementDetails.getBust() != null &&
+                measurementDetails.getUpperChest() != null &&
+                measurementDetails.getBelowBust() != null &&
+                measurementDetails.getShoulder() != null &&
+                measurementDetails.getArmHole() != null &&
+                measurementDetails.getSleeveLength() != null &&
+                measurementDetails.getSleeveCircumference() != null &&
+                measurementDetails.getFrontNeckDepth() != null &&
+                measurementDetails.getShoulderToApexLength() != null &&
+                measurementDetails.getApexToApexLength() != null &&
+                measurementDetails.getBackNeckDepth() != null;
     }
 
     @Override
@@ -116,7 +122,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
         measurementDetailsResponseList.add(addUpperChest(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getUpperChest()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addBelowBust(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBelowBust()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addShoulder(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShoulder()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addArmHole(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getShoulder()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addArmHole(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getArmHole()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addSleeveLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveLength()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addSleeveCircumference(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSleeveCircumference()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addFrontNeckDepth(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getFrontNeckDepth()).orElse(defaultValue) / dividingFactor)));

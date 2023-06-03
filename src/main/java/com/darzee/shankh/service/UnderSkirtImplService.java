@@ -47,7 +47,8 @@ public class UnderSkirtImplService implements OutfitTypeService {
 
     @Override
     public boolean haveMandatoryParams(Measurements measurementDetails) {
-        return measurementDetails.getWaist() != null && measurementDetails.getLength() != null;
+        return measurementDetails.getWaist() != null &&
+                measurementDetails.getLength() != null;
     }
 
     @Override

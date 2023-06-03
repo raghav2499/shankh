@@ -41,8 +41,8 @@ public class PantImplService implements OutfitTypeService {
         if (measurementDetails.getBottom() != null) {
             measurementDAO.setBottom(measurementDetails.getBottom() * multiplyingFactor);
         }
-        if (measurementDetails.getLength() != null) {
-            measurementDAO.setLength(measurementDetails.getLength() * multiplyingFactor);
+        if (measurementDetails.getPantLength() != null) {
+            measurementDAO.setPantLength(measurementDetails.getPantLength() * multiplyingFactor);
         }
         if (measurementDetails.getFly() != null) {
             measurementDAO.setFly(measurementDetails.getFly() * multiplyingFactor);
@@ -57,7 +57,7 @@ public class PantImplService implements OutfitTypeService {
         outfitMeasurementDetails.setSeat(measurementDAO.getSeat());
         outfitMeasurementDetails.setCalf(measurementDAO.getCalf());
         outfitMeasurementDetails.setBottom(measurementDAO.getBottom());
-        outfitMeasurementDetails.setLength(measurementDAO.getLength());
+        outfitMeasurementDetails.setPantLength(measurementDAO.getPantLength());
         outfitMeasurementDetails.setFly(measurementDAO.getFly());
 
         return outfitMeasurementDetails;
@@ -65,9 +65,12 @@ public class PantImplService implements OutfitTypeService {
 
     @Override
     public boolean haveMandatoryParams(Measurements measurementDetails) {
-        return measurementDetails.getWaist() != null && measurementDetails.getSeat() != null
-                && measurementDetails.getCalf() != null && measurementDetails.getBottom() != null
-                && measurementDetails.getLength() != null && measurementDetails.getFly() != null;
+        return measurementDetails.getWaist() != null &&
+                measurementDetails.getSeat() != null &&
+                measurementDetails.getCalf() != null &&
+                measurementDetails.getBottom() != null &&
+                measurementDetails.getPantLength() != null &&
+                measurementDetails.getFly() != null;
     }
 
     @Override
@@ -88,7 +91,7 @@ public class PantImplService implements OutfitTypeService {
         measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSeat()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addCalf(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getCalf()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addBottom(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottom()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPantLength()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addPantLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPantLength()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addFly(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getFly()).orElse(defaultValue) / dividingFactor)));
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
@@ -133,7 +136,7 @@ public class PantImplService implements OutfitTypeService {
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
-    private MeasurementDetails addLength(String value) {
+    private MeasurementDetails addPantLength(String value) {
         String imageLink = PANTS_LENGTH_IMAGE_LINK;
         String title = PANTS_LENGTH_TITLE;
         String index = "5";
