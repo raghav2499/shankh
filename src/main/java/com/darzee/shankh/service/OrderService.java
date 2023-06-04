@@ -376,9 +376,9 @@ public class OrderService {
         if (advancePaid != advancePayment) {
             paymentService.updateAdvancePayment(order, advancePayment);
         }
-//        9888910766
 
-        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(deltaPendingAmount, deltaTotalAmount, boutiqueId);
+        Double deltaAmountRecieved = amountPaidAfterThisUpdate - totalAmountPaid;
+        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(deltaPendingAmount, deltaAmountRecieved, boutiqueId);
 
         generateInvoice(order.getId());
 
