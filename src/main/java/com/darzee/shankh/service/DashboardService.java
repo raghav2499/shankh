@@ -44,14 +44,16 @@ public class DashboardService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique Id");
         }
         LocalDate currentDate = LocalDate.now();
-        if (year < boutiqueDAO.getCreatedAt().getYear() ||
-                (year == boutiqueDAO.getCreatedAt().getYear() &&
-                        month < boutiqueDAO.getCreatedAt().getMonthValue())) {
+        Integer startYear = Optional.ofNullable(boutiqueDAO.getCreatedAt().getYear()).orElse(2023);
+        Integer startMonth = Optional.ofNullable(boutiqueDAO.getCreatedAt().getMonthValue()).orElse(5);
+        if (year < startYear ||
+                (year == startYear &&
+                        month < startMonth)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Reporting data is available after year"
-                            + boutiqueDAO.getCreatedAt().getYear()
+                            + startYear
                             + " and month "
-                            + boutiqueDAO.getCreatedAt().getMonthValue());
+                            + startMonth);
         } else if (year > currentDate.getYear() || (year == currentDate.getYear() && month > currentDate.getMonthValue())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Reporting of future dates is not supported");
@@ -64,8 +66,8 @@ public class DashboardService {
         List<TopCustomerData> topCustomerData = orderService.getTopCustomerData(boutiqueId, month, year);
         SalesDashboard weekwiseSalesSplit = orderService.getWeekWiseSales(boutiqueId, month, year);
         List<OrderTypeDashboardData> orderTypeSalesSplit = orderService.getOrderTypeWiseSales(boutiqueId, month, year);
-        Integer activeSinceMonth = boutiqueDAO.getCreatedAt().getMonthValue();
-        Integer activeSinceYear = boutiqueDAO.getCreatedAt().getYear();
+        Integer activeSinceMonth = startMonth;
+        Integer activeSinceYear = startYear;
 
         String successMessage = "Reporting data fetched successfully";
         BoutiqueReportResponse response = new BoutiqueReportResponse(ledgerDashboardData,
