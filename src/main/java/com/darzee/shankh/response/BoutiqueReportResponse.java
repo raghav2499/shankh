@@ -21,17 +21,24 @@ public class BoutiqueReportResponse {
     SalesDashboard weekwiseSalesSplit;
     List<OrderTypeDashboardData> orderTypeSalesSplit;
 
+    Integer activeSinceMonth;
+    Integer activeSinceYear;
+
     public BoutiqueReportResponse(LedgerDashboardData ledgerDashboardData,
                                   CustomerDashboard customerDashboard,
                                   List<TopCustomerData> topCustomerData,
                                   SalesDashboard weekwiseSalesSplit,
                                   List<OrderTypeDashboardData> orderTypeSalesSplit,
+                                  Integer activeSinceMonth,
+                                  Integer activeSinceYear,
                                   String message) {
         this.ledgerDashboardData = ledgerDashboardData;
         this.customerDashboard = customerDashboard;
         this.topCustomerData = topCustomerData;
         this.weekwiseSalesSplit = weekwiseSalesSplit;
         this.orderTypeSalesSplit = orderTypeSalesSplit;
+        this.activeSinceMonth = activeSinceMonth;
+        this.activeSinceYear = activeSinceYear;
         this.message = message;
     }
 }

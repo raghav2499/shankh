@@ -126,12 +126,12 @@ public class Constants {
         public static final String NIGHT_GOWN_OUTFIT_TYPE_HEADING = "Night Gown";
         public static final String UNDER_SHIRT_OUTFIT_TYPE_HEADING = "Underskirt";
         public static final String SAREE_BLOUSE_OUTFIT_TYPE_HEADING = "Saree Blouse";
-        public static final String MENS_KURTA_OUTFIT_TYPE_HEADING = "Men's Kurta";
-        public static final String MENS_PYJAMA_OUTFIT_TYPE_HEADING = "Men's Pajama";
-        public static final String MENS_SUIT_TOP_OUTFIT_TYPE_HEADING = "Men's Suit";
-        public static final String MENS_SUIT_PANTS_OUTFIT_TYPE_HEADING = "Men's Suit(Pants)";
-        public static final String LADIES_SUIT_KAMEEZ_OUTFIT_TYPE_HEADING = "Ladies Suit(Kameez)";
-        public static final String LADIES_SUIT_SALWAR_OUTFIT_TYPE_HEADING = "Ladies Suit(Salwar)";
+        public static final String MENS_KURTA_OUTFIT_TYPE_HEADING = "Kurta Pajama (Top)";
+        public static final String MENS_PYJAMA_OUTFIT_TYPE_HEADING = "Kurta Pajama (Bottom)";
+        public static final String MENS_SUIT_TOP_OUTFIT_TYPE_HEADING = "Men's Suit (Top)";
+        public static final String MENS_SUIT_PANTS_OUTFIT_TYPE_HEADING = "Men's Suit (Bottom)";
+        public static final String LADIES_SUIT_KAMEEZ_OUTFIT_TYPE_HEADING = "Ladies Suit (Top)";
+        public static final String LADIES_SUIT_SALWAR_OUTFIT_TYPE_HEADING = "Ladies Suit (Bottom)";
 
 
     }

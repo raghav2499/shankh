@@ -1,6 +1,10 @@
 package com.darzee.shankh.service;
 
-import com.darzee.shankh.constants.Constants;
+import com.darzee.shankh.dao.BoutiqueDAO;
+import com.darzee.shankh.entity.Boutique;
+import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
+import com.darzee.shankh.mapper.DaoEntityMapper;
+import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DashboardService {
@@ -23,15 +28,30 @@ public class DashboardService {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private DaoEntityMapper mapper;
+
+    @Autowired
+    private BoutiqueRepo boutiqueRepo;
+
     public ResponseEntity getReportData(String boutiqueIdString, Integer month, Integer year) {
         Long boutiqueId = Long.parseLong(boutiqueIdString);
-        LocalDate reportingStartDate = Constants.REPORTING_START_DATE;
+        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(boutiqueId);
+        BoutiqueDAO boutiqueDAO = null;
+        if(optionalBoutique.isPresent()) {
+             boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(), new CycleAvoidingMappingContext());
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique Id");
+        }
         LocalDate currentDate = LocalDate.now();
-        if (year < reportingStartDate.getYear() ||
-                (year == reportingStartDate.getYear() &&
-                        month < reportingStartDate.getMonthValue())) {
+        if (year < boutiqueDAO.getCreatedAt().getYear() ||
+                (year == boutiqueDAO.getCreatedAt().getYear() &&
+                        month < boutiqueDAO.getCreatedAt().getMonthValue())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Reporting data is available after " + Constants.REPORTING_START_DATE);
+                    "Reporting data is available after year"
+                            + boutiqueDAO.getCreatedAt().getYear()
+                            + " and month "
+                            + boutiqueDAO.getCreatedAt().getMonthValue());
         } else if (year > currentDate.getYear() || (year == currentDate.getYear() && month > currentDate.getMonthValue())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Reporting of future dates is not supported");
@@ -44,12 +64,18 @@ public class DashboardService {
         List<TopCustomerData> topCustomerData = orderService.getTopCustomerData(boutiqueId, month, year);
         SalesDashboard weekwiseSalesSplit = orderService.getWeekWiseSales(boutiqueId, month, year);
         List<OrderTypeDashboardData> orderTypeSalesSplit = orderService.getOrderTypeWiseSales(boutiqueId, month, year);
+        Integer activeSinceMonth = boutiqueDAO.getCreatedAt().getMonthValue();
+        Integer activeSinceYear = boutiqueDAO.getCreatedAt().getYear();
+
         String successMessage = "Reporting data fetched successfully";
         BoutiqueReportResponse response = new BoutiqueReportResponse(ledgerDashboardData,
                 customerDashboard,
                 topCustomerData,
                 weekwiseSalesSplit,
-                orderTypeSalesSplit, successMessage);
+                orderTypeSalesSplit,
+                activeSinceMonth,
+                activeSinceYear,
+                successMessage);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

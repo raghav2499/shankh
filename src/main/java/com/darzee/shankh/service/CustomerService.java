@@ -1,10 +1,7 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.BoutiqueDAO;
-import com.darzee.shankh.dao.CustomerDAO;
-import com.darzee.shankh.dao.ImageReferenceDAO;
-import com.darzee.shankh.dao.MeasurementDAO;
+import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.ImageReference;
@@ -70,7 +67,9 @@ public class CustomerService {
         List<CustomerDetails> customerDetails = boutiqueCustomers
                 .stream()
                 .map(customer ->
-                        new CustomerDetails(customer, getCustomerProfilePicLink(customer.getId())))
+                        new CustomerDetails(customer,
+                                getCustomerProfilePicLink(customer.getId()),
+                                getCustomerRevenue(customer)))
                 .collect(Collectors.toList());
 
         return new ResponseEntity(new GetCustomersResponse(customerDetails), HttpStatus.OK);
@@ -190,6 +189,16 @@ public class CustomerService {
             return getCustomerProfilePicLink(customerImageReferenceId);
         }
         return "";
+    }
+
+    public Double getCustomerRevenue(CustomerDAO customerDAO) {
+        Double sum = 0d;
+        sum = customerDAO.getOrders()
+                .stream()
+                .map(order -> order.getOrderAmount())
+                .mapToDouble(OrderAmountDAO::getTotalAmount)
+                .sum();
+        return sum;
     }
 
     public CustomerDashboard getCustomerDashboardDetails(Long boutiqueId, int month, int year) {

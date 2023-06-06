@@ -25,6 +25,8 @@ public class CustomerDetails {
 
     private String gender;
 
+    private Double revenue;
+
     public CustomerDetails(String customerName, String phoneNumber, String profilePicLink, Long customerId) {
         this.customerName = customerName;
         this.phoneNumber = phoneNumber;
@@ -40,6 +42,18 @@ public class CustomerDetails {
             this.age = customerDAO.getAge();
             this.gender = customerDAO.getGender().getString();
             this.customerId = customerDAO.getId();
+        }
+    }
+
+    public CustomerDetails(CustomerDAO customerDAO, String customerProfilePicLink, Double revenue) {
+        if(customerDAO != null) {
+            this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+            this.phoneNumber = customerDAO.getPhoneNumber();
+            this.profilePicLink = customerProfilePicLink;
+            this.age = customerDAO.getAge();
+            this.gender = customerDAO.getGender().getString();
+            this.customerId = customerDAO.getId();
+            this.revenue = revenue;
         }
     }
 
