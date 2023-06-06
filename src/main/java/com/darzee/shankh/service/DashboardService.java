@@ -44,8 +44,8 @@ public class DashboardService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique Id");
         }
         LocalDate currentDate = LocalDate.now();
-        Integer startYear = Optional.ofNullable(boutiqueDAO.getCreatedAt().getYear()).orElse(2023);
-        Integer startMonth = Optional.ofNullable(boutiqueDAO.getCreatedAt().getMonthValue()).orElse(5);
+        Integer startYear = boutiqueDAO.getCreatedAt() == null ? 2023 : boutiqueDAO.getCreatedAt().getYear();
+        Integer startMonth = boutiqueDAO.getCreatedAt() == null ? 5 : boutiqueDAO.getCreatedAt().getMonthValue();
         if (year < startYear ||
                 (year == startYear &&
                         month < startMonth)) {
