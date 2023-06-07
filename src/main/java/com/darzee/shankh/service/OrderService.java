@@ -203,6 +203,7 @@ public class OrderService {
         List<WeekwiseSalesSplit> weeklySalesAmount = weekwiseSalesData.stream()
                 .map(weeklySalesData -> new WeekwiseSalesSplit((Double) weeklySalesData[0], (Date) weeklySalesData[1]))
                 .collect(Collectors.toList());
+
         return new SalesDashboard(weeklySalesAmount);
     }
 
@@ -504,4 +505,6 @@ public class OrderService {
         }
         return OrderStage.OTHER;
     }
+
+
 }
