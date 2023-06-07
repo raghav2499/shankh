@@ -68,6 +68,7 @@ public class CustomerService {
                 .stream()
                 .map(customer ->
                         new CustomerDetails(customer,
+                                getCustomerProfilePicRefId(customer.getId()),
                                 getCustomerProfilePicLink(customer.getId()),
                                 getCustomerRevenue(customer)))
                 .collect(Collectors.toList());
@@ -197,6 +198,11 @@ public class CustomerService {
             return getCustomerProfilePicLink(customerImageReferenceId);
         }
         return "";
+    }
+
+        public String getCustomerProfilePicRefId(Long customerId) {
+        String customerImageReferenceId = objectImagesService.getCustomerImageReferenceId(customerId);
+        return Optional.ofNullable(customerImageReferenceId).orElse("");
     }
 
     public Double getCustomerRevenue(CustomerDAO customerDAO) {

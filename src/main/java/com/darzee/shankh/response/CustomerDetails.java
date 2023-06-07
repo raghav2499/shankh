@@ -21,6 +21,8 @@ public class CustomerDetails {
     private String phoneNumber;
 
     private Integer age;
+
+    private String referenceId;
     private String profilePicLink;
 
     private String gender;
@@ -45,10 +47,11 @@ public class CustomerDetails {
         }
     }
 
-    public CustomerDetails(CustomerDAO customerDAO, String customerProfilePicLink, Double revenue) {
+    public CustomerDetails(CustomerDAO customerDAO, String referenceId, String customerProfilePicLink, Double revenue) {
         if(customerDAO != null) {
             this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
             this.phoneNumber = customerDAO.getPhoneNumber();
+            this.referenceId = referenceId;
             this.profilePicLink = customerProfilePicLink;
             this.age = customerDAO.getAge();
             this.gender = customerDAO.getGender().getString();
