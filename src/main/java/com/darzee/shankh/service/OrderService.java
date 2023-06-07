@@ -203,7 +203,7 @@ public class OrderService {
         List<WeekwiseSalesSplit> weeklySalesAmount = weekwiseSalesData.stream()
                 .map(weeklySalesData -> new WeekwiseSalesSplit((Double) weeklySalesData[0], (Date) weeklySalesData[1]))
                 .collect(Collectors.toList());
-        populateSalesIfRequired(weekwiseSalesData);
+        populateSalesIfRequired(weeklySalesAmount);
         return new SalesDashboard(weeklySalesAmount);
     }
 
@@ -506,6 +506,10 @@ public class OrderService {
         return OrderStage.OTHER;
     }
 
+    /**
+     * This is a throw-away code, front-end team to handle the week data dynamically
+     * @param weekwiseSales
+     */
     private void populateSalesIfRequired(List<WeekwiseSalesSplit> weekwiseSales) {
         while(weekwiseSales.size() < 5) {
             weekwiseSales.add(new WeekwiseSalesSplit(0d, null));
