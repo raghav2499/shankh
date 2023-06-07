@@ -169,12 +169,20 @@ public class CustomerService {
                 customer.setAge(request.getAge());
             }
 
+            if (isImageUpdated(customer.getId(), request.getCustomerImageReferenceId())) {
+                if (request.getCustomerImageReferenceId() != null) {
+                    saveCustomerImages(customer, request.getCustomerImageReferenceId());
+                } else {
+                    removeCustomerImages(customer);
+                }
+            }
+
             customer = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customer,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
             String customerName = CommonUtils.constructName(customer.getFirstName(), customer.getLastName());
             CreateCustomerResponse response = new CreateCustomerResponse(customerName, customer.getPhoneNumber(),
-                    "", customer.getId(),
+                    getCustomerProfilePicLink(customerId), customer.getId(),
                     "Customer updated successfully");
             return new ResponseEntity(response, HttpStatus.OK);
         }
@@ -239,6 +247,15 @@ public class CustomerService {
         objectImagesService.saveObjectImages(Arrays.asList(imageReferenceId),
                 ImageEntityType.CUSTOMER.getEntityType(),
                 customerDAO.getId());
+    }
+
+    private void removeCustomerImages(CustomerDAO customerDAO) {
+        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
+    }
+
+    private boolean isImageUpdated(Long customerId, String referenceId) {
+      String existingImageReferenceId  =  objectImagesService.getCustomerImageReferenceId(customerId);
+      return existingImageReferenceId != referenceId;
     }
 
 

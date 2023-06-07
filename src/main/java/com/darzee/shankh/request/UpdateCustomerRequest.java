@@ -21,4 +21,6 @@ public class UpdateCustomerRequest {
 
     @NotNull(message = "Boutique id is mandatory for updating customer")
     private Long boutiqueId;
+
+    private String customerImageReferenceId;
 }
