@@ -15,7 +15,8 @@ public class OrderStateMachineService {
         put(OrderStatus.STITCHING_NOT_STARTED, Arrays.asList(OrderStatus.STITCHING_IN_PROGRESS, OrderStatus.ORDER_READY_FOR_TRIAL, OrderStatus.ORDER_COMPLETED));
         put(OrderStatus.STITCHING_IN_PROGRESS, Arrays.asList(OrderStatus.STITCHING_NOT_STARTED, OrderStatus.ORDER_READY_FOR_TRIAL, OrderStatus.ORDER_COMPLETED));
         put(OrderStatus.ORDER_READY_FOR_TRIAL, Arrays.asList(OrderStatus.STITCHING_NOT_STARTED, OrderStatus.STITCHING_IN_PROGRESS, OrderStatus.ORDER_COMPLETED));
-        put(OrderStatus.ORDER_COMPLETED, Arrays.asList(OrderStatus.ORDER_DELIVERED));
+        put(OrderStatus.ORDER_COMPLETED, Arrays.asList(OrderStatus.STITCHING_NOT_STARTED, OrderStatus.STITCHING_IN_PROGRESS, OrderStatus.ORDER_READY_FOR_TRIAL, OrderStatus.ORDER_DELIVERED));
+        put(OrderStatus.ORDER_DELIVERED, Arrays.asList(OrderStatus.STITCHING_NOT_STARTED, OrderStatus.STITCHING_IN_PROGRESS, OrderStatus.ORDER_READY_FOR_TRIAL, OrderStatus.ORDER_COMPLETED));
     }};
 
     public boolean isTransitionAllowed(OrderStatus fromState, OrderStatus toState) {
