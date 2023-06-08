@@ -245,7 +245,7 @@ public class OrderService {
                     customerDetails.getCustomerName(),
                     customerDetails.getPhoneNumber(),
                     salesByCustomer,
-                    customerService.getCustomerProfilePicRefId(customerId));
+                    customerService.getCustomerProfilePicLink(customerId));
             topCustomerDataList.add(topCustomerData);
         }
         return topCustomerDataList;
