@@ -19,11 +19,19 @@ public class Constants {
     public static final LocalDate REPORTING_START_DATE = LocalDate.of(2023,5,1);
 
     public class MeasurementTitles {
+
+        public static final String DRESS_LENGTH_TITLE = "Length";
+        public static final String DRESS_SHOULDER_TITLE = "Shoulder";
+        public static final String DRESS_UPPER_CHEST_TITLE = "Upper Chest";
+        public static final String DRESS_BUST_TITLE = "Bust";
         public static final String DRESS_WAIST_TITLE = "Waist";
         public static final String DRESS_SEAT_TITLE = "Seat";
-        public static final String DRESS_CALF_TITLE = "Calf";
-        public static final String DRESS_ANKLE_TITLE = "Ankle";
-        public static final String DRESS_LENGTH_TITLE = "Length";
+        public static final String DRESS_ARMHOLE_TITLE = "Arm Hole";
+        public static final String DRESS_SLEEVE_LENGTH_TITLE = "Sleeve Length";
+        public static final String DRESS_SLEEVE_CIRCUM_TITLE = "Sleeve Circum";
+
+        public static final String DRESS_FRONT_NECK_DEPTH_TITLE = "Front Neck Depth";
+        public static final String DRESS_BACK_NECK_DEPTH_TITLE = "Back Neck Depth";
 
         public static final String GOWN_LENGTH_TITLE = "Gown Length";
 
@@ -137,12 +145,18 @@ public class Constants {
     }
     public class ImageLinks {
         public static final String DRESS_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress.svg";
-        public static final String DRESS_ANKLE_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress_ankle.svg";
-        public static final String DRESS_CALF_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress_calf.svg";
-        public static final String DRESS_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress_length.svg";
-        public static final String DRESS_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress_seat.svg";
-        public static final String DRESS_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress_waist.svg";
-        public static final String GOWN_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NightGown/nightgown.svg";
+        public static final String DRESS_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress1_len.svg";
+        public static final String DRESS_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress2_shoulder.svg";
+        public static final String DRESS_UPPER_CHEST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress3_upperchest.svg";
+        public static final String DRESS_BUST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress4_bust.svg";
+        public static final String DRESS_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress5_waist.svg";
+        public static final String DRESS_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress6_seat.svg";
+        public static final String DRESS_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress7_armhole.svg";
+        public static final String DRESS_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress8_slevlen.svg";
+        public static final String DRESS_SLEEVE_CIRCUMFERENCE_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress9_slevcircum.svg";
+        public static final String DRESS_FRONT_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress10_frontneckdept.svg";
+        public static final String DRESS_BACK_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress_ankle.svg";
+        public static final String GOWN_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NightGown/dress11_backneckdept.svg";
 
         public static final String GOWN_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NightGown/ng_length.svg";
         public static final String GOWN_BUST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NightGown/ng_bust.svg";
