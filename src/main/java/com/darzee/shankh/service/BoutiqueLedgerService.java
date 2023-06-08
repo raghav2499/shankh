@@ -1,10 +1,12 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
 import com.darzee.shankh.dao.BoutiqueLedgerSnapshotDAO;
 import com.darzee.shankh.entity.BoutiqueLedger;
 import com.darzee.shankh.entity.BoutiqueLedgerSnapshot;
 import com.darzee.shankh.enums.OrderStage;
+import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueLedgerRepo;
@@ -53,32 +55,16 @@ public class BoutiqueLedgerService {
     }
 
     @Transactional
-    public BoutiqueLedgerDAO updateBoutiqueLedgerOnStatusActivation(Long boutiqueId) {
+    public BoutiqueLedgerDAO handleBoutiqueLedgerOnOrderUpdation(Long boutiqueId,
+                                                                 OrderStatus initialStatus,
+                                                                 OrderStatus currentStatus) {
         BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
         if (boutiqueLedger != null) {
-            BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
-//            updateBoutiqueLedgerAmountDetails(pendingAmount, recievedAmount, boutiqueLedgerDAO);
-            incrementActiveOrders(boutiqueLedgerDAO);
-            boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
-                            new CycleAvoidingMappingContext())),
-                    new CycleAvoidingMappingContext());
-            return boutiqueLedgerDAO;
-        }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
-    }
-
-
-    @Transactional
-    public BoutiqueLedgerDAO updateBoutiqueLedgerOnStatusClosure(Long boutiqueId) {
-        BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
-        if (boutiqueLedger != null) {
-            BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
-//            updateBoutiqueLedgerAmountDetails(pendingAmount, recievedAmount, boutiqueLedgerDAO);
-            incrementClosedOrders(boutiqueLedgerDAO);
-            boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
-                            new CycleAvoidingMappingContext())),
-                    new CycleAvoidingMappingContext());
-            return boutiqueLedgerDAO;
+            BoutiqueLedgerDAO ledgerDAO = mapper.boutiqueLedgerObjectToDAO(boutiqueLedger, new CycleAvoidingMappingContext());
+            setUpdatedActiveOrderCount(ledgerDAO, initialStatus, currentStatus);
+            setUpdatedClosedOrderCount(ledgerDAO, initialStatus, currentStatus);
+            repo.save(mapper.boutiqueLedgerDAOToObject(ledgerDAO, new CycleAvoidingMappingContext()));
+            return ledgerDAO;
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
     }
@@ -176,16 +162,33 @@ public class BoutiqueLedgerService {
         return ledger;
     }
 
-    @Transactional
-    private void incrementActiveOrders(BoutiqueLedgerDAO ledgerDAO) {
-        ledgerDAO.incrementActiveOrdersInLedger();
-        repo.save(mapper.boutiqueLedgerDAOToObject(ledgerDAO, new CycleAvoidingMappingContext()));
+    private void setUpdatedActiveOrderCount(BoutiqueLedgerDAO boutiqueLedgerDAO,
+                                            OrderStatus initialStatus,
+                                            OrderStatus currentStatus) {
+        Integer activeOrderCount = boutiqueLedgerDAO.getTotalActiveOrders();
+        if (Constants.ACTIVE_ORDER_STATUS_LIST.contains(currentStatus)
+                && !Constants.ACTIVE_ORDER_STATUS_LIST.contains(initialStatus)) {
+            activeOrderCount++;
+        } else if (!Constants.ACTIVE_ORDER_STATUS_LIST.contains(currentStatus)
+                && Constants.ACTIVE_ORDER_STATUS_LIST.contains(initialStatus)) {
+            activeOrderCount = Math.max(activeOrderCount - 1, 0);
+        }
+        boutiqueLedgerDAO.setTotalActiveOrders(activeOrderCount);
+        boutiqueLedgerDAO.setMonthlyActiveOrders(activeOrderCount);
     }
 
-    @Transactional
-    private void incrementClosedOrders(BoutiqueLedgerDAO ledgerDAO) {
-        ledgerDAO.incrementClosedOrdersInLedger();
-        repo.save(mapper.boutiqueLedgerDAOToObject(ledgerDAO, new CycleAvoidingMappingContext()));
+    private void setUpdatedClosedOrderCount(BoutiqueLedgerDAO boutiqueLedgerDAO,
+                                            OrderStatus initialStatus,
+                                            OrderStatus currentStatus) {
+        if (Constants.CLOSED_ORDER_STATUS_LIST.contains(currentStatus)
+                && !Constants.CLOSED_ORDER_STATUS_LIST.contains(initialStatus)) {
+            boutiqueLedgerDAO.setMonthlyClosedOrders(boutiqueLedgerDAO.getMonthlyClosedOrders() + 1);
+            boutiqueLedgerDAO.setTotalClosedOrders(boutiqueLedgerDAO.getTotalClosedOrders() + 1);
+        } else if (!Constants.CLOSED_ORDER_STATUS_LIST.contains(currentStatus)
+                && Constants.CLOSED_ORDER_STATUS_LIST.contains(initialStatus)) {
+            boutiqueLedgerDAO.setMonthlyClosedOrders(Math.max(boutiqueLedgerDAO.getMonthlyClosedOrders() - 1, 0));
+            boutiqueLedgerDAO.setTotalClosedOrders(Math.max(boutiqueLedgerDAO.getTotalClosedOrders() - 1, 0));
+        }
     }
 
 }

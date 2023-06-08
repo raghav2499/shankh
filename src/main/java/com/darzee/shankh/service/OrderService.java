@@ -478,23 +478,7 @@ public class OrderService {
     private void updateLedgerIfApplicable(OrderDAO order, OrderStatus initialStatus) {
         OrderStatus currentStatus = order.getOrderStatus();
         Long boutiqueId = order.getBoutique().getId();
-        OrderAmountDAO orderAmountDAO = order.getOrderAmount();
-        if (isOrderActivated(currentStatus, initialStatus)) {
-            boutiqueLedgerService.updateBoutiqueLedgerOnStatusActivation(boutiqueId);
-        }
-        if (isOrderClosed(currentStatus, initialStatus)) {
-            boutiqueLedgerService.updateBoutiqueLedgerOnStatusClosure(boutiqueId);
-        }
-    }
-
-    private boolean isOrderActivated(OrderStatus currentStatus, OrderStatus initialStatus) {
-        return Constants.ACTIVE_ORDER_STATUS_LIST.contains(currentStatus)
-                && !Constants.ACTIVE_ORDER_STATUS_LIST.contains(initialStatus);
-    }
-
-    private boolean isOrderClosed(OrderStatus currentStatus, OrderStatus initialStatus) {
-        return Constants.CLOSED_ORDER_STATUS_LIST.contains(currentStatus)
-                && !Constants.CLOSED_ORDER_STATUS_LIST.contains(initialStatus);
+        boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueId, currentStatus, initialStatus);
     }
 
     private OrderStage getOrderStage(OrderStatus status) {
