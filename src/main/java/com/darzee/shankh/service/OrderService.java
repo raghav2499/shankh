@@ -478,7 +478,7 @@ public class OrderService {
     private void updateLedgerIfApplicable(OrderDAO order, OrderStatus initialStatus) {
         OrderStatus currentStatus = order.getOrderStatus();
         Long boutiqueId = order.getBoutique().getId();
-        boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueId, currentStatus, initialStatus);
+        boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueId, initialStatus, currentStatus);
     }
 
     private OrderStage getOrderStage(OrderStatus status) {
