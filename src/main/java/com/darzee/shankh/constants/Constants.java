@@ -155,7 +155,7 @@ public class Constants {
         public static final String DRESS_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress8_slevlen.svg";
         public static final String DRESS_SLEEVE_CIRCUMFERENCE_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress9_slevcircum.svg";
         public static final String DRESS_FRONT_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress10_frontneckdept.svg";
-        public static final String DRESS_BACK_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress_ankle.svg";
+        public static final String DRESS_BACK_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Dress/dress11_backneckdept.svg";
         public static final String GOWN_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NightGown/dress11_backneckdept.svg";
 
         public static final String GOWN_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NightGown/ng_length.svg";
