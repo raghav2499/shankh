@@ -40,6 +40,9 @@ public class Measurements {
 
     private Double apexToApexLength;
 
+    private Double bottomWaist;
+    private Double bottomSeat;
+
 
     public Boolean isPresent() {
         return this.waist != null || this.seat != null || this.calf != null || this.ankle != null || this.bottom != null
@@ -50,7 +53,7 @@ public class Measurements {
                 || this.fly != null || this.blouseLength != null || this.belowBust != null
                 || this.shoulderToApexLength != null || this.kameezLength != null || this.salwarLength != null
                 || this.salwarHip != null || this.gownLength != null || this.shirtLength != null || this.pantLength != null
-                || this.apexToApexLength != null;
+                || this.apexToApexLength != null || this.bottomWaist != null || this.bottomSeat != null;
 
     }
 }

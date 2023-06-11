@@ -40,4 +40,6 @@ public class OutfitMeasurementDetails {
     private Double shirtLength;
     private Double pantLength;
     private Double apexToApexLength;
+    private Double bottomSeat;
+    private Double bottomWaist;
 }

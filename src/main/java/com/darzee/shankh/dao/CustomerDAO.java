@@ -34,18 +34,18 @@ public class CustomerDAO {
     }
 
     public boolean isPhoneNumberUpdated(String value) {
-        return value != null && !this.phoneNumber.equals(value);
+        return (value != null && !value.equals(this.phoneNumber)) || (value == null && this.phoneNumber != null);
     }
 
     public boolean isFirstNameUpdated(String value) {
-        return value != null && !this.firstName.equals(value);
+        return (value != null && !value.equals(this.firstName)) || (value == null && this.firstName != null);
     }
     public boolean isLastNameUpdated(String value) {
-        return value != null && !this.lastName.equals(value);
+        return (value != null && !value.equals(this.lastName)) || (value == null && this.lastName != null);
     }
 
     public boolean isAgeUpdated(Integer value) {
-        return value != null && !this.age.equals(value);
+        return (value != null && !value.equals(this.age)) || (value == null && this.age != null);
     }
 
 

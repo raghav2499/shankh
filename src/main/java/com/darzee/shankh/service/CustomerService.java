@@ -209,6 +209,7 @@ public class CustomerService {
         Double sum = 0d;
         sum = customerDAO.getOrders()
                 .stream()
+                .filter(order -> !Boolean.TRUE.equals(order.getIsDeleted()))
                 .map(order -> order.getOrderAmount())
                 .mapToDouble(OrderAmountDAO::getTotalAmount)
                 .sum();

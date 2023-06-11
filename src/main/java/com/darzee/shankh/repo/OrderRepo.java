@@ -42,6 +42,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             "WHERE ord.boutique_id = :boutiqueId " +
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +
+            "AND ord.is_deleted != true " +
             "GROUP BY ord.customer_id " +
             "ORDER BY totalAmount DESC " +
             "LIMIT 2", nativeQuery = true)

@@ -64,6 +64,12 @@ public class MensSuitImplService implements OutfitTypeService {
         if (measurementDetails.getFly() != null) {
             measurementDAO.setFly(measurementDetails.getFly() * multiplyingFactor);
         }
+        if(measurementDetails.getBottomSeat() != null) {
+            measurementDAO.setBottomSeat(measurementDetails.getBottomSeat() * multiplyingFactor);
+        }
+        if(measurementDetails.getBottomWaist() != null) {
+            measurementDAO.setBottomWaist(measurementDetails.getBottomWaist() * multiplyingFactor);
+        }
     }
 
     @Override
@@ -82,6 +88,8 @@ public class MensSuitImplService implements OutfitTypeService {
         outfitMeasurementDetails.setBottom(measurementDAO.getBottom());
         outfitMeasurementDetails.setFly(measurementDAO.getFly());
         outfitMeasurementDetails.setPantLength(measurementDAO.getPantLength());
+        outfitMeasurementDetails.setBottomSeat(measurementDAO.getBottomSeat());
+        outfitMeasurementDetails.setBottomWaist(measurementDAO.getBottomWaist());
         return outfitMeasurementDetails;
     }
 
@@ -98,7 +106,9 @@ public class MensSuitImplService implements OutfitTypeService {
                 measurementDetails.getCalf() != null &&
                 measurementDetails.getBottom() != null &&
                 measurementDetails.getFly() != null &&
-                measurementDetails.getPantLength() != null;
+                measurementDetails.getPantLength() != null &&
+                measurementDetails.getBottomSeat() != null &&
+                measurementDetails.getBottomWaist() != null;
     }
 
     @Override
@@ -151,8 +161,8 @@ public class MensSuitImplService implements OutfitTypeService {
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
 
-        measurementDetailsResponseList.add(addWaistLower(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getWaist()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addSeatLower(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSeat()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addWaistLower(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottomWaist()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addSeatLower(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottomSeat()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addCalf(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getCalf()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addBottom(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottom()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addLengthLower(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPantLength()).orElse(defaultValue) / dividingFactor)));

@@ -109,6 +109,12 @@ public class Measurement extends GenericEntity {
     @Column(name = "apex_to_apex_length")
     private Double apexToApexLength;
 
+    @Column(name = "bottom_seat")
+    private Double bottomSeat;
+
+    @Column(name = "bottom_waist")
+    private Double bottomWaist;
+
     @OneToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;

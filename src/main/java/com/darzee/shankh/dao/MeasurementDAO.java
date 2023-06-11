@@ -45,6 +45,8 @@ public class MeasurementDAO implements Serializable {
     private Double shirtLength;
     private Double pantLength;
     private Double apexToApexLength;
+    private Double bottomSeat;
+    private Double bottomWaist;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private CustomerDAO customer;
