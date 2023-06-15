@@ -39,18 +39,6 @@ public class BoutiqueLedgerDAO {
         this.setMonthlyClosedOrders(Math.max(this.getMonthlyClosedOrders() - 1, 0));
     }
 
-    public void incrementActiveOrdersInLedger() {
-        this.setTotalActiveOrders(this.getTotalActiveOrders() + 1);
-        this.setMonthlyActiveOrders(this.getTotalActiveOrders());
-    }
-
-    public void incrementClosedOrdersInLedger() {
-        this.setMonthlyClosedOrders(this.getMonthlyClosedOrders() + 1);
-        this.setTotalClosedOrders(this.getTotalClosedOrders() + 1);
-        this.setTotalActiveOrders(this.getTotalActiveOrders() - 1);
-        this.setMonthlyActiveOrders(this.getTotalActiveOrders());
-    }
-
     public void resetMonthlyDetailsInLedger() {
         this.setMonthlyPendingAmount(0d);
         this.setMonthlyAmountRecieved(0d);
