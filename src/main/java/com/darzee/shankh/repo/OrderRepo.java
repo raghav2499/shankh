@@ -31,6 +31,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             "WHERE ord.boutique_id = :boutiqueId " +
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +
+            "AND ord.is_deleted != true " +
             "GROUP BY ord.order_type", nativeQuery = true)
     List<Object[]> getTotalAmountByOrderType(
             @Param("boutiqueId") Long boutiqueId,
