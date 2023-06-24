@@ -44,7 +44,9 @@ public class GetBoutiqueDetailsResponse {
             this.adminTailorPhoneNumber = tailorDAO.getPhoneNumber();
             this.adminTailorRefId = adminTailorRefId;
             this.adminTailorProfilePicUrl = adminTailorImageUrl;
-            this.language = tailorDAO.getLanguage().getOrdinal();
+            if (tailorDAO.getLanguage() != null) {
+                this.language = tailorDAO.getLanguage().getOrdinal();
+            }
         }
     }
 
