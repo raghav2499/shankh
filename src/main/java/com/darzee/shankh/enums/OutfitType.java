@@ -24,7 +24,7 @@ public enum OutfitType {
     @JsonProperty("night_gown")
     EVENING_GOWN("night_gown", 6, "Night Gown", OUTFIT_TYPE_NIGHT_GOWN_LINK),
     @JsonProperty("ladies_suit")
-    LADIES_SUIT("ladies_suit", 7, "Ladies Suit", OUTFIT_TYPE_NIGHT_GOWN_LINK),
+    LADIES_SUIT("ladies_suit", 7, "Ladies Suit", OUTFIT_TYPE_LADIES_SUIT_LINK),
     @JsonProperty("shirt")
     SHIRT("shirt", 8, "Shirt", OUTFIT_TYPE_SHIRT_LINK),
     @JsonProperty("under_skirt")

@@ -269,8 +269,8 @@ public class Constants {
         public static final String OUTFIT_TYPE_SAREE_BLOUSE_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/saree+blouse.svg";
         public static final String OUTFIT_TYPE_MENS_SUIT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/mens+suit.svg";
         public static final String OUTFIT_TYPE_PANT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/pants.svg";
-        public static final String OUTFIT_TYPE_NIGHT_GOWN_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/night+gown.svg";
-        public static final String OUTFIT_TYPE_LADIES_SUIT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/womens+suit.svg";
+        public static final String OUTFIT_TYPE_NIGHT_GOWN_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/nightgown.svg";
+        public static final String OUTFIT_TYPE_LADIES_SUIT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/womenssuit.svg";
         public static final String OUTFIT_TYPE_SHIRT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/shirt.svg";
         public static final String OUTFIT_TYPE_UNDER_SKIRT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/underskirt.svg";
 
