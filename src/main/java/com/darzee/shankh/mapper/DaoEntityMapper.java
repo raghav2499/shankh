@@ -67,6 +67,9 @@ public interface DaoEntityMapper {
 
     BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotToSnapshotDAO(BoutiqueLedgerSnapshot boutiqueLedgerSnapshotDAO);
 
+    DeviceInfoDAO deviceInfoToDAO(DeviceInfo deviceInfo);
+    DeviceInfo deviceInfoDAOToDeviceInfo(DeviceInfoDAO deviceInfoDAO);
+
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if (orderList == null) {
             return null;

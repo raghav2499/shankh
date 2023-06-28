@@ -29,11 +29,11 @@ public class PantImplService implements OutfitTypeService {
     @Override
     public void setMeasurementDetailsInObject(Measurements measurementDetails, MeasurementDAO measurementDAO, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        if (measurementDetails.getWaist() != null) {
-            measurementDAO.setWaist(measurementDetails.getWaist() * multiplyingFactor);
+        if (measurementDetails.getBottomWaist() != null) {
+            measurementDAO.setBottomWaist(measurementDetails.getBottomWaist() * multiplyingFactor);
         }
-        if (measurementDetails.getSeat() != null) {
-            measurementDAO.setSeat(measurementDetails.getSeat() * multiplyingFactor);
+        if (measurementDetails.getBottomSeat() != null) {
+            measurementDAO.setBottomSeat(measurementDetails.getBottomSeat() * multiplyingFactor);
         }
         if (measurementDetails.getCalf() != null) {
             measurementDAO.setCalf(measurementDetails.getCalf() * multiplyingFactor);
@@ -53,8 +53,8 @@ public class PantImplService implements OutfitTypeService {
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementDAO measurementDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
 
-        outfitMeasurementDetails.setWaist(measurementDAO.getWaist());
-        outfitMeasurementDetails.setSeat(measurementDAO.getSeat());
+        outfitMeasurementDetails.setBottomWaist(measurementDAO.getBottomWaist());
+        outfitMeasurementDetails.setBottomSeat(measurementDAO.getBottomSeat());
         outfitMeasurementDetails.setCalf(measurementDAO.getCalf());
         outfitMeasurementDetails.setBottom(measurementDAO.getBottom());
         outfitMeasurementDetails.setPantLength(measurementDAO.getPantLength());
@@ -65,8 +65,8 @@ public class PantImplService implements OutfitTypeService {
 
     @Override
     public boolean haveMandatoryParams(Measurements measurementDetails) {
-        return measurementDetails.getWaist() != null &&
-                measurementDetails.getSeat() != null &&
+        return measurementDetails.getBottomWaist() != null &&
+                measurementDetails.getBottomSeat() != null &&
                 measurementDetails.getCalf() != null &&
                 measurementDetails.getBottom() != null &&
                 measurementDetails.getPantLength() != null &&
@@ -87,8 +87,8 @@ public class PantImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 
-        measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getWaist()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getSeat()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottomWaist()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottomSeat()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addCalf(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getCalf()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addBottom(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottom()).orElse(defaultValue) / dividingFactor)));
         measurementDetailsResponseList.add(addPantLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPantLength()).orElse(defaultValue) / dividingFactor)));

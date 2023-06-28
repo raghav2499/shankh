@@ -14,7 +14,7 @@ public class Constants {
         public static final List<OrderStatus> CLOSED_ORDER_STATUS_LIST = Arrays.asList(OrderStatus.ORDER_DELIVERED);
     public static final Double CM_TO_INCH_DIVIDING_FACTOR = 2.54;
     public static final Double INCH_TO_CM_MULTIPLYING_FACTOR = 2.54;
-    public static final Double DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE = 10d;
+    public static final Double DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE = 0d;
 
     public static final LocalDate REPORTING_START_DATE = LocalDate.of(2023,5,1);
 
