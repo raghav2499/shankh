@@ -21,6 +21,9 @@ public class Measurements extends GenericEntity {
     @Enumerated(EnumType.ORDINAL)
     private OutfitType OutfitType;
 
+    @Column(name = "measurement_value", columnDefinition = "jsonb")
+    private String measurementValue;
+
     @OneToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
