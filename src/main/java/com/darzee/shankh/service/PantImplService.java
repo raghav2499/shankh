@@ -1,23 +1,22 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.constants.Constants;
-import com.darzee.shankh.dao.MeasurementDAO;
+import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.request.Measurements;
+import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.darzee.shankh.constants.Constants.DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 import static com.darzee.shankh.constants.Constants.ImageLinks.*;
+import static com.darzee.shankh.constants.Constants.MeasurementKeys.*;
 import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
 
 @Service
@@ -26,45 +25,58 @@ public class PantImplService implements OutfitTypeService {
     @Autowired
     private DaoEntityMapper mapper;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
-    public void setMeasurementDetailsInObject(Measurements measurementDetails, MeasurementDAO measurementDAO, MeasurementScale scale) {
+    public void setMeasurementDetailsInObject(MeasurementRequest measurementDetails,
+                                              MeasurementsDAO measurementsDAO,
+                                              MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
+        Map<String, Double> measurementValue = measurementsDAO.getMeasurementValue();
+
+        if (measurementValue == null) {
+            measurementValue = new HashMap<>();
+        }
+
         if (measurementDetails.getBottomWaist() != null) {
-            measurementDAO.setBottomWaist(measurementDetails.getBottomWaist() * multiplyingFactor);
+            measurementValue.put(BOTTOM_WAIST_MEASUREMENT_KEY, measurementDetails.getGownLength() * multiplyingFactor);
         }
         if (measurementDetails.getBottomSeat() != null) {
-            measurementDAO.setBottomSeat(measurementDetails.getBottomSeat() * multiplyingFactor);
+            measurementValue.put(BOTTOM_SEAT_MEASUREMENT_KEY, measurementDetails.getBottomSeat() * multiplyingFactor);
         }
         if (measurementDetails.getCalf() != null) {
-            measurementDAO.setCalf(measurementDetails.getCalf() * multiplyingFactor);
+            measurementValue.put(CALF_MEASUREMENT_KEY, measurementDetails.getCalf() * multiplyingFactor);
         }
         if (measurementDetails.getBottom() != null) {
-            measurementDAO.setBottom(measurementDetails.getBottom() * multiplyingFactor);
+            measurementValue.put(BOTTOM_MEASUREMENT_KEY, measurementDetails.getBottom() * multiplyingFactor);
         }
         if (measurementDetails.getPantLength() != null) {
-            measurementDAO.setPantLength(measurementDetails.getPantLength() * multiplyingFactor);
+            measurementValue.put(PANT_LENGTH_MEASUREMENT_KEY, measurementDetails.getPantLength() * multiplyingFactor);
         }
         if (measurementDetails.getFly() != null) {
-            measurementDAO.setFly(measurementDetails.getFly() * multiplyingFactor);
+            measurementValue.put(FLY_MEASUREMENT_KEY, measurementDetails.getFly() * multiplyingFactor);
         }
     }
 
     @Override
-    public OutfitMeasurementDetails extractMeasurementDetails(MeasurementDAO measurementDAO) {
+    public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
+        Map<String, Double> measurementValue =
+                objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
 
-        outfitMeasurementDetails.setBottomWaist(measurementDAO.getBottomWaist());
-        outfitMeasurementDetails.setBottomSeat(measurementDAO.getBottomSeat());
-        outfitMeasurementDetails.setCalf(measurementDAO.getCalf());
-        outfitMeasurementDetails.setBottom(measurementDAO.getBottom());
-        outfitMeasurementDetails.setPantLength(measurementDAO.getPantLength());
-        outfitMeasurementDetails.setFly(measurementDAO.getFly());
+        outfitMeasurementDetails.setBottomWaist(measurementValue.get(BOTTOM_WAIST_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setBottomSeat(measurementValue.get(BOTTOM_SEAT_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setCalf(measurementValue.get(CALF_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setBottom(measurementValue.get(BOTTOM_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setPantLength(measurementValue.get(PANT_LENGTH_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setFly(measurementValue.get(FLY_MEASUREMENT_KEY));
 
         return outfitMeasurementDetails;
     }
 
     @Override
-    public boolean haveMandatoryParams(Measurements measurementDetails) {
+    public boolean haveMandatoryParams(MeasurementRequest measurementDetails) {
         return measurementDetails.getBottomWaist() != null &&
                 measurementDetails.getBottomSeat() != null &&
                 measurementDetails.getCalf() != null &&
@@ -74,25 +86,32 @@ public class PantImplService implements OutfitTypeService {
     }
 
     @Override
-    public boolean areMandatoryParamsSet(MeasurementDAO measurementDAO) {
-        Measurements measurements = mapper.measurementDaoToMeasurement(measurementDAO);
-        return haveMandatoryParams(measurements);
-    }
-
-    @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale) {
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
+        Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 
-        measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottomWaist()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addSeat(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottomSeat()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addCalf(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getCalf()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addBottom(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getBottom()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addPantLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getPantLength()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addFly(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getFly()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(
+                addWaist(CommonUtils.doubleToString(
+                        Optional.ofNullable(measurementValue.get(WAIST_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(
+                addSeat(CommonUtils.doubleToString(
+                        Optional.ofNullable(measurementValue.get(SEAT_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(
+                addCalf(CommonUtils.doubleToString(
+                        Optional.ofNullable(measurementValue.get(CALF_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(
+                addBottom(CommonUtils.doubleToString(
+                        Optional.ofNullable(measurementValue.get(BOTTOM_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(
+                addPantLength(CommonUtils.doubleToString(
+                        Optional.ofNullable(measurementValue.get(PANT_LENGTH_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(
+                addFly(CommonUtils.doubleToString(
+                        Optional.ofNullable(measurementValue.get(FLY_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(PANTS_OUTFIT_IMAGE_LINK);

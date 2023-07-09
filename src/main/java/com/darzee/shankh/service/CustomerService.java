@@ -125,8 +125,6 @@ public class CustomerService {
                 saveCustomerImages(customerDAO, request.getCustomerImageReferenceId());
             }
 
-            MeasurementDAO measurementDAO = measurementService.createCustomerMeasurement(customerDAO);
-            customerDAO.setMeasurement(measurementDAO);
             customerDAO = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customerDAO,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());

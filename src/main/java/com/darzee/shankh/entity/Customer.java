@@ -49,15 +49,14 @@ public class Customer {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "measurement_id")
-    private Measurement measurement;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<Order> orders;
 
     @ManyToOne
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    private List<Measurements> measurements;
 
 }

@@ -2,7 +2,7 @@ package com.darzee.shankh.mapper;
 
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.*;
-import com.darzee.shankh.request.Measurements;
+import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.TailorLoginResponse;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -38,7 +38,7 @@ public interface DaoEntityMapper {
 
     MeasurementDAO measurementObjectToDAO(Measurement measurement, @Context CycleAvoidingMappingContext context);
 
-    Measurements measurementDaoToMeasurement(MeasurementDAO measurementDAO);
+    MeasurementRequest measurementDaoToMeasurement(MeasurementDAO measurementDAO);
 
     ObjectImages objectImageDAOToObjectImage(ObjectImagesDAO objectImages);
 
@@ -69,7 +69,9 @@ public interface DaoEntityMapper {
 
     DeviceInfoDAO deviceInfoToDAO(DeviceInfo deviceInfo);
     DeviceInfo deviceInfoDAOToDeviceInfo(DeviceInfoDAO deviceInfoDAO);
+    MeasurementsDAO measurementsToMeasurementDAO(Measurements measurements, @Context CycleAvoidingMappingContext context);
 
+    Measurements measurementsDAOToMeasurement(MeasurementsDAO measurements, @Context CycleAvoidingMappingContext context);
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if (orderList == null) {
             return null;

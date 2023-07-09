@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Measurements {
+public class MeasurementRequest {
     private Double waist;
     private Double seat;
     private Double calf;

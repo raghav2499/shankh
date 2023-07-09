@@ -150,9 +150,9 @@ public class OrderService {
             OrderAmountDAO orderAmount = order.getOrderAmount();
             OutfitType outfitType = order.getOutfitType();
             CustomerDAO customer = order.getCustomer();
-            MeasurementDAO measurementDAO = customer.getMeasurement();
+            MeasurementsDAO measurementsDAO = customer.getOutfitMeasurement(outfitType);
             OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-            OutfitMeasurementDetails measurementDetails = outfitTypeService.extractMeasurementDetails(measurementDAO);
+            OutfitMeasurementDetails measurementDetails = outfitTypeService.extractMeasurementDetails(measurementsDAO);
             List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
             List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
             String message = "Details fetched succesfully";

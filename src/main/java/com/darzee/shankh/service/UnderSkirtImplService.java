@@ -1,23 +1,23 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.constants.Constants;
-import com.darzee.shankh.dao.MeasurementDAO;
+import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.request.Measurements;
+import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.darzee.shankh.constants.Constants.DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 import static com.darzee.shankh.constants.Constants.ImageLinks.*;
+import static com.darzee.shankh.constants.Constants.MeasurementKeys.LENGTH_MEASUREMENT_KEY;
+import static com.darzee.shankh.constants.Constants.MeasurementKeys.WAIST_MEASUREMENT_KEY;
 import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
 
 @Service
@@ -26,47 +26,61 @@ public class UnderSkirtImplService implements OutfitTypeService {
     @Autowired
     private DaoEntityMapper mapper;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
-    public void setMeasurementDetailsInObject(Measurements measurementDetails, MeasurementDAO measurementDAO, MeasurementScale scale) {
+    public void setMeasurementDetailsInObject(MeasurementRequest measurementDetails,
+                                              MeasurementsDAO measurementsDAO,
+                                              MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
+        Map<String, Double> measurementValue = measurementsDAO.getMeasurementValue();
+
+        if (measurementValue == null) {
+            measurementValue = new HashMap<>();
+        }
+
         if (measurementDetails.getWaist() != null) {
-            measurementDAO.setWaist(measurementDetails.getWaist() * multiplyingFactor);
+            measurementValue.put(WAIST_MEASUREMENT_KEY, measurementDetails.getWaist() * multiplyingFactor);
         }
         if (measurementDetails.getLength() != null) {
-            measurementDAO.setLength(measurementDetails.getLength() * multiplyingFactor);
+            measurementValue.put(LENGTH_MEASUREMENT_KEY, measurementDetails.getLength() * multiplyingFactor);
         }
+
+        measurementsDAO.setMeasurementValue(measurementValue);
     }
 
     @Override
-    public OutfitMeasurementDetails extractMeasurementDetails(MeasurementDAO measurementDAO) {
+    public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
-        outfitMeasurementDetails.setWaist(measurementDAO.getWaist());
-        outfitMeasurementDetails.setLength(measurementDAO.getLength());
+        Map<String, Double> measurementValue =
+                objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
+        outfitMeasurementDetails.setWaist(measurementValue.get(WAIST_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setLength(measurementValue.get(LENGTH_MEASUREMENT_KEY));
         return outfitMeasurementDetails;
     }
 
     @Override
-    public boolean haveMandatoryParams(Measurements measurementDetails) {
+    public boolean haveMandatoryParams(MeasurementRequest measurementDetails) {
         return measurementDetails.getWaist() != null &&
                 measurementDetails.getLength() != null;
     }
 
     @Override
-    public boolean areMandatoryParamsSet(MeasurementDAO measurementDAO) {
-        Measurements measurements = mapper.measurementDaoToMeasurement(measurementDAO);
-        return haveMandatoryParams(measurements);
-    }
-
-    @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementDAO measurementDAO, MeasurementScale scale) {
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
+        Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 
-        measurementDetailsResponseList.add(addWaist(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getWaist()).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(addLength(CommonUtils.doubleToString(Optional.ofNullable(measurementDAO.getLength()).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(
+                addWaist(CommonUtils.doubleToString(
+                        Optional.ofNullable(measurementValue.get(WAIST_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+        measurementDetailsResponseList.add(
+                addLength(CommonUtils.doubleToString(
+                        Optional.ofNullable(measurementValue.get(LENGTH_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(UNDER_SKIRT_OUTFIT_IMAGE_LINK);

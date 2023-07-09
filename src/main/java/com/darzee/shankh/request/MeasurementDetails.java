@@ -17,5 +17,5 @@ public class MeasurementDetails {
     @NotNull(message = "outfit_type is mandatory for saving measurement")
     private Integer outfitType;
     private MeasurementScale scale;
-    private Measurements measurements;
+    private MeasurementRequest measurements;
 }
