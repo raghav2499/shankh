@@ -40,7 +40,7 @@ public class ShirtImplService implements OutfitTypeService {
         }
 
         if (measurementDetails.getShirtLength() != null) {
-            measurementValue.put(SHIRT_LENGTH_MEASUREMENT_KEY, measurementDetails.getGownLength() * multiplyingFactor);
+            measurementValue.put(SHIRT_LENGTH_MEASUREMENT_KEY, measurementDetails.getShirtLength() * multiplyingFactor);
         }
         if (measurementDetails.getNeck() != null) {
             measurementValue.put(NECK_MEASUREMENT_KEY, measurementDetails.getNeck() * multiplyingFactor);
