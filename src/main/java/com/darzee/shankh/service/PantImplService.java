@@ -57,6 +57,7 @@ public class PantImplService implements OutfitTypeService {
         if (measurementDetails.getFly() != null) {
             measurementValue.put(FLY_MEASUREMENT_KEY, measurementDetails.getFly() * multiplyingFactor);
         }
+        measurementsDAO.setMeasurementValue(measurementValue);
     }
 
     @Override

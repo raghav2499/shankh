@@ -64,6 +64,7 @@ public class ShirtImplService implements OutfitTypeService {
             measurementValue.put(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY,
                     measurementDetails.getSleeveCircumference() * multiplyingFactor);
         }
+        measurementsDAO.setMeasurementValue(measurementValue);
     }
 
     @Override

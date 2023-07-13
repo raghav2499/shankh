@@ -86,6 +86,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
         if (measurementDetails.getAnkle() != null) {
             measurementValue.put(ANKLE_MEASUREMENT_KEY, measurementDetails.getAnkle() * multiplyingFactor);
         }
+        measurementsDAO.setMeasurementValue(measurementValue);
 
     }
 

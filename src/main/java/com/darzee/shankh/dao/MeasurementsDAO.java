@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
@@ -20,7 +21,7 @@ public class MeasurementsDAO implements Serializable {
 
     private OutfitType outfitType;
 
-    private Map<String, Double> measurementValue;
+    private Map<String, Double> measurementValue = new HashMap<>();
     private CustomerDAO customer;
 
     private LocalDateTime createdAt;

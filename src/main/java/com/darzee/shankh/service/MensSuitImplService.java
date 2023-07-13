@@ -81,6 +81,7 @@ public class MensSuitImplService implements OutfitTypeService {
         if(measurementDetails.getBottomWaist() != null) {
             measurementValue.put(BOTTOM_WAIST_MEASUREMENT_KEY, measurementDetails.getBottomWaist() * multiplyingFactor);
         }
+        measurementsDAO.setMeasurementValue(measurementValue);
     }
 
     @Override

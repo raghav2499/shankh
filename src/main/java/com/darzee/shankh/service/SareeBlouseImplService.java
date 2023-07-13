@@ -79,6 +79,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
             measurementValue.put(BACK_NECK_DEPTH_MEASUREMENT_KEY,
                     measurementDetails.getBackNeckDepth() * multiplyingFactor);
         }
+        measurementsDAO.setMeasurementValue(measurementValue);
     }
 
     @Override

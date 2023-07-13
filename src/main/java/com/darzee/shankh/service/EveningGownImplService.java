@@ -74,6 +74,7 @@ public class EveningGownImplService implements OutfitTypeService {
         if (measurementDetails.getBackNeckDepth() != null) {
             measurementValue.put(BACK_NECK_DEPTH_MEASUREMENT_KEY, measurementDetails.getBackNeckDepth() * multiplyingFactor);
         }
+        measurementsDAO.setMeasurementValue(measurementValue);
     }
 
     @Override

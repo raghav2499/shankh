@@ -45,18 +45,16 @@ public class MeasurementService {
         Optional<Measurements> measurements = measurementsRepo.findByCustomerIdAndOutfitType(customerId, outfitType);
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         if (customer.isPresent()) {
-            if (measurements.isPresent()) {
-                MeasurementsDAO measurementsDAO = mapper.measurementsToMeasurementDAO(measurements.get(),
-                        new CycleAvoidingMappingContext());
-                MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
-                overallMeasurementDetails = outfitTypeService.setMeasurementDetails(measurementsDAO, measurementScale);
-                overallMeasurementDetails.setMessage(getMeasurementDetailsMessage(true));
-                overallMeasurementDetails.setMeasurementUpdatedAt(measurementsDAO.getUpdatedAt());
-                return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);
-            } else {
-                overallMeasurementDetails.setMessage(getMeasurementDetailsMessage(false));
-                return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);
-            }
+            boolean mandatoryParamsSet = measurements.isPresent() ? true : false;
+            MeasurementsDAO measurementsDAO = measurements.isPresent()
+                    ? mapper.measurementsToMeasurementDAO(measurements.get(), new CycleAvoidingMappingContext())
+                    : new MeasurementsDAO();
+            MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
+            overallMeasurementDetails = outfitTypeService.setMeasurementDetails(measurementsDAO, measurementScale);
+            overallMeasurementDetails.setMessage(getMeasurementDetailsMessage(mandatoryParamsSet));
+            overallMeasurementDetails.setMeasurementUpdatedAt(measurementsDAO.getUpdatedAt());
+            return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);
+
         }
 
         overallMeasurementDetails = new OverallMeasurementDetails("customer_id is invalid");
