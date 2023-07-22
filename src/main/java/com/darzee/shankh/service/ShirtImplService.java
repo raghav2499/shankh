@@ -71,7 +71,9 @@ public class ShirtImplService implements OutfitTypeService {
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
         Map<String, Double> measurementValue =
-                objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
+                (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
+                        ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
+                        : new HashMap<>();
 
         outfitMeasurementDetails.setShirtLength(measurementValue.get(SHIRT_LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setNeck(measurementValue.get(NECK_MEASUREMENT_KEY));

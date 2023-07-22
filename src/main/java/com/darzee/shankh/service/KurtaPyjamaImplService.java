@@ -93,7 +93,9 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
         Map<String, Double> measurementValue =
-                objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
+                (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
+                        ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
+                        : new HashMap<>();
 
         outfitMeasurementDetails.setKurtaLength(measurementValue.get(KURTA_LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setShoulder(measurementValue.get(SHOULDER_MEASUREMENT_KEY));

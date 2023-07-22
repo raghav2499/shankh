@@ -32,7 +32,10 @@ public class LadiesSuitImplService implements OutfitTypeService {
                                               MeasurementsDAO measurementsDAO,
                                               MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        Map<String, Double> measurementValue = measurementsDAO.getMeasurementValue();
+        Map<String, Double> measurementValue =
+                (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
+                        ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
+                        : new HashMap<>();
 
         if (measurementValue == null) {
             measurementValue = new HashMap<>();
