@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.darzee.shankh.constants.Constants.DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 import static com.darzee.shankh.constants.Constants.ImageLinks.*;
 import static com.darzee.shankh.constants.Constants.MeasurementKeys.LENGTH_MEASUREMENT_KEY;
 import static com.darzee.shankh.constants.Constants.MeasurementKeys.WAIST_MEASUREMENT_KEY;
@@ -75,15 +74,12 @@ public class UnderSkirtImplService implements OutfitTypeService {
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
-
-        measurementDetailsResponseList.add(
-                addWaist(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(WAIST_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addLength(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(LENGTH_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-
+        if(measurementValue != null) {
+            measurementDetailsResponseList.add(
+                    addWaist(CommonUtils.doubleToString(measurementValue.get(WAIST_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addLength(CommonUtils.doubleToString(measurementValue.get(LENGTH_MEASUREMENT_KEY) / dividingFactor)));
+        }
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(UNDER_SKIRT_OUTFIT_IMAGE_LINK);
         innerMeasurementDetails.setOutfitTypeHeading(UNDER_SHIRT_OUTFIT_TYPE_HEADING);

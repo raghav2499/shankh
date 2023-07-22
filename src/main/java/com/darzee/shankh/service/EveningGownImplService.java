@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.darzee.shankh.constants.Constants.DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 import static com.darzee.shankh.constants.Constants.ImageLinks.*;
 import static com.darzee.shankh.constants.Constants.MeasurementKeys.*;
 import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
@@ -122,43 +121,30 @@ public class EveningGownImplService implements OutfitTypeService {
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
-
-
-        measurementDetailsResponseList.add(
-                addGownLength(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(GOWN_LENGTH_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addShoulder(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(SHOULDER_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addUpperChest(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(UPPER_CHEST_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addBust(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(BUST_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addWaist(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(WAIST_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addSeat(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(SEAT_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addArmHole(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(ARM_HOLE_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addSleeveLength(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(SLEEVE_LENGTH_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addSleeveCircumference(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addFrontNeckDepth(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(FRONT_NECK_DEPTH_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addBackNeckDepth(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(BACK_NECK_DEPTH_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
-
+        if (measurementValue != null) {
+            measurementDetailsResponseList.add(
+                    addGownLength(CommonUtils.doubleToString(measurementValue.get(GOWN_LENGTH_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addShoulder(CommonUtils.doubleToString(measurementValue.get(SHOULDER_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addUpperChest(CommonUtils.doubleToString(measurementValue.get(UPPER_CHEST_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addBust(CommonUtils.doubleToString(measurementValue.get(BUST_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addWaist(CommonUtils.doubleToString(measurementValue.get(WAIST_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addSeat(CommonUtils.doubleToString(measurementValue.get(SEAT_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addArmHole(CommonUtils.doubleToString(measurementValue.get(ARM_HOLE_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addSleeveLength(CommonUtils.doubleToString(measurementValue.get(SLEEVE_LENGTH_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addSleeveCircumference(CommonUtils.doubleToString(measurementValue.get(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addFrontNeckDepth(CommonUtils.doubleToString(measurementValue.get(FRONT_NECK_DEPTH_MEASUREMENT_KEY) / dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addBackNeckDepth(CommonUtils.doubleToString(measurementValue.get(BACK_NECK_DEPTH_MEASUREMENT_KEY) / dividingFactor)));
+        }
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(GOWN_OUTFIT_IMAGE_LINK);

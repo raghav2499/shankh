@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.darzee.shankh.constants.Constants.DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
 import static com.darzee.shankh.constants.Constants.ImageLinks.*;
 import static com.darzee.shankh.constants.Constants.MeasurementKeys.*;
 import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
@@ -95,26 +94,22 @@ public class PantImplService implements OutfitTypeService {
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        Double defaultValue = DEFAULT_DOUBLE_CM_MEASUREMENT_VALUE;
+        if (measurementValue != null) {
+
+        }
 
         measurementDetailsResponseList.add(
-                addWaist(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(BOTTOM_WAIST_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+                addWaist(CommonUtils.doubleToString(measurementValue.get(BOTTOM_WAIST_MEASUREMENT_KEY) / dividingFactor)));
         measurementDetailsResponseList.add(
-                addSeat(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(BOTTOM_SEAT_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+                addSeat(CommonUtils.doubleToString(measurementValue.get(BOTTOM_SEAT_MEASUREMENT_KEY) / dividingFactor)));
         measurementDetailsResponseList.add(
-                addCalf(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(CALF_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+                addCalf(CommonUtils.doubleToString(measurementValue.get(CALF_MEASUREMENT_KEY) / dividingFactor)));
         measurementDetailsResponseList.add(
-                addBottom(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(BOTTOM_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+                addBottom(CommonUtils.doubleToString(measurementValue.get(BOTTOM_MEASUREMENT_KEY) / dividingFactor)));
         measurementDetailsResponseList.add(
-                addPantLength(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(PANT_LENGTH_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+                addPantLength(CommonUtils.doubleToString(measurementValue.get(PANT_LENGTH_MEASUREMENT_KEY) / dividingFactor)));
         measurementDetailsResponseList.add(
-                addFly(CommonUtils.doubleToString(
-                        Optional.ofNullable(measurementValue.get(FLY_MEASUREMENT_KEY)).orElse(defaultValue) / dividingFactor)));
+                addFly(CommonUtils.doubleToString(measurementValue.get(FLY_MEASUREMENT_KEY) / dividingFactor)));
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(PANTS_OUTFIT_IMAGE_LINK);
