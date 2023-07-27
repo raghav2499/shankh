@@ -78,9 +78,6 @@ public class OrderService {
 
     @Autowired
     private BillGenerator billGenerator;
-
-    @Autowired
-    private MeasurementRepo measurementRepo;
     @Autowired
     private BoutiqueLedgerService boutiqueLedgerService;
 

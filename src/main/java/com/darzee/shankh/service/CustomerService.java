@@ -1,7 +1,10 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.*;
+import com.darzee.shankh.dao.BoutiqueDAO;
+import com.darzee.shankh.dao.CustomerDAO;
+import com.darzee.shankh.dao.ImageReferenceDAO;
+import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.ImageReference;
@@ -56,9 +59,6 @@ public class CustomerService {
 
     @Autowired
     private BoutiqueLedgerRepo boutiqueLedgerRepo;
-
-    @Autowired
-    private MeasurementRepo measurementRepo;
 
     public ResponseEntity getCustomers(Long boutiqueId) {
         List<CustomerDAO> boutiqueCustomers =

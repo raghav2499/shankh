@@ -2,7 +2,6 @@ package com.darzee.shankh.mapper;
 
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.*;
-import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.TailorLoginResponse;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -33,12 +32,6 @@ public interface DaoEntityMapper {
     BoutiqueLedgerDAO boutiqueLedgerObjectToDAO(BoutiqueLedger boutiqueLedger, @Context CycleAvoidingMappingContext context);
 
     BoutiqueLedger boutiqueLedgerDAOToObject(BoutiqueLedgerDAO boutiqueLedgerDAO, @Context CycleAvoidingMappingContext context);
-
-    Measurement measurementDAOToObject(MeasurementDAO measurement, @Context CycleAvoidingMappingContext context);
-
-    MeasurementDAO measurementObjectToDAO(Measurement measurement, @Context CycleAvoidingMappingContext context);
-
-    MeasurementRequest measurementDaoToMeasurement(MeasurementDAO measurementDAO);
 
     ObjectImages objectImageDAOToObjectImage(ObjectImagesDAO objectImages);
 

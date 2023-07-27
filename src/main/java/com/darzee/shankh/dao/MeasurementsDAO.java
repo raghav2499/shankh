@@ -41,4 +41,11 @@ public class MeasurementsDAO implements Serializable {
         }
         return "";
     }
+
+    public boolean containsMeasurement(String key) {
+        if (!CollectionUtils.isEmpty(this.measurementValue) && this.measurementValue.containsKey(key)) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.darzee.shankh.constants.Constants.OutfitType.*;
+import static com.darzee.shankh.constants.OutfitTypeLinks.*;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum OutfitType {
