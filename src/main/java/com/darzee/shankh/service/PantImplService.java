@@ -7,7 +7,6 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
-import com.darzee.shankh.utils.CommonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,21 +94,19 @@ public class PantImplService implements OutfitTypeService {
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         if (measurementValue != null) {
-
+            measurementDetailsResponseList.add(
+                    addWaist(measurementsDAO.getMeasurement(BOTTOM_WAIST_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addSeat(measurementsDAO.getMeasurement(BOTTOM_SEAT_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addCalf(measurementsDAO.getMeasurement(CALF_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addBottom(measurementsDAO.getMeasurement(BOTTOM_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addPantLength(measurementsDAO.getMeasurement(PANT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addFly(measurementsDAO.getMeasurement(FLY_MEASUREMENT_KEY, dividingFactor)));
         }
-
-        measurementDetailsResponseList.add(
-                addWaist(CommonUtils.doubleToString(measurementValue.get(BOTTOM_WAIST_MEASUREMENT_KEY) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addSeat(CommonUtils.doubleToString(measurementValue.get(BOTTOM_SEAT_MEASUREMENT_KEY) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addCalf(CommonUtils.doubleToString(measurementValue.get(CALF_MEASUREMENT_KEY) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addBottom(CommonUtils.doubleToString(measurementValue.get(BOTTOM_MEASUREMENT_KEY) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addPantLength(CommonUtils.doubleToString(measurementValue.get(PANT_LENGTH_MEASUREMENT_KEY) / dividingFactor)));
-        measurementDetailsResponseList.add(
-                addFly(CommonUtils.doubleToString(measurementValue.get(FLY_MEASUREMENT_KEY) / dividingFactor)));
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(PANTS_OUTFIT_IMAGE_LINK);

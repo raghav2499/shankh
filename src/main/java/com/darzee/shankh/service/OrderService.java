@@ -118,11 +118,12 @@ public class OrderService {
             OrderAmountDAO orderAmountDAO = setOrderAmountSpecificDetails(orderAmountDetails, orderDAO);
             orderDAO.setOrderAmount(orderAmountDAO);
             orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
+            String trialDate = orderDAO.getTrialDate() != null ? orderDAO.getTrialDate().toString() : null;
 
 //            boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
 
             return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(), orderDAO.getOutfitType().getName(),
-                    orderDAO.getTrialDate().toString(), orderDAO.getDeliveryDate().toString(),
+                    trialDate, orderDAO.getDeliveryDate().toString(),
                     orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString());
         }
         return null;
@@ -185,9 +186,10 @@ public class OrderService {
                 orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order,
                         order.getBoutique().getId());
             }
+            String trialDate = order.getTrialDate() != null ? order.getTrialDate().toString() : null;
 
             OrderSummary orderSummary = new OrderSummary(order.getId(), order.getInvoiceNo(),
-                    order.getOutfitType().getName(), order.getTrialDate().toString(), order.getDeliveryDate().toString(),
+                    order.getOutfitType().getName(), trialDate, order.getDeliveryDate().toString(),
                     orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString());
             CreateOrderResponse response = new CreateOrderResponse("Order updated successfully", orderSummary);
             return new ResponseEntity(response, HttpStatus.OK);

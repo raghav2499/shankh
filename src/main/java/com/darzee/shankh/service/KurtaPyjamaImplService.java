@@ -7,7 +7,6 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
-import com.darzee.shankh.utils.CommonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -161,27 +160,27 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         if (measurementValue != null) {
             measurementDetailsResponseList.add(
-                    addKurtaLength(CommonUtils.doubleToString(measurementValue.get(KURTA_LENGTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addKurtaLength(measurementsDAO.getMeasurement(KURTA_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addShoulder(CommonUtils.doubleToString(measurementValue.get(SHOULDER_MEASUREMENT_KEY) / dividingFactor)));
+                    addShoulder(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addUpperChest(CommonUtils.doubleToString(measurementValue.get(UPPER_CHEST_MEASUREMENT_KEY) / dividingFactor)));
+                    addUpperChest(measurementsDAO.getMeasurement(UPPER_CHEST_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addBust(CommonUtils.doubleToString(measurementValue.get(BUST_MEASUREMENT_KEY) / dividingFactor)));
+                    addBust(measurementsDAO.getMeasurement(BUST_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addWaist(CommonUtils.doubleToString(measurementValue.get(WAIST_MEASUREMENT_KEY) / dividingFactor)));
+                    addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addSeat(CommonUtils.doubleToString(measurementValue.get(SEAT_MEASUREMENT_KEY) / dividingFactor)));
+                    addSeat(measurementsDAO.getMeasurement(SEAT_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addArmHole(CommonUtils.doubleToString(measurementValue.get(ARM_HOLE_MEASUREMENT_KEY) / dividingFactor)));
+                    addArmHole(measurementsDAO.getMeasurement(ARM_HOLE_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addSleeveLength(CommonUtils.doubleToString(measurementValue.get(SLEEVE_LENGTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addSleeveLength(measurementsDAO.getMeasurement(SLEEVE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addSleeveCircumference(CommonUtils.doubleToString(measurementValue.get(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY) / dividingFactor)));
+                    addSleeveCircumference(measurementsDAO.getMeasurement(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addFrontNeckDepth(CommonUtils.doubleToString(measurementValue.get(FRONT_NECK_DEPTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addFrontNeckDepth(measurementsDAO.getMeasurement(FRONT_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addBackNeckDepth(CommonUtils.doubleToString(measurementValue.get(BACK_NECK_DEPTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addBackNeckDepth(measurementsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
         }
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(KURTA_OUTFIT_IMAGE_LINK);
@@ -197,13 +196,13 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         if (measurementValue != null) {
             measurementDetailsResponseList.add(
-                    addPyjamaLength(CommonUtils.doubleToString(measurementValue.get(PYJAMA_LENGTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addPyjamaLength(measurementsDAO.getMeasurement(PYJAMA_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addPyjamaHip(CommonUtils.doubleToString(measurementValue.get(PYJAMA_HIP_MEASUREMENT_KEY) / dividingFactor)));
+                    addPyjamaHip(measurementsDAO.getMeasurement(PYJAMA_HIP_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addKnee(CommonUtils.doubleToString(measurementValue.get(KNEE_MEASUREMENT_KEY) / dividingFactor)));
+                    addKnee(measurementsDAO.getMeasurement(KNEE_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addAnkle(CommonUtils.doubleToString(measurementValue.get(ANKLE_MEASUREMENT_KEY) / dividingFactor)));
+                    addAnkle(measurementsDAO.getMeasurement(ANKLE_MEASUREMENT_KEY, dividingFactor)));
         }
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);

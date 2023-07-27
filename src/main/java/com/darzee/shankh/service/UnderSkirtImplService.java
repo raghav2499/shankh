@@ -7,7 +7,6 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
-import com.darzee.shankh.utils.CommonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,9 +75,9 @@ public class UnderSkirtImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         if(measurementValue != null) {
             measurementDetailsResponseList.add(
-                    addWaist(CommonUtils.doubleToString(measurementValue.get(WAIST_MEASUREMENT_KEY) / dividingFactor)));
+                    addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addLength(CommonUtils.doubleToString(measurementValue.get(LENGTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
         }
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(UNDER_SKIRT_OUTFIT_IMAGE_LINK);

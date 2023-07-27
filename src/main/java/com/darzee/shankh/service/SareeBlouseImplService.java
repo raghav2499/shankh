@@ -7,7 +7,6 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
-import com.darzee.shankh.utils.CommonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -129,29 +128,29 @@ public class SareeBlouseImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         if(measurementValue != null) {
             measurementDetailsResponseList.add(
-                    addBlouseLength(CommonUtils.doubleToString(measurementValue.get(BLOUSE_LENGTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addBlouseLength(measurementsDAO.getMeasurement(BLOUSE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addBust(CommonUtils.doubleToString(measurementValue.get(BUST_MEASUREMENT_KEY) / dividingFactor)));
+                    addBust(measurementsDAO.getMeasurement(BUST_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addUpperChest(CommonUtils.doubleToString(measurementValue.get(UPPER_CHEST_MEASUREMENT_KEY) / dividingFactor)));
+                    addUpperChest(measurementsDAO.getMeasurement(UPPER_CHEST_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addBelowBust(CommonUtils.doubleToString(measurementValue.get(BELOW_BUST_MEASUREMENT_KEY) / dividingFactor)));
+                    addBelowBust(measurementsDAO.getMeasurement(BELOW_BUST_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addShoulder(CommonUtils.doubleToString(measurementValue.get(SHOULDER_MEASUREMENT_KEY) / dividingFactor)));
+                    addShoulder(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addArmHole(CommonUtils.doubleToString(measurementValue.get(ARM_HOLE_MEASUREMENT_KEY) / dividingFactor)));
+                    addArmHole(measurementsDAO.getMeasurement(ARM_HOLE_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addSleeveLength(CommonUtils.doubleToString(measurementValue.get(SLEEVE_LENGTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addSleeveLength(measurementsDAO.getMeasurement(SLEEVE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addSleeveCircumference(CommonUtils.doubleToString(measurementValue.get(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY) / dividingFactor)));
+                    addSleeveCircumference(measurementsDAO.getMeasurement(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addFrontNeckDepth(CommonUtils.doubleToString(measurementValue.get(FRONT_NECK_DEPTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addFrontNeckDepth(measurementsDAO.getMeasurement(FRONT_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addShoulderToApexLength(CommonUtils.doubleToString(measurementValue.get(SHOULDER_MEASUREMENT_KEY) / dividingFactor)));
+                    addShoulderToApexLength(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addApexToApexLength(CommonUtils.doubleToString(measurementValue.get(APEX_TO_APEX_LENGTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addApexToApexLength(measurementsDAO.getMeasurement(APEX_TO_APEX_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addBackNeckDepth(CommonUtils.doubleToString(measurementValue.get(BACK_NECK_DEPTH_MEASUREMENT_KEY) / dividingFactor)));
+                    addBackNeckDepth(measurementsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
         }
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(BLOUSE_OUTFIT_IMAGE_LINK);

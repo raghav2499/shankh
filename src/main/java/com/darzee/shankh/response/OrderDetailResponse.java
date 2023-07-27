@@ -51,7 +51,7 @@ public class OrderDetailResponse {
         this.orderStatus = order.getOrderStatus().getDisplayString();
         this.isPriorityOrder = Optional.ofNullable(order.getIsPriorityOrder()).orElse(Boolean.FALSE);
         this.outfitType = order.getOutfitType().getDisplayString();
-        this.trialDate = order.getTrialDate().toString();
+        this.trialDate = (order.getTrialDate() != null ? order.getTrialDate().toString() : null);
         this.deliveryDate = order.getDeliveryDate().toString();
         this.outfitTypeIndex = order.getOutfitType().getOrdinal();
         this.outfitTypeImageLink = order.getOutfitType().getImageLink();
@@ -66,7 +66,7 @@ public class OrderDetailResponse {
         this.outfitTypeName = order.getOutfitType().getName();
         this.outfitTypeIndex = order.getOutfitType().getOrdinal();
         this.outfitTypeImageLink = order.getOutfitType().getImageLink();
-        this.trialDate = order.getTrialDate().toString();
+        this.trialDate = (order.getTrialDate() != null ? order.getTrialDate().toString() : null);
         this.deliveryDate = order.getDeliveryDate().toString();
         this.type = order.getOrderType().getDisplayName();
         this.inspiration = order.getInspiration();

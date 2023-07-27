@@ -43,7 +43,7 @@ public class MeasurementService {
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         Optional<Customer> customer = customerRepo.findById(customerId);
         Optional<Measurements> measurements = measurementsRepo.findByCustomerIdAndOutfitType(customerId, outfitType);
-        OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
+        OverallMeasurementDetails overallMeasurementDetails = null;
         if (customer.isPresent()) {
             boolean mandatoryParamsSet = measurements.isPresent() ? true : false;
             MeasurementsDAO measurementsDAO = measurements.isPresent()
@@ -54,7 +54,6 @@ public class MeasurementService {
             overallMeasurementDetails.setMessage(getMeasurementDetailsMessage(mandatoryParamsSet));
             overallMeasurementDetails.setMeasurementUpdatedAt(measurementsDAO.getUpdatedAt());
             return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);
-
         }
 
         overallMeasurementDetails = new OverallMeasurementDetails("customer_id is invalid");
