@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.darzee.shankh.constants.Constants.ImageLinks.*;
-import static com.darzee.shankh.constants.Constants.MeasurementKeys.*;
-import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
+import static com.darzee.shankh.constants.ImageLinks.*;
+import static com.darzee.shankh.constants.MeasurementKeys.*;
+import static com.darzee.shankh.constants.MeasurementTitles.*;
 
 @Service
 public class DressImplService implements OutfitTypeService {

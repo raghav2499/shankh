@@ -14,10 +14,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.darzee.shankh.constants.Constants.ImageLinks.*;
-import static com.darzee.shankh.constants.Constants.MeasurementKeys.LENGTH_MEASUREMENT_KEY;
-import static com.darzee.shankh.constants.Constants.MeasurementKeys.WAIST_MEASUREMENT_KEY;
-import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
+import static com.darzee.shankh.constants.ImageLinks.*;
+import static com.darzee.shankh.constants.MeasurementKeys.LENGTH_MEASUREMENT_KEY;
+import static com.darzee.shankh.constants.MeasurementKeys.WAIST_MEASUREMENT_KEY;
+import static com.darzee.shankh.constants.MeasurementTitles.*;
 
 @Service
 public class UnderSkirtImplService implements OutfitTypeService {

@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.darzee.shankh.constants.Constants.ImageLinks.*;
-import static com.darzee.shankh.constants.Constants.MeasurementKeys.*;
-import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
+import static com.darzee.shankh.constants.ImageLinks.*;
+import static com.darzee.shankh.constants.MeasurementKeys.*;
+import static com.darzee.shankh.constants.MeasurementTitles.*;
 
 @Service
 public class LadiesSuitImplService implements OutfitTypeService {
