@@ -1,4 +1,4 @@
-package com.darzee.shankh.service;
+package com.darzee.shankh.service.outfits;
 
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementsDAO;
@@ -7,6 +7,7 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -96,21 +97,6 @@ public class DressImplService implements OutfitTypeService {
         outfitMeasurementDetails.setFrontNeckDepth(measurementValue.get(FRONT_NECK_DEPTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setBackNeckDepth(measurementValue.get(BACK_NECK_DEPTH_MEASUREMENT_KEY));
         return outfitMeasurementDetails;
-    }
-
-    @Override
-    public boolean haveMandatoryParams(MeasurementRequest measurementDetails) {
-        return measurementDetails.getLength() != null &&
-                measurementDetails.getShoulder() != null &&
-                measurementDetails.getUpperChest() != null &&
-                measurementDetails.getBust() != null &&
-                measurementDetails.getWaist() != null &&
-                measurementDetails.getSeat() != null &&
-                measurementDetails.getArmHole() != null &&
-                measurementDetails.getSleeveLength() != null &&
-                measurementDetails.getSleeveCircumference() != null &&
-                measurementDetails.getFrontNeckDepth() != null &&
-                measurementDetails.getBackNeckDepth() != null;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.darzee.shankh.service;
+package com.darzee.shankh.service.outfits;
 
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementsDAO;
@@ -7,6 +7,7 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,8 @@ import static com.darzee.shankh.constants.Constants.MeasurementKeys.*;
 import static com.darzee.shankh.constants.Constants.MeasurementTitles.*;
 
 @Service
-public class LadiesSuitImplService implements OutfitTypeService {
+public class KurtaPyjamaImplService implements OutfitTypeService {
+
     @Autowired
     private DaoEntityMapper mapper;
 
@@ -33,17 +35,13 @@ public class LadiesSuitImplService implements OutfitTypeService {
                                               MeasurementsDAO measurementsDAO,
                                               MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        Map<String, Double> measurementValue =
-                (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
-                        ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
-                        : new HashMap<>();
+        Map<String, Double> measurementValue = measurementsDAO.getMeasurementValue();
 
         if (measurementValue == null) {
             measurementValue = new HashMap<>();
         }
-
-        if (measurementDetails.getKameezLength() != null) {
-            measurementValue.put(KAMEEZ_LENGTH_MEASUREMENT_KEY, measurementDetails.getKameezLength() * multiplyingFactor);
+        if (measurementDetails.getKurtaLength() != null) {
+            measurementValue.put(KURTA_LENGTH_MEASUREMENT_KEY, measurementDetails.getKurtaLength() * multiplyingFactor);
         }
         if (measurementDetails.getShoulder() != null) {
             measurementValue.put(SHOULDER_MEASUREMENT_KEY, measurementDetails.getShoulder() * multiplyingFactor);
@@ -78,29 +76,30 @@ public class LadiesSuitImplService implements OutfitTypeService {
             measurementValue.put(BACK_NECK_DEPTH_MEASUREMENT_KEY,
                     measurementDetails.getBackNeckDepth() * multiplyingFactor);
         }
-        if (measurementDetails.getSalwarHip() != null) {
-            measurementValue.put(SALWAR_HIP_MEASUREMENT_KEY, measurementDetails.getSalwarHip() * multiplyingFactor);
+        if (measurementDetails.getPyjamaLength() != null) {
+            measurementValue.put(PYJAMA_LENGTH_MEASUREMENT_KEY,
+                    measurementDetails.getPyjamaLength() * multiplyingFactor);
+        }
+        if (measurementDetails.getPyjamaHip() != null) {
+            measurementValue.put(PYJAMA_HIP_MEASUREMENT_KEY, measurementDetails.getPyjamaHip() * multiplyingFactor);
         }
         if (measurementDetails.getKnee() != null) {
             measurementValue.put(KNEE_MEASUREMENT_KEY, measurementDetails.getKnee() * multiplyingFactor);
         }
-        if (measurementDetails.getSalwarLength() != null) {
-            measurementValue.put(SALWAR_LENGTH_MEASUREMENT_KEY, measurementDetails.getSalwarLength() * multiplyingFactor);
-        }
         if (measurementDetails.getAnkle() != null) {
             measurementValue.put(ANKLE_MEASUREMENT_KEY, measurementDetails.getAnkle() * multiplyingFactor);
         }
-        measurementsDAO.setMeasurementValue(measurementValue);
-
     }
 
     @Override
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
         Map<String, Double> measurementValue =
-                objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
+                (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
+                        ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
+                        : new HashMap<>();
 
-        outfitMeasurementDetails.setKameezLength(measurementValue.get(KAMEEZ_LENGTH_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setKurtaLength(measurementValue.get(KURTA_LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setShoulder(measurementValue.get(SHOULDER_MEASUREMENT_KEY));
         outfitMeasurementDetails.setUpperChest(measurementValue.get(UPPER_CHEST_MEASUREMENT_KEY));
         outfitMeasurementDetails.setBust(measurementValue.get(BUST_MEASUREMENT_KEY));
@@ -111,31 +110,12 @@ public class LadiesSuitImplService implements OutfitTypeService {
         outfitMeasurementDetails.setSleeveCircumference(measurementValue.get(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY));
         outfitMeasurementDetails.setFrontNeckDepth(measurementValue.get(FRONT_NECK_DEPTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setBackNeckDepth(measurementValue.get(BACK_NECK_DEPTH_MEASUREMENT_KEY));
-        outfitMeasurementDetails.setSalwarHip(measurementValue.get(SALWAR_HIP_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setPyjamaLength(measurementValue.get(PYJAMA_LENGTH_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setPyjamaHip(measurementValue.get(PYJAMA_HIP_MEASUREMENT_KEY));
         outfitMeasurementDetails.setKnee(measurementValue.get(KNEE_MEASUREMENT_KEY));
-        outfitMeasurementDetails.setSalwarLength(measurementValue.get(SALWAR_LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setAnkle(measurementValue.get(ANKLE_MEASUREMENT_KEY));
 
         return outfitMeasurementDetails;
-    }
-
-    @Override
-    public boolean haveMandatoryParams(MeasurementRequest measurementDetails) {
-        return measurementDetails.getKameezLength() != null &&
-                measurementDetails.getShoulder() != null &&
-                measurementDetails.getUpperChest() != null &&
-                measurementDetails.getBust() != null &&
-                measurementDetails.getWaist() != null &&
-                measurementDetails.getSeat() != null &&
-                measurementDetails.getArmHole() != null &&
-                measurementDetails.getSleeveLength() != null &&
-                measurementDetails.getSleeveCircumference() != null &&
-                measurementDetails.getFrontNeckDepth() != null &&
-                measurementDetails.getBackNeckDepth() != null &&
-                measurementDetails.getSalwarHip() != null &&
-                measurementDetails.getKnee() != null &&
-                measurementDetails.getSalwarLength() != null &&
-                measurementDetails.getAnkle() != null;
     }
 
     @Override
@@ -148,15 +128,21 @@ public class LadiesSuitImplService implements OutfitTypeService {
         return overallMeasurementDetails;
     }
 
+    @Override
+    public OutfitDetails getOutfitDetails() {
+        OutfitType outfitType = OutfitType.KURTA_PYJAMA;
+        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
+                outfitType.getImageLink(), 2);
+    }
+
     private InnerMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementsDAO measurementsDAO, MeasurementScale scale) {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-
         if (measurementValue != null) {
             measurementDetailsResponseList.add(
-                    addKameezLength(measurementsDAO.getMeasurement(KAMEEZ_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+                    addKurtaLength(measurementsDAO.getMeasurement(KURTA_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addShoulder(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
@@ -178,144 +164,137 @@ public class LadiesSuitImplService implements OutfitTypeService {
             measurementDetailsResponseList.add(
                     addBackNeckDepth(measurementsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
         }
-
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
-        innerMeasurementDetails.setOutfitImageLink(LADIES_SUIT_OUTFIT_IMAGE_LINK);
-        innerMeasurementDetails.setOutfitTypeHeading(LADIES_SUIT_KAMEEZ_OUTFIT_TYPE_HEADING);
+        innerMeasurementDetails.setOutfitImageLink(KURTA_OUTFIT_IMAGE_LINK);
+        innerMeasurementDetails.setOutfitTypeHeading(MENS_KURTA_OUTFIT_TYPE_HEADING);
         return innerMeasurementDetails;
     }
 
-    private InnerMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementsDAO measurementsDAO, MeasurementScale scale) {
+    private InnerMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementsDAO measurementsDAO,
+                                                                        MeasurementScale scale) {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         if (measurementValue != null) {
             measurementDetailsResponseList.add(
-                    addSalwarHip(measurementsDAO.getMeasurement(SALWAR_HIP_MEASUREMENT_KEY, dividingFactor)));
+                    addPyjamaLength(measurementsDAO.getMeasurement(PYJAMA_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addPyjamaHip(measurementsDAO.getMeasurement(PYJAMA_HIP_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addKnee(measurementsDAO.getMeasurement(KNEE_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addSalwarLength(measurementsDAO.getMeasurement(SALWAR_LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
                     addAnkle(measurementsDAO.getMeasurement(ANKLE_MEASUREMENT_KEY, dividingFactor)));
         }
+
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
-        innerMeasurementDetails.setOutfitImageLink(LADIES_SUIT_LOWER_IMAGE_LINK);
-        innerMeasurementDetails.setOutfitTypeHeading(LADIES_SUIT_SALWAR_OUTFIT_TYPE_HEADING);
+        innerMeasurementDetails.setOutfitImageLink(PYJAMA_OUTFIT_IMAGE_LINK);
+        innerMeasurementDetails.setOutfitTypeHeading(MENS_PYJAMA_OUTFIT_TYPE_HEADING);
         return innerMeasurementDetails;
     }
 
-    @Override
-    public OutfitDetails getOutfitDetails() {
-        OutfitType outfitType = OutfitType.LADIES_SUIT;
-        return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitType.getImageLink(), 2);
-    }
-
-    private MeasurementDetails addKameezLength(String value) {
-        String imageLink = LADIES_SUIT_LENGTH_IMAGE_LINK;
-        String title = LADIES_SUIT_KAMEEZ_LENGTH_TITLE;
+    private MeasurementDetails addKurtaLength(String value) {
+        String imageLink = KURTA_LENGTH_IMAGE_LINK;
+        String title = KURTA_LENGTH_TITLE;
         String index = "1";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addShoulder(String value) {
-        String imageLink = LADIES_SUIT_SHOULDER_IMAGE_LINK;
-        String title = LADIES_SUIT_SHOULDER_TITLE;
+        String imageLink = KURTA_SHOULDER_IMAGE_LINK;
+        String title = KURTA_SHOULDER_TITLE;
         String index = "2";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addUpperChest(String value) {
-        String imageLink = LADIES_SUIT_UPPER_CHEST_IMAGE_LINK;
-        String title = LADIES_SUIT_UPPER_CHEST_TITLE;
+        String imageLink = KURTA_UPPER_CHEST_IMAGE_LINK;
+        String title = KURTA_UPPER_CHEST_TITLE;
         String index = "3";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addBust(String value) {
-        String imageLink = LADIES_SUIT_BUST_IMAGE_LINK;
-        String title = LADIES_SUIT_BUST_TITLE;
+        String imageLink = KURTA_BUST_IMAGE_LINK;
+        String title = KURTA_BUST_TITLE;
         String index = "4";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addWaist(String value) {
-        String imageLink = LADIES_SUIT_WAIST_IMAGE_LINK;
-        String title = LADIES_SUIT_WAIST_TITLE;
+        String imageLink = KURTA_WAIST_IMAGE_LINK;
+        String title = KURTA_WAIST_TITLE;
         String index = "5";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addSeat(String value) {
-        String imageLink = LADIES_SUIT_SEAT_IMAGE_LINK;
-        String title = LADIES_SUIT_SEAT_TITLE;
+        String imageLink = KURTA_SEAT_IMAGE_LINK;
+        String title = KURTA_SEAT_TITLE;
         String index = "6";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addArmHole(String value) {
-        String imageLink = LADIES_SUIT_ARMHOLE_IMAGE_LINK;
-        String title = LADIES_SUIT_ARMHOLE_TITLE;
+        String imageLink = KURTA_ARMHOLE_IMAGE_LINK;
+        String title = KURTA_ARMHOLE_TITLE;
         String index = "7";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addSleeveLength(String value) {
-        String imageLink = LADIES_SUIT_SLEEVE_LENGTH_IMAGE_LINK;
-        String title = LADIES_SUIT_SLEEVE_LENGTH_TITLE;
+        String imageLink = KURTA_SLEEVE_LENGTH_IMAGE_LINK;
+        String title = KURTA_SLEEVE_LENGTH_TITLE;
         String index = "8";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addSleeveCircumference(String value) {
-        String imageLink = LADIES_SUIT_SLEEVE_CIRCUM_IMAGE_LINK;
-        String title = LADIES_SUIT_SLEEVE_CIRCUM_TITLE;
+        String imageLink = KURTA_SLEEVE_CIRCUM_IMAGE_LINK;
+        String title = KURTA_SLEEVE_CIRCUM_TITLE;
         String index = "9";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addFrontNeckDepth(String value) {
-        String imageLink = LADIES_SUIT_FRONT_NECK_DEPTH_IMAGE_LINK;
-        String title = LADIES_SUIT_FRONT_NECK_DEPTH_TITLE;
+        String imageLink = KURTA_FRONT_NECK_DEPTH_IMAGE_LINK;
+        String title = KURTA_FRONT_NECK_DEPTH_TITLE;
         String index = "10";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addBackNeckDepth(String value) {
-        String imageLink = LADIES_SUIT_BACK_NECK_DEPTH_IMAGE_LINK;
-        String title = LADIES_SUIT_BACK_NECK_DEPTH_TITLE;
+        String imageLink = KURTA_BACK_NECK_DEPTH_IMAGE_LINK;
+        String title = KURTA_BACK_NECK_DEPTH_TITLE;
         String index = "11";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
-    private MeasurementDetails addSalwarHip(String value) {
-        String imageLink = LADIES_SUIT_SALWAR_HIP_IMAGE_LINK;
-        String title = LADIES_SUIT_SALWAR_HIP_TITLE;
+    private MeasurementDetails addPyjamaLength(String value) {
+        String imageLink = PYJAMA_LENGTH_IMAGE_LINK;
+        String title = PYJAMA_LENGTH_TITLE;
         String index = "1";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
-    private MeasurementDetails addKnee(String value) {
-        String imageLink = LADIES_SUIT_KNEE_IMAGE_LINK;
-        String title = LADIES_SUIT_KNEE_TITLE;
+    private MeasurementDetails addPyjamaHip(String value) {
+        String imageLink = PYJAMA_HIP_IMAGE_LINK;
+        String title = PYJAMA_HIP_TITLE;
         String index = "2";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
-    private MeasurementDetails addSalwarLength(String value) {
-        String imageLink = LADIES_SUIT_SALWAR_LENGTH_IMAGE_LINK;
-        String title = LADIES_SUIT_SALWAR_LENGTH_TITLE;
+    private MeasurementDetails addKnee(String value) {
+        String imageLink = PYJAMA_KNEE_IMAGE_LINK;
+        String title = PYJAMA_KNEE_TITLE;
         String index = "3";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addAnkle(String value) {
-        String imageLink = LADIES_SUIT_ANKLE_IMAGE_LINK;
-        String title = LADIES_SUIT_ANKLE_TITLE;
+        String imageLink = PYJAMA_ANKLE_IMAGE_LINK;
+        String title = PYJAMA_ANKLE_TITLE;
         String index = "4";
         return new MeasurementDetails(imageLink, title, value, index);
     }
-
 }

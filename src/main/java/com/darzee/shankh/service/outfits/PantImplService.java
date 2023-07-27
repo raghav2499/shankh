@@ -1,4 +1,4 @@
-package com.darzee.shankh.service;
+package com.darzee.shankh.service.outfits;
 
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementsDAO;
@@ -7,6 +7,7 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,12 @@ public class PantImplService implements OutfitTypeService {
         if (measurementDetails.getFly() != null) {
             measurementValue.put(FLY_MEASUREMENT_KEY, measurementDetails.getFly() * multiplyingFactor);
         }
+        if (measurementDetails.getInSeam() != null) {
+            measurementValue.put(IN_SEAM_MEASUREMENT_KEY, measurementDetails.getInSeam() * multiplyingFactor);
+        }
+        if (measurementDetails.getCrotch() != null) {
+            measurementValue.put(CROTCH_MEASUREMENT_KEY, measurementDetails.getCrotch() * multiplyingFactor);
+        }
         measurementsDAO.setMeasurementValue(measurementValue);
     }
 
@@ -72,18 +79,10 @@ public class PantImplService implements OutfitTypeService {
         outfitMeasurementDetails.setBottom(measurementValue.get(BOTTOM_MEASUREMENT_KEY));
         outfitMeasurementDetails.setPantLength(measurementValue.get(PANT_LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setFly(measurementValue.get(FLY_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setInSeam(measurementValue.get(IN_SEAM_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setCrotch(measurementValue.get(CROTCH_MEASUREMENT_KEY));
 
         return outfitMeasurementDetails;
-    }
-
-    @Override
-    public boolean haveMandatoryParams(MeasurementRequest measurementDetails) {
-        return measurementDetails.getBottomWaist() != null &&
-                measurementDetails.getBottomSeat() != null &&
-                measurementDetails.getCalf() != null &&
-                measurementDetails.getBottom() != null &&
-                measurementDetails.getPantLength() != null &&
-                measurementDetails.getFly() != null;
     }
 
     @Override
@@ -106,6 +105,10 @@ public class PantImplService implements OutfitTypeService {
                     addPantLength(measurementsDAO.getMeasurement(PANT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addFly(measurementsDAO.getMeasurement(FLY_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addInSeam(measurementsDAO.getMeasurement(IN_SEAM_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addCrotch(measurementsDAO.getMeasurement(CROTCH_MEASUREMENT_KEY, dividingFactor)));
         }
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
@@ -136,31 +139,50 @@ public class PantImplService implements OutfitTypeService {
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
+    private MeasurementDetails addThigh(String value) {
+        String imageLink = PANTS_THIGH_IMAGE_LINK;
+        String title = PANTS_THIGH_TITLE;
+        String index = "3";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+
     private MeasurementDetails addCalf(String value) {
         String imageLink = PANTS_CALF_IMAGE_LINK;
         String title = PANTS_CALF_TITLE;
-        String index = "3";
+        String index = "4";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addBottom(String value) {
         String imageLink = PANTS_BOTTOM_IMAGE_LINK;
         String title = PANTS_BOTTOM_TITLE;
-        String index = "4";
+        String index = "5";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addPantLength(String value) {
         String imageLink = PANTS_LENGTH_IMAGE_LINK;
         String title = PANTS_LENGTH_TITLE;
-        String index = "5";
+        String index = "6";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addFly(String value) {
         String imageLink = PANTS_FLY_IMAGE_LINK;
         String title = PANTS_FLY_TITLE;
-        String index = "6";
+        String index = "7";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+    private MeasurementDetails addInSeam(String value) {
+        String imageLink = PANTS_IN_SEAM_IMAGE_LINK;
+        String title = PANTS_IN_SEAM_TITLE;
+        String index = "8";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+    private MeasurementDetails addCrotch(String value) {
+        String imageLink = PANTS_CROTCH_IMAGE_LINK;
+        String title = PANTS_CROTCH_TITLE;
+        String index = "9";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 }

@@ -42,4 +42,20 @@ public class OutfitMeasurementDetails {
     private Double apexToApexLength;
     private Double bottomSeat;
     private Double bottomWaist;
+    private Double aboveHead;
+    private Double aroundShoulder;
+    private Double pardiGher;
+    private Double lengaGher;
+    private Double kas;
+    private Double hip;
+    private Double pardiShoulder;
+    private Double lengaShoulder;
+    private Double pardiLength;
+    private Double lengaLength;
+    private Double bicep;
+    private Double elbowRound;
+    private Double crossFront;
+    private Double crossBack;
+    private Double inSeam;
+    private Double crotch;
 }

@@ -8,8 +8,6 @@ import com.darzee.shankh.response.OutfitMeasurementDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 
 public interface OutfitTypeService {
-
-    public boolean haveMandatoryParams(MeasurementRequest measurementDetails);
     public void setMeasurementDetailsInObject(MeasurementRequest measurementDetails,
                                               MeasurementsDAO measurementDAO,
                                               MeasurementScale scale);

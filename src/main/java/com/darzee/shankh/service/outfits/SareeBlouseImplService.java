@@ -1,4 +1,4 @@
-package com.darzee.shankh.service;
+package com.darzee.shankh.service.outfits;
 
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.MeasurementsDAO;
@@ -7,6 +7,7 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,6 @@ public class SareeBlouseImplService implements OutfitTypeService {
 
         if (measurementValue == null) {
             measurementValue = new HashMap<>();
-            measurementValue.put(WAIST_MEASUREMENT_KEY, measurementDetails.getWaist() * multiplyingFactor);
         }
         if (measurementDetails.getBlouseLength() != null) {
             measurementValue.put(BLOUSE_LENGTH_MEASUREMENT_KEY, measurementDetails.getBlouseLength() * multiplyingFactor);
@@ -62,20 +62,36 @@ public class SareeBlouseImplService implements OutfitTypeService {
             measurementValue.put(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY,
                     measurementDetails.getSleeveCircumference() * multiplyingFactor);
         }
-        if (measurementDetails.getFrontNeckDepth() != null) {
-            measurementValue.put(FRONT_NECK_DEPTH_MEASUREMENT_KEY, measurementDetails.getFrontNeckDepth() * multiplyingFactor);
+        if (measurementDetails.getBicep() != null) {
+            measurementValue.put(BICEP_MEASUREMENT_KEY,
+                    measurementDetails.getBicep() * multiplyingFactor);
         }
-        if (measurementDetails.getShoulderToApexLength() != null) {
-            measurementValue.put(SHOULDER_TO_APEX_LENGTH_MEASUREMENT_KEY,
-                    measurementDetails.getShoulderToApexLength() * multiplyingFactor);
+        if (measurementDetails.getElbowRound() != null) {
+            measurementValue.put(ELBOW_ROUND_MEASUREMENT_KEY,
+                    measurementDetails.getElbowRound() * multiplyingFactor);
         }
         if (measurementDetails.getApexToApexLength() != null) {
             measurementValue.put(APEX_TO_APEX_LENGTH_MEASUREMENT_KEY,
                     measurementDetails.getApexToApexLength() * multiplyingFactor);
         }
+        if (measurementDetails.getShoulderToApexLength() != null) {
+            measurementValue.put(SHOULDER_TO_APEX_LENGTH_MEASUREMENT_KEY,
+                    measurementDetails.getShoulderToApexLength() * multiplyingFactor);
+        }
+        if (measurementDetails.getFrontNeckDepth() != null) {
+            measurementValue.put(FRONT_NECK_DEPTH_MEASUREMENT_KEY, measurementDetails.getFrontNeckDepth() * multiplyingFactor);
+        }
         if (measurementDetails.getBackNeckDepth() != null) {
             measurementValue.put(BACK_NECK_DEPTH_MEASUREMENT_KEY,
                     measurementDetails.getBackNeckDepth() * multiplyingFactor);
+        }
+        if (measurementDetails.getCrossFront() != null) {
+            measurementValue.put(CROSS_FRONT_MEASUREMENT_KEY,
+                    measurementDetails.getCrossFront() * multiplyingFactor);
+        }
+        if (measurementDetails.getCrossBack() != null) {
+            measurementValue.put(CROSS_BACK_MEASUREMENT_KEY,
+                    measurementDetails.getCrossBack() * multiplyingFactor);
         }
         measurementsDAO.setMeasurementValue(measurementValue);
     }
@@ -95,28 +111,16 @@ public class SareeBlouseImplService implements OutfitTypeService {
         outfitMeasurementDetails.setArmHole(measurementValue.get(ARM_HOLE_MEASUREMENT_KEY));
         outfitMeasurementDetails.setSleeveLength(measurementValue.get(SLEEVE_LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setSleeveCircumference(measurementValue.get(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setBicep(measurementValue.get(BICEP_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setElbowRound(measurementValue.get(ELBOW_ROUND_MEASUREMENT_KEY));
         outfitMeasurementDetails.setFrontNeckDepth(measurementValue.get(FRONT_NECK_DEPTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setShoulderToApexLength(measurementValue.get(SHOULDER_TO_APEX_LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setApexToApexLength(measurementValue.get(APEX_TO_APEX_LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setBackNeckDepth(measurementValue.get(BACK_NECK_DEPTH_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setCrossFront(measurementValue.get(CROSS_FRONT_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setCrossBack(measurementValue.get(CROSS_BACK_MEASUREMENT_KEY));
 
         return outfitMeasurementDetails;
-    }
-
-    @Override
-    public boolean haveMandatoryParams(MeasurementRequest measurementDetails) {
-        return measurementDetails.getBlouseLength() != null &&
-                measurementDetails.getBust() != null &&
-                measurementDetails.getUpperChest() != null &&
-                measurementDetails.getBelowBust() != null &&
-                measurementDetails.getShoulder() != null &&
-                measurementDetails.getArmHole() != null &&
-                measurementDetails.getSleeveLength() != null &&
-                measurementDetails.getSleeveCircumference() != null &&
-                measurementDetails.getFrontNeckDepth() != null &&
-                measurementDetails.getShoulderToApexLength() != null &&
-                measurementDetails.getApexToApexLength() != null &&
-                measurementDetails.getBackNeckDepth() != null;
     }
 
     @Override
@@ -126,7 +130,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if(measurementValue != null) {
+        if (measurementValue != null) {
             measurementDetailsResponseList.add(
                     addBlouseLength(measurementsDAO.getMeasurement(BLOUSE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
@@ -144,6 +148,10 @@ public class SareeBlouseImplService implements OutfitTypeService {
             measurementDetailsResponseList.add(
                     addSleeveCircumference(measurementsDAO.getMeasurement(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
+                    addBicep(measurementsDAO.getMeasurement(BICEP_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addElbowRound(measurementsDAO.getMeasurement(ELBOW_ROUND_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
                     addFrontNeckDepth(measurementsDAO.getMeasurement(FRONT_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addShoulderToApexLength(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
@@ -151,6 +159,10 @@ public class SareeBlouseImplService implements OutfitTypeService {
                     addApexToApexLength(measurementsDAO.getMeasurement(APEX_TO_APEX_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addBackNeckDepth(measurementsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addCrossFront(measurementsDAO.getMeasurement(CROSS_FRONT_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addCrossBack(measurementsDAO.getMeasurement(CROSS_BACK_MEASUREMENT_KEY, dividingFactor)));
         }
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(BLOUSE_OUTFIT_IMAGE_LINK);
@@ -222,31 +234,57 @@ public class SareeBlouseImplService implements OutfitTypeService {
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
+    private MeasurementDetails addBicep(String value) {
+        String imageLink = BLOUSE_BICEP_IMAGE_LINK;
+        String title = BLOUSE_BICEP_TITLE;
+        String index = "9";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+
+    private MeasurementDetails addElbowRound(String value) {
+        String imageLink = BLOUSE_ELBOW_ROUND_IMAGE_LINK;
+        String title = BLOUSE_ELBOW_ROUND_TITLE;
+        String index = "10";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+
     private MeasurementDetails addFrontNeckDepth(String value) {
         String imageLink = BLOUSE_FRONT_NECK_DEPTH_IMAGE_LINK;
         String title = BLOUSE_FRONT_NECK_DEPTH_TITLE;
-        String index = "9";
+        String index = "11";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addShoulderToApexLength(String value) {
         String imageLink = BLOUSE_SHOULDER_TO_APEX_IMAGE_LINK;
         String title = BLOUSE_SHOULDER_TO_APEX_TITLE;
-        String index = "10";
+        String index = "12";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addApexToApexLength(String value) {
         String imageLink = BLOUSE_APEX_TO_APEX_IMAGE_LINK;
         String title = BLOUSE_APEX_TO_APEX_TITLE;
-        String index = "11";
+        String index = "13";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addBackNeckDepth(String value) {
         String imageLink = BLOUSE_BACK_NECK_DEPTH_IMAGE_LINK;
         String title = BLOUSE_BACK_NECK_DEPTH_TITLE;
-        String index = "12";
+        String index = "14";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+    private MeasurementDetails addCrossFront(String value) {
+        String imageLink = BLOUSE_CROSS_FRONT_IMAGE_LINK;
+        String title = BLOUSE_CROSS_FRONT_TITLE;
+        String index = "15";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+    private MeasurementDetails addCrossBack(String value) {
+        String imageLink = BLOUSE_CROSS_BACK_IMAGE_LINK;
+        String title = BLOUSE_CROSS_BACK_TITLE;
+        String index = "16";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 }

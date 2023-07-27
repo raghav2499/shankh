@@ -28,7 +28,16 @@ public enum OutfitType {
     @JsonProperty("shirt")
     SHIRT("shirt", 8, "Shirt", OUTFIT_TYPE_SHIRT_LINK),
     @JsonProperty("under_skirt")
-    UNDER_SKIRT("under_skirt", 9, "Under Skirt", OUTFIT_TYPE_UNDER_SKIRT_LINK);
+    UNDER_SKIRT("under_skirt", 9, "Under Skirt", OUTFIT_TYPE_UNDER_SKIRT_LINK),
+
+    @JsonProperty("nehru_jacket")
+    NEHRU_JACKET("nehru_jacket", 10, "Nehru Jacket", OUTFIT_TYPE_NEHRU_JACKET_LINK),
+
+    @JsonProperty("rida")
+    RIDA("rida", 11, "Rida", OUTFIT_TYPE_BURKHA_LINK),
+
+    @JsonProperty("waist_coat")
+    WAIST_COAT("waist_coat", 12, "Waist Coat", OUTFIT_TYPE_WAIST_COAT_LINK);
     private String name;
     private Integer ordinal;
 

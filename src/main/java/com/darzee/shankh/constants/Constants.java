@@ -58,10 +58,14 @@ public class Constants {
         public static final String BLOUSE_ARMHOLE_TITLE = "Armhole";
         public static final String BLOUSE_SLEEVE_LENGTH_TITLE = "Sleeve Length";
         public static final String BLOUSE_SLEEVE_CIRCUM_TITLE = "Sleeve Circum";
+        public static final String BLOUSE_BICEP_TITLE = "Bicep";
+        public static final String BLOUSE_ELBOW_ROUND_TITLE = "Elbow Round";
         public static final String BLOUSE_FRONT_NECK_DEPTH_TITLE = "Front Neck Depth";
         public static final String BLOUSE_SHOULDER_TO_APEX_TITLE = "Shoulder to Apex";
         public static final String BLOUSE_APEX_TO_APEX_TITLE = "Apex to Apex";
         public static final String BLOUSE_BACK_NECK_DEPTH_TITLE = "Back Neck Depth";
+        public static final String BLOUSE_CROSS_FRONT_TITLE = "Cross Front";
+        public static final String BLOUSE_CROSS_BACK_TITLE = "Cross Back";
         public static final String SHIRT_LENGTH_TITLE = "Length";
         public static final String SHIRT_NECK_TITLE = "Neck";
         public static final String SHIRT_SHOULDER_TITLE = "Shoulder";
@@ -75,6 +79,8 @@ public class Constants {
 
         public static final String PANTS_SEAT_TITLE = "Seat";
 
+        public static final String PANTS_THIGH_TITLE = "Thigh Circum";
+
         public static final String PANTS_CALF_TITLE = "Calf/Knee";
 
         public static final String PANTS_BOTTOM_TITLE = "Bottom/Bells";
@@ -82,6 +88,8 @@ public class Constants {
         public static final String PANTS_LENGTH_TITLE = "Length";
 
         public static final String PANTS_FLY_TITLE = "Fly(Ply)";
+        public static final String PANTS_IN_SEAM_TITLE = "In-Seam";
+        public static final String PANTS_CROTCH_TITLE = "Crotch";
         public static final String KURTA_LENGTH_TITLE = "Kurta Length";
         public static final String KURTA_SHOULDER_TITLE = "Shoulder";
         public static final String KURTA_UPPER_CHEST_TITLE = "Upper Chest";
@@ -128,6 +136,31 @@ public class Constants {
         public static final String LADIES_SUIT_ANKLE_TITLE = "Ankle";
         public static final String LADIES_SUIT_SALWAR_LENGTH_TITLE = "Salwar Length";
 
+        public static final String NEHRU_JACKET_LENGTH_TITLE = "Length";
+
+        public static final String NEHRU_JACKET_NECK_TITLE = "Neck";
+
+        public static final String NEHRU_JACKET_CHEST_TITLE = "Chest";
+
+        public static final String NEHRU_JACKET_WAIST_TITLE = "Waist";
+        public static final String WAIST_COAT_LENGTH_TITLE = "Length";
+        public static final String WAIST_COAT_CHEST_TITLE = "Chest";
+
+        public static final String WAIST_COAT_WAIST_TITLE = "Waist";
+
+        public static final String RIDA_ABOVE_HEAD_TITLE = "Above Head";
+        public static final String RIDA_PARDI_SHOULDER_TITLE = "Shoulder";
+        public static final String RIDA_AROUND_SHOULDER_TITLE = "Around Shoulder";
+        public static final String RIDA_PARDI_LENGTH_TITLE = "Length";
+        public static final String RIDA_PARDI_GHER_TITLE = "Gher";
+        public static final String RIDA_KAS_TITLE = "Kas";
+        public static final String RIDA_LENGA_SHOULDER_TITLE = "Shoulder";
+        public static final String RIDA_BUST_TITLE = "Bust";
+        public static final String RIDA_WAIST_TITLE = "Waist";
+        public static final String RIDA_HIP_TITLE = "Hips";
+        public static final String RIDA_LENGA_LENGTH_TITLE = "Length";
+        public static final String RIDA_LENGA_GHER_TITLE = "Gher";
+
         public static final String DRESS_OUTFIT_TYPE_HEADING = "Dress";
         public static final String PANTS_OUTFIT_TYPE_HEADING = "Pants";
         public static final String SHIRT_OUTFIT_TYPE_HEADING = "Shirt";
@@ -140,6 +173,10 @@ public class Constants {
         public static final String MENS_SUIT_PANTS_OUTFIT_TYPE_HEADING = "Men's Suit (Bottom)";
         public static final String LADIES_SUIT_KAMEEZ_OUTFIT_TYPE_HEADING = "Ladies Suit (Top)";
         public static final String LADIES_SUIT_SALWAR_OUTFIT_TYPE_HEADING = "Ladies Suit (Bottom)";
+        public static final String NEHRU_JACKET_OUTFIT_TYPE_HEADING = "Nehru Jacket";
+        public static final String WAIST_COAT_OUTFIT_TYPE_HEADING = "Waist Coat";
+        public static final String RIDA_PARDI_OUTFIT_TYPE_HEADING = "Pardi";
+        public static final String RIDA_LENGA_OUTFIT_TYPE_HEADING = "Lenga";
 
 
     }
@@ -174,18 +211,22 @@ public class Constants {
         public static final String UNDER_SKIRT_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Underskirt/us_length.svg";
         public static final String UNDER_SKIRT_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Underskirt/us_waist.svg";
         public static final String BLOUSE_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse.svg";
-        public static final String BLOUSE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_len.svg";
-        public static final String BLOUSE_BUST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_bust.svg";
-        public static final String BLOUSE_UPPOER_CHEST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_upperchest.svg";
-        public static final String BLOUSE_BELOW_BUST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_belowbust.svg";
-        public static final String BLOUSE_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_shoulder.svg";
-        public static final String BLOUSE_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_armhole.svg";
-        public static final String BLOUSE_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_slevelen.svg";
-        public static final String BLOUSE_SLEEVE_CICUM_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_slevcircum.svg";
-        public static final String BLOUSE_FRONT_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_frontneck.svg";
-        public static final String BLOUSE_SHOULDER_TO_APEX_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_sholtoapex.svg";
-        public static final String BLOUSE_APEX_TO_APEX_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_apextoapex.svg";
-        public static final String BLOUSE_BACK_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse_back+neck.svg";
+        public static final String BLOUSE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse1_len.svg";
+        public static final String BLOUSE_BUST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse2_bust.svg";
+        public static final String BLOUSE_UPPOER_CHEST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse3_upperchest.svg";
+        public static final String BLOUSE_BELOW_BUST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse4_belowbust.svg";
+        public static final String BLOUSE_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse5_shoulder.svg";
+        public static final String BLOUSE_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse6_armhole.svg";
+        public static final String BLOUSE_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse7_slevelen.svg";
+        public static final String BLOUSE_SLEEVE_CICUM_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse8_slevcircumeference.svg";
+        public static final String BLOUSE_BICEP_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse9_bicep.svg";
+        public static final String BLOUSE_ELBOW_ROUND_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse10_elbowround.svg";
+        public static final String BLOUSE_APEX_TO_APEX_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse11_apextoapex.svg";
+        public static final String BLOUSE_SHOULDER_TO_APEX_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse12_shouldertoapex.svg";
+        public static final String BLOUSE_FRONT_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse13_frontneckdepth.svg";
+        public static final String BLOUSE_BACK_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse14_backneckdepth.svg";
+        public static final String BLOUSE_CROSS_FRONT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse15_crossfront.svg";
+        public static final String BLOUSE_CROSS_BACK_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Blouse/blouse16_crossback.svg";
         public static final String SHIRT_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Shirt/shirt.svg";
         public static final String SHIRT_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Shirt/shirt_length.svg";
         public static final String SHIRT_NECK_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Shirt/shirt_neck.svg";
@@ -196,12 +237,15 @@ public class Constants {
         public static final String SHIRT_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Shirt/shirt_sleeve.svg";
         public static final String SHIRT_SLEEVE_CIRCUM_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Shirt/shirt_sleevecircum.svg";
         public static final String PANTS_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants.svg";
-        public static final String PANTS_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants_waist.svg";
-        public static final String PANTS_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants_seat.svg";
-        public static final String PANTS_CALF_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants_calf.svg";
-        public static final String PANTS_BOTTOM_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants_bottom.svg";
-        public static final String PANTS_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants_length.svg";
-        public static final String PANTS_FLY_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants_fly.svg";
+        public static final String PANTS_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants1_waist.svg";
+        public static final String PANTS_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants2_seat.svg";
+        public static final String PANTS_THIGH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants3_thie.svg";
+        public static final String PANTS_CALF_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants4_calf.svg";
+        public static final String PANTS_BOTTOM_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants5_bottom.svg";
+        public static final String PANTS_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pant6_len.svg";
+        public static final String PANTS_FLY_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants7_fly.svg";
+        public static final String PANTS_IN_SEAM_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants8_Inseam.svg";
+        public static final String PANTS_CROTCH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Pants/pants9_Crotch.svg";
         public static final String KURTA_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Kurta+pajama/menskurta/nightgown.svg";
         public static final String KURTA_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Kurta+pajama/menskurta/nightgown1_len.svg";
         public static final String KURTA_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Kurta+pajama/menskurta/nightgown2_shoulder.svg";
@@ -253,6 +297,34 @@ public class Constants {
         public static final String LADIES_SUIT_ANKLE_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Salwar+kameez/salwar/pajama_ankle.svg";
         public static final String LADIES_SUIT_SALWAR_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Salwar+kameez/salwar/pajama_len.svg";
 
+        public static final String NEHRU_JACKET_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NehruJacket/Nehrujacket.svg";
+
+        public static final String NEHRU_JACKET_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NehruJacket/nehrujacket1_length.svg";
+        public static final String NEHRU_JACKET_NECK_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NehruJacket/nehrujacket2_neck.svg";
+        public static final String NEHRU_JACKET_CHEST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NehruJacket/nehrujacket3_chest.svg";
+        public static final String NEHRU_JACKET_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/NehruJacket/nehrujacket4_waist.svg";
+
+        public static final String WAIST_COAT_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/WaistCoat/Waistcoat.svg";
+
+        public static final String WAIST_COAT_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/WaistCoat/Waistcoat1_length.svg";
+        public static final String WAIST_COAT_CHEST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/WaistCoat/Waistcoat2_chest.svg";
+        public static final String WAIST_COAT_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/WaistCoat/Waistcoat3_waist.svg";
+        public static final String PARDI_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/pardi/bhurkaupper.svg";
+        public static final String RIDA_ABOVE_HEAD_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/pardi/bhurkaupper_above_head.svg";
+        public static final String RIDA_PARDI_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/pardi/bhurkaupper_shoulder.svg";
+        public static final String RIDA_AROUND_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/pardi/bhurkaupper_around_shoulder.svg";
+        public static final String RIDA_PARDI_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/pardi/bhurkaupper_length.svg";
+        public static final String RIDA_PARDI_GHER_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/pardi/bhurkaupper_gher.svg";
+        public static final String RIDA_KAS_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/pardi/bhurkaupper_kas.svg";
+
+        public static final String LENGA_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/lenga/bhurka.svg";
+        public static final String RIDA_LENGA_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/lenga/bhurka1_shoulder.svg";
+        public static final String RIDA_BUST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/lenga/bhurka2_Bust.svg";
+        public static final String RIDA_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/lenga/bhurka3_waist.svg";
+        public static final String RIDA_HIPS_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/lenga/bhurka4_Hips.svg";
+        public static final String RIDA_LENGA_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/lenga/bhurka5_Length.svg";
+        public static final String RIDA_LENGA_GHER_IMAGE_LINK = "https://s3.amazonaws.com/darzee.backend.static/Measurement/Rida/lenga/bhurka6_gher.svg";
+
     }
 
     public class MeasurementKeys {
@@ -269,6 +341,10 @@ public class Constants {
 
         public static final String SLEEVE_LENGTH_MEASUREMENT_KEY = "sleeve_length";
         public static final String SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY = "sleeve_circumference";
+        public static final String BICEP_MEASUREMENT_KEY = "bicep";
+        public static final String ELBOW_ROUND_MEASUREMENT_KEY = "elbow_round";
+        public static final String CROSS_FRONT_MEASUREMENT_KEY = "cross_front";
+        public static final String CROSS_BACK_MEASUREMENT_KEY = "cross_back";
 
         public static final String FRONT_NECK_DEPTH_MEASUREMENT_KEY = "front_neck_depth";
 
@@ -288,6 +364,8 @@ public class Constants {
         public static final String BOTTOM_MEASUREMENT_KEY = "bottom";
         public static final String PANT_LENGTH_MEASUREMENT_KEY = "pant_length";
         public static final String FLY_MEASUREMENT_KEY = "fly";
+        public static final String IN_SEAM_MEASUREMENT_KEY = "in_seam";
+        public static final String CROTCH_MEASUREMENT_KEY = "crotch";
         public static final String KURTA_LENGTH_MEASUREMENT_KEY = "kurta_length";
         public static final String PYJAMA_LENGTH_MEASUREMENT_KEY = "pyjama_length";
         public static final String PYJAMA_HIP_MEASUREMENT_KEY = "pyjama_hip";
@@ -299,6 +377,17 @@ public class Constants {
 
         public static final String SALWAR_HIP_MEASUREMENT_KEY = "salwar_hip";
         public static final String SALWAR_LENGTH_MEASUREMENT_KEY = "salwar_length";
+        public static final String ABOVE_HEAD_MEASUREMENT_KEY = "above_head";
+        public static final String AROUND_SHOULDER_MEASUREMENT_KEY = "around_shoulder";
+        public static final String PARDI_SHOULDER_MEASUREMENT_KEY = "pardi_shoulder";
+        public static final String LENGA_SHOULDER_MEASUREMENT_KEY = "lenga_shoulder";
+        public static final String PARDI_LENGTH_MEASUREMENT_KEY = "pardi_length";
+        public static final String LENGA_LENGTH_MEASUREMENT_KEY = "lenga_length";
+        public static final String PARDI_GHER_MEASUREMENT_KEY = "pardi_gher";
+        public static final String LENGA_GHER_MEASUREMENT_KEY = "lenga_gher";
+        public static final String KAS_MEASUREMENT_KEY = "kas";
+        public static final String HIP_MEASUREMENT_KEY = "hip";
+
     }
     public class OutfitType {
         public static final String KURTA_PYJAMA_TITLE = "Men's Kurta Pajama";
@@ -320,6 +409,9 @@ public class Constants {
         public static final String OUTFIT_TYPE_SHIRT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/shirt.svg";
         public static final String OUTFIT_TYPE_UNDER_SKIRT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/underskirt.svg";
 
+        public static final String OUTFIT_TYPE_NEHRU_JACKET_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/nehrujacket.svg";
+        public static final String OUTFIT_TYPE_BURKHA_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/burqa.svg";
+        public static final String OUTFIT_TYPE_WAIST_COAT_LINK = "https://s3.amazonaws.com/darzee.backend.static/OutfitType/OutfitType/waistcost.svg";
 
     }
 

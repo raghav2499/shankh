@@ -37,23 +37,23 @@ public class MeasurementRequest {
     private Double gownLength;
     private Double shirtLength;
     private Double pantLength;
-
     private Double apexToApexLength;
-
     private Double bottomWaist;
     private Double bottomSeat;
-
-
-    public Boolean isPresent() {
-        return this.waist != null || this.seat != null || this.calf != null || this.ankle != null || this.bottom != null
-                || this.length != null || this.kurtaLength != null || this.shoulder != null || this.chest != null
-                || this.upperChest != null || this.bust != null || this.armHole != null || this.sleeveLength != null
-                || this.sleeveCircumference != null || this.neck != null || this.frontNeckDepth != null
-                || this.backNeckDepth != null || this.pyjamaLength != null || this.pyjamaHip != null || this.knee != null
-                || this.fly != null || this.blouseLength != null || this.belowBust != null
-                || this.shoulderToApexLength != null || this.kameezLength != null || this.salwarLength != null
-                || this.salwarHip != null || this.gownLength != null || this.shirtLength != null || this.pantLength != null
-                || this.apexToApexLength != null || this.bottomWaist != null || this.bottomSeat != null;
-
-    }
+    private Double aboveHead;
+    private Double aroundShoulder;
+    private Double pardiGher;
+    private Double lengaGher;
+    private Double kas;
+    private Double hip;
+    private Double pardiShoulder;
+    private Double lengaShoulder;
+    private Double pardiLength;
+    private Double lengaLength;
+    private Double bicep;
+    private Double elbowRound;
+    private Double crossFront;
+    private Double crossBack;
+    private Double inSeam;
+    private Double crotch;
 }
