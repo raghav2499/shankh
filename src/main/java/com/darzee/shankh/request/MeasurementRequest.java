@@ -56,4 +56,5 @@ public class MeasurementRequest {
     private Double crossBack;
     private Double inSeam;
     private Double crotch;
+    private Double thigh;
 }

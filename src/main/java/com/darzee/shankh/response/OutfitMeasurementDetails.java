@@ -58,4 +58,5 @@ public class OutfitMeasurementDetails {
     private Double crossBack;
     private Double inSeam;
     private Double crotch;
+    private Double thigh;
 }

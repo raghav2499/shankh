@@ -44,6 +44,9 @@ public class PantImplService implements OutfitTypeService {
         if (measurementDetails.getBottomSeat() != null) {
             measurementValue.put(BOTTOM_SEAT_MEASUREMENT_KEY, measurementDetails.getBottomSeat() * multiplyingFactor);
         }
+        if (measurementDetails.getThigh() != null) {
+            measurementValue.put(THIGH_MEASUREMENT_KEY, measurementDetails.getThigh() * multiplyingFactor);
+        }
         if (measurementDetails.getCalf() != null) {
             measurementValue.put(CALF_MEASUREMENT_KEY, measurementDetails.getCalf() * multiplyingFactor);
         }
@@ -75,6 +78,7 @@ public class PantImplService implements OutfitTypeService {
 
         outfitMeasurementDetails.setBottomWaist(measurementValue.get(BOTTOM_WAIST_MEASUREMENT_KEY));
         outfitMeasurementDetails.setBottomSeat(measurementValue.get(BOTTOM_SEAT_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setThigh(measurementValue.get(THIGH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setCalf(measurementValue.get(CALF_MEASUREMENT_KEY));
         outfitMeasurementDetails.setBottom(measurementValue.get(BOTTOM_MEASUREMENT_KEY));
         outfitMeasurementDetails.setPantLength(measurementValue.get(PANT_LENGTH_MEASUREMENT_KEY));
@@ -97,6 +101,8 @@ public class PantImplService implements OutfitTypeService {
                     addWaist(measurementsDAO.getMeasurement(BOTTOM_WAIST_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addSeat(measurementsDAO.getMeasurement(BOTTOM_SEAT_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addThigh(measurementsDAO.getMeasurement(THIGH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addCalf(measurementsDAO.getMeasurement(CALF_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
