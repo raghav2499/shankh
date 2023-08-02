@@ -17,12 +17,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.darzee.shankh.constants.ImageLinks.*;
-import static com.darzee.shankh.constants.MeasurementKeys.LENGTH_MEASUREMENT_KEY;
-import static com.darzee.shankh.constants.MeasurementKeys.WAIST_MEASUREMENT_KEY;
+import static com.darzee.shankh.constants.MeasurementKeys.*;
 import static com.darzee.shankh.constants.MeasurementTitles.*;
 
 @Service
-public class UnderSkirtImplService implements OutfitTypeService {
+public class LehengaImplService implements OutfitTypeService {
 
     @Autowired
     private DaoEntityMapper mapper;
@@ -40,41 +39,50 @@ public class UnderSkirtImplService implements OutfitTypeService {
         if (measurementValue == null) {
             measurementValue = new HashMap<>();
         }
-
-        if (measurementDetails.getWaist() != null) {
-            measurementValue.put(WAIST_MEASUREMENT_KEY, measurementDetails.getWaist() * multiplyingFactor);
+        if (measurementDetails.getWaistCircum() != null) {
+            measurementValue.put(WAIST_CIRCUM_MEASUREMENT_KEY, measurementDetails.getWaistCircum() * multiplyingFactor);
+        }
+        if (measurementDetails.getHipCircum() != null) {
+            measurementValue.put(HIP_CIRCUM_MEASUREMENT_KEY, measurementDetails.getHipCircum() * multiplyingFactor);
+        }
+        if (measurementDetails.getWaistToKnee() != null) {
+            measurementValue.put(WAIST_TO_KNEE_MEASUREMENT_KEY, measurementDetails.getWaistToKnee() * multiplyingFactor);
         }
         if (measurementDetails.getLength() != null) {
             measurementValue.put(LENGTH_MEASUREMENT_KEY, measurementDetails.getLength() * multiplyingFactor);
         }
-
         measurementsDAO.setMeasurementValue(measurementValue);
     }
 
     @Override
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
+
         Map<String, Double> measurementValue =
                 (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
                         ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
                         : new HashMap<>();
-        outfitMeasurementDetails.setWaist(measurementValue.get(WAIST_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setWaistCircum(measurementValue.get(WAIST_CIRCUM_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setHipCircum(measurementValue.get(HIP_CIRCUM_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setWaistToKnee(measurementValue.get(WAIST_TO_KNEE_MEASUREMENT_KEY));
         outfitMeasurementDetails.setLength(measurementValue.get(LENGTH_MEASUREMENT_KEY));
         return outfitMeasurementDetails;
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO,
-                                                           MeasurementScale scale,
-                                                           Boolean nonEmptyValuesOnly) {
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale, Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if(measurementValue != null) {
+        if (measurementValue != null) {
             measurementDetailsResponseList.add(
-                    addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
+                        addWaistCircum(measurementsDAO.getMeasurement(WAIST_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addHipCircum(measurementsDAO.getMeasurement(HIP_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addWaistToKnee(measurementsDAO.getMeasurement(WAIST_TO_KNEE_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
         }
@@ -84,32 +92,46 @@ public class UnderSkirtImplService implements OutfitTypeService {
                     .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
                     .collect(Collectors.toList());
         }
+
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
-        innerMeasurementDetails.setOutfitImageLink(UNDER_SKIRT_OUTFIT_IMAGE_LINK);
-        innerMeasurementDetails.setOutfitTypeHeading(UNDER_SHIRT_OUTFIT_TYPE_HEADING);
+        innerMeasurementDetails.setOutfitImageLink(LEHENGA_OUTFIT_IMAGE_LINK);
+        innerMeasurementDetails.setOutfitTypeHeading(LEHENGA_OUTFIT_TYPE_HEADING);
         overallMeasurementDetails.setInnerMeasurementDetails(Arrays.asList(innerMeasurementDetails));
         return overallMeasurementDetails;
     }
 
     @Override
     public OutfitDetails getOutfitDetails() {
-        OutfitType outfitType = OutfitType.UNDER_SKIRT;
+        OutfitType outfitType = OutfitType.LEHENGA;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
                 outfitType.getImageLink(), 1);
     }
 
-    private MeasurementDetails addWaist(String value) {
-        String imageLink = UNDER_SKIRT_WAIST_IMAGE_LINK;
-        String title = UNDER_SKIRT_WAIST_TITLE;
+    private MeasurementDetails addWaistCircum(String value) {
+        String imageLink = LEHENGA_WAIST_CIRCUM_OUTFIT_IMAGE_LINK;
+        String title = LEHENGA_WAIST_CIRCUM_OUTFIT_TYPE_HEADING;
         String index = "1";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
-    private MeasurementDetails addLength(String value) {
-        String imageLink = UNDER_SKIRT_LENGTH_IMAGE_LINK;
-        String title = UNDER_SKIRT_LENGTH_TITLE;
+    private MeasurementDetails addHipCircum(String value) {
+        String imageLink = LEHENGA_HIP_CIRCUM_IMAGE_LINK;
+        String title = LEHENGA_HIP_CIRCUM_OUTFIT_TYPE_HEADING;
         String index = "2";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
+    private MeasurementDetails addWaistToKnee(String value) {
+        String imageLink = LEHENGA_WAIST_TO_KNEE_IMAGE_LINK;
+        String title = LEHENGA_WAIST_TO_KNEE_OUTFIT_TYPE_HEADING;
+        String index = "3";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+
+    private MeasurementDetails addLength(String value) {
+        String imageLink = LEHENGA_LENGTH_IMAGE_LINK;
+        String title = LEHENGA_LENGTH_OUTFIT_TYPE_HEADING;
+        String index = "4";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
 }

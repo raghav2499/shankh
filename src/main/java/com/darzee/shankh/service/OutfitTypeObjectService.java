@@ -37,6 +37,18 @@ public class OutfitTypeObjectService {
     @Autowired
     private UnderSkirtImplService underSkirtImplService;
 
+    @Autowired
+    private NehruJacketImplService nehruJacketImplService;
+
+    @Autowired
+    private RidaImplService ridaImplService;
+
+    @Autowired
+    private WaistCoatImplSevice waistCoatImplSevice;
+
+    @Autowired
+    private LehengaImplService lehengaImplService;
+
     public OutfitTypeService getOutfitTypeObject(OutfitType outfitType) throws Exception {
         switch(outfitType) {
             case KURTA_PYJAMA:
@@ -57,6 +69,14 @@ public class OutfitTypeObjectService {
                 return pantImplService;
             case UNDER_SKIRT:
                 return underSkirtImplService;
+            case NEHRU_JACKET:
+                return nehruJacketImplService;
+            case RIDA:
+                return ridaImplService;
+            case WAIST_COAT:
+                return waistCoatImplSevice;
+            case LEHENGA:
+                return lehengaImplService;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Outfit Type not supported");
         }

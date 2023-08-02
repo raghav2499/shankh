@@ -9,10 +9,12 @@ import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.darzee.shankh.constants.ImageLinks.*;
 import static com.darzee.shankh.constants.MeasurementKeys.*;
@@ -100,7 +102,7 @@ public class EveningGownImplService implements OutfitTypeService {
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale) {
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale, Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
@@ -129,6 +131,12 @@ public class EveningGownImplService implements OutfitTypeService {
                     addFrontNeckDepth(measurementsDAO.getMeasurement(FRONT_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addBackNeckDepth(measurementsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
+        }
+        if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
+            measurementDetailsResponseList = measurementDetailsResponseList
+                    .stream()
+                    .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
+                    .collect(Collectors.toList());
         }
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);

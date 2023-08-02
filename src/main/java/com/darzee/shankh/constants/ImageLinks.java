@@ -13,12 +13,17 @@ public class ImageLinks {
     public static final String DRESS_UPPER_CHEST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress3_upperchest.svg";
     public static final String DRESS_BUST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress4_bust.svg";
     public static final String DRESS_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress5_waist.svg";
-    public static final String DRESS_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress6_seat.svg";
+    public static final String DRESS_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress6_hipcircumference.svg";
     public static final String DRESS_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress7_armhole.svg";
-    public static final String DRESS_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress8_slevlen.svg";
-    public static final String DRESS_SLEEVE_CIRCUMFERENCE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress9_slevcircum.svg";
-    public static final String DRESS_FRONT_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress10_frontneckdept.svg";
-    public static final String DRESS_BACK_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress11_backneckdept.svg";
+    public static final String DRESS_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress8_sleevelength.svg";
+    public static final String DRESS_BICEP_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress9_bicep.svg";
+    public static final String DRESS_ELBOW_ROUND_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress10_elbowround.svg";
+    public static final String DRESS_SLEEVE_CIRCUMFERENCE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress11_sleevecircumfernce.svg";
+    public static final String DRESS_FRONT_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress12_frontneckdepth.svg";
+    public static final String DRESS_BACK_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress13_backneckdepth.svg";
+    public static final String DRESS_CROSS_FRONT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress14_frontcross.svg";
+    public static final String DRESS_CROSS_BACK_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress15_backcross.svg";
+    public static final String DRESS_DART_POINT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Dress/dress16_dartpoint.svg";
     public static final String GOWN_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/NightGown/nightgown.svg";
 
     public static final String GOWN_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/NightGown/ng_length.svg";
@@ -53,15 +58,19 @@ public class ImageLinks {
     public static final String BLOUSE_BACK_NECK_DEPTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse14_backneckdepth.svg";
     public static final String BLOUSE_CROSS_FRONT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse15_crossfront.svg";
     public static final String BLOUSE_CROSS_BACK_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse16_crossback.svg";
+    public static final String BLOUSE_DART_POINT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse17_dartpoint.svg";
     public static final String SHIRT_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt.svg";
-    public static final String SHIRT_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt_length.svg";
-    public static final String SHIRT_NECK_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt_neck.svg";
-    public static final String SHIRT_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt_shoulder.svg";
-    public static final String SHIRT_CHEST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt_chest.svg";
-    public static final String SHIRT_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt_waist.svg";
-    public static final String SHIRT_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt_seat.svg";
-    public static final String SHIRT_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt_sleeve.svg";
-    public static final String SHIRT_SLEEVE_CIRCUM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt_sleevecircum.svg";
+    public static final String SHIRT_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt1_len.svg";
+    public static final String SHIRT_NECK_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt2_neck.svg";
+    public static final String SHIRT_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt3_shoulder.svg";
+    public static final String SHIRT_CHEST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt4_chest.svg";
+    public static final String SHIRT_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt5_waist.svg";
+    public static final String SHIRT_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt6_hipcircumference.svg";
+    public static final String SHIRT_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt7_sleevelength.svg";
+    public static final String SHIRT_BICEP_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt8_bicep.svg";
+    public static final String SHIRT_ELBOW_ROUND_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt9_elbowround.svg";
+    public static final String SHIRT_SLEEVE_CIRCUM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt10_sleevecircumference.svg";
+    public static final String SHIRT_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Shirt/shirt11_armhole.svg";
     public static final String PANTS_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pants.svg";
     public static final String PANTS_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pants1_waist.svg";
     public static final String PANTS_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pants2_seat.svg";
@@ -150,6 +159,11 @@ public class ImageLinks {
     public static final String RIDA_HIPS_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Rida/lenga/bhurka4_Hips.svg";
     public static final String RIDA_LENGA_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Rida/lenga/bhurka5_Length.svg";
     public static final String RIDA_LENGA_GHER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Rida/lenga/bhurka6_gher.svg";
+    public static final String LEHENGA_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Lehnga/lehanga.svg";
+    public static final String LEHENGA_WAIST_CIRCUM_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Lehnga/lehanga1_waistcircumference.svg";
+    public static final String LEHENGA_HIP_CIRCUM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Lehnga/lehanga2_hipcircumference.svg";
+    public static final String LEHENGA_WAIST_TO_KNEE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Lehnga/lehanga3_waisttoknee.svg";
+    public static final String LEHENGA_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Lehnga/lehanga4_length.svg";
 
 }
 

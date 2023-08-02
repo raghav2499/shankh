@@ -9,6 +9,7 @@ import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.darzee.shankh.constants.ImageLinks.*;
 import static com.darzee.shankh.constants.MeasurementKeys.*;
@@ -119,12 +121,15 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale) {
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO,
+                                                           MeasurementScale scale,
+                                                           Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         List<InnerMeasurementDetails> innerMeasurementDetails = new ArrayList<>();
-        innerMeasurementDetails.add(setMeasurementDetailsInObjectTop(measurementsDAO, scale));
-        innerMeasurementDetails.add(setMeasurementDetailsInObjectBottom(measurementsDAO, scale));
+        innerMeasurementDetails.add(setMeasurementDetailsInObjectTop(measurementsDAO, scale, nonEmptyValuesOnly));
+        innerMeasurementDetails.add(setMeasurementDetailsInObjectBottom(measurementsDAO, scale, nonEmptyValuesOnly));
         overallMeasurementDetails.setInnerMeasurementDetails(innerMeasurementDetails);
+
         return overallMeasurementDetails;
     }
 
@@ -135,7 +140,9 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
                 outfitType.getImageLink(), 2);
     }
 
-    private InnerMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementsDAO measurementsDAO, MeasurementScale scale) {
+    private InnerMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementsDAO measurementsDAO,
+                                                                     MeasurementScale scale,
+                                                                     Boolean nonEmptyValuesOnly) {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
@@ -164,6 +171,12 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
             measurementDetailsResponseList.add(
                     addBackNeckDepth(measurementsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
         }
+        if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
+            measurementDetailsResponseList = measurementDetailsResponseList
+                    .stream()
+                    .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
+                    .collect(Collectors.toList());
+        }
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(KURTA_OUTFIT_IMAGE_LINK);
         innerMeasurementDetails.setOutfitTypeHeading(MENS_KURTA_OUTFIT_TYPE_HEADING);
@@ -171,7 +184,8 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
     }
 
     private InnerMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementsDAO measurementsDAO,
-                                                                        MeasurementScale scale) {
+                                                                        MeasurementScale scale,
+                                                                        Boolean nonEmptyValuesOnly) {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
@@ -185,6 +199,12 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
                     addKnee(measurementsDAO.getMeasurement(KNEE_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addAnkle(measurementsDAO.getMeasurement(ANKLE_MEASUREMENT_KEY, dividingFactor)));
+        }
+        if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
+            measurementDetailsResponseList = measurementDetailsResponseList
+                    .stream()
+                    .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
+                    .collect(Collectors.toList());
         }
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);

@@ -14,7 +14,9 @@ public interface OutfitTypeService {
 
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementDAO);
 
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementDAO, MeasurementScale scale);
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementDAO,
+                                                           MeasurementScale scale,
+                                                           Boolean nonEmptyValuesOnly);
 
     public OutfitDetails getOutfitDetails();
 }

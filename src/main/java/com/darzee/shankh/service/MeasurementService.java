@@ -35,7 +35,10 @@ public class MeasurementService {
     @Autowired
     private CustomerRepo customerRepo;
 
-    public ResponseEntity getMeasurementDetails(Long customerId, Integer outfitTypeIndex, String scale)
+    public ResponseEntity getMeasurementDetails(Long customerId,
+                                                Integer outfitTypeIndex,
+                                                String scale,
+                                                Boolean nonEmptyValuesOnly)
             throws Exception {
         validateGetMeasurementRequestParams(outfitTypeIndex, scale);
 
@@ -50,7 +53,9 @@ public class MeasurementService {
                     ? mapper.measurementsToMeasurementDAO(measurements.get(), new CycleAvoidingMappingContext())
                     : new MeasurementsDAO();
             MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
-            overallMeasurementDetails = outfitTypeService.setMeasurementDetails(measurementsDAO, measurementScale);
+            overallMeasurementDetails = outfitTypeService.setMeasurementDetails(measurementsDAO,
+                    measurementScale,
+                    nonEmptyValuesOnly);
             overallMeasurementDetails.setMessage(getMeasurementDetailsMessage(mandatoryParamsSet));
             overallMeasurementDetails.setMeasurementUpdatedAt(measurementsDAO.getUpdatedAt());
             return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);

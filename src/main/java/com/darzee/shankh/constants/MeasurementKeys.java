@@ -2,6 +2,9 @@ package com.darzee.shankh.constants;
 
 public class MeasurementKeys {
     public static final String LENGTH_MEASUREMENT_KEY = "length";
+    public static final String WAIST_CIRCUM_MEASUREMENT_KEY = "waist_circum";
+    public static final String HIP_CIRCUM_MEASUREMENT_KEY = "hip_circum";
+    public static final String WAIST_TO_KNEE_MEASUREMENT_KEY = "waist_to_knee";
     public static final String WAIST_MEASUREMENT_KEY = "waist";
     public static final String BLOUSE_LENGTH_MEASUREMENT_KEY = "blouse_length";
 
@@ -18,6 +21,7 @@ public class MeasurementKeys {
     public static final String ELBOW_ROUND_MEASUREMENT_KEY = "elbow_round";
     public static final String CROSS_FRONT_MEASUREMENT_KEY = "cross_front";
     public static final String CROSS_BACK_MEASUREMENT_KEY = "cross_back";
+    public static final String DART_POINT_MEASUREMENT_KEY = "dart_point";
 
     public static final String FRONT_NECK_DEPTH_MEASUREMENT_KEY = "front_neck_depth";
 

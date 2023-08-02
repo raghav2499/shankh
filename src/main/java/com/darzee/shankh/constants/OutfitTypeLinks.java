@@ -20,5 +20,6 @@ public class OutfitTypeLinks {
     public static final String OUTFIT_TYPE_NEHRU_JACKET_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/OutfitType/OutfitType/nehrujacket.svg";
     public static final String OUTFIT_TYPE_BURKHA_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/OutfitType/OutfitType/burqa.svg";
     public static final String OUTFIT_TYPE_WAIST_COAT_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/OutfitType/OutfitType/waistcost.svg";
+    public static final String OUTFIT_TYPE_LEHENGA_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/OutfitType/OutfitType/lehenga.svg";
 
 }

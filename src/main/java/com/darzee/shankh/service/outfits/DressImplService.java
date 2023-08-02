@@ -9,10 +9,12 @@ import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.darzee.shankh.constants.ImageLinks.*;
 import static com.darzee.shankh.constants.MeasurementKeys.*;
@@ -62,6 +64,12 @@ public class DressImplService implements OutfitTypeService {
         if (measurementDetails.getSleeveLength() != null) {
             measurementValue.put(SLEEVE_LENGTH_MEASUREMENT_KEY, measurementDetails.getSleeveLength() * multiplyingFactor);
         }
+        if (measurementDetails.getBicep() != null) {
+            measurementValue.put(BICEP_MEASUREMENT_KEY, measurementDetails.getBicep() * multiplyingFactor);
+        }
+        if (measurementDetails.getElbowRound() != null) {
+            measurementValue.put(ELBOW_ROUND_MEASUREMENT_KEY, measurementDetails.getElbowRound() * multiplyingFactor);
+        }
         if (measurementDetails.getSleeveCircumference() != null) {
             measurementValue.put(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY,
                     measurementDetails.getSleeveCircumference() * multiplyingFactor);
@@ -73,6 +81,18 @@ public class DressImplService implements OutfitTypeService {
         if (measurementDetails.getBackNeckDepth() != null) {
             measurementValue.put(BACK_NECK_DEPTH_MEASUREMENT_KEY,
                     measurementDetails.getBackNeckDepth() * multiplyingFactor);
+        }
+        if (measurementDetails.getCrossFront() != null) {
+            measurementValue.put(CROSS_FRONT_MEASUREMENT_KEY,
+                    measurementDetails.getCrossFront() * multiplyingFactor);
+        }
+        if (measurementDetails.getCrossBack() != null) {
+            measurementValue.put(CROSS_BACK_MEASUREMENT_KEY,
+                    measurementDetails.getCrossBack() * multiplyingFactor);
+        }
+        if (measurementDetails.getDartPoint() != null) {
+            measurementValue.put(DART_POINT_MEASUREMENT_KEY,
+                    measurementDetails.getDartPoint() * multiplyingFactor);
         }
         measurementsDAO.setMeasurementValue(measurementValue);
     }
@@ -93,14 +113,19 @@ public class DressImplService implements OutfitTypeService {
         outfitMeasurementDetails.setSeat(measurementValue.get(SEAT_MEASUREMENT_KEY));
         outfitMeasurementDetails.setArmHole(measurementValue.get(ARM_HOLE_MEASUREMENT_KEY));
         outfitMeasurementDetails.setSleeveLength(measurementValue.get(SLEEVE_LENGTH_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setBicep(measurementValue.get(BICEP_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setElbowRound(measurementValue.get(ELBOW_ROUND_MEASUREMENT_KEY));
         outfitMeasurementDetails.setSleeveCircumference(measurementValue.get(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY));
         outfitMeasurementDetails.setFrontNeckDepth(measurementValue.get(FRONT_NECK_DEPTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setBackNeckDepth(measurementValue.get(BACK_NECK_DEPTH_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setCrossFront(measurementValue.get(CROSS_FRONT_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setCrossBack(measurementValue.get(CROSS_BACK_MEASUREMENT_KEY));
+        outfitMeasurementDetails.setDartPoint(measurementValue.get(DART_POINT_MEASUREMENT_KEY));
         return outfitMeasurementDetails;
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale) {
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale, Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
@@ -124,11 +149,28 @@ public class DressImplService implements OutfitTypeService {
             measurementDetailsResponseList.add(
                     addSleeveLength(measurementsDAO.getMeasurement(SLEEVE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
+                    addBicep(measurementsDAO.getMeasurement(BICEP_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addElbowRound(measurementsDAO.getMeasurement(ELBOW_ROUND_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
                     addSleeveCircum(measurementsDAO.getMeasurement(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addFrontNeckDepth(measurementsDAO.getMeasurement(FRONT_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addBackNeckDepth(measurementsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addCrossFront(measurementsDAO.getMeasurement(CROSS_FRONT_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addCrossBack(measurementsDAO.getMeasurement(CROSS_BACK_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addDartPoint(measurementsDAO.getMeasurement(DART_POINT_MEASUREMENT_KEY, dividingFactor)));
+        }
+
+        if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
+            measurementDetailsResponseList = measurementDetailsResponseList
+                    .stream()
+                    .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
+                    .collect(Collectors.toList());
         }
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
@@ -202,24 +244,60 @@ public class DressImplService implements OutfitTypeService {
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
+    private MeasurementDetails addBicep(String value) {
+        String imageLink = DRESS_BICEP_IMAGE_LINK;
+        String title = DRESS_BICEP_TITLE;
+        String index = "9";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+
+
+    private MeasurementDetails addElbowRound(String value) {
+        String imageLink = DRESS_ELBOW_ROUND_IMAGE_LINK;
+        String title = DRESS_ELBOW_ROUND_TITLE;
+        String index = "10";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+
     private MeasurementDetails addSleeveCircum(String value) {
         String imageLink = DRESS_SLEEVE_CIRCUMFERENCE_IMAGE_LINK;
         String title = DRESS_SLEEVE_CIRCUM_TITLE;
-        String index = "9";
+        String index = "11";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addFrontNeckDepth(String value) {
         String imageLink = DRESS_FRONT_NECK_DEPTH_IMAGE_LINK;
         String title = DRESS_FRONT_NECK_DEPTH_TITLE;
-        String index = "10";
+        String index = "12";
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
     private MeasurementDetails addBackNeckDepth(String value) {
         String imageLink = DRESS_BACK_NECK_DEPTH_IMAGE_LINK;
         String title = DRESS_BACK_NECK_DEPTH_TITLE;
-        String index = "11";
+        String index = "13";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
+    private MeasurementDetails addCrossFront(String value) {
+        String imageLink = DRESS_CROSS_FRONT_IMAGE_LINK;
+        String title = DRESS_CROSS_FRONT_TITLE;
+        String index = "14";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+    private MeasurementDetails addCrossBack(String value) {
+        String imageLink = DRESS_CROSS_BACK_IMAGE_LINK;
+        String title = DRESS_CROSS_BACK_TITLE;
+        String index = "15";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+    private MeasurementDetails addDartPoint(String value) {
+        String imageLink = DRESS_DART_POINT_IMAGE_LINK;
+        String title = DRESS_DART_POINT_TITLE;
+        String index = "16";
+        return new MeasurementDetails(imageLink, title, value, index);
+    }
+
+
 }

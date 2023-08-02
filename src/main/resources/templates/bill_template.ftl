@@ -74,7 +74,7 @@
 <body>
     <div class="shop-icon"></div>
 
-    <h2 class="bill-heading">BILL</h2>
+    <h2 class="bill-heading">${businessName}</h2>
 
     <div class="bill-info-container">
       <div class="bill-info-left">

@@ -10,10 +10,15 @@ public class MeasurementTitles {
     public static final String DRESS_SEAT_TITLE = "Seat";
     public static final String DRESS_ARMHOLE_TITLE = "Arm Hole";
     public static final String DRESS_SLEEVE_LENGTH_TITLE = "Sleeve Length";
+    public static final String DRESS_BICEP_TITLE = "Bicep";
+    public static final String DRESS_ELBOW_ROUND_TITLE = "Elbow Round";
     public static final String DRESS_SLEEVE_CIRCUM_TITLE = "Sleeve Circum";
 
     public static final String DRESS_FRONT_NECK_DEPTH_TITLE = "Front Neck Depth";
     public static final String DRESS_BACK_NECK_DEPTH_TITLE = "Back Neck Depth";
+    public static final String DRESS_CROSS_FRONT_TITLE = "Front Cross";
+    public static final String DRESS_CROSS_BACK_TITLE = "Back Cross";
+    public static final String DRESS_DART_POINT_TITLE = "Dart Point";
 
     public static final String GOWN_LENGTH_TITLE = "Gown Length";
 
@@ -42,20 +47,27 @@ public class MeasurementTitles {
     public static final String BLOUSE_SLEEVE_CIRCUM_TITLE = "Sleeve Circum";
     public static final String BLOUSE_BICEP_TITLE = "Bicep";
     public static final String BLOUSE_ELBOW_ROUND_TITLE = "Elbow Round";
-    public static final String BLOUSE_FRONT_NECK_DEPTH_TITLE = "Front Neck Depth";
-    public static final String BLOUSE_SHOULDER_TO_APEX_TITLE = "Shoulder to Apex";
+
     public static final String BLOUSE_APEX_TO_APEX_TITLE = "Apex to Apex";
+
+    public static final String BLOUSE_SHOULDER_TO_APEX_TITLE = "Shoulder to Apex";
+
+    public static final String BLOUSE_FRONT_NECK_DEPTH_TITLE = "Front Neck Depth";
     public static final String BLOUSE_BACK_NECK_DEPTH_TITLE = "Back Neck Depth";
     public static final String BLOUSE_CROSS_FRONT_TITLE = "Cross Front";
     public static final String BLOUSE_CROSS_BACK_TITLE = "Cross Back";
+    public static final String BLOUSE_DART_POINT_TITLE = "Dart Point";
     public static final String SHIRT_LENGTH_TITLE = "Length";
     public static final String SHIRT_NECK_TITLE = "Neck";
     public static final String SHIRT_SHOULDER_TITLE = "Shoulder";
     public static final String SHIRT_CHEST_TITLE = "Chest";
     public static final String SHIRT_WAIST_TITLE = "Waist";
     public static final String SHIRT_SEAT_TITLE = "Seat";
-    public static final String SHIRT_SLEEVE_LENGTH_TITLE = "Sleeve";
-    public static final String SHIRT_SLEEVE_CIRCUM_TITLE = "Sleeve Circum";
+    public static final String SHIRT_SLEEVE_LENGTH_TITLE = "Sleeve Length";
+    public static final String SHIRT_BICEP_TITLE = "Bicep";
+    public static final String SHIRT_ELBOW_ROUND_TITLE = "Elbow Round";
+    public static final String SHIRT_SLEEVE_CIRCUM_TITLE = "Sleeve Circumference";
+    public static final String SHIRT_ARMHOLE_TITLE = "Arm Hole";
 
     public static final String PANTS_WAIST_TITLE = "Waist";
 
@@ -102,7 +114,7 @@ public class MeasurementTitles {
     public static final String MENS_SUIT_BOTTOM_TITLE = "Bottom/Bells";
     public static final String MENS_SUIT_LOWER_LENGTH_TITLE = "Length";
     public static final String MENS_SUIT_FLY_TITLE = "Fly(Ply)";
-    public static final String LADIES_SUIT_KAMEEZ_LENGTH_TITLE = "Kameez Length";
+    public static final String LADIES_SUIT_KAMEEZ_LENGTH_TITLE = "Length";
     public static final String LADIES_SUIT_SHOULDER_TITLE = "Shoulder";
     public static final String LADIES_SUIT_UPPER_CHEST_TITLE = "Upper Chest";
     public static final String LADIES_SUIT_BUST_TITLE = "Bust";
@@ -144,6 +156,8 @@ public class MeasurementTitles {
     public static final String RIDA_LENGA_GHER_TITLE = "Gher";
 
     public static final String DRESS_OUTFIT_TYPE_HEADING = "Dress";
+
+    public static final String LEHENGA_OUTFIT_TYPE_HEADING = "Lehenga";
     public static final String PANTS_OUTFIT_TYPE_HEADING = "Pants";
     public static final String SHIRT_OUTFIT_TYPE_HEADING = "Shirt";
     public static final String NIGHT_GOWN_OUTFIT_TYPE_HEADING = "Night Gown";
@@ -159,6 +173,10 @@ public class MeasurementTitles {
     public static final String WAIST_COAT_OUTFIT_TYPE_HEADING = "Waist Coat";
     public static final String RIDA_PARDI_OUTFIT_TYPE_HEADING = "Pardi";
     public static final String RIDA_LENGA_OUTFIT_TYPE_HEADING = "Lenga";
+    public static final String LEHENGA_WAIST_CIRCUM_OUTFIT_TYPE_HEADING = "Waist Circum";
+    public static final String LEHENGA_HIP_CIRCUM_OUTFIT_TYPE_HEADING = "Hip Circum";
+    public static final String LEHENGA_WAIST_TO_KNEE_OUTFIT_TYPE_HEADING = "Waist to Knee";
+    public static final String LEHENGA_LENGTH_OUTFIT_TYPE_HEADING = "Length";
 
 
 }

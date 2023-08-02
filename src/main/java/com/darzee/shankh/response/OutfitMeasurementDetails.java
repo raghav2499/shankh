@@ -56,7 +56,11 @@ public class OutfitMeasurementDetails {
     private Double elbowRound;
     private Double crossFront;
     private Double crossBack;
+    private Double dartPoint;
     private Double inSeam;
     private Double crotch;
     private Double thigh;
+    private Double waistCircum;
+    private Double hipCircum;
+    private Double waistToKnee;
 }
