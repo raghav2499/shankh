@@ -3,14 +3,12 @@ package com.darzee.shankh.response;
 import com.darzee.shankh.dao.CustomerDAO;
 import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.dao.OrderDAO;
-import com.darzee.shankh.service.OutfitImageLinkService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,9 +19,6 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderDetailResponse {
-
-    @Autowired
-    private OutfitImageLinkService outfitImageLinkService;
 
     private Long orderId;
     private String orderStatus;
@@ -50,7 +45,7 @@ public class OrderDetailResponse {
 
 
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, String customerProfilePicLnk,
-                               OrderAmountDAO orderAmountDAO) {
+                               OrderAmountDAO orderAmountDAO, String outfitTypeImageLink) {
         this.customerDetails = new CustomerDetails(customer, customerProfilePicLnk);
         this.orderAmountDetails = new OrderAmountDetails(orderAmountDAO);
         this.orderId = order.getId();
@@ -60,18 +55,19 @@ public class OrderDetailResponse {
         this.trialDate = (order.getTrialDate() != null ? order.getTrialDate().toString() : null);
         this.deliveryDate = order.getDeliveryDate().toString();
         this.outfitTypeIndex = order.getOutfitType().getOrdinal();
-        this.outfitTypeImageLink = outfitImageLinkService.getOutfitImageLink(order.getOutfitType());
+        this.outfitTypeImageLink = outfitTypeImageLink;
     }
 
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, OutfitMeasurementDetails outfitMeasurementDetails,
-                               OrderAmountDAO orderAmountDAO, List<String> clothImageRefIds, List<String> clothImagesLink, String message) {
+                               OrderAmountDAO orderAmountDAO, List<String> clothImageRefIds,
+                               List<String> clothImagesLink, String outfitImageLink, String message) {
         this.orderId = order.getId();
         this.orderStatus = order.getOrderStatus().getDisplayString();
         this.isPriorityOrder = Optional.ofNullable(order.getIsPriorityOrder()).orElse(Boolean.FALSE);
         this.outfitType = order.getOutfitType().getDisplayString();
         this.outfitTypeName = order.getOutfitType().getName();
         this.outfitTypeIndex = order.getOutfitType().getOrdinal();
-        this.outfitTypeImageLink = outfitImageLinkService.getOutfitImageLink(order.getOutfitType());
+        this.outfitTypeImageLink = outfitImageLink;
         this.trialDate = (order.getTrialDate() != null ? order.getTrialDate().toString() : null);
         this.deliveryDate = order.getDeliveryDate().toString();
         this.type = order.getOrderType().getDisplayName();

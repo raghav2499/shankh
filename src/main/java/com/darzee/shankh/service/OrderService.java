@@ -71,6 +71,9 @@ public class OrderService {
     private OrderStateMachineService orderStateMachineService;
 
     @Autowired
+    private OutfitImageLinkService outfitImageLinkService;
+
+    @Autowired
     private ObjectImagesService objectImagesService;
 
     @Autowired
@@ -153,9 +156,10 @@ public class OrderService {
             OutfitMeasurementDetails measurementDetails = outfitTypeService.extractMeasurementDetails(measurementsDAO);
             List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
             List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
+            String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
             String message = "Details fetched succesfully";
             OrderDetailResponse response = new OrderDetailResponse(customer, order, measurementDetails, orderAmount,
-                    clothImagesReferenceIds, clothImageUrlLinks, message);
+                    clothImagesReferenceIds, clothImageUrlLinks, outfitImageLink, message);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
@@ -404,7 +408,12 @@ public class OrderService {
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
-        return new OrderDetailResponse(orderDAO.getCustomer(), orderDAO, customerProfilePicLink, orderDAO.getOrderAmount());
+        String outfitImageLink = outfitImageLinkService.getOutfitImageLink(orderDAO.getOutfitType());
+        return new OrderDetailResponse(orderDAO.getCustomer(),
+                orderDAO,
+                customerProfilePicLink,
+                orderDAO.getOrderAmount(),
+                outfitImageLink);
     }
 
     private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
