@@ -3,12 +3,14 @@ package com.darzee.shankh.response;
 import com.darzee.shankh.dao.CustomerDAO;
 import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.dao.OrderDAO;
+import com.darzee.shankh.service.OutfitImageLinkService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,10 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderDetailResponse {
+
+    @Autowired
+    private OutfitImageLinkService outfitImageLinkService;
+
     private Long orderId;
     private String orderStatus;
     private Boolean isPriorityOrder;
@@ -54,7 +60,7 @@ public class OrderDetailResponse {
         this.trialDate = (order.getTrialDate() != null ? order.getTrialDate().toString() : null);
         this.deliveryDate = order.getDeliveryDate().toString();
         this.outfitTypeIndex = order.getOutfitType().getOrdinal();
-        this.outfitTypeImageLink = order.getOutfitType().getImageLink();
+        this.outfitTypeImageLink = outfitImageLinkService.getOutfitImageLink(order.getOutfitType());
     }
 
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, OutfitMeasurementDetails outfitMeasurementDetails,
@@ -65,7 +71,7 @@ public class OrderDetailResponse {
         this.outfitType = order.getOutfitType().getDisplayString();
         this.outfitTypeName = order.getOutfitType().getName();
         this.outfitTypeIndex = order.getOutfitType().getOrdinal();
-        this.outfitTypeImageLink = order.getOutfitType().getImageLink();
+        this.outfitTypeImageLink = outfitImageLinkService.getOutfitImageLink(order.getOutfitType());
         this.trialDate = (order.getTrialDate() != null ? order.getTrialDate().toString() : null);
         this.deliveryDate = order.getDeliveryDate().toString();
         this.type = order.getOrderType().getDisplayName();

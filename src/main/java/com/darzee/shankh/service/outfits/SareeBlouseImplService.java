@@ -7,6 +7,7 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.OutfitImageLinkService;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,9 @@ public class SareeBlouseImplService implements OutfitTypeService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private OutfitImageLinkService outfitImageLinkService;
 
     @Override
     public void setMeasurementDetailsInObject(MeasurementRequest measurementDetails,
@@ -163,7 +167,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
             measurementDetailsResponseList.add(
                     addApexToApexLength(measurementsDAO.getMeasurement(APEX_TO_APEX_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addShoulderToApexLength(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
+                    addShoulderToApexLength(measurementsDAO.getMeasurement(SHOULDER_TO_APEX_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addFrontNeckDepth(measurementsDAO.getMeasurement(FRONT_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
@@ -192,7 +196,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.SAREE_BLOUSE;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitType.getImageLink(), 1);
+                outfitImageLinkService.getOutfitImageLink(outfitType), 1);
     }
 
     private MeasurementDetails addBlouseLength(String value) {

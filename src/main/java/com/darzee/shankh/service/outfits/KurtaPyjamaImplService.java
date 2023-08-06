@@ -7,6 +7,7 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.OutfitImageLinkService;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,9 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private OutfitImageLinkService outfitImageLinkService;
 
     @Override
     public void setMeasurementDetailsInObject(MeasurementRequest measurementDetails,
@@ -137,7 +141,7 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.KURTA_PYJAMA;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitType.getImageLink(), 2);
+                outfitImageLinkService.getOutfitImageLink(outfitType), 2);
     }
 
     private InnerMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementsDAO measurementsDAO,

@@ -29,11 +29,16 @@ public class CustomerDetails {
 
     private Double revenue;
 
-    public CustomerDetails(String customerName, String phoneNumber, String profilePicLink, Long customerId) {
+    public CustomerDetails(String customerName,
+                           String phoneNumber,
+                           String profilePicLink,
+                           Long customerId,
+                           String gender) {
         this.customerName = customerName;
         this.phoneNumber = phoneNumber;
         this.profilePicLink = profilePicLink;
         this.customerId = customerId;
+        this.gender = gender;
     }
 
     public CustomerDetails(CustomerDAO customerDAO, String customerProfilePicLink) {

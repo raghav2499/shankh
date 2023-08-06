@@ -7,6 +7,7 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.OutfitImageLinkService;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,9 @@ public class ShirtImplService implements OutfitTypeService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private OutfitImageLinkService outfitImageLinkService;
 
     @Override
     public void setMeasurementDetailsInObject(MeasurementRequest measurementDetails,
@@ -62,17 +66,17 @@ public class ShirtImplService implements OutfitTypeService {
             measurementValue.put(SLEEVE_LENGTH_MEASUREMENT_KEY, measurementDetails.getSleeveLength() * multiplyingFactor);
         }
         if (measurementDetails.getBicep() != null) {
-            measurementValue.put(BICEP_MEASUREMENT_KEY, measurementDetails.getSleeveLength() * multiplyingFactor);
+            measurementValue.put(BICEP_MEASUREMENT_KEY, measurementDetails.getBicep() * multiplyingFactor);
         }
         if (measurementDetails.getElbowRound() != null) {
-            measurementValue.put(ELBOW_ROUND_MEASUREMENT_KEY, measurementDetails.getSleeveLength() * multiplyingFactor);
+            measurementValue.put(ELBOW_ROUND_MEASUREMENT_KEY, measurementDetails.getElbowRound() * multiplyingFactor);
         }
         if (measurementDetails.getSleeveCircumference() != null) {
             measurementValue.put(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY,
                     measurementDetails.getSleeveCircumference() * multiplyingFactor);
         }
         if (measurementDetails.getArmHole() != null) {
-            measurementValue.put(ARM_HOLE_MEASUREMENT_KEY, measurementDetails.getSleeveLength() * multiplyingFactor);
+            measurementValue.put(ARM_HOLE_MEASUREMENT_KEY, measurementDetails.getArmHole() * multiplyingFactor);
         }
         measurementsDAO.setMeasurementValue(measurementValue);
     }
@@ -151,7 +155,7 @@ public class ShirtImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.SHIRT;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitType.getImageLink(), 1);
+                outfitImageLinkService.getOutfitImageLink(outfitType), 1);
     }
 
     private MeasurementDetails addShirtLength(String value) {

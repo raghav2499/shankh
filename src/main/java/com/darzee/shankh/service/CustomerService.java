@@ -109,8 +109,9 @@ public class CustomerService {
             if (existingCustomer.isPresent()) {
                 CustomerDAO customerDAO = mapper.customerObjectToDao(existingCustomer.get(), new CycleAvoidingMappingContext());
                 String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+                String gender = customerDAO.getGender() != null ? customerDAO.getGender().getString() : null;
                 response = new CreateCustomerResponse(customerName, customerDAO.getPhoneNumber(), "",
-                        customerDAO.getId(), "Customer already registered");
+                        customerDAO.getId(), gender, "Customer already registered");
                 return new ResponseEntity(response, HttpStatus.OK);
             }
 
@@ -133,8 +134,9 @@ public class CustomerService {
                     new CycleAvoidingMappingContext());
 
             String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+            String gender = customerDAO.getGender() != null ? customerDAO.getGender().getString() : null;
             response = new CreateCustomerResponse(customerName, customerDAO.getPhoneNumber(), "",
-                    customerDAO.getId(), "Customer created successfully");
+                    customerDAO.getId(), gender, "Customer created successfully");
             return new ResponseEntity(response, HttpStatus.CREATED);
         }
         response.setMessage("This boutique is not enrolled with us");
@@ -183,8 +185,9 @@ public class CustomerService {
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
             String customerName = CommonUtils.constructName(customer.getFirstName(), customer.getLastName());
+            String gender = customer.getGender() != null ? customer.getGender().getString() : null;
             CreateCustomerResponse response = new CreateCustomerResponse(customerName, customer.getPhoneNumber(),
-                    getCustomerProfilePicLink(customerId), customer.getId(),
+                    getCustomerProfilePicLink(customerId), customer.getId(), gender,
                     "Customer updated successfully");
             return new ResponseEntity(response, HttpStatus.OK);
         }

@@ -8,64 +8,50 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.darzee.shankh.constants.OutfitTypeLinks.*;
-
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum OutfitType {
 
     @JsonProperty("kurta_pyjama")
-    KURTA_PYJAMA("kurta_pyjama", 1, "Kurta Pajama",
-            OUTFIT_TYPE_KURTA_PYJAMA_LINK, Arrays.asList(Gender.MALE)),
+    KURTA_PYJAMA("kurta_pyjama", 1, "Kurta Pajama", Arrays.asList(Gender.MALE)),
     @JsonProperty("dress")
-    DRESS("dress", 2, "Dress", OUTFIT_TYPE_DRESS_LINK, Arrays.asList(Gender.FEMALE)),
+    DRESS("dress", 2, "Dress", Arrays.asList(Gender.FEMALE)),
     @JsonProperty("saree_blouse")
-    SAREE_BLOUSE("saree_blouse", 3, "Saree Blouse",
-            OUTFIT_TYPE_SAREE_BLOUSE_LINK, Arrays.asList(Gender.FEMALE)),
+    SAREE_BLOUSE("saree_blouse", 3, "Saree Blouse", Arrays.asList(Gender.FEMALE)),
     @JsonProperty("mens_suit")
-    MENS_SUIT("mens_suit", 4, "Men's Suit",
-            OUTFIT_TYPE_MENS_SUIT_LINK, Arrays.asList(Gender.MALE)),
+    MENS_SUIT("mens_suit", 4, "Men's Suit", Arrays.asList(Gender.MALE)),
     @JsonProperty("pants")
-    PANTS("pants", 5, "Pants", OUTFIT_TYPE_PANT_LINK, Arrays.asList(Gender.MALE)),
+    PANTS("pants", 5, "Pants", Arrays.asList(Gender.MALE)),
     @JsonProperty("night_gown")
-    EVENING_GOWN("night_gown", 6, "Night Gown",
-            OUTFIT_TYPE_NIGHT_GOWN_LINK, Arrays.asList(Gender.FEMALE)),
+    EVENING_GOWN("night_gown", 6, "Night Gown", Arrays.asList(Gender.FEMALE)),
     @JsonProperty("ladies_suit")
-    LADIES_SUIT("ladies_suit", 7, "Ladies Suit",
-            OUTFIT_TYPE_LADIES_SUIT_LINK, Arrays.asList(Gender.FEMALE)),
+    LADIES_SUIT("ladies_suit", 7, "Ladies Suit", Arrays.asList(Gender.FEMALE)),
     @JsonProperty("shirt")
-    SHIRT("shirt", 8, "Shirt", OUTFIT_TYPE_SHIRT_LINK, Arrays.asList(Gender.MALE)),
+    SHIRT("shirt", 8, "Shirt", Arrays.asList(Gender.MALE)),
     @JsonProperty("under_skirt")
-    UNDER_SKIRT("under_skirt", 9, "Under Skirt",
-            OUTFIT_TYPE_UNDER_SKIRT_LINK, Arrays.asList(Gender.FEMALE)),
+    UNDER_SKIRT("under_skirt", 9, "Under Skirt", Arrays.asList(Gender.FEMALE)),
 
     @JsonProperty("nehru_jacket")
-    NEHRU_JACKET("nehru_jacket", 10, "Nehru Jacket",
-            OUTFIT_TYPE_NEHRU_JACKET_LINK, Arrays.asList(Gender.MALE)),
+    NEHRU_JACKET("nehru_jacket", 10, "Nehru Jacket", Arrays.asList(Gender.MALE)),
 
     @JsonProperty("rida")
-    RIDA("rida", 11, "Rida",
-            OUTFIT_TYPE_BURKHA_LINK, Arrays.asList(Gender.FEMALE)),
+    RIDA("rida", 11, "Rida", Arrays.asList(Gender.FEMALE)),
 
     @JsonProperty("waist_coat")
-    WAIST_COAT("waist_coat", 12, "Waist Coat",
-            OUTFIT_TYPE_WAIST_COAT_LINK, Arrays.asList(Gender.MALE)),
+    WAIST_COAT("waist_coat", 12, "Waist Coat", Arrays.asList(Gender.MALE)),
 
     @JsonProperty("lehenga")
-    LEHENGA("lehenga", 13, "Lehenga", OUTFIT_TYPE_LEHENGA_LINK, Arrays.asList(Gender.FEMALE));
+    LEHENGA("lehenga", 13, "Lehenga", Arrays.asList(Gender.FEMALE));
     private String name;
     private Integer ordinal;
 
     private String displayString;
 
-    private String imageLink;
-
     private List<Gender> gender;
 
-    OutfitType(String name, Integer ordinal, String displayString, String imageLink, List<Gender> genderList) {
+    OutfitType(String name, Integer ordinal, String displayString, List<Gender> genderList) {
         this.name = name;
         this.ordinal = ordinal;
         this.displayString = displayString;
-        this.imageLink = imageLink;
         this.gender = genderList;
     }
 
@@ -79,10 +65,6 @@ public enum OutfitType {
 
     public String getDisplayString() {
         return this.displayString;
-    }
-
-    public String getImageLink() {
-        return this.imageLink;
     }
 
     public List<Gender> getGenderList() {
