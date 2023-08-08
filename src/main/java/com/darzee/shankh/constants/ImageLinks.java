@@ -48,7 +48,7 @@ public class ImageLinks {
     public static final String BLOUSE_BELOW_BUST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse4_belowbust.svg";
     public static final String BLOUSE_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse5_shoulder.svg";
     public static final String BLOUSE_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse6_armhole.svg";
-    public static final String BLOUSE_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse7_sleevelength.svg.svg";
+    public static final String BLOUSE_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse7_sleevelength.svg";
     public static final String BLOUSE_SLEEVE_CICUM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse8_slevcircumeference.svg";
     public static final String BLOUSE_BICEP_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse9_bicep.svg";
     public static final String BLOUSE_ELBOW_ROUND_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse10_elbowround.svg";
