@@ -36,7 +36,7 @@ public class MeasurementKeys {
     public static final String CHEST_MEASUREMENT_KEY = "chest";
     public static final String BOTTOM_WAIST_MEASUREMENT_KEY = "bottom_waist";
     public static final String BOTTOM_SEAT_MEASUREMENT_KEY = "bottom_seat";
-    public static final String THIGH_MEASUREMENT_KEY = "bottom_seat";
+    public static final String THIGH_MEASUREMENT_KEY = "thigh";
     public static final String CALF_MEASUREMENT_KEY = "calf";
 
     public static final String BOTTOM_MEASUREMENT_KEY = "bottom";

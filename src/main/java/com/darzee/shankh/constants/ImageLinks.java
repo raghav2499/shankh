@@ -48,7 +48,7 @@ public class ImageLinks {
     public static final String BLOUSE_BELOW_BUST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse4_belowbust.svg";
     public static final String BLOUSE_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse5_shoulder.svg";
     public static final String BLOUSE_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse6_armhole.svg";
-    public static final String BLOUSE_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse7_slevelen.svg";
+    public static final String BLOUSE_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse7_sleevelength.svg.svg";
     public static final String BLOUSE_SLEEVE_CICUM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse8_slevcircumeference.svg";
     public static final String BLOUSE_BICEP_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse9_bicep.svg";
     public static final String BLOUSE_ELBOW_ROUND_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Blouse/blouse10_elbowround.svg";
@@ -77,7 +77,7 @@ public class ImageLinks {
     public static final String PANTS_THIGH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pants3_thie.svg";
     public static final String PANTS_CALF_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pants4_calf.svg";
     public static final String PANTS_BOTTOM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pants5_bottom.svg";
-    public static final String PANTS_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pant6_len.svg";
+    public static final String PANTS_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pants6_len.svg";
     public static final String PANTS_FLY_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pants7_fly.svg";
     public static final String PANTS_IN_SEAM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pants8_Inseam.svg";
     public static final String PANTS_CROTCH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Pants/pants9_Crotch.svg";
@@ -146,7 +146,7 @@ public class ImageLinks {
     public static final String WAIST_COAT_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/WaistCoat/Waistcoat3_waist.svg";
     public static final String PARDI_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Rida/pardi/bhurkaupper.svg";
     public static final String RIDA_ABOVE_HEAD_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Rida/pardi/bhurkaupper_above_head.svg";
-    public static final String RIDA_PARDI_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Rida/pardi/bhurkaupper_shoulder.svg";
+    public static final String RIDA_PARDI_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Rida/pardi/bhurkaupper_shouder.svg";
     public static final String RIDA_AROUND_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Rida/pardi/bhurkaupper_around_shoulder.svg";
     public static final String RIDA_PARDI_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Rida/pardi/bhurkaupper_length.svg";
     public static final String RIDA_PARDI_GHER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Rida/pardi/bhurkaupper_gher.svg";
