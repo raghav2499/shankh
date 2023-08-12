@@ -297,7 +297,11 @@ public class OrderService {
             String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
             OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
             BoutiqueDAO boutique = orderDAO.getBoutique();
-            File bill = billGenerator.generateBill(customerName, customerDAO.getPhoneNumber(), orderDAO, orderAmountDAO, boutique);
+            File bill = billGenerator.generateBill(customerName,
+                    customerDAO.getPhoneNumber(),
+                    orderDAO,
+                    orderAmountDAO,
+                    boutique);
             String fileUploadUrl = bucketService.uploadInvoice(bill, orderId);
             bill.delete();
             return fileUploadUrl;
