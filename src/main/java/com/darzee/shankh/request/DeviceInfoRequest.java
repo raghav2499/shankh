@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DeviceInfoRequest {
 
-    @NotNull(message = "boutique_id is mandatory to save device info")
-    public Long boutiqueId;
+    @NotNull(message = "tailor_id is mandatory to save device info")
+    public Long tailorId;
     public String deviceToken;
     public String appVersion;
 }
