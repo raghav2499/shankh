@@ -281,6 +281,7 @@ public class OrderService {
             PaymentMode paymentMode = PaymentMode.getPaymentTypeEnumOrdinalMap().get(request.getPaymentMode());
             paymentService.recordPayment(amountRecieved, paymentMode, Boolean.FALSE, orderDAO);
 
+            generateInvoice(orderDAO.getId());
             RecievePaymentResponse response = new RecievePaymentResponse(message,
                     orderId,
                     pendingAmountLeft);
