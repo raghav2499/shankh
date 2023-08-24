@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface DeviceInfoRepo extends JpaRepository<DeviceInfo, Long> {
 
-    Optional<DeviceInfo> findByBoutiqueId(Long boutiqueId);
+    Optional<DeviceInfo> findByTailorId(Long tailorId);
 }

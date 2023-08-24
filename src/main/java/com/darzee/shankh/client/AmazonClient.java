@@ -75,5 +75,16 @@ public class AmazonClient {
         return shortLivedUrl;
     }
 
+    private String generatePresignedUrlForPortfolioCover(String bucketName, Long tailorId, String fileName) {
+        String path = tailorId + "/cover/";
+        return path;
+    }
+
+    private String generatePresignedUrlForPortfolioOutfit(String bucketName, String tailorId, String outfit,
+                                                        String fileName) {
+        String path = tailorId + "/outfit/" + outfit + "/" + fileName;
+        return path;
+    }
+
 
 }
