@@ -1,7 +1,6 @@
 package com.darzee.shankh.entity;
 
 import com.darzee.shankh.enums.OutfitType;
-import com.darzee.shankh.enums.SubOutfitType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,7 +25,7 @@ public class PortfolioOutfits extends GenericEntity {
     private OutfitType outfitType;
 
     @Column(name = "sub_outfit_type")
-    private SubOutfitType subOutfitType;
+    private Integer subOutfitType;
 
     @ManyToOne
     @JoinColumn(name = "portfolio_id")
