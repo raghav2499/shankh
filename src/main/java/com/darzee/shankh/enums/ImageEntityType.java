@@ -15,7 +15,13 @@ public enum ImageEntityType {
     CUSTOMER("customer"),
 
     @JsonProperty("tailor")
-    TAILOR("tailor");
+    TAILOR("tailor"),
+
+    @JsonProperty("portfolio_cover")
+    PORTFOLIO_COVER("portfolio_cover"),
+
+    @JsonProperty("portfolio_outfit")
+    PORTFOLIO_OUTFIT("portfolio_outfit");
 
     private String entityType;
 

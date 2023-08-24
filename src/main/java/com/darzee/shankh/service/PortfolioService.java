@@ -88,7 +88,7 @@ public class PortfolioService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Portfolio ID");
         }
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
-        Port
+
     }
 
     public void getPortfolioOutfitImage(Long portfolioId, Integer fileType, String fileName) {

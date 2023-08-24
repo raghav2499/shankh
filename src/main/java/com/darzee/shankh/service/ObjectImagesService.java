@@ -81,6 +81,18 @@ public class ObjectImagesService {
         return null;
     }
 
+    @Nullable
+    public String getProfileCoverReference(Long portfolioId) {
+        Optional<ObjectImages> profileCoverImage = repo.findByEntityIdAndEntityTypeAndIsValid(portfolioId,
+                ImageEntityType.PORTFOLIO_COVER.getEntityType(),
+                Boolean.TRUE);
+        if(profileCoverImage.isPresent()) {
+            ObjectImagesDAO objectImagesDAO = mapper.objectImagesToObjectImagesDAO(profileCoverImage.get());
+            return objectImagesDAO.getReferenceId();
+        }
+        return null;
+    }
+
     public void invalidateExistingReferenceIds(String entityType, Long entityId) {
         List<ObjectImages> validImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(entityId,
                 entityType,

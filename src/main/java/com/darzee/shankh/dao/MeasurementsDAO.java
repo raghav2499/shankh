@@ -2,7 +2,6 @@ package com.darzee.shankh.dao;
 
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.utils.CommonUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +16,6 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 public class MeasurementsDAO implements Serializable {
-    ObjectMapper objectMapper = new ObjectMapper();
 
     private Long id;
 
