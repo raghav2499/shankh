@@ -1,5 +1,6 @@
 package com.darzee.shankh.entity;
 
+import com.darzee.shankh.enums.ColorEnum;
 import com.darzee.shankh.enums.OutfitType;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,11 +23,18 @@ public class PortfolioOutfits extends GenericEntity {
     private String title;
 
     @Column(name = "outfit_type")
+    @Enumerated(EnumType.ORDINAL)
     private OutfitType outfitType;
 
     @Column(name = "sub_outfit_type")
     private Integer subOutfitType;
 
+    @Column(name = "color")
+    @Enumerated(EnumType.ORDINAL)
+    private ColorEnum color;
+
+    @Column(name = "is_active")
+    private Boolean isActive = Boolean.TRUE;
     @ManyToOne
     @JoinColumn(name = "portfolio_id")
     private Portfolio portfolio;

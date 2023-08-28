@@ -18,8 +18,10 @@ public class BucketController {
     private BucketService bucketService;
 
     @PostMapping("/uploadFile")
-    public UploadImageResponse uploadFile(@RequestPart(value = "file") MultipartFile file) throws Exception {
-        return bucketService.uploadPhoto(file);
+    public UploadImageResponse uploadFile(@RequestPart(value = "file") MultipartFile file,
+                                          @RequestPart(value = "file_type", required = false) String uploadFileType)
+            throws Exception {
+        return bucketService.uploadPhoto(file, uploadFileType);
     }
 
     @GetMapping("/downloadFile")

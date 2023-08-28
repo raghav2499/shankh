@@ -28,6 +28,9 @@ public class AmazonClient {
     @Value("${amazonProperties.s3.bucketName}")
     private String privateBucketName;
 
+    @Value("${amazonProperties.s3.portfolioBucketName}")
+    private String portfolioBucketName;
+
     @Value("${amazonProperties.s3.accessKey}")
     private String accessKey;
 
@@ -47,13 +50,33 @@ public class AmazonClient {
         return new ImmutablePair(referenceId, shortLivedUrl);
     }
 
+    public ImmutablePair<String, String> uploadPortfolioFile(File file, String fileName) {
+        s3client.putObject(new PutObjectRequest(portfolioBucketName, fileName, file));
+        String referenceId = UUID.randomUUID().toString();
+        String shortLivedUrl = generateShortLivedUrl(portfolioBucketName, fileName);
+        return new ImmutablePair(referenceId, shortLivedUrl);
+    }
+
+    public List<String> generateShortLivedPortfolioUrls(List<String> fileNames) {
+        List<String> urlList = new ArrayList<>(fileNames.size());
+        for (String fileName : fileNames) {
+            String url = generateShortLivedUrl(portfolioBucketName, fileName);
+            urlList.add(url);
+        }
+        return urlList;
+    }
+
     public String generateShortLivedUrl(String fileName) {
         return generateShortLivedUrl(privateBucketName, fileName);
     }
 
+    public String generateShortLivedUrlForPortfolio(String fileName) {
+        return generateShortLivedUrl(portfolioBucketName, fileName);
+    }
+
     public List<String> generateShortLivedUrls(List<String> fileNames) {
         List<String> urlList = new ArrayList<>(fileNames.size());
-        for(String fileName : fileNames) {
+        for (String fileName : fileNames) {
             String url = generateShortLivedUrl(privateBucketName, fileName);
             urlList.add(url);
         }
@@ -74,17 +97,4 @@ public class AmazonClient {
         String shortLivedUrl = s3client.generatePresignedUrl(generatePresignedUrlRequest).toString();
         return shortLivedUrl;
     }
-
-    private String generatePresignedUrlForPortfolioCover(String bucketName, Long tailorId, String fileName) {
-        String path = tailorId + "/cover/";
-        return path;
-    }
-
-    private String generatePresignedUrlForPortfolioOutfit(String bucketName, String tailorId, String outfit,
-                                                        String fileName) {
-        String path = tailorId + "/outfit/" + outfit + "/" + fileName;
-        return path;
-    }
-
-
 }

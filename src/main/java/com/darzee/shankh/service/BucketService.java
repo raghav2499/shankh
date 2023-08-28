@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.entity.ImageReference;
+import com.darzee.shankh.enums.UploadFileType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.ImageReferenceRepo;
 import com.darzee.shankh.request.DownloadImageRequest;
@@ -38,11 +39,17 @@ public class BucketService {
     @Value("invoice/")
     private String invoiceDirectory;
 
-    public UploadImageResponse uploadPhoto(MultipartFile multipartFile) throws Exception {
+    public UploadImageResponse uploadPhoto(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
         try {
             File file = FileUtil.convertMultiPartToFile(multipartFile);
             String fileName = FileUtil.generateFileName(multipartFile);
-            ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, fileName);
+            ImmutablePair<String, String> fileUploadResult = null;
+            UploadFileType uploadFileType = UploadFileType.uploadFileOrdinalEnumMap.get(CommonUtils.stringToInt(uploadFileTypeOrdinal));
+            if (UploadFileType.PORTFOLIO.equals(uploadFileType)) {
+                fileUploadResult = client.uploadPortfolioFile(file, fileName);
+            } else {
+                fileUploadResult = client.uploadFile(file, fileName);
+            }
             ImageReferenceDAO imageReference = new ImageReferenceDAO(fileUploadResult.getKey(),
                     fileName);
             imageReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
@@ -52,7 +59,6 @@ public class BucketService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
         }
     }
-
     public DownloadImageResponse getFileUrls(DownloadImageRequest request) {
         List<String> fileReferenceIds = request.getFileReferenceIds();
         List<ImageReferenceDAO> imageReferences = CommonUtils.mapList(
@@ -76,9 +82,19 @@ public class BucketService {
 
     public String getShortLivedUrl(String imageReferenceId) {
         Optional<ImageReference> imageReference = imageReferenceRepo.findByReferenceId(imageReferenceId);
-        if(imageReference.isPresent()) {
+        if (imageReference.isPresent()) {
             ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(imageReference.get());
             String shortLivedUrl = client.generateShortLivedUrl(imageReferenceDAO.getImageName());
+            return shortLivedUrl;
+        }
+        return null;
+    }
+
+    public String getPortfolioImageShortLivedUrl(String imageReferenceId) {
+        Optional<ImageReference> imageReference = imageReferenceRepo.findByReferenceId(imageReferenceId);
+        if (imageReference.isPresent()) {
+            ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(imageReference.get());
+            String shortLivedUrl = client.generateShortLivedUrlForPortfolio(imageReferenceDAO.getImageName());
             return shortLivedUrl;
         }
         return null;

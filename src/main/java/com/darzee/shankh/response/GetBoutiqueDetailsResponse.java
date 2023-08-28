@@ -18,14 +18,11 @@ public class GetBoutiqueDetailsResponse {
     private Long boutiqueId;
     private String boutiqueName;
     private Integer tailorCount;
-
     private Integer language;
-
     private List<String> shopImagesRefId;
     private List<String> shopImageUrls;
     private String adminTailorName;
     private String adminTailorPhoneNumber;
-
     private String adminTailorRefId;
     private Integer boutiqueType;
     private String adminTailorProfilePicUrl;

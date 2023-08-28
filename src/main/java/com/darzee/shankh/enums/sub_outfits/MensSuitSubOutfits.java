@@ -1,19 +1,20 @@
 package com.darzee.shankh.enums.sub_outfits;
 
+import com.darzee.shankh.enums.SubOutfitType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum MensSuitSubOutfits {
+public enum MensSuitSubOutfits implements SubOutfitType {
 
-    FORMAL_BUSINESS_SUIT("formal_business_suit", 1),
-    WEDDING_SUIT("wedding_suit", 2),
-    BANDHGALA_SUIT("bandhgala_suit", 3),
-    JODHPURI_SUIT("jodhpuri_suit", 4),
-    INDO_WESTERN_SUIT("indo_western_suit", 5),
-    TUXEDO("tuxedo", 6);
+    FORMAL_BUSINESS_SUIT("formal_business_suit", 33),
+    WEDDING_SUIT("wedding_suit", 34),
+    BANDHGALA_SUIT("bandhgala_suit", 35),
+    JODHPURI_SUIT("jodhpuri_suit", 36),
+    INDO_WESTERN_SUIT("indo_western_suit", 37),
+    TUXEDO("tuxedo", 38);
 
     private String name;
     private Integer ordinal;
@@ -23,10 +24,10 @@ public enum MensSuitSubOutfits {
         this.ordinal = ordinal;
     }
 
-    private static Map<Integer, MensSuitSubOutfits> mensSuitSubOutfitEnumMap = getMensSuitSubOutfitEnumMap();
+    private static Map<Integer, SubOutfitType> mensSuitSubOutfitEnumMap = getSubOutfitEnumMap();
 
-    private static Map<Integer, MensSuitSubOutfits> getMensSuitSubOutfitEnumMap() {
-        Map<Integer, MensSuitSubOutfits> mensSuitSubOutfitsHashMap = new HashMap<>();
+    public static Map<Integer, SubOutfitType> getSubOutfitEnumMap() {
+        Map<Integer, SubOutfitType> mensSuitSubOutfitsHashMap = new HashMap<>();
         for (MensSuitSubOutfits subOutfit : values()) {
             mensSuitSubOutfitsHashMap.put(subOutfit.ordinal, subOutfit);
         }

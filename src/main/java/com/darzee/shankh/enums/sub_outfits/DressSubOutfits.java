@@ -20,8 +20,8 @@ public enum DressSubOutfits implements SubOutfitType {
         this.ordinal = ordinal;
     }
 
-    @Override
-    public Map<Integer, SubOutfitType> getSubOutfitEnumMap() {
+    private static Map<Integer, SubOutfitType> dressSubOutfitEnumMap = getSubOutfitEnumMap();
+    public static Map<Integer, SubOutfitType> getSubOutfitEnumMap() {
         Map<Integer, SubOutfitType> dressSubOutfitsMap = new HashMap<>();
         for(DressSubOutfits dressSubOutfits : values()) {
             dressSubOutfitsMap.put(dressSubOutfits.ordinal, dressSubOutfits);

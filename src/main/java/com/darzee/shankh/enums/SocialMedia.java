@@ -33,4 +33,8 @@ public enum SocialMedia {
         return socialMediaOrdinalMap;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
 }

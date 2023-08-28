@@ -11,12 +11,13 @@ import java.util.List;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Validated
-public class CreateOutfitPortfolioRequest {
+public class CreatePortfolioOutfitRequest {
 
-    @NotNull(message = "OutfitType is mandatory")
+    @NotNull(message = "outfit_type is mandatory")
     private Integer outfitType;
     private String title;
-    private Integer subOutfits;
+    @NotNull(message = "sub_outfit_type is mandatory")
+    private Integer subOutfit;
     private Integer color;
-    private List<String> referenceId;
+    private List<String> referenceIds;
 }

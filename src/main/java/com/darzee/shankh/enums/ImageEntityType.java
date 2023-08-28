@@ -20,6 +20,9 @@ public enum ImageEntityType {
     @JsonProperty("portfolio_cover")
     PORTFOLIO_COVER("portfolio_cover"),
 
+    @JsonProperty("portfolio_profile")
+    PORTFOLIO_PROFILE("portfolio_profile"),
+
     @JsonProperty("portfolio_outfit")
     PORTFOLIO_OUTFIT("portfolio_outfit");
 

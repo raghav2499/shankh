@@ -1,18 +1,16 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.enums.OutfitType;
-import com.darzee.shankh.request.CreateOutfitPortfolioRequest;
+import com.darzee.shankh.request.CreatePortfolioOutfitRequest;
 import com.darzee.shankh.request.CreatePortfolioRequest;
+import com.darzee.shankh.response.CreatePortfolioOutfitResponse;
 import com.darzee.shankh.response.CreatePortfolioResponse;
+import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
 import com.darzee.shankh.response.UsernameAvailableResponse;
 import com.darzee.shankh.service.PortfolioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import org.thymeleaf.util.StringUtils;
 
 import javax.validation.Valid;
 
@@ -28,27 +26,25 @@ public class PortfolioController {
         return portfolioService.isUsernameAvailable(username);
     }
 
-    @PostMapping(value = "/portfolio", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CreatePortfolioResponse> createPortfolio(@Valid CreatePortfolioRequest request) {
+    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CreatePortfolioResponse> createPortfolio(@RequestBody @Valid CreatePortfolioRequest request) {
         return portfolioService.createPortfolio(request);
     }
 
     @PostMapping(value = "/{portfolio_id}/portfolio_outfit", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void createPortfolioOutfit(@Valid CreateOutfitPortfolioRequest request,
-                                      @PathVariable("portfolio_id") Long portfolioId) {
-        portfolioService.createPortfolioOutfits(request, portfolioId);
+    public ResponseEntity<CreatePortfolioOutfitResponse> createPortfolioOutfit(@RequestBody @Valid CreatePortfolioOutfitRequest request,
+                                                                               @PathVariable("portfolio_id") Long portfolioId) {
+        return portfolioService.createPortfolioOutfits(request, portfolioId);
     }
 
-    @GetMapping("/{portfolio_id}/get_file")
-    public void getFiles(@PathVariable("portfolio_id") Long portfolioId,
-                         @RequestParam("type") Integer filetype,
-                         @RequestParam("name") String fileName) {
-        if (StringUtils.isEmpty(fileName)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file name");
-        }
-        if (filetype == null || filetype > OutfitType.values().length) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type");
-        }
-        portfolioService.getPortfolioOutfitImage(portfolioId, filetype, fileName);
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(@RequestParam("tailor_id") Long tailorId) {
+        return portfolioService.getPortfolio(tailorId);
+    }
+
+
+    @GetMapping(value = "/{portfolio_id}/portfolio_outfit", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void getPortfolioOutfit(@RequestParam("sub_outfit") Integer subOutfit) {
+
     }
 }

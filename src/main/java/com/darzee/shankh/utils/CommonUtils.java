@@ -39,4 +39,14 @@ public class CommonUtils {
                 .orElse("");
         return sanitisedString;
     }
+
+    public static Integer stringToInt(String str) {
+        Integer result = null;
+        try {
+            result = Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return result;
+        }
+        return result;
+    }
 }
