@@ -112,6 +112,7 @@ public class WaistCoatImplSevice implements OutfitTypeService {
         String index = "1";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addChest(String value) {
         String imageLink = WAIST_COAT_CHEST_IMAGE_LINK;
         String title = WAIST_COAT_CHEST_TITLE;
@@ -126,5 +127,20 @@ public class WaistCoatImplSevice implements OutfitTypeService {
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        subOutfitMap.put(92, "single_breasted_waistcoat");
+        subOutfitMap.put(93, "double_breasted_waistcoat");
+        subOutfitMap.put(94, "shawl_collar_waistcoat");
+        subOutfitMap.put(95, "notch_collar_waistcoat");
+        subOutfitMap.put(96, "mandarin_collar_waistcoat");
+        subOutfitMap.put(97, "full_back_waistcoat");
+        subOutfitMap.put(98, "adjustable_back_waistcoat");
+        subOutfitMap.put(99, "patterned_waistcoat");
+        subOutfitMap.put(100, "silk_waistcoat");
+        subOutfitMap.put(101, "textured_waistcoat");
+
+        return subOutfitMap;
+    }
 }
 

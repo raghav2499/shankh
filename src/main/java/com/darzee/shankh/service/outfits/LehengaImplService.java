@@ -82,7 +82,7 @@ public class LehengaImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         if (measurementValue != null) {
             measurementDetailsResponseList.add(
-                        addWaistCircum(measurementsDAO.getMeasurement(WAIST_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
+                    addWaistCircum(measurementsDAO.getMeasurement(WAIST_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addHipCircum(measurementsDAO.getMeasurement(HIP_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
@@ -137,5 +137,27 @@ public class LehengaImplService implements OutfitTypeService {
         String title = LEHENGA_LENGTH_OUTFIT_TYPE_HEADING;
         String index = "4";
         return new MeasurementDetails(imageLink, title, value, index);
+    }
+
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+
+        subOutfitMap.put(17, "a_line_lehenga");
+        subOutfitMap.put(18, "circular_lehenga");
+        subOutfitMap.put(19, "mermaid_lehenga");
+        subOutfitMap.put(20, "panelled_lehenga");
+        subOutfitMap.put(21, "jacket_lehenga");
+        subOutfitMap.put(22, "sharara_lehenga");
+        subOutfitMap.put(23, "trail_lehenga");
+        subOutfitMap.put(24, "lehenga_saree");
+        subOutfitMap.put(25, "flared_lehenga");
+        subOutfitMap.put(26, "ruffled_lehenga");
+        subOutfitMap.put(27, "straight_cut_lehenga");
+        subOutfitMap.put(28, "half_saree_lehenga");
+        subOutfitMap.put(29, "lehenga_with_cape");
+        subOutfitMap.put(30, "asymmetric_lehenga");
+        subOutfitMap.put(31, "tiered_lehenga");
+        subOutfitMap.put(32, "indowestern_lehenga");
+        return subOutfitMap;
     }
 }

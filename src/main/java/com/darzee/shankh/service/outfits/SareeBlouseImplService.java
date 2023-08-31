@@ -318,4 +318,19 @@ public class SareeBlouseImplService implements OutfitTypeService {
         String index = "17";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        subOutfitMap.put(66, "classic_blouse");
+        subOutfitMap.put(67, "princess_cut_blouse");
+        subOutfitMap.put(68, "high_neck_blouse");
+        subOutfitMap.put(69, "halter_neck_blouse");
+        subOutfitMap.put(70, "backless_blouse");
+        subOutfitMap.put(71, "jacket_blouse");
+        subOutfitMap.put(72, "peplum_blouse");
+        subOutfitMap.put(73, "sheer_blouse");
+        subOutfitMap.put(74, "designer_blouse");
+        subOutfitMap.put(75, "printed_blouse");
+        return subOutfitMap;
+    }
 }

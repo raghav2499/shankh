@@ -57,7 +57,7 @@ public class AmazonClient {
         return new ImmutablePair(referenceId, shortLivedUrl);
     }
 
-    public List<String> generateShortLivedPortfolioUrls(List<String> fileNames) {
+    public List<String> generateShortLivedUrlForPortfolio(List<String> fileNames) {
         List<String> urlList = new ArrayList<>(fileNames.size());
         for (String fileName : fileNames) {
             String url = generateShortLivedUrl(portfolioBucketName, fileName);

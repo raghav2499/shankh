@@ -210,6 +210,7 @@ public class RidaImplService implements OutfitTypeService {
         String index = "2";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addAroundShoulder(String value) {
         String imageLink = RIDA_AROUND_SHOULDER_IMAGE_LINK;
         String title = RIDA_AROUND_SHOULDER_TITLE;
@@ -278,5 +279,18 @@ public class RidaImplService implements OutfitTypeService {
         String title = RIDA_LENGA_GHER_TITLE;
         String index = "6";
         return new MeasurementDetails(imageLink, title, value, index);
+    }
+
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        subOutfitMap.put(58, "plain_rida");
+        subOutfitMap.put(59, "embroidered_rida");
+        subOutfitMap.put(60, "printed_rida");
+        subOutfitMap.put(61, "lace_border_rida");
+        subOutfitMap.put(62, "patchwork_rida");
+        subOutfitMap.put(63, "traditional_rida");
+        subOutfitMap.put(64, "formal_rida");
+        subOutfitMap.put(65, "eid_special_rida");
+        return subOutfitMap;
     }
 }

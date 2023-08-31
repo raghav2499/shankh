@@ -191,6 +191,15 @@ public class DressImplService implements OutfitTypeService {
                 outfitImageLinkService.getOutfitImageLink(outfitType), 1);
     }
 
+    @Override
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        subOutfitMap.put(1, "short_dress");
+        subOutfitMap.put(2, "long_dress");
+        subOutfitMap.put(3, "maxi_dress");
+        return subOutfitMap;
+    }
+
     private MeasurementDetails addLength(String value) {
         String imageLink = DRESS_LENGTH_IMAGE_LINK;
         String title = DRESS_LENGTH_TITLE;
@@ -290,12 +299,14 @@ public class DressImplService implements OutfitTypeService {
         String index = "14";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addCrossBack(String value) {
         String imageLink = DRESS_CROSS_BACK_IMAGE_LINK;
         String title = DRESS_CROSS_BACK_TITLE;
         String index = "15";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addDartPoint(String value) {
         String imageLink = DRESS_DART_POINT_IMAGE_LINK;
         String title = DRESS_DART_POINT_TITLE;

@@ -321,4 +321,14 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
         String index = "4";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        subOutfitMap.put(4, "pathani_suit");
+        subOutfitMap.put(5, "sherwani");
+        subOutfitMap.put(6, "achkan");
+        subOutfitMap.put(7, "jodhpuri_suit");
+        subOutfitMap.put(8, "indo_western_kurta_pyjama");
+        subOutfitMap.put(9, "designer_kurta_pyjama");
+        return subOutfitMap;
+    }
 }

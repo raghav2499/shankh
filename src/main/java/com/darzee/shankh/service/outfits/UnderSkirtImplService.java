@@ -75,7 +75,7 @@ public class UnderSkirtImplService implements OutfitTypeService {
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if(measurementValue != null) {
+        if (measurementValue != null) {
             measurementDetailsResponseList.add(
                     addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
@@ -115,4 +115,15 @@ public class UnderSkirtImplService implements OutfitTypeService {
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        subOutfitMap.put(85, "cotton_petticoats");
+        subOutfitMap.put(86, "silk_petticoats");
+        subOutfitMap.put(87, "satin_petticoats");
+        subOutfitMap.put(88, "printed_petticoats");
+        subOutfitMap.put(89, "ruffled_petticoats");
+        subOutfitMap.put(90, "a_line_petticoats");
+        subOutfitMap.put(91, "drawstring_petticoats");
+        return subOutfitMap;
+    }
 }

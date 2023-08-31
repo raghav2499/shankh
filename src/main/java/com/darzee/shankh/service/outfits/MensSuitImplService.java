@@ -83,10 +83,10 @@ public class MensSuitImplService implements OutfitTypeService {
         if (measurementDetails.getFly() != null) {
             measurementValue.put(FLY_MEASUREMENT_KEY, measurementDetails.getFly() * multiplyingFactor);
         }
-        if(measurementDetails.getBottomSeat() != null) {
+        if (measurementDetails.getBottomSeat() != null) {
             measurementValue.put(BOTTOM_SEAT_MEASUREMENT_KEY, measurementDetails.getBottomSeat() * multiplyingFactor);
         }
-        if(measurementDetails.getBottomWaist() != null) {
+        if (measurementDetails.getBottomWaist() != null) {
             measurementValue.put(BOTTOM_WAIST_MEASUREMENT_KEY, measurementDetails.getBottomWaist() * multiplyingFactor);
         }
         measurementsDAO.setMeasurementValue(measurementValue);
@@ -136,7 +136,7 @@ public class MensSuitImplService implements OutfitTypeService {
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if(measurementValue != null) {
+        if (measurementValue != null) {
             measurementDetailsResponseList.add(
                     addLengthUpper(measurementsDAO.getMeasurement(SHIRT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
@@ -180,7 +180,7 @@ public class MensSuitImplService implements OutfitTypeService {
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if(measurementValue != null) {
+        if (measurementValue != null) {
             measurementDetailsResponseList.add(
                     addWaistLower(measurementsDAO.getMeasurement(BOTTOM_WAIST_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
@@ -303,5 +303,16 @@ public class MensSuitImplService implements OutfitTypeService {
         String title = MENS_SUIT_FLY_TITLE;
         String index = "6";
         return new MeasurementDetails(imageLink, title, value, index);
+    }
+
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        subOutfitMap.put(33, "formal_business_suit");
+        subOutfitMap.put(34, "wedding_suit");
+        subOutfitMap.put(35, "bandhgala_suit");
+        subOutfitMap.put(36, "jodhpuri_suit");
+        subOutfitMap.put(37, "indo_western_suit");
+        subOutfitMap.put(38, "tuxedo");
+        return subOutfitMap;
     }
 }

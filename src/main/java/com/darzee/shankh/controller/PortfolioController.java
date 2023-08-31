@@ -2,10 +2,7 @@ package com.darzee.shankh.controller;
 
 import com.darzee.shankh.request.CreatePortfolioOutfitRequest;
 import com.darzee.shankh.request.CreatePortfolioRequest;
-import com.darzee.shankh.response.CreatePortfolioOutfitResponse;
-import com.darzee.shankh.response.CreatePortfolioResponse;
-import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
-import com.darzee.shankh.response.UsernameAvailableResponse;
+import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.PortfolioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -33,7 +30,7 @@ public class PortfolioController {
 
     @PostMapping(value = "/{portfolio_id}/portfolio_outfit", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreatePortfolioOutfitResponse> createPortfolioOutfit(@RequestBody @Valid CreatePortfolioOutfitRequest request,
-                                                                               @PathVariable("portfolio_id") Long portfolioId) {
+                                                                               @PathVariable("portfolio_id") Long portfolioId) throws Exception {
         return portfolioService.createPortfolioOutfits(request, portfolioId);
     }
 
@@ -43,8 +40,10 @@ public class PortfolioController {
     }
 
 
-    @GetMapping(value = "/{portfolio_id}/portfolio_outfit", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void getPortfolioOutfit(@RequestParam("sub_outfit") Integer subOutfit) {
-
+    @GetMapping(value = "/portfolio_outfit", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(@RequestParam("username") String username,
+                                                                          @RequestParam(value = "outfit_type", required = false, defaultValue = "") String outfitType,
+                                                                          @RequestParam(value = "sub_outfit", required = false, defaultValue = "") String subOutfit) throws Exception {
+        return portfolioService.getPortfolioOutfit(username, outfitType, subOutfit);
     }
 }

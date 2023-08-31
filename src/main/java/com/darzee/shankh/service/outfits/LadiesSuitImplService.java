@@ -322,5 +322,15 @@ public class LadiesSuitImplService implements OutfitTypeService {
         String index = "4";
         return new MeasurementDetails(imageLink, title, value, index);
     }
-
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        subOutfitMap.put(10, "salwar_kameez");
+        subOutfitMap.put(11, "anarkali_suit");
+        subOutfitMap.put(12, "churidar_suit");
+        subOutfitMap.put(13, "patiala_suit");
+        subOutfitMap.put(14, "palazzo_suit");
+        subOutfitMap.put(15, "sharara_suit");
+        subOutfitMap.put(16, "lehenga_suit");
+        return subOutfitMap;
+    }
 }

@@ -7,6 +7,8 @@ import com.darzee.shankh.response.OutfitDetails;
 import com.darzee.shankh.response.OutfitMeasurementDetails;
 import com.darzee.shankh.response.OverallMeasurementDetails;
 
+import java.util.Map;
+
 public interface OutfitTypeService {
     public void setMeasurementDetailsInObject(MeasurementRequest measurementDetails,
                                               MeasurementsDAO measurementDAO,
@@ -19,4 +21,6 @@ public interface OutfitTypeService {
                                                            Boolean nonEmptyValuesOnly);
 
     public OutfitDetails getOutfitDetails();
+
+    public Map<Integer, String> getSubOutfitMap();
 }

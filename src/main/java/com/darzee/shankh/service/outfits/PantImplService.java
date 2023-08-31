@@ -193,16 +193,30 @@ public class PantImplService implements OutfitTypeService {
         String index = "7";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addInSeam(String value) {
         String imageLink = PANTS_IN_SEAM_IMAGE_LINK;
         String title = PANTS_IN_SEAM_TITLE;
         String index = "8";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addCrotch(String value) {
         String imageLink = PANTS_CROTCH_IMAGE_LINK;
         String title = PANTS_CROTCH_TITLE;
         String index = "9";
         return new MeasurementDetails(imageLink, title, value, index);
+    }
+
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        subOutfitMap.put(51, "formal_trousers");
+        subOutfitMap.put(52, "chinos");
+        subOutfitMap.put(53, "jeans");
+        subOutfitMap.put(54, "cargos");
+        subOutfitMap.put(55, "trackpants");
+        subOutfitMap.put(56, "joggers");
+        subOutfitMap.put(57, "formal_trousers_with_ethnic_touch");
+        return subOutfitMap;
     }
 }

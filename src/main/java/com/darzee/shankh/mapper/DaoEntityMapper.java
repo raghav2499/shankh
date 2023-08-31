@@ -106,5 +106,18 @@ public interface DaoEntityMapper {
         return orderList;
     }
 
+    default List<PortfolioOutfitsDAO> portfolioObjectListToDAOList(List<PortfolioOutfits> portfolioOutfits,
+                                                          @Context CycleAvoidingMappingContext context) {
+        if (portfolioOutfits == null) {
+            return null;
+        }
+        List<PortfolioOutfitsDAO> portfolioOutfitsDAOList = new ArrayList<>();
+        for (PortfolioOutfits portfolioOutfit : portfolioOutfits) {
+            PortfolioOutfitsDAO portfolioOutfitsDAO = portfolioOutfitsToPortfolioOutfitsDAO(portfolioOutfit, context);
+            portfolioOutfitsDAOList.add(portfolioOutfitsDAO);
+        }
+        return portfolioOutfitsDAOList;
+    }
+
 
 }

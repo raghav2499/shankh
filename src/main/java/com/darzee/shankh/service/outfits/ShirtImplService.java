@@ -113,7 +113,7 @@ public class ShirtImplService implements OutfitTypeService {
         Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if(measurementValue != null) {
+        if (measurementValue != null) {
             measurementDetailsResponseList.add(
                     addShirtLength(measurementsDAO.getMeasurement(SHIRT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
@@ -206,12 +206,14 @@ public class ShirtImplService implements OutfitTypeService {
         String index = "7";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addBicep(String value) {
         String imageLink = SHIRT_BICEP_IMAGE_LINK;
         String title = SHIRT_BICEP_TITLE;
         String index = "8";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addElbowRound(String value) {
         String imageLink = SHIRT_ELBOW_ROUND_IMAGE_LINK;
         String title = SHIRT_ELBOW_ROUND_TITLE;
@@ -225,6 +227,7 @@ public class ShirtImplService implements OutfitTypeService {
         String index = "10";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addArmhole(String value) {
         String imageLink = SHIRT_ARMHOLE_IMAGE_LINK;
         String title = SHIRT_ARMHOLE_TITLE;
@@ -232,4 +235,17 @@ public class ShirtImplService implements OutfitTypeService {
         return new MeasurementDetails(imageLink, title, value, index);
     }
 
+    public Map<Integer, String> getSubOutfitMap() {
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        subOutfitMap.put(76, "formal_shirts");
+        subOutfitMap.put(77, "casual_shirts");
+        subOutfitMap.put(78, "printed_shirts");
+        subOutfitMap.put(79, "striped_shirts");
+        subOutfitMap.put(80, "checkered_shirts");
+        subOutfitMap.put(81, "denim_shirts");
+        subOutfitMap.put(82, "polo_shirts");
+        subOutfitMap.put(83, "kurta_shirts");
+        subOutfitMap.put(84, "nehrucollar_shirts");
+        return subOutfitMap;
+    }
 }

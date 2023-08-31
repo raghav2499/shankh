@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Table(name = "portfolio_outfits")
 @Entity
@@ -35,6 +36,12 @@ public class PortfolioOutfits extends GenericEntity {
 
     @Column(name = "is_active")
     private Boolean isActive = Boolean.TRUE;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
     @ManyToOne
     @JoinColumn(name = "portfolio_id")
     private Portfolio portfolio;

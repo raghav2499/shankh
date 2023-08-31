@@ -105,6 +105,22 @@ public class ObjectImagesService {
         return null;
     }
 
+    @Nullable
+    public List<String> getPortfolioOutfitsReferenceIds(Long portfolioOutfitId) {
+        List<ObjectImages> portfolioOutfitImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(portfolioOutfitId,
+                ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(),
+                Boolean.TRUE);
+        if (!Collections.isEmpty(portfolioOutfitImages)) {
+            List<ObjectImagesDAO> portfolioOutfitImagesDAO = CommonUtils.mapList(portfolioOutfitImages,
+                    mapper::objectImagesToObjectImagesDAO);
+            List<String> portfolioOutfitImageReferenceIds = portfolioOutfitImagesDAO.stream()
+                    .map(portfolioOutfitImage -> portfolioOutfitImage.getReferenceId())
+                    .collect(Collectors.toList());
+            return portfolioOutfitImageReferenceIds;
+        }
+        return null;
+    }
+
     public void invalidateExistingReferenceIds(String entityType, Long entityId) {
         List<ObjectImages> validImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(entityId,
                 entityType,
