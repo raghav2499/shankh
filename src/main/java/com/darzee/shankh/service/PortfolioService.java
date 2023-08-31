@@ -167,12 +167,8 @@ public class PortfolioService {
     public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(String username, String outfitTypes,
                                                                           String subOutfits) throws Exception {
         GetPortfolioOutfitsResponse response = new GetPortfolioOutfitsResponse();
-        List<Integer> outfitTypeOrdinals = Arrays.stream(outfitTypes.split(","))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
-        List<Integer> subOutfitTypeOrdinals = Arrays.stream(subOutfits.split(","))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+        List<Integer> outfitTypeOrdinals = new ArrayList<>();
+        List<Integer> subOutfitTypeOrdinals = new ArrayList<>();
 
         Optional<Portfolio> portfolio = portfolioRepo.findByUsername(username);
         if (!portfolio.isPresent()) {
@@ -180,14 +176,21 @@ public class PortfolioService {
         }
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
         List<OutfitType> outfits = null;
-        if (!CollectionUtils.isEmpty(outfitTypeOrdinals)) {
+        if (!StringUtils.isEmpty(outfitTypes)) {
+            outfitTypeOrdinals = Arrays.stream(outfitTypes.split(","))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
             outfits = outfitTypeOrdinals.stream()
                     .map(outfitTypeOrdinal -> OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeOrdinal))
                     .collect(Collectors.toList());
         } else {
             outfits = Arrays.asList(OutfitType.values());
         }
-        if (CollectionUtils.isEmpty(subOutfitTypeOrdinals)) {
+        if (!StringUtils.isEmpty(subOutfits)) {
+            subOutfitTypeOrdinals = Arrays.stream(subOutfits.split(","))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+        } else {
             OutfitTypeService outfitTypeService = null;
             for (OutfitType outfitType : outfits) {
                 outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
