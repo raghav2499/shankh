@@ -40,10 +40,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
                                               MeasurementsDAO measurementsDAO,
                                               MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        Map<String, Double> measurementValue =
-                (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
-                        ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
-                        : new HashMap<>();
+        Map<String, Double> measurementValue = measurementsDAO.getMeasurementValue();
 
         if (measurementValue == null) {
             measurementValue = new HashMap<>();
@@ -105,7 +102,9 @@ public class LadiesSuitImplService implements OutfitTypeService {
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
         Map<String, Double> measurementValue =
-                objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
+                (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
+                        ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
+                        : new HashMap<>();
 
         outfitMeasurementDetails.setKameezLength(measurementValue.get(KAMEEZ_LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setShoulder(measurementValue.get(SHOULDER_MEASUREMENT_KEY));
