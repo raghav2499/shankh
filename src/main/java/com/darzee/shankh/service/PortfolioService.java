@@ -68,9 +68,12 @@ public class PortfolioService {
     }
 
     public ResponseEntity<CreatePortfolioResponse> createPortfolio(CreatePortfolioRequest request) {
+        CreatePortfolioResponse response = new CreatePortfolioResponse();
         Optional<Tailor> tailor = tailorRepo.findById(request.getTailorId());
         if (!tailor.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Tailor ID");
+            String invalidTailorMessage = "Invalid Tailor ID";
+            response.setMessage(invalidTailorMessage);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
         TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
         List<String> requestSocialMedia = request.getSocialMedia();
@@ -100,16 +103,18 @@ public class PortfolioService {
         String successfulMessage = "Portfolio created successfully";
         String tailorName = tailorDAO.getName();
         String boutiqueName = tailorDAO.getBoutique().getName();
-        CreatePortfolioResponse response = new CreatePortfolioResponse(successfulMessage, tailorName, boutiqueName,
+        response = new CreatePortfolioResponse(successfulMessage, tailorName, boutiqueName,
                 portfolio.getAboutDetails(), portfolio.getSocialMedia());
         return new ResponseEntity<CreatePortfolioResponse>(response, HttpStatus.CREATED);
     }
 
     public ResponseEntity<CreatePortfolioOutfitResponse> createPortfolioOutfits(CreatePortfolioOutfitRequest request,
                                                                                 Long portfolioId) throws Exception {
+        CreatePortfolioOutfitResponse response = new CreatePortfolioOutfitResponse();
         Optional<Portfolio> portfolio = portfolioRepo.findById(portfolioId);
         if (!portfolio.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Portfolio ID");
+            response.setMessage("Portfolio for this tailor doesn't exist");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(request.getOutfitType());
@@ -133,7 +138,7 @@ public class PortfolioService {
                     portfolioOutfit.getId());
         }
         String successMessage = "Portfolio outfit saved successfully";
-        CreatePortfolioOutfitResponse response = new CreatePortfolioOutfitResponse(successMessage,
+        response = new CreatePortfolioOutfitResponse(successMessage,
                 portfolioOutfit.getId());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
