@@ -12,6 +12,8 @@ public class MeasurementRequest {
     private Double calf;
     private Double ankle;
     private Double bottom;
+    private Double bottomLength;
+    private Double bottomHipCircum;
     private Double length;
     private Double kurtaLength;
     private Double shoulder;
@@ -27,6 +29,9 @@ public class MeasurementRequest {
     private Double pyjamaLength;
     private Double pyjamaHip;
     private Double knee;
+    private Double nikkerLength;
+    private Double shararaCircum;
+    private Double mohri;
     private Double fly;
     private Double blouseLength;
     private Double belowBust;

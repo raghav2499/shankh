@@ -36,6 +36,12 @@ public class OutfitImageLinkService {
                 return OUTFIT_TYPE_WAIST_COAT_LINK;
             case LEHENGA:
                 return OUTFIT_TYPE_LEHENGA_LINK;
+            case SHARARA:
+                return OUTFIT_TYPE_SHARARA_LINK;
+            case SHERWANI:
+                return OUTFIT_TYPE_SHERWANI_LINK;
+            case INDO_WESTERN:
+                return OUTFIT_TYPE_INDO_WESTERN_LINK;
             default:
                 return null;
         }

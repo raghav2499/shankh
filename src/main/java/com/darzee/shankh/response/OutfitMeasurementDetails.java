@@ -14,6 +14,7 @@ public class OutfitMeasurementDetails {
     private Double calf;
     private Double ankle;
     private Double bottom;
+    private Double bottomLength;
     private Double length;
     private Double kurtaLength;
     private Double shoulder;
@@ -63,4 +64,9 @@ public class OutfitMeasurementDetails {
     private Double waistCircum;
     private Double hipCircum;
     private Double waistToKnee;
+    private Double mohri;
+    private Double nikkerLength;
+    private Double shararaCircum;
+    private Double bottomHipCircum;
+
 }

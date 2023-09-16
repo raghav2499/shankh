@@ -35,11 +35,14 @@ public class MeasurementKeys {
     public static final String NECK_MEASUREMENT_KEY = "neck";
     public static final String CHEST_MEASUREMENT_KEY = "chest";
     public static final String BOTTOM_WAIST_MEASUREMENT_KEY = "bottom_waist";
+
+    public static final String BOTTOM_LENGTH_MEASUREMENT_KEY = "bottom_length";
     public static final String BOTTOM_SEAT_MEASUREMENT_KEY = "bottom_seat";
     public static final String THIGH_MEASUREMENT_KEY = "thigh";
     public static final String CALF_MEASUREMENT_KEY = "calf";
 
     public static final String BOTTOM_MEASUREMENT_KEY = "bottom";
+    public static final String BOTTOM_HIP_CIRCUM_MEASUREMENT_KEY = "bottom_hip_circum";
     public static final String PANT_LENGTH_MEASUREMENT_KEY = "pant_length";
     public static final String FLY_MEASUREMENT_KEY = "fly";
     public static final String IN_SEAM_MEASUREMENT_KEY = "in_seam";
@@ -49,6 +52,9 @@ public class MeasurementKeys {
     public static final String PYJAMA_HIP_MEASUREMENT_KEY = "pyjama_hip";
 
     public static final String KNEE_MEASUREMENT_KEY = "knee";
+    public static final String MOHRI_MEASUREMENT_KEY = "mohri";
+    public static final String NIKKER_LENGTH_MEASUREMENT_KEY = "nikker_length";
+    public static final String SHARARA_CIRCUM_MEASUREMENT_KEY = "sharara_circum";
 
     public static final String ANKLE_MEASUREMENT_KEY = "ankle";
     public static final String KAMEEZ_LENGTH_MEASUREMENT_KEY = "kameez_length";

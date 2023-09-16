@@ -40,7 +40,16 @@ public enum OutfitType {
     WAIST_COAT("waist_coat", 12, "Waist Coat", Arrays.asList(Gender.MALE)),
 
     @JsonProperty("lehenga")
-    LEHENGA("lehenga", 13, "Lehenga", Arrays.asList(Gender.FEMALE));
+    LEHENGA("lehenga", 13, "Lehenga", Arrays.asList(Gender.FEMALE)),
+
+    @JsonProperty("sharara")
+    SHARARA("sharara", 14, "Sharara", Arrays.asList(Gender.FEMALE)),
+
+    @JsonProperty("sherwani")
+    SHERWANI("sherwani", 15, "Sherwani", Arrays.asList(Gender.MALE)),
+
+    @JsonProperty("indo_western")
+    INDO_WESTERN("indo_western", 16, "Indo Western", Arrays.asList(Gender.MALE));
     private String name;
     private Integer ordinal;
 
@@ -77,37 +86,17 @@ public enum OutfitType {
 
     public static Map<String, OutfitType> getOutfitEnumMap() {
         Map<String, OutfitType> outfitEnumMap = new HashMap<>();
-        outfitEnumMap.put(KURTA_PYJAMA.name, KURTA_PYJAMA);
-        outfitEnumMap.put(DRESS.name, DRESS);
-        outfitEnumMap.put(SAREE_BLOUSE.name, SAREE_BLOUSE);
-        outfitEnumMap.put(MENS_SUIT.name, MENS_SUIT);
-        outfitEnumMap.put(PANTS.name, PANTS);
-        outfitEnumMap.put(EVENING_GOWN.name, EVENING_GOWN);
-        outfitEnumMap.put(LADIES_SUIT.name, LADIES_SUIT);
-        outfitEnumMap.put(SHIRT.name, SHIRT);
-        outfitEnumMap.put(UNDER_SKIRT.name, UNDER_SKIRT);
-        outfitEnumMap.put(NEHRU_JACKET.name, NEHRU_JACKET);
-        outfitEnumMap.put(RIDA.name, RIDA);
-        outfitEnumMap.put(WAIST_COAT.name, WAIST_COAT);
-        outfitEnumMap.put(LEHENGA.name, LEHENGA);
+        for(OutfitType outfitType : OutfitType.values()) {
+            outfitEnumMap.put(outfitType.name, outfitType);
+        }
         return outfitEnumMap;
     }
 
     public static Map<Integer, OutfitType> getOutfitOrdinalEnumMap() {
         Map<Integer, OutfitType> outfitOrdinalEnumMap = new HashMap<>();
-        outfitOrdinalEnumMap.put(KURTA_PYJAMA.ordinal, KURTA_PYJAMA);
-        outfitOrdinalEnumMap.put(DRESS.ordinal, DRESS);
-        outfitOrdinalEnumMap.put(SAREE_BLOUSE.ordinal, SAREE_BLOUSE);
-        outfitOrdinalEnumMap.put(MENS_SUIT.ordinal, MENS_SUIT);
-        outfitOrdinalEnumMap.put(PANTS.ordinal, PANTS);
-        outfitOrdinalEnumMap.put(EVENING_GOWN.ordinal, EVENING_GOWN);
-        outfitOrdinalEnumMap.put(LADIES_SUIT.ordinal, LADIES_SUIT);
-        outfitOrdinalEnumMap.put(SHIRT.ordinal, SHIRT);
-        outfitOrdinalEnumMap.put(UNDER_SKIRT.ordinal, UNDER_SKIRT);
-        outfitOrdinalEnumMap.put(NEHRU_JACKET.ordinal, NEHRU_JACKET);
-        outfitOrdinalEnumMap.put(RIDA.ordinal, RIDA);
-        outfitOrdinalEnumMap.put(WAIST_COAT.ordinal, WAIST_COAT);
-        outfitOrdinalEnumMap.put(LEHENGA.ordinal, LEHENGA);
+        for(OutfitType outfitType : OutfitType.values()) {
+            outfitOrdinalEnumMap.put(outfitType.ordinal, outfitType);
+        }
         return outfitOrdinalEnumMap;
     }
 

@@ -61,7 +61,7 @@ public class PortfolioService {
     private AmazonClient s3Client;
 
     public ResponseEntity<UsernameAvailableResponse> isUsernameAvailable(String username) {
-        boolean isUsernameAvailable = (!portfolioRepo.findByUsername(username).isPresent());
+        boolean isUsernameAvailable = usernameAvailable(username);
         String message = "Details fetched successfully";
         UsernameAvailableResponse response = new UsernameAvailableResponse(message, username, isUsernameAvailable);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -73,6 +73,11 @@ public class PortfolioService {
         if (!tailor.isPresent()) {
             String invalidTailorMessage = "Invalid Tailor ID";
             response.setMessage(invalidTailorMessage);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        if (!usernameAvailable(request.getUsername())) {
+            String usernameUnavailable = "Username not available";
+            response.setMessage(usernameUnavailable);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
@@ -247,4 +252,7 @@ public class PortfolioService {
         return new ArrayList<>();
     }
 
+    private boolean usernameAvailable(String username) {
+        return (!portfolioRepo.findByUsername(username).isPresent());
+    }
 }

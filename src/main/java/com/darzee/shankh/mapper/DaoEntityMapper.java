@@ -23,6 +23,8 @@ public interface DaoEntityMapper {
 
     OrderDAO orderObjectToDao(Order order, @Context CycleAvoidingMappingContext context);
 
+    SampleImageReferenceDAO sampleImageRefToDAO(SampleImageReference sampleImageReference);
+
     Order orderaDaoToObject(OrderDAO orderDAO, @Context CycleAvoidingMappingContext context);
 
     CustomerDAO customerObjectToDao(Customer customer, @Context CycleAvoidingMappingContext context);
@@ -79,6 +81,18 @@ public interface DaoEntityMapper {
             orderDAOList.add(orderDAO);
         }
         return orderDAOList;
+    }
+
+    default List<SampleImageReferenceDAO> sampleImageRefToDAOList(List<SampleImageReference> sampleImageReferences) {
+        if (sampleImageReferences == null) {
+            return null;
+        }
+        List<SampleImageReferenceDAO> referenceDAOList = new ArrayList<>();
+        for (SampleImageReference sampleImageReference : sampleImageReferences) {
+            SampleImageReferenceDAO imageReferenceDAO = sampleImageRefToDAO(sampleImageReference);
+            referenceDAOList.add(imageReferenceDAO);
+        }
+        return referenceDAOList;
     }
 
     default List<CustomerDAO> customerObjectListToDAOList(List<Customer> customerList,

@@ -18,10 +18,11 @@ import static com.darzee.shankh.enums.OrderSort.TRIAL_DATE;
 
 public class GetOrderDetailsRequest {
 
-    public static Map<String, Object> getPagingAndSortCriteria(String sortKey, Integer count, Integer offset) {
+    public static Map<String, Object> getPagingAndSortCriteria(String sortKey, Integer countPerPage, Integer pageCount) {
         Map<String, Object> finalParamsMap = new HashMap<>();
+        pageCount = pageCount - 1;//pageCount is 0 indexed
         setSortingCriteria(finalParamsMap, sortKey);
-        setPagingCriteria(finalParamsMap, count, offset);
+        setPagingCriteria(finalParamsMap, countPerPage, pageCount);
         return finalParamsMap;
     }
 
@@ -79,8 +80,8 @@ public class GetOrderDetailsRequest {
         paramsMap.put(parasmMapSortKey, paramsSortValue);
     }
 
-    private static void setPagingCriteria(Map<String, Object> paramsMap, Integer count, Integer offset) {
-        paramsMap.put(PARAMS_MAP_COUNT_KEY, count);
-        paramsMap.put(PARAMS_MAP_OFFSET_KEY, offset);
+    private static void setPagingCriteria(Map<String, Object> paramsMap, Integer countPerPage, Integer pageCount) {
+        paramsMap.put(PARAMS_MAP_COUNT_PER_PAGE_KEY, countPerPage);
+        paramsMap.put(PARAMS_MAP_PAGE_COUNT_KEY, pageCount);
     }
 }

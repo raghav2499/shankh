@@ -15,12 +15,12 @@ public class FilterOrderService {
 
     public Pageable getPagingCriteria(Map<String, Object> paramMap) {
         Sort sortCriteria = sortIfNeeded(paramMap);
-        Integer size = Integer.valueOf(paramMap.get(PARAMS_MAP_COUNT_KEY).toString());
-        Integer offset = Integer.valueOf((String) Optional.ofNullable(paramMap.get(PARAMS_MAP_OFFSET_KEY)).orElse(0).toString());
+        Integer size = Integer.valueOf(paramMap.get(PARAMS_MAP_COUNT_PER_PAGE_KEY).toString());
+        Integer page = Integer.valueOf((String) Optional.ofNullable(paramMap.get(PARAMS_MAP_PAGE_COUNT_KEY)).orElse(0).toString());
         if (sortCriteria == null) {
-            return PageRequest.of(offset, size);
+            return PageRequest.of(page, size);
         }
-        return PageRequest.of(offset, size, sortCriteria);
+        return PageRequest.of(page, size, sortCriteria);
     }
 
     public Sort sortIfNeeded(Map<String, Object> paramMap) {
