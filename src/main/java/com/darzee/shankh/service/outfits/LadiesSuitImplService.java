@@ -100,7 +100,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
             measurementValue.put(SALWAR_LENGTH_MEASUREMENT_KEY, measurementDetails.getSalwarLength() * multiplyingFactor);
         }
         if (measurementDetails.getBottomWaist() != null) {
-            measurementValue.put(BOTTOM_WAIST_MEASUREMENT_KEY, measurementDetails.getWaist() * multiplyingFactor);
+            measurementValue.put(BOTTOM_WAIST_MEASUREMENT_KEY, measurementDetails.getBottomWaist() * multiplyingFactor);
         }
         if (measurementDetails.getThigh() != null) {
             measurementValue.put(THIGH_MEASUREMENT_KEY, measurementDetails.getThigh() * multiplyingFactor);
@@ -285,7 +285,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
 
     private MeasurementDetails addBelowBust(String value) {
         String imageLink = LADIES_SUIT_BELOW_BUST_IMAGE_LINK;
-        String title = LADIES_SUIT_BUST_TITLE;
+        String title = LADIES_SUIT_BELOW_BUST_TITLE;
         String index = "4";
         return new MeasurementDetails(imageLink, title, value, index);
     }

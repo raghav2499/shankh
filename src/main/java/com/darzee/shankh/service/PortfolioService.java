@@ -205,7 +205,9 @@ public class PortfolioService {
             for (OutfitType outfitType : outfits) {
                 outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
                 Map<Integer, String> subOutfitMap = outfitTypeService.getSubOutfitMap();
-                subOutfitTypeOrdinals.addAll(subOutfitMap.keySet());
+                if(subOutfitMap.size() > 0) {
+                    subOutfitTypeOrdinals.addAll(subOutfitMap.keySet());
+                }
             }
         }
         List<PortfolioOutfits> portfolioOutfits =

@@ -227,7 +227,7 @@ public class SherwaniImplService implements OutfitTypeService {
             measurementDetailsResponseList.add(
                     addBottom(measurementsDAO.getMeasurement(BOTTOM_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
-                    addLengthLower(measurementsDAO.getMeasurement(PANT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+                    addLengthLower(measurementsDAO.getMeasurement(BOTTOM_LENGTH_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(
                     addFly(measurementsDAO.getMeasurement(FLY_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(

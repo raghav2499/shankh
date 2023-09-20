@@ -305,7 +305,7 @@ public class ShararaImplService implements OutfitTypeService {
     }
 
     private MeasurementDetails addBelowBust(String value) {
-        String imageLink = SHARARA_BELOW_BUST_TITLE;
+        String imageLink = SHARARA_TOP_BELOW_BUST_IMAGE_LINK;
         String title = SHARARA_BELOW_BUST_TITLE;
         String index = "4";
         return new MeasurementDetails(imageLink, title, value, index);
@@ -319,7 +319,7 @@ public class ShararaImplService implements OutfitTypeService {
     }
 
     private MeasurementDetails addHipCircum(String value) {
-        String imageLink = SHARARA_HIP_CIRCUM_TITLE;
+        String imageLink = SHARARA_TOP_HIP_CIRCUM_IMAGE_LINK;
         String title = SHARARA_HIP_CIRCUM_TITLE;
         String index = "6";
         return new MeasurementDetails(imageLink, title, value, index);

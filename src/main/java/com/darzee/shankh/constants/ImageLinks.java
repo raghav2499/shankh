@@ -116,13 +116,12 @@ public class ImageLinks {
     public static final String MENS_SUIT_FLY_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Mens+Suit/mens'suit(pants)/pants_fly.svg";
     public static final String LADIES_SUIT_OUTFIT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/nightgown.svg";
     public static final String LADIES_SUIT_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_length.svg";
-    public static final String LADIES_SUIT_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_shoulder.svg";
+    public static final String LADIES_SUIT_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_Shoulder.svg";
     public static final String LADIES_SUIT_UPPER_CHEST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_upperchest.svg";
-    public static final String LADIES_SUIT_BUST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_bust.svg";
+    public static final String LADIES_SUIT_BUST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_Bust.svg";
     public static final String LADIES_SUIT_BELOW_BUST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_Belowbust.svg";
     public static final String LADIES_SUIT_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_waist.svg";
-    public static final String LADIES_SUIT_SEAT_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/NightGown/ng_seat.svg";
-    public static final String LADIES_SUIT_HIP_CIRCUM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/NightGown/ng_hip.svg";
+    public static final String LADIES_SUIT_HIP_CIRCUM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_hip.svg";
     public static final String LADIES_SUIT_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_armhole.svg";
     public static final String LADIES_SUIT_BICEP_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_bicep.svg";
     public static final String LADIES_SUIT_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_slevelen.svg";
@@ -132,7 +131,6 @@ public class ImageLinks {
     public static final String LADIES_SUIT_FRONT_CROSS_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_frontcross.svg";
     public static final String LADIES_SUIT_BACK_CROSS_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/kameze/ng_backcross.svg";
     public static final String LADIES_SUIT_LOWER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/salwar/pajama.svg";
-    public static final String LADIES_SUIT_SALWAR_HIP_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/salwar/pajama_hip.svg";
     public static final String LADIES_SUIT_SALWAR_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/salwar/pajama_waist.svg";
     public static final String LADIES_SUIT_SALWAR_THIGH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/salwar/pajama_thigh.svg";
     public static final String LADIES_SUIT_KNEE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Salwar+kameez/salwar/pajama_knee.svg";
@@ -195,7 +193,7 @@ public class ImageLinks {
     public static final String SHARARA_TOP_WAIST_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Sharara/top/shararatop5_waist.svg";
     public static final String SHARARA_TOP_HIP_CIRCUM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Sharara/top/shararatop6_hipcircumference.svg";
     public static final String SHARARA_TOP_SHOULDER_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Sharara/top/shararatop7_Shoulder.svg";
-    public static final String SHARARA_TOP_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Sharara/top/shararatop8_armhole.svg.svg";
+    public static final String SHARARA_TOP_ARMHOLE_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Sharara/top/shararatop8_armhole.svg";
     public static final String SHARARA_TOP_BICEP_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Sharara/top/shararatop9_bicep.svg";
     public static final String SHARARA_TOP_SLEEVE_LENGTH_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Sharara/top/shararatop10_sleevelength.svg";
     public static final String SHARARA_TOP_SLEEVE_CIRCUM_IMAGE_LINK = "https://s3.amazonaws.com/" + getStaticBucket() + "/Measurement/Sharara/top/shararatop11_sleevecircumfernce.svg";
