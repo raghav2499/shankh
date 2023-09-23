@@ -14,7 +14,7 @@ public interface PortfolioOutfitsRepo extends JpaRepository<PortfolioOutfits, Lo
     List<PortfolioOutfits> findAllByPortfolioIdAndOutfitType(long portfolioId, OutfitType outfitType);
 
     @Nullable
-    List<PortfolioOutfits> findAllByPortfolioIdAndOutfitTypeInOrSubOutfitTypeIn(long portfolioId,
+    List<PortfolioOutfits> findAllByPortfolioIdAndOutfitTypeInAndSubOutfitTypeIn(long portfolioId,
                                                                                  List<OutfitType> outfitType,
                                                                                  List<Integer> subOutfitType);
 }

@@ -211,7 +211,7 @@ public class PortfolioService {
             }
         }
         List<PortfolioOutfits> portfolioOutfits =
-                portfolioOutfitsRepo.findAllByPortfolioIdAndOutfitTypeInOrSubOutfitTypeIn(portfolioDAO.getId(),
+                portfolioOutfitsRepo.findAllByPortfolioIdAndOutfitTypeInAndSubOutfitTypeIn(portfolioDAO.getId(),
                         outfits,
                         subOutfitTypeOrdinals);
         if (CollectionUtils.isEmpty(portfolioOutfits)) {

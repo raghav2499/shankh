@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,11 @@ public class SampleImageService {
     @Autowired
     private AmazonClient amazonClient;
 
-    public ResponseEntity<GetSampleImageResponse> getSampleCoverImages() {
+    public ResponseEntity<GetSampleImageResponse> getSampleImages(String type) {
+        SampleImageType sampleImageType = SampleImageType.sampleImageNameEnumMap.get(type);
+        if (!SampleImageType.PORTFOLIO_COVER.equals(sampleImageType)) {
+            throw new ResponseStatusException(HttpStatus.OK, "Image type not supported for sample image API");
+        }
         GetSampleImageResponse imageResponse = new GetSampleImageResponse();
         List<SampleImageReference> sampleImageReferences =
                 sampleImageRefRepo.findAllByBucketNameAndImageType(BucketName.PORTFOLIO,
