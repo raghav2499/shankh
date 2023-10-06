@@ -283,14 +283,14 @@ public class RidaImplService implements OutfitTypeService {
 
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
-        subOutfitMap.put(58, "plain_rida");
-        subOutfitMap.put(59, "embroidered_rida");
-        subOutfitMap.put(60, "printed_rida");
-        subOutfitMap.put(61, "lace_border_rida");
-        subOutfitMap.put(62, "patchwork_rida");
-        subOutfitMap.put(63, "traditional_rida");
-        subOutfitMap.put(64, "formal_rida");
-        subOutfitMap.put(65, "eid_special_rida");
+        subOutfitMap.put(58, "Plain Rida");
+        subOutfitMap.put(59, "Embroidered Rida");
+        subOutfitMap.put(60, "Printed Rida");
+        subOutfitMap.put(61, "Lace Border Rida");
+        subOutfitMap.put(62, "Patchwork Rida");
+        subOutfitMap.put(63, "Traditional Rida");
+        subOutfitMap.put(64, "Formal Rida");
+        subOutfitMap.put(65, "Eid Special Rida");
         return subOutfitMap;
     }
 }

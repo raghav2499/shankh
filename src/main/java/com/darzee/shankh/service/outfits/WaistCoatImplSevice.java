@@ -129,16 +129,16 @@ public class WaistCoatImplSevice implements OutfitTypeService {
 
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
-        subOutfitMap.put(92, "single_breasted_waistcoat");
-        subOutfitMap.put(93, "double_breasted_waistcoat");
-        subOutfitMap.put(94, "shawl_collar_waistcoat");
-        subOutfitMap.put(95, "notch_collar_waistcoat");
-        subOutfitMap.put(96, "mandarin_collar_waistcoat");
-        subOutfitMap.put(97, "full_back_waistcoat");
-        subOutfitMap.put(98, "adjustable_back_waistcoat");
-        subOutfitMap.put(99, "patterned_waistcoat");
-        subOutfitMap.put(100, "silk_waistcoat");
-        subOutfitMap.put(101, "textured_waistcoat");
+        subOutfitMap.put(92, "Single Breasted Waistcoat");
+        subOutfitMap.put(93, "Double Breasted Waistcoat");
+        subOutfitMap.put(94, "Shawl Collar Waistcoat");
+        subOutfitMap.put(95, "Notch Collar Waistcoat");
+        subOutfitMap.put(96, "Mandarin Collar Waistcoat");
+        subOutfitMap.put(97, "Full Back Waistcoat");
+        subOutfitMap.put(98, "Adjustable Back Waistcoat");
+        subOutfitMap.put(99, "Patterned Waistcoat");
+        subOutfitMap.put(100, "Silk Waistcoat");
+        subOutfitMap.put(101, "Textured Waistcoat");
 
         return subOutfitMap;
     }

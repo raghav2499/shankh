@@ -210,13 +210,13 @@ public class PantImplService implements OutfitTypeService {
 
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
-        subOutfitMap.put(51, "formal_trousers");
-        subOutfitMap.put(52, "chinos");
-        subOutfitMap.put(53, "jeans");
-        subOutfitMap.put(54, "cargos");
-        subOutfitMap.put(55, "trackpants");
-        subOutfitMap.put(56, "joggers");
-        subOutfitMap.put(57, "formal_trousers_with_ethnic_touch");
+        subOutfitMap.put(51, "Formal Trousers");
+        subOutfitMap.put(52, "Chinos");
+        subOutfitMap.put(53, "Jeans");
+        subOutfitMap.put(54, "Cargos");
+        subOutfitMap.put(55, "Trackpants");
+        subOutfitMap.put(56, "Joggers");
+        subOutfitMap.put(57, "Formal Trousers With Ethnic Touch");
         return subOutfitMap;
     }
 }

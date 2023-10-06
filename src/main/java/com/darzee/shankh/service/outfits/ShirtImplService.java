@@ -237,15 +237,15 @@ public class ShirtImplService implements OutfitTypeService {
 
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
-        subOutfitMap.put(76, "formal_shirts");
-        subOutfitMap.put(77, "casual_shirts");
-        subOutfitMap.put(78, "printed_shirts");
-        subOutfitMap.put(79, "striped_shirts");
-        subOutfitMap.put(80, "checkered_shirts");
-        subOutfitMap.put(81, "denim_shirts");
-        subOutfitMap.put(82, "polo_shirts");
-        subOutfitMap.put(83, "kurta_shirts");
-        subOutfitMap.put(84, "nehrucollar_shirts");
+        subOutfitMap.put(76, "Formal Shirts");
+        subOutfitMap.put(77, "Casual Shirts");
+        subOutfitMap.put(78, "Printed Shirts");
+        subOutfitMap.put(79, "Striped Shirts");
+        subOutfitMap.put(80, "Checkered Shirts");
+        subOutfitMap.put(81, "Denim Shirts");
+        subOutfitMap.put(82, "Polo Shirts");
+        subOutfitMap.put(83, "Kurta Shirts");
+        subOutfitMap.put(84, "Nehrucollar Shirts");
         return subOutfitMap;
     }
 }

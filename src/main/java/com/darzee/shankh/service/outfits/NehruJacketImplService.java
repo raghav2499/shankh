@@ -142,13 +142,13 @@ public class NehruJacketImplService implements OutfitTypeService {
 
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
-        subOutfitMap.put(39, "classic_nehru_jacket");
-        subOutfitMap.put(40, "embroidered_nehru_jacket");
-        subOutfitMap.put(41, "printed_nehru_jacket");
-        subOutfitMap.put(42, "velvet_nehru_jacket");
-        subOutfitMap.put(43, "linen_nehru_jacket");
-        subOutfitMap.put(44, "silk_nehru_jacket");
-        subOutfitMap.put(45, "textured_nehru_jacket");
+        subOutfitMap.put(39, "Classic Nehru Jacket");
+        subOutfitMap.put(40, "Embroidered Nehru Jacket");
+        subOutfitMap.put(41, "Printed Nehru Jacket");
+        subOutfitMap.put(42, "Velvet Nehru Jacket");
+        subOutfitMap.put(43, "Linen Nehru Jacket");
+        subOutfitMap.put(44, "Silk Nehru Jacket");
+        subOutfitMap.put(45, "Textured Nehru Jacket");
         return subOutfitMap;
     }
 }

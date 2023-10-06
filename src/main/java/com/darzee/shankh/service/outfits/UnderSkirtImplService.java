@@ -117,13 +117,13 @@ public class UnderSkirtImplService implements OutfitTypeService {
 
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
-        subOutfitMap.put(85, "cotton_petticoats");
-        subOutfitMap.put(86, "silk_petticoats");
-        subOutfitMap.put(87, "satin_petticoats");
-        subOutfitMap.put(88, "printed_petticoats");
-        subOutfitMap.put(89, "ruffled_petticoats");
-        subOutfitMap.put(90, "a_line_petticoats");
-        subOutfitMap.put(91, "drawstring_petticoats");
+        subOutfitMap.put(85, "Cotton Petticoats");
+        subOutfitMap.put(86, "Silk Petticoats");
+        subOutfitMap.put(87, "Satin Petticoats");
+        subOutfitMap.put(88, "Printed Petticoats");
+        subOutfitMap.put(89, "Ruffled Petticoats");
+        subOutfitMap.put(90, "A Line Petticoats");
+        subOutfitMap.put(91, "Drawstring Petticoats");
         return subOutfitMap;
     }
 }
