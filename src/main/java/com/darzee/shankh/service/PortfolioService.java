@@ -157,6 +157,7 @@ public class PortfolioService {
 
     public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(Long tailorId) {
         Optional<Portfolio> portfolio = portfolioRepo.findByTailorId(tailorId);
+        GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse();
         if (portfolio.isPresent()) {
             PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(),
                     new CycleAvoidingMappingContext());
@@ -173,12 +174,14 @@ public class PortfolioService {
                 portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
             }
             String successMessage = "Portfolio details fetched successfully";
-            GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse(successMessage, tailorName,
+            response = new GetPortfolioDetailsResponse(successMessage, tailorName,
                     boutiqueName, portfolioDAO.getId(), portfolioDAO.getSocialMedia(), portfolioDAO.getAboutDetails(),
                     portfolioDAO.getUsername(), portfolioProfileImageUrl, portfolioCoverImageUrl);
             return new ResponseEntity(response, HttpStatus.OK);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tailor's portfolio diesn't exist");
+        String message = "Tailor's portfolio doesn't exist";
+        response.setMessage(message);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(String username, String outfitTypes,
