@@ -46,4 +46,8 @@ public enum ColorEnum {
         }
         return colorEnumOrdinalMap;
     }
+
+    public String getName() {
+        return name;
+    }
 }

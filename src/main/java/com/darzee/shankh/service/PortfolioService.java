@@ -35,7 +35,7 @@ public class PortfolioService {
     private BucketService bucketService;
 
     @Autowired
-    private OutfitTypeObjectService outfitTypeObjectService;
+    private OutfitService outfitService;
 
     @Autowired
     private PortfolioRepo portfolioRepo;
@@ -132,8 +132,7 @@ public class PortfolioService {
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(request.getOutfitType());
         Integer subOutfitOrdinal = request.getSubOutfit();
-        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-        Set<Integer> possibleSubOutfits = outfitTypeService.getSubOutfitMap().keySet();
+        Set<Integer> possibleSubOutfits = outfitService.getSubOutfitMap(outfitType).keySet();
         List<String> portfolioOutfitReferenceIds = request.getReferenceIds();
         if (!possibleSubOutfits.contains(subOutfitOrdinal)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Sub Outfit Type");
@@ -211,8 +210,7 @@ public class PortfolioService {
         } else {
             OutfitTypeService outfitTypeService = null;
             for (OutfitType outfitType : outfits) {
-                outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-                Map<Integer, String> subOutfitMap = outfitTypeService.getSubOutfitMap();
+                Map<Integer, String> subOutfitMap = outfitService.getSubOutfitMap(outfitType);
                 if (subOutfitMap.size() > 0) {
                     subOutfitTypeOrdinals.addAll(subOutfitMap.keySet());
                 }
@@ -264,5 +262,39 @@ public class PortfolioService {
 
     private boolean usernameAvailable(String username) {
         return (!portfolioRepo.findByUsername(username).isPresent());
+    }
+
+    public ResponseEntity<GetPortfolioFilterResponse> getFilters(Long tailorId) throws Exception {
+        Optional<Portfolio> portfolio = portfolioRepo.findByTailorId(tailorId);
+        GetPortfolioFilterResponse response = null;
+        if (!portfolio.isPresent()) {
+            String message = "Portfolio doesn't exist";
+            response = new GetPortfolioFilterResponse(message);
+        }
+        PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(),
+                new CycleAvoidingMappingContext());
+        List<PortfolioOutfitsDAO> portfolioOutfits = portfolioDAO.getPortfolioOutfits();
+        Map<String, List<String>> subOutfitMap = new HashMap<>();
+        List<String> colorFilterList = new ArrayList<>();
+        for (PortfolioOutfitsDAO portfolioOutfitsDAO : portfolioOutfits) {
+            OutfitType outfitType = portfolioOutfitsDAO.getOutfitType();
+            Integer subOutfitIdx = portfolioOutfitsDAO.getSubOutfitType();
+            String portfolioSubOutfit = outfitService.getSubOutfitName(outfitType, subOutfitIdx);
+            List<String> subOutfitList = Optional.ofNullable(subOutfitMap.get(outfitType.getName())).orElse(new ArrayList<>());
+
+            if (!subOutfitList.contains(portfolioSubOutfit)) {
+                subOutfitList.add(portfolioSubOutfit);
+                subOutfitMap.put(outfitType.getName(), subOutfitList);
+            }
+            colorFilterList.add(portfolioOutfitsDAO.getColor().getName());
+        }
+        List<OutfitFilter> outfitFilters = new ArrayList<>();
+        for (Map.Entry<String, List<String>> pair : subOutfitMap.entrySet()) {
+            OutfitFilter outfitFilter = new OutfitFilter(pair.getKey(), pair.getValue());
+            outfitFilters.add(outfitFilter);
+        }
+        String successMessage = "Filters fetched successfully";
+        response = new GetPortfolioFilterResponse(successMessage, outfitFilters, colorFilterList);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
