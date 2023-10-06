@@ -60,6 +60,7 @@ public class OutfitService {
         Map<Integer, String> subOutfitMap = outfitTypeService.getSubOutfitMap();
         return subOutfitMap;
     }
+
     public String getSubOutfitName(OutfitType outfitType, Integer subOutfitIdx) throws Exception {
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         String subOutfitString = outfitTypeService.getSubOutfitMap().get(subOutfitIdx);

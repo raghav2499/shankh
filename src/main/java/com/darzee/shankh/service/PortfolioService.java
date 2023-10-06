@@ -1,12 +1,19 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.*;
+import com.darzee.shankh.dao.PortfolioDAO;
+import com.darzee.shankh.dao.PortfolioOutfitsDAO;
+import com.darzee.shankh.dao.TailorDAO;
+import com.darzee.shankh.dao.BoutiqueDAO;
+import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.Portfolio;
 import com.darzee.shankh.entity.PortfolioOutfits;
 import com.darzee.shankh.entity.Tailor;
-import com.darzee.shankh.enums.*;
+import com.darzee.shankh.enums.ColorEnum;
+import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.enums.SocialMedia;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
@@ -273,6 +280,7 @@ public class PortfolioService {
         if (!portfolio.isPresent()) {
             String message = "Portfolio doesn't exist";
             response = new GetPortfolioFilterResponse(message);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(),
                 new CycleAvoidingMappingContext());
