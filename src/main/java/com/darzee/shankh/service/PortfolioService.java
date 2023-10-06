@@ -1,10 +1,7 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.ImageReferenceDAO;
-import com.darzee.shankh.dao.PortfolioDAO;
-import com.darzee.shankh.dao.PortfolioOutfitsDAO;
-import com.darzee.shankh.dao.TailorDAO;
+import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.Portfolio;
 import com.darzee.shankh.entity.PortfolioOutfits;
@@ -70,6 +67,9 @@ public class PortfolioService {
     public ResponseEntity<CreatePortfolioResponse> createPortfolio(CreatePortfolioRequest request) {
         CreatePortfolioResponse response = new CreatePortfolioResponse();
         Optional<Tailor> tailor = tailorRepo.findById(request.getTailorId());
+        TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
+        BoutiqueDAO boutique = tailorDAO.getBoutique();
+
         if (!tailor.isPresent()) {
             String invalidTailorMessage = "Invalid Tailor ID";
             response.setMessage(invalidTailorMessage);
@@ -80,7 +80,15 @@ public class PortfolioService {
             response.setMessage(usernameUnavailable);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
+        Optional<Portfolio> optionalExistingPortfolio = portfolioRepo.findByTailorId(request.getTailorId());
+        if (optionalExistingPortfolio.isPresent()) {
+            PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(optionalExistingPortfolio.get(),
+                    new CycleAvoidingMappingContext());
+            String portfolioExistsMessage = "Portfolio exists for this tailor";
+            response = new CreatePortfolioResponse(portfolioExistsMessage, tailorDAO.getName(), boutique.getName(),
+                    portfolioDAO.getAboutDetails(), portfolioDAO.getSocialMedia());
+            return new ResponseEntity<CreatePortfolioResponse>(response, HttpStatus.OK);
+        }
         List<String> requestSocialMedia = request.getSocialMedia();
         Map<String, String> socialMediaMap = new HashMap<>();
         for (Integer idx = 0; idx < requestSocialMedia.size(); idx++) {
@@ -107,7 +115,7 @@ public class PortfolioService {
         }
         String successfulMessage = "Portfolio created successfully";
         String tailorName = tailorDAO.getName();
-        String boutiqueName = tailorDAO.getBoutique().getName();
+        String boutiqueName = boutique.getName();
         response = new CreatePortfolioResponse(successfulMessage, tailorName, boutiqueName,
                 portfolio.getAboutDetails(), portfolio.getSocialMedia());
         return new ResponseEntity<CreatePortfolioResponse>(response, HttpStatus.CREATED);
@@ -205,7 +213,7 @@ public class PortfolioService {
             for (OutfitType outfitType : outfits) {
                 outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
                 Map<Integer, String> subOutfitMap = outfitTypeService.getSubOutfitMap();
-                if(subOutfitMap.size() > 0) {
+                if (subOutfitMap.size() > 0) {
                     subOutfitTypeOrdinals.addAll(subOutfitMap.keySet());
                 }
             }
