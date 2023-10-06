@@ -6,7 +6,7 @@ headers = {
     "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3MDkwMzIxNzYxIiwiZXhwIjoyMDAzMTcwMzEyLCJpYXQiOjE2ODc4MTAzMTJ9.HwzkaF9xv4PWuOUY128c4N9Yr8siPsxVvF3iNp9mHkRXw6O409zVUHEuoLsTALA3n17efCbBDBDmdJPK7_YTCg"
 }
 
-for boutique_id in range(88, 900):
+for boutique_id in range(88, 616):
     url = f"{base_url}/{boutique_id}{endpoint}"
     response = requests.post(url, headers=headers)
 
