@@ -1,15 +1,19 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.dao.PortfolioDAO;
 import com.darzee.shankh.dao.PortfolioOutfitsDAO;
 import com.darzee.shankh.dao.TailorDAO;
+import com.darzee.shankh.dao.BoutiqueDAO;
+import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.Portfolio;
 import com.darzee.shankh.entity.PortfolioOutfits;
 import com.darzee.shankh.entity.Tailor;
-import com.darzee.shankh.enums.*;
+import com.darzee.shankh.enums.ColorEnum;
+import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.enums.SocialMedia;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
@@ -38,7 +42,7 @@ public class PortfolioService {
     private BucketService bucketService;
 
     @Autowired
-    private OutfitTypeObjectService outfitTypeObjectService;
+    private OutfitService outfitService;
 
     @Autowired
     private PortfolioRepo portfolioRepo;
@@ -70,6 +74,9 @@ public class PortfolioService {
     public ResponseEntity<CreatePortfolioResponse> createPortfolio(CreatePortfolioRequest request) {
         CreatePortfolioResponse response = new CreatePortfolioResponse();
         Optional<Tailor> tailor = tailorRepo.findById(request.getTailorId());
+        TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
+        BoutiqueDAO boutique = tailorDAO.getBoutique();
+
         if (!tailor.isPresent()) {
             String invalidTailorMessage = "Invalid Tailor ID";
             response.setMessage(invalidTailorMessage);
@@ -80,7 +87,15 @@ public class PortfolioService {
             response.setMessage(usernameUnavailable);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
+        Optional<Portfolio> optionalExistingPortfolio = portfolioRepo.findByTailorId(request.getTailorId());
+        if (optionalExistingPortfolio.isPresent()) {
+            PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(optionalExistingPortfolio.get(),
+                    new CycleAvoidingMappingContext());
+            String portfolioExistsMessage = "Portfolio exists for this tailor";
+            response = new CreatePortfolioResponse(portfolioExistsMessage, tailorDAO.getName(), boutique.getName(),
+                    portfolioDAO.getAboutDetails(), portfolioDAO.getSocialMedia());
+            return new ResponseEntity<CreatePortfolioResponse>(response, HttpStatus.OK);
+        }
         List<String> requestSocialMedia = request.getSocialMedia();
         Map<String, String> socialMediaMap = new HashMap<>();
         for (Integer idx = 0; idx < requestSocialMedia.size(); idx++) {
@@ -107,7 +122,7 @@ public class PortfolioService {
         }
         String successfulMessage = "Portfolio created successfully";
         String tailorName = tailorDAO.getName();
-        String boutiqueName = tailorDAO.getBoutique().getName();
+        String boutiqueName = boutique.getName();
         response = new CreatePortfolioResponse(successfulMessage, tailorName, boutiqueName,
                 portfolio.getAboutDetails(), portfolio.getSocialMedia());
         return new ResponseEntity<CreatePortfolioResponse>(response, HttpStatus.CREATED);
@@ -124,8 +139,7 @@ public class PortfolioService {
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(request.getOutfitType());
         Integer subOutfitOrdinal = request.getSubOutfit();
-        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-        Set<Integer> possibleSubOutfits = outfitTypeService.getSubOutfitMap().keySet();
+        Set<Integer> possibleSubOutfits = outfitService.getSubOutfitMap(outfitType).keySet();
         List<String> portfolioOutfitReferenceIds = request.getReferenceIds();
         if (!possibleSubOutfits.contains(subOutfitOrdinal)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Sub Outfit Type");
@@ -206,9 +220,8 @@ public class PortfolioService {
         } else {
             OutfitTypeService outfitTypeService = null;
             for (OutfitType outfitType : outfits) {
-                outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-                Map<Integer, String> subOutfitMap = outfitTypeService.getSubOutfitMap();
-                if(subOutfitMap.size() > 0) {
+                Map<Integer, String> subOutfitMap = outfitService.getSubOutfitMap(outfitType);
+                if (subOutfitMap.size() > 0) {
                     subOutfitTypeOrdinals.addAll(subOutfitMap.keySet());
                 }
             }
@@ -259,5 +272,40 @@ public class PortfolioService {
 
     private boolean usernameAvailable(String username) {
         return (!portfolioRepo.findByUsername(username).isPresent());
+    }
+
+    public ResponseEntity<GetPortfolioFilterResponse> getFilters(Long tailorId) throws Exception {
+        Optional<Portfolio> portfolio = portfolioRepo.findByTailorId(tailorId);
+        GetPortfolioFilterResponse response = null;
+        if (!portfolio.isPresent()) {
+            String message = "Portfolio doesn't exist";
+            response = new GetPortfolioFilterResponse(message);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(),
+                new CycleAvoidingMappingContext());
+        List<PortfolioOutfitsDAO> portfolioOutfits = portfolioDAO.getPortfolioOutfits();
+        Map<String, List<String>> subOutfitMap = new HashMap<>();
+        List<String> colorFilterList = new ArrayList<>();
+        for (PortfolioOutfitsDAO portfolioOutfitsDAO : portfolioOutfits) {
+            OutfitType outfitType = portfolioOutfitsDAO.getOutfitType();
+            Integer subOutfitIdx = portfolioOutfitsDAO.getSubOutfitType();
+            String portfolioSubOutfit = outfitService.getSubOutfitName(outfitType, subOutfitIdx);
+            List<String> subOutfitList = Optional.ofNullable(subOutfitMap.get(outfitType.getName())).orElse(new ArrayList<>());
+
+            if (!subOutfitList.contains(portfolioSubOutfit)) {
+                subOutfitList.add(portfolioSubOutfit);
+                subOutfitMap.put(outfitType.getName(), subOutfitList);
+            }
+            colorFilterList.add(portfolioOutfitsDAO.getColor().getName());
+        }
+        List<OutfitFilter> outfitFilters = new ArrayList<>();
+        for (Map.Entry<String, List<String>> pair : subOutfitMap.entrySet()) {
+            OutfitFilter outfitFilter = new OutfitFilter(pair.getKey(), pair.getValue());
+            outfitFilters.add(outfitFilter);
+        }
+        String successMessage = "Filters fetched successfully";
+        response = new GetPortfolioFilterResponse(successMessage, outfitFilters, colorFilterList);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

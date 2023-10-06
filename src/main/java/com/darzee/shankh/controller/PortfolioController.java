@@ -48,4 +48,11 @@ public class PortfolioController {
                                                                           @RequestParam(value = "sub_outfit", required = false, defaultValue = "") String subOutfit) throws Exception {
         return portfolioService.getPortfolioOutfit(username, outfitType, subOutfit);
     }
+
+    @GetMapping(value = "/filters", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity<GetPortfolioFilterResponse> getPortfolioFilters(@RequestParam("tailor_id") Long tailorId)
+            throws Exception {
+        return portfolioService.getFilters(tailorId);
+    }
 }
