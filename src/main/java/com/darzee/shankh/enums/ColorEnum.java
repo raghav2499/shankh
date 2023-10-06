@@ -8,26 +8,26 @@ import java.util.Map;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ColorEnum {
 
-    RED("red", 1),
-    ROYAL_BLUE("royal_blue", 2),
-    LIGHT_YELLOW("light_yellow", 3),
-    GREEN("green", 4),
-    ORANGE("orange", 5),
-    PURPLE("purple", 6),
-    BABY_PINK("baby_pink", 7),
-    BROWN("brown", 8),
-    BLACK("black", 9),
-    WHITE("white", 10),
-    LIGHT_GREY("light_grey", 11),
-    BEIGE("beige", 12),
-    NAVY_BLUE("navy_blue", 13),
-    TORQUOISE("torquoise", 14),
-    MAROON("maroon", 15),
-    YELLOW("yellow", 16),
-    GREY("grey", 17),
-    CREAM("cream", 18),
-    OLIVE("olive", 19),
-    TEAL("teal", 20);
+    RED("Red", 1),
+    ROYAL_BLUE("Royal Blue", 2),
+    LIGHT_YELLOW("Light Yellow", 3),
+    GREEN("Green", 4),
+    ORANGE("Orange", 5),
+    PURPLE("Purple", 6),
+    BABY_PINK("Baby Pink", 7),
+    BROWN("Brown", 8),
+    BLACK("Black", 9),
+    WHITE("White", 10),
+    LIGHT_GREY("Light Grey", 11),
+    BEIGE("Beige", 12),
+    NAVY_BLUE("Navy Blue", 13),
+    TORQUOISE("Torquoise", 14),
+    MAROON("Maroon", 15),
+    YELLOW("Yellow", 16),
+    GREY("Grey", 17),
+    CREAM("Cream", 18),
+    OLIVE("Olive", 19),
+    TEAL("Teal", 20);
 
     private String name;
     private Integer ordinal;
