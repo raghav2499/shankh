@@ -285,27 +285,28 @@ public class PortfolioService {
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(),
                 new CycleAvoidingMappingContext());
         List<PortfolioOutfitsDAO> portfolioOutfits = portfolioDAO.getPortfolioOutfits();
-        Map<String, List<String>> subOutfitMap = new HashMap<>();
-        List<String> colorFilterList = new ArrayList<>();
+        Map<OutfitType, OutfitFilter> outfitFilterMap = new HashMap<>();
+        Map<Integer, String> colorFilterMap = new HashMap<>();
         for (PortfolioOutfitsDAO portfolioOutfitsDAO : portfolioOutfits) {
             OutfitType outfitType = portfolioOutfitsDAO.getOutfitType();
-            Integer subOutfitIdx = portfolioOutfitsDAO.getSubOutfitType();
-            String portfolioSubOutfit = outfitService.getSubOutfitName(outfitType, subOutfitIdx);
-            List<String> subOutfitList = Optional.ofNullable(subOutfitMap.get(outfitType.getName())).orElse(new ArrayList<>());
-
-            if (!subOutfitList.contains(portfolioSubOutfit)) {
-                subOutfitList.add(portfolioSubOutfit);
-                subOutfitMap.put(outfitType.getName(), subOutfitList);
+            OutfitFilter outfitFilter = null;
+            if (outfitFilterMap.containsKey(outfitType)) {
+                outfitFilter = outfitFilterMap.get(outfitType);
+            } else {
+                outfitFilter = new OutfitFilter(outfitType.getName(), outfitType.getOrdinal(), new HashMap<>());
             }
-            colorFilterList.add(portfolioOutfitsDAO.getColor().getName());
+            Map<Integer, String> totalSuboutfits = outfitService.getSubOutfitMap(outfitType);
+            String portfolioSubOutfitString = totalSuboutfits.get(portfolioOutfitsDAO.getSubOutfitType());
+            Map<Integer, String> filteredSubOutfits = outfitFilter.getSubOutfits();
+            filteredSubOutfits.put(portfolioOutfitsDAO.getSubOutfitType(), portfolioSubOutfitString);
+            outfitFilter.setSubOutfits(filteredSubOutfits);
+            outfitFilterMap.put(outfitType, outfitFilter);
+            colorFilterMap.put(portfolioOutfitsDAO.getColor().getOrdinal(), portfolioOutfitsDAO.getColor().getName());
         }
-        List<OutfitFilter> outfitFilters = new ArrayList<>();
-        for (Map.Entry<String, List<String>> pair : subOutfitMap.entrySet()) {
-            OutfitFilter outfitFilter = new OutfitFilter(pair.getKey(), pair.getValue());
-            outfitFilters.add(outfitFilter);
-        }
+
         String successMessage = "Filters fetched successfully";
-        response = new GetPortfolioFilterResponse(successMessage, outfitFilters, colorFilterList);
+        List<OutfitFilter> outfitFilterList = new ArrayList<>(outfitFilterMap.values());
+        response = new GetPortfolioFilterResponse(successMessage, outfitFilterList, colorFilterMap);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -17,7 +18,7 @@ import java.util.List;
 public class GetPortfolioFilterResponse {
     private String message;
     private List<OutfitFilter> outfitFilter;
-    private List<String> colorFilter;
+    private Map<Integer, String> colorFilter;
 
     public GetPortfolioFilterResponse(String message) {
         this.message = message;

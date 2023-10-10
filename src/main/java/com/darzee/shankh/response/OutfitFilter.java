@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Map;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -14,5 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class OutfitFilter {
     private String name;
-    private List<String> subOutfits;
+    private Integer index;
+    private Map<Integer, String> subOutfits;
 }
