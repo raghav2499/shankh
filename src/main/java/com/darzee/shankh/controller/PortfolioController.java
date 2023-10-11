@@ -2,6 +2,7 @@ package com.darzee.shankh.controller;
 
 import com.darzee.shankh.request.CreatePortfolioOutfitRequest;
 import com.darzee.shankh.request.CreatePortfolioRequest;
+import com.darzee.shankh.request.UpdatePortfolioRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.PortfolioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,11 @@ public class PortfolioController {
     @CrossOrigin
     public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(@RequestParam("tailor_id") Long tailorId) {
         return portfolioService.getPortfolio(tailorId);
+    }
+
+    @PutMapping(value = "/{tailor_id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updatePortfolio(@PathVariable("tailor_id") Long tailorId, @RequestBody @Valid UpdatePortfolioRequest request){
+        return portfolioService.updatePortfolio(tailorId, request);
     }
 
 

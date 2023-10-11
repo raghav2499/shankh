@@ -16,6 +16,8 @@ public class PortfolioDAO {
 
     private String username;
 
+    private Integer usernameUpdatesCounts;
+
     private String aboutDetails;
 
     private Map<String, String> socialMedia;
@@ -33,5 +35,6 @@ public class PortfolioDAO {
         this.aboutDetails = aboutDetails;
         this.socialMedia = socialMedia;
         this.tailor = tailor;
+        this.usernameUpdatesCounts = this.usernameUpdatesCounts+1;
     }
 }
