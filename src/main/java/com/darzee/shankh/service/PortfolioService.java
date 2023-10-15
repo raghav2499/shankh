@@ -236,21 +236,22 @@ public class PortfolioService {
 
         List<PortfolioOutfitsDAO> portfolioOutfitsDAOs = mapper.portfolioObjectListToDAOList(portfolioOutfits,
                 new CycleAvoidingMappingContext());
-        Map<Integer, List<PortfolioOutfitDetails>> outfitDetails = new HashMap<>();
-        for (PortfolioOutfitsDAO portfolioOutfit : portfolioOutfitsDAOs) {
-            List<String> portfolioOutfitReferences =
-                    objectImagesService.getPortfolioOutfitsReferenceIds(portfolioOutfit.getId());
-            List<String> portfolioOutfitImageLinks = getPortfolioOutfitImageLinks(portfolioOutfitReferences);
-
-            PortfolioOutfitDetails portfolioOutfitDetails =
-                    new PortfolioOutfitDetails(portfolioOutfit.getSubOutfitType(), portfolioOutfit.getTitle(),
-                            portfolioOutfitImageLinks, portfolioOutfit.getCreatedAt().toLocalDate());
-            List<PortfolioOutfitDetails> portfolioOutfitDetailsList =
-                    Optional.ofNullable(outfitDetails.get(portfolioOutfit.getOutfitType().getOrdinal())).orElse(new ArrayList<>());
-            portfolioOutfitDetailsList.add(portfolioOutfitDetails);
-            outfitDetails.put(portfolioOutfit.getOutfitType().getOrdinal(), portfolioOutfitDetailsList);
+        Map<OutfitType, List<PortfolioOutfitsDAO>> portfolioOutfitMap = portfolioOutfitsDAOs
+                .stream()
+                .collect(
+                        Collectors.groupingBy(PortfolioOutfitsDAO::getOutfitType)
+                );
+        List<OutfitTypeGroupedPortfolioDetails> outfitDetails = new ArrayList<>();
+        for (Map.Entry<OutfitType, List<PortfolioOutfitsDAO>> entrySet : portfolioOutfitMap.entrySet()) {
+            OutfitType outfitType = entrySet.getKey();
+            List<PortfolioOutfitDetails> portfolioOutfitDetails = getPortfolioOutfitDetails(entrySet.getValue());
+            OutfitTypeGroupedPortfolioDetails groupedPortfolioDetails = new OutfitTypeGroupedPortfolioDetails(
+                    outfitType.getDisplayString(),
+                    outfitType.getOrdinal(),
+                    portfolioOutfitDetails);
+            outfitDetails.add(groupedPortfolioDetails);
         }
-        response.setOutfitDetails(outfitDetails);
+        response.setOutfitTypeGroupedPortfolioDetails(outfitDetails);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -293,7 +294,7 @@ public class PortfolioService {
             if (outfitFilterMap.containsKey(outfitType)) {
                 outfitFilter = outfitFilterMap.get(outfitType);
             } else {
-                outfitFilter = new OutfitFilter(outfitType.getName(), outfitType.getOrdinal(), new HashMap<>());
+                outfitFilter = new OutfitFilter(outfitType.getDisplayString(), outfitType.getOrdinal(), new HashMap<>());
             }
             Map<Integer, String> totalSuboutfits = outfitService.getSubOutfitMap(outfitType);
             String portfolioSubOutfitString = totalSuboutfits.get(portfolioOutfitsDAO.getSubOutfitType());
@@ -309,4 +310,18 @@ public class PortfolioService {
         response = new GetPortfolioFilterResponse(successMessage, outfitFilterList, colorFilterMap);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    private List<PortfolioOutfitDetails> getPortfolioOutfitDetails(List<PortfolioOutfitsDAO> portfolioOutfitsDAOs) {
+        List<PortfolioOutfitDetails> portfolioOutfitDetails = new ArrayList<>();
+        for (PortfolioOutfitsDAO portfolioOutfit : portfolioOutfitsDAOs) {
+            PortfolioOutfitDetails outfitDetail = new PortfolioOutfitDetails(portfolioOutfit);
+            List<String> portfolioOutfitReferences =
+                    objectImagesService.getPortfolioOutfitsReferenceIds(portfolioOutfit.getId());
+            List<String> portfolioOutfitImageLinks = getPortfolioOutfitImageLinks(portfolioOutfitReferences);
+            outfitDetail.setImageUrl(portfolioOutfitImageLinks);
+            portfolioOutfitDetails.add(outfitDetail);
+        }
+        return portfolioOutfitDetails;
+    }
+
 }
