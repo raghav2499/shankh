@@ -140,24 +140,36 @@ public class PortfolioService {
             PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
 
             if(!StringUtils.isEmpty(request.getUsername())){
-                if(portfolioDAO.getUsernameUpdatesCounts() > 2){
-                    String usernameUpdateNotAllowed = "Portfolio username update is not allowed as you have changed your username 2 times already!";
-                    response.setMessage(usernameUpdateNotAllowed);
-                    return new ResponseEntity(response, HttpStatus.OK);
+                try{
+                    if(portfolioDAO.getUsernameUpdatesCounts() >= 2){
+                        String usernameUpdateNotAllowed = "Portfolio username update is not allowed as you have changed your username 2 times already!";
+                        response.setMessage(usernameUpdateNotAllowed);
+                        return new ResponseEntity(response, HttpStatus.OK);
+                    }
+                    if(!usernameAvailable(request.getUsername())){
+                        String usernameUnavailable = "Username not available";
+                        response.setMessage(usernameUnavailable);
+                        return new ResponseEntity<>(response, HttpStatus.OK);
+                    }
+                    portfolioDAO.setUsername(request.getUsername());
+                    portfolioDAO.updateUsernameCount();
+                }catch (NullPointerException e){
+                    if(!usernameAvailable(request.getUsername())){
+                        String usernameUnavailable = "Username not available";
+                        response.setMessage(usernameUnavailable);
+                        return new ResponseEntity<>(response, HttpStatus.OK);
+                    }
+                    portfolioDAO.setUsername(request.getUsername());
+                    portfolioDAO.setUsernameUpdatesCounts(0);
                 }
-                if(!usernameAvailable(request.getUsername())){
-                    String usernameUnavailable = "Username not available";
-                    response.setMessage(usernameUnavailable);
-                    return new ResponseEntity<>(response, HttpStatus.OK);
-                }
-                portfolioDAO.setUsername(request.getUsername());
             }
             if(!StringUtils.isEmpty(request.getAbout())){
                 portfolioDAO.setAboutDetails(request.getAbout());
             }
+
             List<String> updatedSocialMedia = request.getSocialMedia();
             Map<String, String> updatedSocialMediaMap = new HashMap<>();
-            if(!updatedSocialMedia.isEmpty()){
+            if(updatedSocialMedia != null && !updatedSocialMedia.isEmpty()){
                 for (Integer idx = 0; idx < updatedSocialMedia.size(); idx++) {
                     if (updatedSocialMedia.get(idx) != null) {
                         updatedSocialMediaMap.put(
@@ -183,8 +195,8 @@ public class PortfolioService {
             String successfulMessage = "Portfolio updated successfully";
             String tailorName = tailorDAO.getName();
             String boutiqueName = boutique.getName();
-            response = new CreatePortfolioResponse(successfulMessage, tailorName, boutiqueName,
-                    updatedPortfolio.getAboutDetails(), updatedPortfolio.getSocialMedia());
+
+            response = new CreatePortfolioResponse(successfulMessage, tailorName, boutiqueName, updatedPortfolio.getAboutDetails(), updatedPortfolio.getSocialMedia());
             return new ResponseEntity(response, HttpStatus.OK);
         }
         response.setMessage("Sorry! Portfolio doesn't exist!");

@@ -35,6 +35,10 @@ public class PortfolioDAO {
         this.aboutDetails = aboutDetails;
         this.socialMedia = socialMedia;
         this.tailor = tailor;
-        this.usernameUpdatesCounts = this.usernameUpdatesCounts+1;
+        this.usernameUpdatesCounts = 0;
+    }
+
+    public void updateUsernameCount(){
+        this.usernameUpdatesCounts++;
     }
 }
