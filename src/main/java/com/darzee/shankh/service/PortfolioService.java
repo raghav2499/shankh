@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,12 +112,12 @@ public class PortfolioService {
                 new CycleAvoidingMappingContext());
 
         if (!StringUtils.isEmpty(request.getCoverImageReference())) {
-            objectImagesService.saveObjectImages(Arrays.asList(request.getCoverImageReference()),
+            objectImagesService.saveObjectImages(Collections.singletonList(request.getCoverImageReference()),
                     ImageEntityType.PORTFOLIO_COVER.getEntityType(),
                     portfolio.getId());
         }
         if (!StringUtils.isEmpty(request.getProfileImageReference())) {
-            objectImagesService.saveObjectImages(Arrays.asList(request.getProfileImageReference()),
+            objectImagesService.saveObjectImages(Collections.singletonList(request.getProfileImageReference()),
                     ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
                     portfolio.getId());
         }
@@ -130,67 +129,44 @@ public class PortfolioService {
         return new ResponseEntity<CreatePortfolioResponse>(response, HttpStatus.CREATED);
     }
 
-    public  ResponseEntity updatePortfolio(Long tailorId, UpdatePortfolioRequest request) {
+    public ResponseEntity updatePortfolio(Long tailorId, UpdatePortfolioRequest request) {
         Optional<Portfolio> portfolio = portfolioRepo.findByTailorId(tailorId);
         CreatePortfolioResponse response = new CreatePortfolioResponse();
-        Optional<Tailor> tailor = tailorRepo.findById(tailorId);
-        TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
-        BoutiqueDAO boutique = tailorDAO.getBoutique();
-        if(portfolio.isPresent()){
+        if (portfolio.isPresent()) {
+            Optional<Tailor> tailor = tailorRepo.findById(tailorId);
+            TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
+            BoutiqueDAO boutique = tailorDAO.getBoutique();
             PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
 
-            if(!StringUtils.isEmpty(request.getUsername())){
-                try{
-                    if(portfolioDAO.getUsernameUpdatesCounts() >= 2){
-                        String usernameUpdateNotAllowed = "Portfolio username update is not allowed as you have changed your username 2 times already!";
-                        response.setMessage(usernameUpdateNotAllowed);
-                        return new ResponseEntity(response, HttpStatus.OK);
-                    }
-                    if(!usernameAvailable(request.getUsername())){
-                        String usernameUnavailable = "Username not available";
-                        response.setMessage(usernameUnavailable);
-                        return new ResponseEntity<>(response, HttpStatus.OK);
-                    }
-                    portfolioDAO.setUsername(request.getUsername());
-                    portfolioDAO.updateUsernameCount();
-                }catch (NullPointerException e){
-                    if(!usernameAvailable(request.getUsername())){
-                        String usernameUnavailable = "Username not available";
-                        response.setMessage(usernameUnavailable);
-                        return new ResponseEntity<>(response, HttpStatus.OK);
-                    }
-                    portfolioDAO.setUsername(request.getUsername());
-                    portfolioDAO.setUsernameUpdatesCounts(0);
+            if (!StringUtils.isEmpty(request.getUsername())) {
+                if (portfolioDAO.getUsernameUpdatesCounts() >= 2) {
+                    String usernameUpdateNotAllowed = "Portfolio username update is not allowed as you have changed your username 2 times already!";
+                    response.setMessage(usernameUpdateNotAllowed);
+                    return new ResponseEntity(response, HttpStatus.OK);
                 }
+                portfolioDAO.setUsername(request.getUsername());
+                portfolioDAO.updateUsernameCount();
             }
-            if(!StringUtils.isEmpty(request.getAbout())){
+            if (!StringUtils.isEmpty(request.getAbout())) {
                 portfolioDAO.setAboutDetails(request.getAbout());
             }
 
             List<String> updatedSocialMedia = request.getSocialMedia();
             Map<String, String> updatedSocialMediaMap = new HashMap<>();
-            if(updatedSocialMedia != null && !updatedSocialMedia.isEmpty()){
+            if (updatedSocialMedia != null && !updatedSocialMedia.isEmpty()) {
                 for (Integer idx = 0; idx < updatedSocialMedia.size(); idx++) {
                     if (updatedSocialMedia.get(idx) != null) {
-                        updatedSocialMediaMap.put(
-                                SocialMedia.getSocialMediaOrdinalEnumMap().get(idx + 1).getName(),
-                                updatedSocialMedia.get(idx));
+                        updatedSocialMediaMap.put(SocialMedia.getSocialMediaOrdinalEnumMap().get(idx + 1).getName(), updatedSocialMedia.get(idx));
                     }
                 }
                 portfolioDAO.setSocialMedia(updatedSocialMediaMap);
             }
-            PortfolioDAO updatedPortfolio = mapper.portfolioToPortfolioDAO(portfolioRepo.save(mapper.portfolioDAOToPortfolio(portfolioDAO,
-                            new CycleAvoidingMappingContext())),
-                    new CycleAvoidingMappingContext());
-            if(!StringUtils.isEmpty(request.getCoverImageReference())){
-                objectImagesService.saveObjectImages(Arrays.asList(request.getProfileImageReference()),
-                        ImageEntityType.PORTFOLIO_COVER.getEntityType(),
-                        portfolioDAO.getId());
+            PortfolioDAO updatedPortfolio = mapper.portfolioToPortfolioDAO(portfolioRepo.save(mapper.portfolioDAOToPortfolio(portfolioDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+            if (!StringUtils.isEmpty(request.getCoverImageReference())) {
+                objectImagesService.saveObjectImages(Collections.singletonList(request.getProfileImageReference()), ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
             }
-            if(!StringUtils.isEmpty(request.getProfileImageReference())){
-                objectImagesService.saveObjectImages(Arrays.asList(request.getProfileImageReference()),
-                        ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
-                        portfolioDAO.getId());
+            if (!StringUtils.isEmpty(request.getProfileImageReference())) {
+                objectImagesService.saveObjectImages(Collections.singletonList(request.getProfileImageReference()), ImageEntityType.PORTFOLIO_PROFILE.getEntityType(), portfolioDAO.getId());
             }
             String successfulMessage = "Portfolio updated successfully";
             String tailorName = tailorDAO.getName();
@@ -200,7 +176,7 @@ public class PortfolioService {
             return new ResponseEntity(response, HttpStatus.OK);
         }
         response.setMessage("Sorry! Portfolio doesn't exist!");
-        return new ResponseEntity(response,HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     public ResponseEntity<CreatePortfolioOutfitResponse> createPortfolioOutfits(CreatePortfolioOutfitRequest request,
