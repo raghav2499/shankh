@@ -170,7 +170,7 @@ public class PortfolioService {
                     new CycleAvoidingMappingContext());
             String tailorName = tailorRepo.findNameById(tailorId);
             String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
-            String portfolioProfileReference = objectImagesService.getProfileProfileReference(portfolioDAO.getId());
+            String portfolioProfileReference = objectImagesService.getPortfiolioProfileReference(portfolioDAO.getId());
             String portfolioCoverReference = objectImagesService.getProfileCoverReference(portfolioDAO.getId());
             String portfolioProfileImageUrl = null;
             String portfolioCoverImageUrl = null;
@@ -322,6 +322,16 @@ public class PortfolioService {
             portfolioOutfitDetails.add(outfitDetail);
         }
         return portfolioOutfitDetails;
+    }
+
+    public ResponseEntity<GetPortfolioColorResponse> getColors() {
+        Map<Integer, ColorEnum> colorEnumMap = ColorEnum.getColorOrdinalEnumMap();
+        Map<Integer, String> responseMap = colorEnumMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(e -> e.getKey(),
+                        e -> e.getValue().getName()));
+        GetPortfolioColorResponse response = new GetPortfolioColorResponse(responseMap);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

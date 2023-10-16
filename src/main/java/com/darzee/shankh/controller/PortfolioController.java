@@ -55,4 +55,9 @@ public class PortfolioController {
             throws Exception {
         return portfolioService.getFilters(tailorId);
     }
+
+    @GetMapping(value = "/colors", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetPortfolioColorResponse> getPortfolioColors() {
+        return portfolioService.getColors();
+    }
 }
