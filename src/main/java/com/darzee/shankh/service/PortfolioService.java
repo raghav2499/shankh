@@ -131,7 +131,7 @@ public class PortfolioService {
 
     public ResponseEntity updatePortfolio(Long tailorId, UpdatePortfolioRequest request) {
         Optional<Portfolio> portfolio = portfolioRepo.findByTailorId(tailorId);
-        CreatePortfolioResponse response = new CreatePortfolioResponse();
+        GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse();
         if (portfolio.isPresent()) {
             Optional<Tailor> tailor = tailorRepo.findById(tailorId);
             TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
@@ -163,16 +163,29 @@ public class PortfolioService {
             }
             PortfolioDAO updatedPortfolio = mapper.portfolioToPortfolioDAO(portfolioRepo.save(mapper.portfolioDAOToPortfolio(portfolioDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
             if (!StringUtils.isEmpty(request.getCoverImageReference())) {
+                objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
                 objectImagesService.saveObjectImages(Collections.singletonList(request.getProfileImageReference()), ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
             }
             if (!StringUtils.isEmpty(request.getProfileImageReference())) {
+                objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_PROFILE.getEntityType(), portfolioDAO.getId());
                 objectImagesService.saveObjectImages(Collections.singletonList(request.getProfileImageReference()), ImageEntityType.PORTFOLIO_PROFILE.getEntityType(), portfolioDAO.getId());
             }
+
+            String portfolioProfileImageUrl = null;
+            String portfolioCoverImageUrl = null;
+
+            if(request.getProfileImageReference() != null){
+                portfolioProfileImageUrl = bucketService.getPortfolioImageShortLivedUrl(request.getProfileImageReference());
+            }
+            if(request.getCoverImageReference() != null){
+                portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(request.getCoverImageReference());
+            }
+
             String successfulMessage = "Portfolio updated successfully";
             String tailorName = tailorDAO.getName();
             String boutiqueName = boutique.getName();
 
-            response = new CreatePortfolioResponse(successfulMessage, tailorName, boutiqueName, updatedPortfolio.getAboutDetails(), updatedPortfolio.getSocialMedia());
+            response = new GetPortfolioDetailsResponse(successfulMessage, tailorName, boutiqueName, portfolioDAO.getId(), updatedPortfolio.getSocialMedia(),updatedPortfolio.getAboutDetails(),updatedPortfolio.getUsername(), portfolioProfileImageUrl,portfolioCoverImageUrl);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         response.setMessage("Sorry! Portfolio doesn't exist!");
