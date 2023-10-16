@@ -1,5 +1,6 @@
 package com.darzee.shankh.response;
 
+import com.darzee.shankh.dao.PortfolioOutfitsDAO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -20,4 +21,10 @@ public class PortfolioOutfitDetails {
     private String title;
     private List<String> imageUrl;
     private LocalDate creationTime;
+
+    public PortfolioOutfitDetails(PortfolioOutfitsDAO portfolioOutfitsDAO) {
+        this.subOutfitType = portfolioOutfitsDAO.getSubOutfitType();
+        this.title = portfolioOutfitsDAO.getTitle();
+        this.creationTime = portfolioOutfitsDAO.getCreatedAt().toLocalDate();
+    }
 }

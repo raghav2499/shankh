@@ -94,7 +94,7 @@ public class ObjectImagesService {
     }
 
     @Nullable
-    public String getProfileProfileReference(Long portfolioId) {
+    public String getPortfiolioProfileReference(Long portfolioId) {
         Optional<ObjectImages> profileCoverImage = repo.findByEntityIdAndEntityTypeAndIsValid(portfolioId,
                 ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
                 Boolean.TRUE);

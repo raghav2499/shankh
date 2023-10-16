@@ -221,7 +221,7 @@ public class PortfolioService {
                     new CycleAvoidingMappingContext());
             String tailorName = tailorRepo.findNameById(tailorId);
             String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
-            String portfolioProfileReference = objectImagesService.getProfileProfileReference(portfolioDAO.getId());
+            String portfolioProfileReference = objectImagesService.getPortfiolioProfileReference(portfolioDAO.getId());
             String portfolioCoverReference = objectImagesService.getProfileCoverReference(portfolioDAO.getId());
             String portfolioProfileImageUrl = null;
             String portfolioCoverImageUrl = null;
@@ -287,21 +287,22 @@ public class PortfolioService {
 
         List<PortfolioOutfitsDAO> portfolioOutfitsDAOs = mapper.portfolioObjectListToDAOList(portfolioOutfits,
                 new CycleAvoidingMappingContext());
-        Map<Integer, List<PortfolioOutfitDetails>> outfitDetails = new HashMap<>();
-        for (PortfolioOutfitsDAO portfolioOutfit : portfolioOutfitsDAOs) {
-            List<String> portfolioOutfitReferences =
-                    objectImagesService.getPortfolioOutfitsReferenceIds(portfolioOutfit.getId());
-            List<String> portfolioOutfitImageLinks = getPortfolioOutfitImageLinks(portfolioOutfitReferences);
-
-            PortfolioOutfitDetails portfolioOutfitDetails =
-                    new PortfolioOutfitDetails(portfolioOutfit.getSubOutfitType(), portfolioOutfit.getTitle(),
-                            portfolioOutfitImageLinks, portfolioOutfit.getCreatedAt().toLocalDate());
-            List<PortfolioOutfitDetails> portfolioOutfitDetailsList =
-                    Optional.ofNullable(outfitDetails.get(portfolioOutfit.getOutfitType().getOrdinal())).orElse(new ArrayList<>());
-            portfolioOutfitDetailsList.add(portfolioOutfitDetails);
-            outfitDetails.put(portfolioOutfit.getOutfitType().getOrdinal(), portfolioOutfitDetailsList);
+        Map<OutfitType, List<PortfolioOutfitsDAO>> portfolioOutfitMap = portfolioOutfitsDAOs
+                .stream()
+                .collect(
+                        Collectors.groupingBy(PortfolioOutfitsDAO::getOutfitType)
+                );
+        List<OutfitTypeGroupedPortfolioDetails> outfitDetails = new ArrayList<>();
+        for (Map.Entry<OutfitType, List<PortfolioOutfitsDAO>> entrySet : portfolioOutfitMap.entrySet()) {
+            OutfitType outfitType = entrySet.getKey();
+            List<PortfolioOutfitDetails> portfolioOutfitDetails = getPortfolioOutfitDetails(entrySet.getValue());
+            OutfitTypeGroupedPortfolioDetails groupedPortfolioDetails = new OutfitTypeGroupedPortfolioDetails(
+                    outfitType.getDisplayString(),
+                    outfitType.getOrdinal(),
+                    portfolioOutfitDetails);
+            outfitDetails.add(groupedPortfolioDetails);
         }
-        response.setOutfitDetails(outfitDetails);
+        response.setOutfitTypeGroupedPortfolioDetails(outfitDetails);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -336,27 +337,52 @@ public class PortfolioService {
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(),
                 new CycleAvoidingMappingContext());
         List<PortfolioOutfitsDAO> portfolioOutfits = portfolioDAO.getPortfolioOutfits();
-        Map<String, List<String>> subOutfitMap = new HashMap<>();
-        List<String> colorFilterList = new ArrayList<>();
+        Map<OutfitType, OutfitFilter> outfitFilterMap = new HashMap<>();
+        Map<Integer, String> colorFilterMap = new HashMap<>();
         for (PortfolioOutfitsDAO portfolioOutfitsDAO : portfolioOutfits) {
             OutfitType outfitType = portfolioOutfitsDAO.getOutfitType();
-            Integer subOutfitIdx = portfolioOutfitsDAO.getSubOutfitType();
-            String portfolioSubOutfit = outfitService.getSubOutfitName(outfitType, subOutfitIdx);
-            List<String> subOutfitList = Optional.ofNullable(subOutfitMap.get(outfitType.getName())).orElse(new ArrayList<>());
-
-            if (!subOutfitList.contains(portfolioSubOutfit)) {
-                subOutfitList.add(portfolioSubOutfit);
-                subOutfitMap.put(outfitType.getName(), subOutfitList);
+            OutfitFilter outfitFilter = null;
+            if (outfitFilterMap.containsKey(outfitType)) {
+                outfitFilter = outfitFilterMap.get(outfitType);
+            } else {
+                outfitFilter = new OutfitFilter(outfitType.getDisplayString(), outfitType.getOrdinal(), new HashMap<>());
             }
-            colorFilterList.add(portfolioOutfitsDAO.getColor().getName());
+            Map<Integer, String> totalSuboutfits = outfitService.getSubOutfitMap(outfitType);
+            String portfolioSubOutfitString = totalSuboutfits.get(portfolioOutfitsDAO.getSubOutfitType());
+            Map<Integer, String> filteredSubOutfits = outfitFilter.getSubOutfits();
+            filteredSubOutfits.put(portfolioOutfitsDAO.getSubOutfitType(), portfolioSubOutfitString);
+            outfitFilter.setSubOutfits(filteredSubOutfits);
+            outfitFilterMap.put(outfitType, outfitFilter);
+            colorFilterMap.put(portfolioOutfitsDAO.getColor().getOrdinal(), portfolioOutfitsDAO.getColor().getName());
         }
-        List<OutfitFilter> outfitFilters = new ArrayList<>();
-        for (Map.Entry<String, List<String>> pair : subOutfitMap.entrySet()) {
-            OutfitFilter outfitFilter = new OutfitFilter(pair.getKey(), pair.getValue());
-            outfitFilters.add(outfitFilter);
-        }
+
         String successMessage = "Filters fetched successfully";
-        response = new GetPortfolioFilterResponse(successMessage, outfitFilters, colorFilterList);
+        List<OutfitFilter> outfitFilterList = new ArrayList<>(outfitFilterMap.values());
+        response = new GetPortfolioFilterResponse(successMessage, outfitFilterList, colorFilterMap);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    private List<PortfolioOutfitDetails> getPortfolioOutfitDetails(List<PortfolioOutfitsDAO> portfolioOutfitsDAOs) {
+        List<PortfolioOutfitDetails> portfolioOutfitDetails = new ArrayList<>();
+        for (PortfolioOutfitsDAO portfolioOutfit : portfolioOutfitsDAOs) {
+            PortfolioOutfitDetails outfitDetail = new PortfolioOutfitDetails(portfolioOutfit);
+            List<String> portfolioOutfitReferences =
+                    objectImagesService.getPortfolioOutfitsReferenceIds(portfolioOutfit.getId());
+            List<String> portfolioOutfitImageLinks = getPortfolioOutfitImageLinks(portfolioOutfitReferences);
+            outfitDetail.setImageUrl(portfolioOutfitImageLinks);
+            portfolioOutfitDetails.add(outfitDetail);
+        }
+        return portfolioOutfitDetails;
+    }
+
+    public ResponseEntity<GetPortfolioColorResponse> getColors() {
+        Map<Integer, ColorEnum> colorEnumMap = ColorEnum.getColorOrdinalEnumMap();
+        Map<Integer, String> responseMap = colorEnumMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(e -> e.getKey(),
+                        e -> e.getValue().getName()));
+        GetPortfolioColorResponse response = new GetPortfolioColorResponse(responseMap);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

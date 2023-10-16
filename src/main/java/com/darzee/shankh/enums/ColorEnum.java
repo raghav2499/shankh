@@ -50,4 +50,8 @@ public enum ColorEnum {
     public String getName() {
         return name;
     }
+
+    public Integer getOrdinal() {
+        return ordinal;
+    }
 }
