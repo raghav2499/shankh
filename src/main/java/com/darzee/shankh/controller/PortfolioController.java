@@ -41,9 +41,9 @@ public class PortfolioController {
         return portfolioService.getPortfolio(tailorId);
     }
 
-    @PutMapping(value = "/{tailor_id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updatePortfolio(@PathVariable("tailor_id") Long tailorId, @RequestBody @Valid UpdatePortfolioRequest request){
-        return portfolioService.updatePortfolio(tailorId, request);
+    @PutMapping(value = "/{portfolio_id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updatePortfolio(@PathVariable("portfolio_id") Long portfolioId, @RequestBody @Valid UpdatePortfolioRequest request){
+        return portfolioService.updatePortfolio(portfolioId, request);
     }
 
 

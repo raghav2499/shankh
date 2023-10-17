@@ -129,55 +129,29 @@ public class PortfolioService {
         return new ResponseEntity<CreatePortfolioResponse>(response, HttpStatus.CREATED);
     }
 
-    public ResponseEntity updatePortfolio(Long tailorId, UpdatePortfolioRequest request) {
-        Optional<Portfolio> portfolio = portfolioRepo.findByTailorId(tailorId);
+    public ResponseEntity updatePortfolio(Long portfolioId, UpdatePortfolioRequest request) {
+        Optional<Portfolio> portfolio = portfolioRepo.findById(portfolioId);
         GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse();
         if (portfolio.isPresent()) {
-            Optional<Tailor> tailor = tailorRepo.findById(tailorId);
+            PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
+            Optional<Tailor> tailor = tailorRepo.findById(portfolioDAO.getTailor().getId());
             TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
             BoutiqueDAO boutique = tailorDAO.getBoutique();
-            PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
 
-            if (!StringUtils.isEmpty(request.getUsername())) {
-                if (portfolioDAO.getUsernameUpdatesCounts() >= 2) {
-                    String usernameUpdateNotAllowed = "Portfolio username update is not allowed as you have changed your username 2 times already!";
-                    response.setMessage(usernameUpdateNotAllowed);
-                    return new ResponseEntity(response, HttpStatus.OK);
-                }
-                portfolioDAO.setUsername(request.getUsername());
-                portfolioDAO.updateUsernameCount();
-            }
-            if (!StringUtils.isEmpty(request.getAbout())) {
-                portfolioDAO.setAboutDetails(request.getAbout());
-            }
+            updateUsername(request, portfolioDAO, response);
+            updateAboutDetails(request, portfolioDAO);
+            updateSocialMedia(request, portfolioDAO);
 
-            List<String> updatedSocialMedia = request.getSocialMedia();
-            Map<String, String> updatedSocialMediaMap = new HashMap<>();
-            if (updatedSocialMedia != null && !updatedSocialMedia.isEmpty()) {
-                for (Integer idx = 0; idx < updatedSocialMedia.size(); idx++) {
-                    if (updatedSocialMedia.get(idx) != null) {
-                        updatedSocialMediaMap.put(SocialMedia.getSocialMediaOrdinalEnumMap().get(idx + 1).getName(), updatedSocialMedia.get(idx));
-                    }
-                }
-                portfolioDAO.setSocialMedia(updatedSocialMediaMap);
-            }
-            PortfolioDAO updatedPortfolio = mapper.portfolioToPortfolioDAO(portfolioRepo.save(mapper.portfolioDAOToPortfolio(portfolioDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-            if (!StringUtils.isEmpty(request.getCoverImageReference())) {
-                objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
-                objectImagesService.saveObjectImages(Collections.singletonList(request.getProfileImageReference()), ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
-            }
-            if (!StringUtils.isEmpty(request.getProfileImageReference())) {
-                objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_PROFILE.getEntityType(), portfolioDAO.getId());
-                objectImagesService.saveObjectImages(Collections.singletonList(request.getProfileImageReference()), ImageEntityType.PORTFOLIO_PROFILE.getEntityType(), portfolioDAO.getId());
-            }
+            PortfolioDAO updatedPortfolio = mapper.portfolioToPortfolioDAO(portfolioRepo.save(mapper.portfolioDAOToPortfolio(portfolioDAO,
+                    new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
+            updateImageReference(request, portfolioDAO);
             String portfolioProfileImageUrl = null;
             String portfolioCoverImageUrl = null;
-
-            if(request.getProfileImageReference() != null){
+            if (!StringUtils.isEmpty(request.getCoverImageReference()) && request.getProfileImageReference() != null) {
                 portfolioProfileImageUrl = bucketService.getPortfolioImageShortLivedUrl(request.getProfileImageReference());
             }
-            if(request.getCoverImageReference() != null){
+            if (!StringUtils.isEmpty(request.getProfileImageReference()) && request.getCoverImageReference() != null) {
                 portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(request.getCoverImageReference());
             }
 
@@ -185,11 +159,62 @@ public class PortfolioService {
             String tailorName = tailorDAO.getName();
             String boutiqueName = boutique.getName();
 
-            response = new GetPortfolioDetailsResponse(successfulMessage, tailorName, boutiqueName, portfolioDAO.getId(), updatedPortfolio.getSocialMedia(),updatedPortfolio.getAboutDetails(),updatedPortfolio.getUsername(), portfolioProfileImageUrl,portfolioCoverImageUrl);
+            response = new GetPortfolioDetailsResponse(successfulMessage, tailorName, boutiqueName, portfolioDAO.getId(),
+                    updatedPortfolio.getSocialMedia(), updatedPortfolio.getAboutDetails(), updatedPortfolio.getUsername(),
+                    portfolioProfileImageUrl, portfolioCoverImageUrl);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         response.setMessage("Sorry! Portfolio doesn't exist!");
         return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    private void updateUsername(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO,
+                                GetPortfolioDetailsResponse response) {
+        if (!StringUtils.isEmpty(request.getUsername())) {
+            if (portfolioDAO.getUsernameUpdatesCounts() >= 2) {
+                String usernameUpdateResponse = "Username update is not allowed as you have changed your username 2 times";
+                response.setMessage(usernameUpdateResponse);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, usernameUpdateResponse);
+            }
+            portfolioDAO.setUsername(request.getUsername());
+            portfolioDAO.incrementUsernameUpdateCount();
+        }
+    }
+
+    private void updateAboutDetails(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO) {
+        if (!StringUtils.isEmpty(request.getAbout())) {
+            portfolioDAO.setAboutDetails(request.getAbout());
+        }
+    }
+
+    private void updateSocialMedia(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO) {
+        List<String> updatedSocialMedia = request.getSocialMedia();
+        Map<String, String> updatedSocialMediaMap = new HashMap<>();
+        if (updatedSocialMedia != null && !updatedSocialMedia.isEmpty()) {
+            for (int idx = 0; idx < updatedSocialMedia.size(); idx++) {
+                if (updatedSocialMedia.get(idx) != null && !(StringUtils.isEmpty(updatedSocialMedia.get(idx)))) {
+                    updatedSocialMediaMap.put(SocialMedia.getSocialMediaOrdinalEnumMap().get(idx + 1).getName(),
+                            updatedSocialMedia.get(idx));
+                }
+            }
+            portfolioDAO.setSocialMedia(updatedSocialMediaMap);
+        }
+    }
+
+    private void updateImageReference(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO) {
+        if (!StringUtils.isEmpty(request.getCoverImageReference()) && request.getCoverImageReference() != null) {
+            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_COVER.getEntityType(),
+                    portfolioDAO.getId());
+            objectImagesService.saveObjectImages(Arrays.asList(request.getCoverImageReference()),
+                    ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
+        }
+        if (!StringUtils.isEmpty(request.getProfileImageReference()) && request.getProfileImageReference() != null) {
+            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
+                    portfolioDAO.getId());
+            objectImagesService.saveObjectImages(Arrays.asList(request.getProfileImageReference()),
+                    ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
+                    portfolioDAO.getId());
+        }
     }
 
     public ResponseEntity<CreatePortfolioOutfitResponse> createPortfolioOutfits(CreatePortfolioOutfitRequest request,

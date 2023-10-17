@@ -38,7 +38,7 @@ public class PortfolioDAO {
         this.usernameUpdatesCounts = 0;
     }
 
-    public void updateUsernameCount(){
+    public void incrementUsernameUpdateCount(){
         this.usernameUpdatesCounts++;
     }
 }
