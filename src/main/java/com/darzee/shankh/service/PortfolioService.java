@@ -191,13 +191,13 @@ public class PortfolioService {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(String username, String outfitTypes,
+    public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(Long portfolioId, String outfitTypes,
                                                                           String subOutfits) throws Exception {
         GetPortfolioOutfitsResponse response = new GetPortfolioOutfitsResponse();
         List<Integer> outfitTypeOrdinals = new ArrayList<>();
         List<Integer> subOutfitTypeOrdinals = new ArrayList<>();
 
-        Optional<Portfolio> portfolio = portfolioRepo.findByUsername(username);
+        Optional<Portfolio> portfolio = portfolioRepo.findById(portfolioId);
         if (!portfolio.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Portfolio Id");
         }

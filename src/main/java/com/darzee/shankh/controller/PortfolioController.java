@@ -41,12 +41,12 @@ public class PortfolioController {
     }
 
 
-    @GetMapping(value = "/portfolio_outfit", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/portfolio_outfit", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(@RequestParam("username") String username,
+    public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(@PathVariable("id") Long portfolioId,
                                                                           @RequestParam(value = "outfit_type", required = false, defaultValue = "") String outfitType,
                                                                           @RequestParam(value = "sub_outfit", required = false, defaultValue = "") String subOutfit) throws Exception {
-        return portfolioService.getPortfolioOutfit(username, outfitType, subOutfit);
+        return portfolioService.getPortfolioOutfit(portfolioId, outfitType, subOutfit);
     }
 
     @GetMapping(value = "/filters", produces = MediaType.APPLICATION_JSON_VALUE)

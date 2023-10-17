@@ -30,6 +30,7 @@ public enum ColorEnum {
     TEAL("Teal", 20);
 
     private String name;
+
     private Integer ordinal;
 
     ColorEnum(String name, Integer ordinal) {
