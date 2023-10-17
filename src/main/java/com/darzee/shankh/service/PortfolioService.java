@@ -325,12 +325,11 @@ public class PortfolioService {
     }
 
     public ResponseEntity<GetPortfolioColorResponse> getColors() {
-        Map<Integer, ColorEnum> colorEnumMap = ColorEnum.getColorOrdinalEnumMap();
-        Map<Integer, String> responseMap = colorEnumMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(e -> e.getKey(),
-                        e -> e.getValue().getName()));
-        GetPortfolioColorResponse response = new GetPortfolioColorResponse(responseMap);
+        List<PortfolioColorDetail> colorDetails = Arrays.stream(ColorEnum.values())
+                .map(color ->
+                        new PortfolioColorDetail(color.getOrdinal(), color.getName()))
+                .collect(Collectors.toList());
+        GetPortfolioColorResponse response = new GetPortfolioColorResponse(colorDetails);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
