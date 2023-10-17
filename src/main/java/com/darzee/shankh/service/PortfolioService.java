@@ -327,7 +327,7 @@ public class PortfolioService {
     public ResponseEntity<GetPortfolioColorResponse> getColors() {
         List<PortfolioColorDetail> colorDetails = Arrays.stream(ColorEnum.values())
                 .map(color ->
-                        new PortfolioColorDetail(color.getOrdinal(), color.getName()))
+                        new PortfolioColorDetail(color.getOrdinal(), color.getHexcode(), color.getName()))
                 .collect(Collectors.toList());
         GetPortfolioColorResponse response = new GetPortfolioColorResponse(colorDetails);
         return new ResponseEntity<>(response, HttpStatus.OK);
