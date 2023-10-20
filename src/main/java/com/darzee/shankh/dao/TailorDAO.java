@@ -3,12 +3,14 @@ package com.darzee.shankh.dao;
 import com.darzee.shankh.enums.Language;
 import com.darzee.shankh.enums.TailorRole;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class TailorDAO {
     private Long id;
     private String name;

@@ -1,11 +1,7 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.PortfolioDAO;
-import com.darzee.shankh.dao.PortfolioOutfitsDAO;
-import com.darzee.shankh.dao.TailorDAO;
-import com.darzee.shankh.dao.BoutiqueDAO;
-import com.darzee.shankh.dao.ImageReferenceDAO;
+import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.Portfolio;
 import com.darzee.shankh.entity.PortfolioOutfits;
@@ -125,6 +121,10 @@ public class PortfolioService {
                     ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
                     portfolio.getId());
         }
+        tailorDAO.setPortfolio(portfolio);
+        tailorDAO = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
         String successfulMessage = "Portfolio created successfully";
         String tailorName = tailorDAO.getName();
         String boutiqueName = boutique.getName();

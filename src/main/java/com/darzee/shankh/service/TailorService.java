@@ -49,7 +49,7 @@ public class TailorService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private BoutiqueService boutiqueService;
+    private BoutiqueTailorService boutiqueTailorService;
 
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
@@ -76,7 +76,7 @@ public class TailorService {
         }
         if (isAdminSignupRequest) {
             BoutiqueDetails boutiqueDetails = request.getBoutiqueDetails();
-            boutiqueDAO = boutiqueService.createNewBoutique(boutiqueDetails);
+            boutiqueDAO = boutiqueTailorService.createNewBoutique(boutiqueDetails);
             BoutiqueLedgerDAO boutiqueLedgerDAO = new BoutiqueLedgerDAO(boutiqueDAO.getId());
             boutiqueLedgerRepo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));
         } else {
@@ -97,7 +97,7 @@ public class TailorService {
                 new CycleAvoidingMappingContext());
 
         if (request.getProfilePicReferenceId() != null) {
-            boutiqueService.saveTailorImageReference(request.getProfilePicReferenceId(), tailorDAO.getId());
+            boutiqueTailorService.saveTailorImageReference(request.getProfilePicReferenceId(), tailorDAO.getId());
         }
         if (TailorRole.ADMIN.equals(role)) {
             boutiqueDAO.setAdminTailor(tailorDAO);
@@ -150,10 +150,6 @@ public class TailorService {
         return new ResponseEntity("No profile found", HttpStatus.OK);
     }
 
-    public String getTailorPortfolioLink(TailorDAO tailor) {
-        return portfolioService.getPortfolioLink(tailor.getPortfolio());
-    }
-
     private Boolean isTailorAlreadySignedUp(String phoneNumber) {
         Optional<Tailor> tailor = tailorRepo.findByPhoneNumber(phoneNumber);
         if (tailor.isPresent()) {
@@ -161,5 +157,4 @@ public class TailorService {
         }
         return false;
     }
-
 }

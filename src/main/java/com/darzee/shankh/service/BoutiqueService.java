@@ -12,22 +12,18 @@ import com.darzee.shankh.repo.BoutiqueLedgerRepo;
 import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.repo.OrderRepo;
 import com.darzee.shankh.repo.TailorRepo;
-import com.darzee.shankh.request.BoutiqueDetails;
 import com.darzee.shankh.request.UpdateBoutiqueDetails;
 import com.darzee.shankh.request.UpdateTailorRequest;
 import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
 import io.jsonwebtoken.lang.Collections;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +40,7 @@ public class BoutiqueService {
     private BucketService bucketService;
 
     @Autowired
-    private TailorService tailorService;
+    private BoutiqueTailorService boutiqueTailorService;
 
     @Autowired
     private BoutiqueRepo boutiqueRepo;
@@ -59,21 +55,6 @@ public class BoutiqueService {
     private OrderRepo orderRepo;
     @Autowired
     private BoutiqueLedgerRepo boutiqueLedgerRepo;
-
-    public BoutiqueDAO createNewBoutique(BoutiqueDetails boutiqueDetails) {
-        String boutiqueReferenceId = generateUniqueBoutiqueReferenceId();
-        BoutiqueType boutiqueType = BoutiqueType.getOrdinalEnumMap().get(boutiqueDetails.getBoutiqueType());
-        BoutiqueDAO boutiqueDAO = new BoutiqueDAO(boutiqueDetails.getBoutiqueName(),
-                boutiqueType.getName(),
-                boutiqueReferenceId);
-        boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
-                        new CycleAvoidingMappingContext())),
-                new CycleAvoidingMappingContext());
-        if (!CollectionUtils.isEmpty(boutiqueDetails.getShopImageReferenceIds())) {
-            saveBoutiqueReferences(boutiqueDetails.getShopImageReferenceIds(), boutiqueDAO);
-        }
-        return boutiqueDAO;
-    }
 
     @Transactional
     public ResponseEntity updateBoutiqueDetails(Long boutiqueId, UpdateBoutiqueDetails request) {
@@ -130,11 +111,6 @@ public class BoutiqueService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique id");
     }
 
-    //todo : check if there's no boutique with same reference id
-    public String generateUniqueBoutiqueReferenceId() {
-        return RandomStringUtils.randomAlphanumeric(6);
-    }
-
     private List<String> getBoutiqueImagesReferenceIds(Long boutiqueId) {
         List<String> boutiqueImages = objectImagesService.getBoutiqueImageReferenceId(boutiqueId);
         if (Collections.isEmpty(boutiqueImages)) {
@@ -162,7 +138,7 @@ public class BoutiqueService {
         if (adminTailorImageReferenceId != null) {
             adminTailorImageUrl = bucketService.getShortLivedUrl(adminTailorImageReferenceId);
         }
-        String portfolioLink = tailorService.getTailorPortfolioLink(tailorDAO);
+        String portfolioLink = boutiqueTailorService.getTailorPortfolioLink(tailorDAO);
         GetBoutiqueDetailsResponse response = new GetBoutiqueDetailsResponse(boutiqueDAO, tailorDAO,
                 shopImageReferenceIds, shopImageUrls, adminTailorImageReferenceId, adminTailorImageUrl,
                 portfolioLink);
@@ -181,20 +157,13 @@ public class BoutiqueService {
             tailorDAO.setLanguage(updatedLanguage);
         }
         if(request.getTailorProfilePicReferenceId() != null) {
-            saveTailorImageReference(request.getTailorProfilePicReferenceId(), tailorDAO.getId());
+            boutiqueTailorService.saveTailorImageReference(request.getTailorProfilePicReferenceId(), tailorDAO.getId());
         }
         TailorDAO updatedTailor = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
 
         return updatedTailor;
-    }
-
-    public void saveTailorImageReference(String imageReference, Long tailorId) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.TAILOR.getEntityType(), tailorId);
-        objectImagesService.saveObjectImages(Arrays.asList(imageReference),
-                ImageEntityType.TAILOR.getEntityType(),
-                tailorId);
     }
 
 
