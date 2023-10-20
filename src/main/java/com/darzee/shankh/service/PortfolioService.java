@@ -19,6 +19,7 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.CreatePortfolioOutfitRequest;
 import com.darzee.shankh.request.CreatePortfolioRequest;
+import com.darzee.shankh.request.UpdatePortfolioRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -115,12 +116,12 @@ public class PortfolioService {
                 new CycleAvoidingMappingContext());
 
         if (!StringUtils.isEmpty(request.getCoverImageReference())) {
-            objectImagesService.saveObjectImages(Arrays.asList(request.getCoverImageReference()),
+            objectImagesService.saveObjectImages(Collections.singletonList(request.getCoverImageReference()),
                     ImageEntityType.PORTFOLIO_COVER.getEntityType(),
                     portfolio.getId());
         }
         if (!StringUtils.isEmpty(request.getProfileImageReference())) {
-            objectImagesService.saveObjectImages(Arrays.asList(request.getProfileImageReference()),
+            objectImagesService.saveObjectImages(Collections.singletonList(request.getProfileImageReference()),
                     ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
                     portfolio.getId());
         }
@@ -130,6 +131,96 @@ public class PortfolioService {
         response = new CreatePortfolioResponse(successfulMessage, tailorName, boutiqueName,
                 portfolio.getAboutDetails(), portfolio.getSocialMedia());
         return new ResponseEntity<CreatePortfolioResponse>(response, HttpStatus.CREATED);
+    }
+
+    public ResponseEntity updatePortfolio(Long portfolioId, UpdatePortfolioRequest request) {
+        Optional<Portfolio> portfolio = portfolioRepo.findById(portfolioId);
+        GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse();
+        if (portfolio.isPresent()) {
+            PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
+            Optional<Tailor> tailor = tailorRepo.findById(portfolioDAO.getTailor().getId());
+            TailorDAO tailorDAO = mapper.tailorObjectToDao(tailor.get(), new CycleAvoidingMappingContext());
+            BoutiqueDAO boutique = tailorDAO.getBoutique();
+
+            updateUsername(request, portfolioDAO, response);
+            updateAboutDetails(request, portfolioDAO);
+            updateSocialMedia(request, portfolioDAO);
+
+            PortfolioDAO updatedPortfolio = mapper.portfolioToPortfolioDAO(portfolioRepo.save(mapper.portfolioDAOToPortfolio(portfolioDAO,
+                    new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+
+            updateImageReference(request, portfolioDAO);
+            String portfolioProfileReference = objectImagesService.getPortfiolioProfileReference(portfolioDAO.getId());
+            String portfolioCoverReference = objectImagesService.getProfileCoverReference(portfolioDAO.getId());
+            String portfolioProfileImageUrl = null;
+            String portfolioCoverImageUrl = null;
+            if (portfolioProfileReference != null) {
+                portfolioProfileImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioProfileReference);
+            }
+            if (portfolioCoverReference != null) {
+                portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
+            }
+
+            String successfulMessage = "Portfolio updated successfully";
+            String tailorName = tailorDAO.getName();
+            String boutiqueName = boutique.getName();
+
+            response = new GetPortfolioDetailsResponse(successfulMessage, tailorName, boutiqueName, portfolioDAO.getId(),
+                    updatedPortfolio.getSocialMedia(), updatedPortfolio.getAboutDetails(), updatedPortfolio.getUsername(),
+                    portfolioProfileImageUrl, portfolioCoverImageUrl);
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        response.setMessage("Sorry! Portfolio doesn't exist!");
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    private void updateUsername(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO,
+                                GetPortfolioDetailsResponse response) {
+        if (!StringUtils.isEmpty(request.getUsername())) {
+            if (portfolioDAO.getUsernameUpdatesCounts() >= 2) {
+                String usernameUpdateResponse = "Username update is not allowed as you have changed your username 2 times";
+                response.setMessage(usernameUpdateResponse);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, usernameUpdateResponse);
+            }
+            portfolioDAO.setUsername(request.getUsername());
+            portfolioDAO.incrementUsernameUpdateCount();
+        }
+    }
+
+    private void updateAboutDetails(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO) {
+        if (!StringUtils.isEmpty(request.getAbout())) {
+            portfolioDAO.setAboutDetails(request.getAbout());
+        }
+    }
+
+    private void updateSocialMedia(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO) {
+        List<String> updatedSocialMedia = request.getSocialMedia();
+        Map<String, String> updatedSocialMediaMap = new HashMap<>();
+        if (updatedSocialMedia != null && !updatedSocialMedia.isEmpty()) {
+            for (int idx = 0; idx < updatedSocialMedia.size(); idx++) {
+                if (updatedSocialMedia.get(idx) != null && !(StringUtils.isEmpty(updatedSocialMedia.get(idx)))) {
+                    updatedSocialMediaMap.put(SocialMedia.getSocialMediaOrdinalEnumMap().get(idx + 1).getName(),
+                            updatedSocialMedia.get(idx));
+                }
+            }
+            portfolioDAO.setSocialMedia(updatedSocialMediaMap);
+        }
+    }
+
+    private void updateImageReference(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO) {
+        if (!StringUtils.isEmpty(request.getCoverImageReference())) {
+            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_COVER.getEntityType(),
+                    portfolioDAO.getId());
+            objectImagesService.saveObjectImages(Arrays.asList(request.getCoverImageReference()),
+                    ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
+        }
+        if (!StringUtils.isEmpty(request.getProfileImageReference())) {
+            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
+                    portfolioDAO.getId());
+            objectImagesService.saveObjectImages(Arrays.asList(request.getProfileImageReference()),
+                    ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
+                    portfolioDAO.getId());
+        }
     }
 
     public ResponseEntity<CreatePortfolioOutfitResponse> createPortfolioOutfits(CreatePortfolioOutfitRequest request,

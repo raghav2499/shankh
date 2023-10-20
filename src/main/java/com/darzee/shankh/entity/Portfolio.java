@@ -24,6 +24,9 @@ public class Portfolio extends GenericEntity {
     @Column(name = "username")
     private String username;
 
+    @Column(name = "username_updates_counts")
+    private Integer usernameUpdatesCounts;
+
     @Column(name = "about_details")
     private String aboutDetails;
 
