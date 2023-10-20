@@ -146,13 +146,15 @@ public class PortfolioService {
                     new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
             updateImageReference(request, portfolioDAO);
+            String portfolioProfileReference = objectImagesService.getPortfiolioProfileReference(portfolioDAO.getId());
+            String portfolioCoverReference = objectImagesService.getProfileCoverReference(portfolioDAO.getId());
             String portfolioProfileImageUrl = null;
             String portfolioCoverImageUrl = null;
-            if (!StringUtils.isEmpty(request.getCoverImageReference()) && request.getProfileImageReference() != null) {
-                portfolioProfileImageUrl = bucketService.getPortfolioImageShortLivedUrl(request.getProfileImageReference());
+            if (portfolioProfileReference != null) {
+                portfolioProfileImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioProfileReference);
             }
-            if (!StringUtils.isEmpty(request.getProfileImageReference()) && request.getCoverImageReference() != null) {
-                portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(request.getCoverImageReference());
+            if (portfolioCoverReference != null) {
+                portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
             }
 
             String successfulMessage = "Portfolio updated successfully";
@@ -202,13 +204,13 @@ public class PortfolioService {
     }
 
     private void updateImageReference(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO) {
-        if (!StringUtils.isEmpty(request.getCoverImageReference()) && request.getCoverImageReference() != null) {
+        if (!StringUtils.isEmpty(request.getCoverImageReference())) {
             objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_COVER.getEntityType(),
                     portfolioDAO.getId());
             objectImagesService.saveObjectImages(Arrays.asList(request.getCoverImageReference()),
                     ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
         }
-        if (!StringUtils.isEmpty(request.getProfileImageReference()) && request.getProfileImageReference() != null) {
+        if (!StringUtils.isEmpty(request.getProfileImageReference())) {
             objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
                     portfolioDAO.getId());
             objectImagesService.saveObjectImages(Arrays.asList(request.getProfileImageReference()),
