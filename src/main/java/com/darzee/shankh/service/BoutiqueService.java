@@ -44,6 +44,9 @@ public class BoutiqueService {
     private BucketService bucketService;
 
     @Autowired
+    private TailorService tailorService;
+
+    @Autowired
     private BoutiqueRepo boutiqueRepo;
 
     @Autowired
@@ -159,8 +162,10 @@ public class BoutiqueService {
         if (adminTailorImageReferenceId != null) {
             adminTailorImageUrl = bucketService.getShortLivedUrl(adminTailorImageReferenceId);
         }
+        String portfolioLink = tailorService.getTailorPortfolioLink(tailorDAO);
         GetBoutiqueDetailsResponse response = new GetBoutiqueDetailsResponse(boutiqueDAO, tailorDAO,
-                shopImageReferenceIds, shopImageUrls, adminTailorImageReferenceId, adminTailorImageUrl);
+                shopImageReferenceIds, shopImageUrls, adminTailorImageReferenceId, adminTailorImageUrl,
+                portfolioLink);
         return response;
     }
 

@@ -58,6 +58,9 @@ public class TailorService {
     private ObjectImagesService objectImagesService;
 
     @Autowired
+    private PortfolioService portfolioService;
+
+    @Autowired
     private TokenManager tokenManager;
     @Autowired
     private CustomerRepo customerRepo;
@@ -145,6 +148,10 @@ public class TailorService {
             return new ResponseEntity("success", HttpStatus.OK);
         }
         return new ResponseEntity("No profile found", HttpStatus.OK);
+    }
+
+    public String getTailorPortfolioLink(TailorDAO tailor) {
+        return portfolioService.getPortfolioLink(tailor.getPortfolio());
     }
 
     private Boolean isTailorAlreadySignedUp(String phoneNumber) {

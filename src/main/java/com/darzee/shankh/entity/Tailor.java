@@ -38,4 +38,8 @@ public class Tailor extends GenericEntity {
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
 
+    @OneToOne
+    @JoinColumn(name = "portfolio_id")
+    private Portfolio portfolio;
+
 }

@@ -23,6 +23,7 @@ import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -63,6 +64,9 @@ public class PortfolioService {
 
     @Autowired
     private AmazonClient s3Client;
+
+    @Value("${portfolio.base_url}")
+    private String baseUrl;
 
     public ResponseEntity<UsernameAvailableResponse> isUsernameAvailable(String username) {
         boolean isUsernameAvailable = usernameAvailable(username);
@@ -331,6 +335,14 @@ public class PortfolioService {
                 .collect(Collectors.toList());
         GetPortfolioColorResponse response = new GetPortfolioColorResponse(colorDetails);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public String getPortfolioLink(PortfolioDAO portfolioDAO) {
+        if (portfolioDAO == null) {
+            return null;
+        }
+        String username = portfolioDAO.getUsername();
+        return baseUrl + "/" + username;
     }
 
 }
