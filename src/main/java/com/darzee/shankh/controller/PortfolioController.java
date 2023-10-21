@@ -35,6 +35,12 @@ public class PortfolioController {
         return portfolioService.createPortfolioOutfits(request, portfolioId);
     }
 
+    @PutMapping(value = "/portfolio_outfit/{portfolio_outfit_id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CreatePortfolioOutfitResponse> updatePortfolioOutfit(@RequestBody @Valid CreatePortfolioOutfitRequest request,
+                                                                             @PathVariable("portfolio_outfit_id") Long portfolioOutfitId) throws Exception {
+        return portfolioService.updatePortfolioOutfits(request, portfolioOutfitId);
+    }
+
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(@RequestParam("tailor_id") Long tailorId) {
