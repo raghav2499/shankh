@@ -10,11 +10,10 @@ import java.util.List;
 
 @Repository
 public interface PortfolioOutfitsRepo extends JpaRepository<PortfolioOutfits, Long> {
-    @Nullable
-    List<PortfolioOutfits> findAllByPortfolioIdAndOutfitType(long portfolioId, OutfitType outfitType);
 
     @Nullable
-    List<PortfolioOutfits> findAllByPortfolioIdAndOutfitTypeInAndSubOutfitTypeIn(long portfolioId,
-                                                                                 List<OutfitType> outfitType,
-                                                                                 List<Integer> subOutfitType);
+    List<PortfolioOutfits> findAllByPortfolioIdAndOutfitTypeInAndSubOutfitTypeInAndIsValid(long portfolioId,
+                                                                                           List<OutfitType> outfitType,
+                                                                                           List<Integer> subOutfitType,
+                                                                                           Boolean isValid);
 }

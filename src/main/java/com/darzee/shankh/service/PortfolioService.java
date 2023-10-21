@@ -167,7 +167,7 @@ public class PortfolioService {
 
             response = new GetPortfolioDetailsResponse(successfulMessage, tailorName, boutiqueName, portfolioDAO.getId(),
                     updatedPortfolio.getSocialMedia(), updatedPortfolio.getAboutDetails(), updatedPortfolio.getUsername(),
-                    portfolioProfileImageUrl, portfolioCoverImageUrl);
+                    portfolioProfileImageUrl, portfolioCoverImageUrl, portfolioProfileReference, portfolioCoverReference);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         response.setMessage("Sorry! Portfolio doesn't exist!");
@@ -278,7 +278,8 @@ public class PortfolioService {
             String successMessage = "Portfolio details fetched successfully";
             response = new GetPortfolioDetailsResponse(successMessage, tailorName,
                     boutiqueName, portfolioDAO.getId(), portfolioDAO.getSocialMedia(), portfolioDAO.getAboutDetails(),
-                    portfolioDAO.getUsername(), portfolioProfileImageUrl, portfolioCoverImageUrl);
+                    portfolioDAO.getUsername(), portfolioProfileImageUrl, portfolioCoverImageUrl,
+                    portfolioProfileReference, portfolioCoverReference);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         String message = "Tailor's portfolio doesn't exist";
@@ -322,9 +323,10 @@ public class PortfolioService {
             }
         }
         List<PortfolioOutfits> portfolioOutfits =
-                portfolioOutfitsRepo.findAllByPortfolioIdAndOutfitTypeInAndSubOutfitTypeIn(portfolioDAO.getId(),
+                portfolioOutfitsRepo.findAllByPortfolioIdAndOutfitTypeInAndSubOutfitTypeInAndIsValid(portfolioDAO.getId(),
                         outfits,
-                        subOutfitTypeOrdinals);
+                        subOutfitTypeOrdinals,
+                        Boolean.TRUE);
         if (CollectionUtils.isEmpty(portfolioOutfits)) {
             return new ResponseEntity(response, HttpStatus.OK);
         }
@@ -414,6 +416,7 @@ public class PortfolioService {
                     objectImagesService.getPortfolioOutfitsReferenceIds(portfolioOutfit.getId());
             List<String> portfolioOutfitImageLinks = getPortfolioOutfitImageLinks(portfolioOutfitReferences);
             outfitDetail.setImageUrl(portfolioOutfitImageLinks);
+            outfitDetail.setImageReferences(portfolioOutfitReferences);
             portfolioOutfitDetails.add(outfitDetail);
         }
         return portfolioOutfitDetails;

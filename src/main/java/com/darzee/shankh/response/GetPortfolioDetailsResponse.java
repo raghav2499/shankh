@@ -24,4 +24,6 @@ public class GetPortfolioDetailsResponse {
     private String username;
     private String profileImageLink;
     private String coverImageLink;
+    private String profileImageReferenceId;
+    private String coverImageReferenceId;
 }
