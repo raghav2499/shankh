@@ -20,6 +20,7 @@ public class PortfolioOutfitDetails {
     private Integer subOutfitType;
     private String title;
     private List<String> imageUrl;
+    private List<String> imageReferences;
     private LocalDate creationTime;
 
     public PortfolioOutfitDetails(PortfolioOutfitsDAO portfolioOutfitsDAO) {

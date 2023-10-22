@@ -6,12 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GetPortfolioColorResponse {
-    private List<PortfolioColorDetail> colorDetail;
+public class PortfolioColorDetail {
+    private Integer ordinal;
+    private String hexCode;
+    private String name;
 }

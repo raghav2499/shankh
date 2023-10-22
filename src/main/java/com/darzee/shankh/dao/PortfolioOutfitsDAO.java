@@ -27,6 +27,7 @@ public class PortfolioOutfitsDAO {
 
     private Integer subOutfitType;
     private ColorEnum color;
+    private Boolean isValid = Boolean.TRUE;
 
     private PortfolioDAO portfolio;
 

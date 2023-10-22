@@ -49,13 +49,16 @@ public class TailorService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private BoutiqueService boutiqueService;
+    private BoutiqueTailorService boutiqueTailorService;
 
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
     private ObjectImagesService objectImagesService;
+
+    @Autowired
+    private PortfolioService portfolioService;
 
     @Autowired
     private TokenManager tokenManager;
@@ -73,7 +76,7 @@ public class TailorService {
         }
         if (isAdminSignupRequest) {
             BoutiqueDetails boutiqueDetails = request.getBoutiqueDetails();
-            boutiqueDAO = boutiqueService.createNewBoutique(boutiqueDetails);
+            boutiqueDAO = boutiqueTailorService.createNewBoutique(boutiqueDetails);
             BoutiqueLedgerDAO boutiqueLedgerDAO = new BoutiqueLedgerDAO(boutiqueDAO.getId());
             boutiqueLedgerRepo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));
         } else {
@@ -94,7 +97,7 @@ public class TailorService {
                 new CycleAvoidingMappingContext());
 
         if (request.getProfilePicReferenceId() != null) {
-            boutiqueService.saveTailorImageReference(request.getProfilePicReferenceId(), tailorDAO.getId());
+            boutiqueTailorService.saveTailorImageReference(request.getProfilePicReferenceId(), tailorDAO.getId());
         }
         if (TailorRole.ADMIN.equals(role)) {
             boutiqueDAO.setAdminTailor(tailorDAO);
@@ -154,5 +157,4 @@ public class TailorService {
         }
         return false;
     }
-
 }

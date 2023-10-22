@@ -1,11 +1,7 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.PortfolioDAO;
-import com.darzee.shankh.dao.PortfolioOutfitsDAO;
-import com.darzee.shankh.dao.TailorDAO;
-import com.darzee.shankh.dao.BoutiqueDAO;
-import com.darzee.shankh.dao.ImageReferenceDAO;
+import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.Portfolio;
 import com.darzee.shankh.entity.PortfolioOutfits;
@@ -24,6 +20,7 @@ import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -64,6 +61,9 @@ public class PortfolioService {
 
     @Autowired
     private AmazonClient s3Client;
+
+    @Value("${portfolio.base_url}")
+    private String baseUrl;
 
     public ResponseEntity<UsernameAvailableResponse> isUsernameAvailable(String username) {
         boolean isUsernameAvailable = usernameAvailable(username);
@@ -121,6 +121,10 @@ public class PortfolioService {
                     ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
                     portfolio.getId());
         }
+        tailorDAO.setPortfolio(portfolio);
+        tailorDAO = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
         String successfulMessage = "Portfolio created successfully";
         String tailorName = tailorDAO.getName();
         String boutiqueName = boutique.getName();
@@ -146,13 +150,15 @@ public class PortfolioService {
                     new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
             updateImageReference(request, portfolioDAO);
+            String portfolioProfileReference = objectImagesService.getPortfiolioProfileReference(portfolioDAO.getId());
+            String portfolioCoverReference = objectImagesService.getProfileCoverReference(portfolioDAO.getId());
             String portfolioProfileImageUrl = null;
             String portfolioCoverImageUrl = null;
-            if (!StringUtils.isEmpty(request.getCoverImageReference()) && request.getProfileImageReference() != null) {
-                portfolioProfileImageUrl = bucketService.getPortfolioImageShortLivedUrl(request.getProfileImageReference());
+            if (portfolioProfileReference != null) {
+                portfolioProfileImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioProfileReference);
             }
-            if (!StringUtils.isEmpty(request.getProfileImageReference()) && request.getCoverImageReference() != null) {
-                portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(request.getCoverImageReference());
+            if (portfolioCoverReference != null) {
+                portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
             }
 
             String successfulMessage = "Portfolio updated successfully";
@@ -161,7 +167,7 @@ public class PortfolioService {
 
             response = new GetPortfolioDetailsResponse(successfulMessage, tailorName, boutiqueName, portfolioDAO.getId(),
                     updatedPortfolio.getSocialMedia(), updatedPortfolio.getAboutDetails(), updatedPortfolio.getUsername(),
-                    portfolioProfileImageUrl, portfolioCoverImageUrl);
+                    portfolioProfileImageUrl, portfolioCoverImageUrl, portfolioProfileReference, portfolioCoverReference);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         response.setMessage("Sorry! Portfolio doesn't exist!");
@@ -202,13 +208,13 @@ public class PortfolioService {
     }
 
     private void updateImageReference(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO) {
-        if (!StringUtils.isEmpty(request.getCoverImageReference()) && request.getCoverImageReference() != null) {
+        if (!StringUtils.isEmpty(request.getCoverImageReference())) {
             objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_COVER.getEntityType(),
                     portfolioDAO.getId());
             objectImagesService.saveObjectImages(Arrays.asList(request.getCoverImageReference()),
                     ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
         }
-        if (!StringUtils.isEmpty(request.getProfileImageReference()) && request.getProfileImageReference() != null) {
+        if (!StringUtils.isEmpty(request.getProfileImageReference())) {
             objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
                     portfolioDAO.getId());
             objectImagesService.saveObjectImages(Arrays.asList(request.getProfileImageReference()),
@@ -353,7 +359,8 @@ public class PortfolioService {
             String successMessage = "Portfolio details fetched successfully";
             response = new GetPortfolioDetailsResponse(successMessage, tailorName,
                     boutiqueName, portfolioDAO.getId(), portfolioDAO.getSocialMedia(), portfolioDAO.getAboutDetails(),
-                    portfolioDAO.getUsername(), portfolioProfileImageUrl, portfolioCoverImageUrl);
+                    portfolioDAO.getUsername(), portfolioProfileImageUrl, portfolioCoverImageUrl,
+                    portfolioProfileReference, portfolioCoverReference);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         String message = "Tailor's portfolio doesn't exist";
@@ -361,13 +368,13 @@ public class PortfolioService {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(String username, String outfitTypes,
+    public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(Long portfolioId, String outfitTypes,
                                                                           String subOutfits) throws Exception {
         GetPortfolioOutfitsResponse response = new GetPortfolioOutfitsResponse();
         List<Integer> outfitTypeOrdinals = new ArrayList<>();
         List<Integer> subOutfitTypeOrdinals = new ArrayList<>();
 
-        Optional<Portfolio> portfolio = portfolioRepo.findByUsername(username);
+        Optional<Portfolio> portfolio = portfolioRepo.findById(portfolioId);
         if (!portfolio.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Portfolio Id");
         }
@@ -397,9 +404,10 @@ public class PortfolioService {
             }
         }
         List<PortfolioOutfits> portfolioOutfits =
-                portfolioOutfitsRepo.findAllByPortfolioIdAndOutfitTypeInAndSubOutfitTypeIn(portfolioDAO.getId(),
+                portfolioOutfitsRepo.findAllByPortfolioIdAndOutfitTypeInAndSubOutfitTypeInAndIsValid(portfolioDAO.getId(),
                         outfits,
-                        subOutfitTypeOrdinals);
+                        subOutfitTypeOrdinals,
+                        Boolean.TRUE);
         if (CollectionUtils.isEmpty(portfolioOutfits)) {
             return new ResponseEntity(response, HttpStatus.OK);
         }
@@ -489,19 +497,27 @@ public class PortfolioService {
                     objectImagesService.getPortfolioOutfitsReferenceIds(portfolioOutfit.getId());
             List<String> portfolioOutfitImageLinks = getPortfolioOutfitImageLinks(portfolioOutfitReferences);
             outfitDetail.setImageUrl(portfolioOutfitImageLinks);
+            outfitDetail.setImageReferences(portfolioOutfitReferences);
             portfolioOutfitDetails.add(outfitDetail);
         }
         return portfolioOutfitDetails;
     }
 
     public ResponseEntity<GetPortfolioColorResponse> getColors() {
-        Map<Integer, ColorEnum> colorEnumMap = ColorEnum.getColorOrdinalEnumMap();
-        Map<Integer, String> responseMap = colorEnumMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(e -> e.getKey(),
-                        e -> e.getValue().getName()));
-        GetPortfolioColorResponse response = new GetPortfolioColorResponse(responseMap);
+        List<PortfolioColorDetail> colorDetails = Arrays.stream(ColorEnum.values())
+                .map(color ->
+                        new PortfolioColorDetail(color.getOrdinal(), color.getHexcode(), color.getName()))
+                .collect(Collectors.toList());
+        GetPortfolioColorResponse response = new GetPortfolioColorResponse(colorDetails);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public String getPortfolioLink(PortfolioDAO portfolioDAO) {
+        if (portfolioDAO == null) {
+            return null;
+        }
+        String username = portfolioDAO.getUsername();
+        return baseUrl + "/" + username;
     }
 
 }

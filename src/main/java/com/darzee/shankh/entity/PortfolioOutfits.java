@@ -42,6 +42,9 @@ public class PortfolioOutfits extends GenericEntity {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "is_valid")
+    private Boolean isValid;
     @ManyToOne
     @JoinColumn(name = "portfolio_id")
     private Portfolio portfolio;

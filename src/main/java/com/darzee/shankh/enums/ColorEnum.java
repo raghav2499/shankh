@@ -8,32 +8,34 @@ import java.util.Map;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ColorEnum {
 
-    RED("Red", 1),
-    ROYAL_BLUE("Royal Blue", 2),
-    LIGHT_YELLOW("Light Yellow", 3),
-    GREEN("Green", 4),
-    ORANGE("Orange", 5),
-    PURPLE("Purple", 6),
-    BABY_PINK("Baby Pink", 7),
-    BROWN("Brown", 8),
-    BLACK("Black", 9),
-    WHITE("White", 10),
-    LIGHT_GREY("Light Grey", 11),
-    BEIGE("Beige", 12),
-    NAVY_BLUE("Navy Blue", 13),
-    TORQUOISE("Torquoise", 14),
-    MAROON("Maroon", 15),
-    YELLOW("Yellow", 16),
-    GREY("Grey", 17),
-    CREAM("Cream", 18),
-    OLIVE("Olive", 19),
-    TEAL("Teal", 20);
+    RED("Red", "DF1A1A", 1),
+    ROYAL_BLUE("Royal Blue", "3E2FE8", 2),
+    LIGHT_YELLOW("Light Yellow", "F0DF45", 3),
+    GREEN("Green", "3AD15C", 4),
+    ORANGE("Orange", "FDBA0E", 5),
+    PURPLE("Purple", "800080", 6),
+    BABY_PINK("Baby Pink", "F998D2", 7),
+    BROWN("Brown", "964B00", 8),
+    BLACK("Black", "000000", 9),
+    WHITE("White", "FFFFFF", 10),
+    LIGHT_GREY("Light Grey", "D9D9D9", 11),
+    BEIGE("Beige", "D1C0A8", 12),
+    NAVY_BLUE("Navy Blue", "000080", 13),
+    TORQUOISE("Torquoise", "30D5C8", 14),
+    MAROON("Maroon", "800000", 15),
+    YELLOW("Yellow", "FFD700", 16),
+    GREY("Grey", "C0C0C0", 17),
+    CREAM("Cream", "FFFDD0", 18),
+    OLIVE("Olive", "808000", 19),
+    TEAL("Teal", "008080", 20);
 
     private String name;
+    private String hexcode;
     private Integer ordinal;
 
-    ColorEnum(String name, Integer ordinal) {
+    ColorEnum(String name, String hexcode, Integer ordinal) {
         this.name = name;
+        this.hexcode = hexcode;
         this.ordinal = ordinal;
     }
 
@@ -49,6 +51,10 @@ public enum ColorEnum {
 
     public String getName() {
         return name;
+    }
+
+    public String getHexcode() {
+        return hexcode;
     }
 
     public Integer getOrdinal() {
