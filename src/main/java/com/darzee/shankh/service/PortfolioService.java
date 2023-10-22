@@ -338,6 +338,28 @@ public class PortfolioService {
         }
     }
 
+    public ResponseEntity<CreatePortfolioOutfitResponse> deletePortfolioOutfit(Long portfolioOutfitId) throws Exception {
+        CreatePortfolioOutfitResponse response = new CreatePortfolioOutfitResponse();
+        Optional<PortfolioOutfits> portfolioOutfit = portfolioOutfitsRepo.findById(portfolioOutfitId);
+        if (portfolioOutfit.isPresent()) {
+            PortfolioOutfitsDAO portfolioOutfitsDao = mapper.portfolioOutfitsToPortfolioOutfitsDAO(portfolioOutfit.get(),
+                    new CycleAvoidingMappingContext());
+            portfolioOutfitsDao.setIsValid(Boolean.FALSE);
+
+            PortfolioOutfitsDAO deletedPortfolioOutfitDao = mapper.portfolioOutfitsToPortfolioOutfitsDAO(
+                    portfolioOutfitsRepo.save(mapper.portfolioOutfitsDAOToPortfolioOutfits(portfolioOutfitsDao,
+                            new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext());
+
+            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(),
+                    portfolioOutfitId);
+            response.setMessage("Portfolio outfit deleted!");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        response.setMessage("Portfolio outfit not found!");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(Long tailorId) {
         Optional<Portfolio> portfolio = portfolioRepo.findByTailorId(tailorId);
         GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse();

@@ -41,6 +41,11 @@ public class PortfolioController {
         return portfolioService.updatePortfolioOutfits(request, portfolioOutfitId);
     }
 
+    @PutMapping(value = "/delete_portfolio_outfit/{portfolio_outfit_id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CreatePortfolioOutfitResponse> deletePortfolioOutfit(@PathVariable("portfolio_outfit_id") Long portfolioOutfitId) throws Exception {
+        return portfolioService.deletePortfolioOutfit(portfolioOutfitId);
+    }
+
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(@RequestParam("tailor_id") Long tailorId) {
@@ -51,7 +56,6 @@ public class PortfolioController {
     public ResponseEntity updatePortfolio(@PathVariable("portfolio_id") Long portfolioId, @RequestBody @Valid UpdatePortfolioRequest request){
         return portfolioService.updatePortfolio(portfolioId, request);
     }
-
 
     @GetMapping(value = "/{id}/portfolio_outfit", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
