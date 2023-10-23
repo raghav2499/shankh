@@ -176,7 +176,7 @@ public class PortfolioService {
 
     private void updateUsername(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO,
                                 GetPortfolioDetailsResponse response) {
-        if (!StringUtils.isEmpty(request.getUsername())) {
+        if (!StringUtils.isEmpty(request.getUsername()) && !Objects.equals(request.getUsername(), portfolioDAO.getUsername())) {
             if (portfolioDAO.getUsernameUpdatesCounts() >= 2) {
                 String usernameUpdateResponse = "Username update is not allowed as you have changed your username 2 times";
                 response.setMessage(usernameUpdateResponse);
