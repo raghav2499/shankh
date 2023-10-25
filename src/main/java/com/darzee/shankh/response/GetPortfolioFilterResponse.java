@@ -18,7 +18,7 @@ import java.util.Map;
 public class GetPortfolioFilterResponse {
     private String message;
     private List<OutfitFilter> outfitFilter;
-    private Map<Integer, String> colorFilter;
+    private Map<String, String> colorFilter;
 
     public GetPortfolioFilterResponse(String message) {
         this.message = message;

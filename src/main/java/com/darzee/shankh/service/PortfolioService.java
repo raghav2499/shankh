@@ -384,7 +384,7 @@ public class PortfolioService {
                 new CycleAvoidingMappingContext());
         List<PortfolioOutfitsDAO> portfolioOutfits = portfolioDAO.getPortfolioOutfits();
         Map<OutfitType, OutfitFilter> outfitFilterMap = new HashMap<>();
-        Map<Integer, String> colorFilterMap = new HashMap<>();
+        Map<String, String> colorFilterMap = new HashMap<>();
         for (PortfolioOutfitsDAO portfolioOutfitsDAO : portfolioOutfits) {
             OutfitType outfitType = portfolioOutfitsDAO.getOutfitType();
             OutfitFilter outfitFilter = null;
@@ -399,7 +399,7 @@ public class PortfolioService {
             filteredSubOutfits.put(portfolioOutfitsDAO.getSubOutfitType(), portfolioSubOutfitString);
             outfitFilter.setSubOutfits(filteredSubOutfits);
             outfitFilterMap.put(outfitType, outfitFilter);
-            colorFilterMap.put(portfolioOutfitsDAO.getColor().getOrdinal(), portfolioOutfitsDAO.getColor().getName());
+            colorFilterMap.put(portfolioOutfitsDAO.getColor().getHexcode(), portfolioOutfitsDAO.getColor().getName());
         }
 
         String successMessage = "Filters fetched successfully";
