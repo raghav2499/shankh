@@ -260,9 +260,10 @@ public class PortfolioService {
     public ResponseEntity<CreatePortfolioOutfitResponse> updatePortfolioOutfits(CreatePortfolioOutfitRequest request,
                                                                                 Long portfolioOutfitId) throws Exception {
         CreatePortfolioOutfitResponse response = new CreatePortfolioOutfitResponse();
-        Optional<PortfolioOutfits> portfolioOutfit = portfolioOutfitsRepo.findById(portfolioOutfitId);
+        Optional<PortfolioOutfits> portfolioOutfit = portfolioOutfitsRepo.findByIdAndIsValid(portfolioOutfitId,
+                Boolean.TRUE);
         OutfitType outfitType = null;
-        if (portfolioOutfit.isPresent()) {
+        if (portfolioOutfit.isPresent() && portfolioOutfit.get().getIsValid()) {
             PortfolioOutfitsDAO portfolioOutfitDao = mapper.portfolioOutfitsToPortfolioOutfitsDAO(portfolioOutfit.get(),
                     new CycleAvoidingMappingContext());
             if (request.getOutfitType() != null) {
@@ -295,7 +296,7 @@ public class PortfolioService {
                     portfolioOutfitsRepo.save(mapper.portfolioOutfitsDAOToPortfolioOutfits(portfolioOutfitDao,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
-            updatePortfolioOutfitImageReference(request, updatePortfolioOutfit, updatePortfolioOutfit.getId());
+            updatePortfolioOutfitImageReference(request, updatePortfolioOutfit);
             response.setMessage("Portfolio outfit updated successfully!");
             response.setPortfolioOutfitId(portfolioOutfitId);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -305,42 +306,29 @@ public class PortfolioService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    private void updatePortfolioOutfitImageReference(CreatePortfolioOutfitRequest request,
-                                                     PortfolioOutfitsDAO updatePortfolioOutfit,
-                                                     Long portfolioOutfitId) {
+    private void updatePortfolioOutfitImageReference(CreatePortfolioOutfitRequest request, PortfolioOutfitsDAO updatePortfolioOutfit) {
         List<String> portfolioOutfitReferenceIds = request.getReferenceIds();
         if (!CollectionUtils.isEmpty(portfolioOutfitReferenceIds)) {
-            List<String> existingReferenceIds = objectImagesService.getPortfolioOutfitsReferenceIds(portfolioOutfitId);
+            List<String> existingReferenceIds = objectImagesService.getPortfolioOutfitsReferenceIds(updatePortfolioOutfit.getId());
             if (CollectionUtils.isEmpty(existingReferenceIds)) {
-                objectImagesService.saveObjectImages(portfolioOutfitReferenceIds,
-                        ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(),
-                        portfolioOutfitId);
+                objectImagesService.saveObjectImages(portfolioOutfitReferenceIds, ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
             }
-            if (!CollectionUtils.isEmpty(existingReferenceIds)) {
-                List<String> removedReferenceIds = existingReferenceIds
-                        .stream()
-                        .filter(exisingId -> !portfolioOutfitReferenceIds.contains(exisingId))
-                        .collect(Collectors.toList());
+            List<String> removedReferenceIds = new ArrayList<>(existingReferenceIds);
+            removedReferenceIds.removeAll(portfolioOutfitReferenceIds);
 
-                List<String> updatedReferenceIds = portfolioOutfitReferenceIds
-                        .stream()
-                        .filter(newId -> !existingReferenceIds.contains(newId))
-                        .collect(Collectors.toList());
+            List<String> updatedReferenceIds = new ArrayList<>(portfolioOutfitReferenceIds);
+            updatedReferenceIds.removeAll(existingReferenceIds);
 
-                for (String removedId : removedReferenceIds) {
-                    objectImagesService.invalidateExistingReferenceId(removedId);
-                }
-                if (!CollectionUtils.isEmpty(updatedReferenceIds)) {
-                    objectImagesService.saveObjectImages(updatedReferenceIds, ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(),
-                            portfolioOutfitId);
-                }
+            objectImagesService.invalidateExistingReferenceIds(removedReferenceIds);
+            if (!CollectionUtils.isEmpty(updatedReferenceIds)) {
+                objectImagesService.saveObjectImages(updatedReferenceIds, ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
             }
         }
     }
 
-    public ResponseEntity<CreatePortfolioOutfitResponse> deletePortfolioOutfit(Long portfolioOutfitId) throws Exception {
+    public ResponseEntity<CreatePortfolioOutfitResponse> invalidatePortfolioOutfit(Long portfolioOutfitId) throws Exception {
         CreatePortfolioOutfitResponse response = new CreatePortfolioOutfitResponse();
-        Optional<PortfolioOutfits> portfolioOutfit = portfolioOutfitsRepo.findById(portfolioOutfitId);
+        Optional<PortfolioOutfits> portfolioOutfit = portfolioOutfitsRepo.findByIdAndIsValid(portfolioOutfitId, Boolean.TRUE);
         if (portfolioOutfit.isPresent()) {
             PortfolioOutfitsDAO portfolioOutfitsDao = mapper.portfolioOutfitsToPortfolioOutfitsDAO(portfolioOutfit.get(),
                     new CycleAvoidingMappingContext());
@@ -354,6 +342,7 @@ public class PortfolioService {
             objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(),
                     portfolioOutfitId);
             response.setMessage("Portfolio outfit deleted!");
+            response.setPortfolioOutfitId(portfolioOutfitId);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         response.setMessage("Portfolio outfit not found!");

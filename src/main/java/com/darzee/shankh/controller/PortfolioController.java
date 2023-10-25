@@ -41,9 +41,9 @@ public class PortfolioController {
         return portfolioService.updatePortfolioOutfits(request, portfolioOutfitId);
     }
 
-    @PutMapping(value = "/delete_portfolio_outfit/{portfolio_outfit_id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CreatePortfolioOutfitResponse> deletePortfolioOutfit(@PathVariable("portfolio_outfit_id") Long portfolioOutfitId) throws Exception {
-        return portfolioService.deletePortfolioOutfit(portfolioOutfitId);
+    @PutMapping(value = "/invalidate_portfolio_outfit/{portfolio_outfit_id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CreatePortfolioOutfitResponse> invalidatePortfolioOutfit(@PathVariable("portfolio_outfit_id") Long portfolioOutfitId) throws Exception {
+        return portfolioService.invalidatePortfolioOutfit(portfolioOutfitId);
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)

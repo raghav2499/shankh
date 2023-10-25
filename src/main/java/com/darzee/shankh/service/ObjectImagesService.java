@@ -134,12 +134,15 @@ public class ObjectImagesService {
         }
     }
 
-    public void invalidateExistingReferenceId(String imageReferenceId){
-        Optional<ObjectImages> validImage = repo.findByReferenceIdAndIsValid(imageReferenceId, Boolean.TRUE);
-        if(validImage.isPresent() && validImage.get().getIsValid()){
-            ObjectImagesDAO objectImageDao = mapper.objectImagesToObjectImagesDAO(validImage.get());
-            objectImageDao.setIsValid(Boolean.FALSE);
-            repo.save(mapper.objectImageDAOToObjectImage(objectImageDao));
+    public void invalidateExistingReferenceIds(List<String> invalidReferenceIds){
+        for (String referenceId : invalidReferenceIds){
+            Optional<ObjectImages> validImage = repo.findAllByReferenceIdAndIsValid(referenceId,
+                    Boolean.TRUE);
+            if(validImage.isPresent()){
+                ObjectImagesDAO objectImageDao = mapper.objectImagesToObjectImagesDAO(validImage.get());
+                objectImageDao.setIsValid(Boolean.FALSE);
+                repo.save(mapper.objectImageDAOToObjectImage(objectImageDao));
+            }
         }
     }
 
