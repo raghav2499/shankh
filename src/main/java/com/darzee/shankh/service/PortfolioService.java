@@ -234,11 +234,8 @@ public class PortfolioService {
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(request.getOutfitType());
         Integer subOutfitOrdinal = request.getSubOutfit();
-        Set<Integer> possibleSubOutfits = outfitService.getSubOutfitMap(outfitType).keySet();
+        validateSubOutfits(request.getOutfitType(), subOutfitOrdinal);
         List<String> portfolioOutfitReferenceIds = request.getReferenceIds();
-        if (!possibleSubOutfits.contains(subOutfitOrdinal)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Sub Outfit Type");
-        }
         ColorEnum color = ColorEnum.getColorOrdinalEnumMap().get(request.getColor());
         PortfolioOutfitsDAO portfolioOutfit = new PortfolioOutfitsDAO(request.getTitle(), outfitType, subOutfitOrdinal,
                 color, portfolioDAO);
@@ -255,6 +252,101 @@ public class PortfolioService {
         response = new CreatePortfolioOutfitResponse(successMessage,
                 portfolioOutfit.getId());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    public ResponseEntity<CreatePortfolioOutfitResponse> updatePortfolioOutfits(CreatePortfolioOutfitRequest request,
+                                                                                Long portfolioOutfitId) throws Exception {
+        CreatePortfolioOutfitResponse response = new CreatePortfolioOutfitResponse();
+        Optional<PortfolioOutfits> portfolioOutfit = portfolioOutfitsRepo.findByIdAndIsValid(portfolioOutfitId,
+                Boolean.TRUE);
+        OutfitType outfitType = null;
+        if (portfolioOutfit.isPresent() && portfolioOutfit.get().getIsValid()) {
+            PortfolioOutfitsDAO portfolioOutfitDao = mapper.portfolioOutfitsToPortfolioOutfitsDAO(portfolioOutfit.get(),
+                    new CycleAvoidingMappingContext());
+            if (request.getOutfitType() != null) {
+                outfitType = OutfitType.getOutfitOrdinalEnumMap().get(request.getOutfitType());
+                if (outfitType == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Outfit Type!");
+                }
+                portfolioOutfitDao.setOutfitType(outfitType);
+            }
+            if (request.getSubOutfit() != null) {
+                validateSubOutfits(request.getOutfitType(), request.getSubOutfit());
+                portfolioOutfitDao.setSubOutfitType(request.getSubOutfit());
+            }
+            if (!StringUtils.isEmpty(request.getTitle()) && request.getTitle() != null) {
+                portfolioOutfitDao.setTitle(request.getTitle());
+            }
+            if (request.getColor() != null) {
+                ColorEnum color = ColorEnum.getColorOrdinalEnumMap().get(request.getColor());
+                if (color == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Color!");
+                }
+                portfolioOutfitDao.setColor(color);
+            }
+            PortfolioOutfitsDAO updatePortfolioOutfit = mapper.portfolioOutfitsToPortfolioOutfitsDAO(
+                    portfolioOutfitsRepo.save(mapper.portfolioOutfitsDAOToPortfolioOutfits(portfolioOutfitDao,
+                            new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext());
+            updatePortfolioOutfitImageReference(request, updatePortfolioOutfit);
+            response.setMessage("Portfolio outfit updated successfully!");
+            response.setPortfolioOutfitId(portfolioOutfitId);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        }
+        response.setMessage("Portfolio outfit not found!");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private void updatePortfolioOutfitImageReference(CreatePortfolioOutfitRequest request, PortfolioOutfitsDAO updatePortfolioOutfit) {
+        List<String> portfolioOutfitReferenceIds = request.getReferenceIds();
+        if (!CollectionUtils.isEmpty(portfolioOutfitReferenceIds)) {
+            List<String> existingReferenceIds = objectImagesService.getPortfolioOutfitsReferenceIds(updatePortfolioOutfit.getId());
+            if (CollectionUtils.isEmpty(existingReferenceIds)) {
+                objectImagesService.saveObjectImages(portfolioOutfitReferenceIds, ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
+            }
+            List<String> removedReferenceIds = new ArrayList<>(existingReferenceIds);
+            removedReferenceIds.removeAll(portfolioOutfitReferenceIds);
+
+            List<String> updatedReferenceIds = new ArrayList<>(portfolioOutfitReferenceIds);
+            updatedReferenceIds.removeAll(existingReferenceIds);
+
+            objectImagesService.invalidateExistingReferenceIds(removedReferenceIds);
+            if (!CollectionUtils.isEmpty(updatedReferenceIds)) {
+                objectImagesService.saveObjectImages(updatedReferenceIds, ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
+            }
+        }
+    }
+
+    public ResponseEntity<CreatePortfolioOutfitResponse> invalidatePortfolioOutfit(Long portfolioOutfitId) throws Exception {
+        CreatePortfolioOutfitResponse response = new CreatePortfolioOutfitResponse();
+        Optional<PortfolioOutfits> portfolioOutfit = portfolioOutfitsRepo.findByIdAndIsValid(portfolioOutfitId, Boolean.TRUE);
+        if (portfolioOutfit.isPresent()) {
+            PortfolioOutfitsDAO portfolioOutfitsDao = mapper.portfolioOutfitsToPortfolioOutfitsDAO(portfolioOutfit.get(),
+                    new CycleAvoidingMappingContext());
+            portfolioOutfitsDao.setIsValid(Boolean.FALSE);
+
+            PortfolioOutfitsDAO deletedPortfolioOutfitDao = mapper.portfolioOutfitsToPortfolioOutfitsDAO(
+                    portfolioOutfitsRepo.save(mapper.portfolioOutfitsDAOToPortfolioOutfits(portfolioOutfitsDao,
+                            new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext());
+
+            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(),
+                    portfolioOutfitId);
+            response.setMessage("Portfolio outfit deleted!");
+            response.setPortfolioOutfitId(portfolioOutfitId);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        response.setMessage("Portfolio outfit not found!");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private void validateSubOutfits(Integer outfitOrdinal, Integer subOutfitOrdinal) throws Exception {
+        OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitOrdinal);
+        Set<Integer> possibleSubOutfits = outfitService.getSubOutfitMap(outfitType).keySet();
+        if(!possibleSubOutfits.contains(subOutfitOrdinal)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Sub Outfit Type!");
+        }
     }
 
     public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(Long tailorId) {

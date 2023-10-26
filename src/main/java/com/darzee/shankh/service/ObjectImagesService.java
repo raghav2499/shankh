@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.ObjectImagesDAO;
 import com.darzee.shankh.entity.ObjectImages;
 import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.ObjectImagesRepo;
 import com.darzee.shankh.utils.CommonUtils;
@@ -130,6 +131,18 @@ public class ObjectImagesService {
                     mapper::objectImagesToObjectImagesDAO);
             objectImagesDAOs.forEach(objectImage -> objectImage.setIsValid(Boolean.FALSE));
             repo.saveAll(CommonUtils.mapList(objectImagesDAOs, mapper::objectImageDAOToObjectImage));
+        }
+    }
+
+    public void invalidateExistingReferenceIds(List<String> invalidReferenceIds){
+        for (String referenceId : invalidReferenceIds){
+            Optional<ObjectImages> validImage = repo.findByReferenceIdAndIsValid(referenceId,
+                    Boolean.TRUE);
+            if(validImage.isPresent()){
+                ObjectImagesDAO objectImageDao = mapper.objectImagesToObjectImagesDAO(validImage.get());
+                objectImageDao.setIsValid(Boolean.FALSE);
+                repo.save(mapper.objectImageDAOToObjectImage(objectImageDao));
+            }
         }
     }
 

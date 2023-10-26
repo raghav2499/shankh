@@ -12,5 +12,7 @@ public interface ObjectImagesRepo extends JpaRepository<ObjectImages, Long> {
 
     Optional<ObjectImages> findByEntityIdAndEntityTypeAndIsValid(Long entityId, String entityType, boolean isValid);
 
+    Optional<ObjectImages> findByReferenceIdAndIsValid(String referenceId, Boolean isValid);
+
     List<ObjectImages> findAllByEntityIdAndEntityTypeAndIsValid(Long entityId, String entityType, boolean isValid);
 }
