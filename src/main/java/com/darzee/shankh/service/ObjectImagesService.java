@@ -136,7 +136,7 @@ public class ObjectImagesService {
 
     public void invalidateExistingReferenceIds(List<String> invalidReferenceIds){
         for (String referenceId : invalidReferenceIds){
-            Optional<ObjectImages> validImage = repo.findAllByReferenceIdAndIsValid(referenceId,
+            Optional<ObjectImages> validImage = repo.findByReferenceIdAndIsValid(referenceId,
                     Boolean.TRUE);
             if(validImage.isPresent()){
                 ObjectImagesDAO objectImageDao = mapper.objectImagesToObjectImagesDAO(validImage.get());

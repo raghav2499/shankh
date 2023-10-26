@@ -234,11 +234,8 @@ public class PortfolioService {
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(), new CycleAvoidingMappingContext());
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(request.getOutfitType());
         Integer subOutfitOrdinal = request.getSubOutfit();
-        Set<Integer> possibleSubOutfits = outfitService.getSubOutfitMap(outfitType).keySet();
+        validateSubOutfits(request.getOutfitType(), subOutfitOrdinal);
         List<String> portfolioOutfitReferenceIds = request.getReferenceIds();
-        if (!possibleSubOutfits.contains(subOutfitOrdinal)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Sub Outfit Type");
-        }
         ColorEnum color = ColorEnum.getColorOrdinalEnumMap().get(request.getColor());
         PortfolioOutfitsDAO portfolioOutfit = new PortfolioOutfitsDAO(request.getTitle(), outfitType, subOutfitOrdinal,
                 color, portfolioDAO);
@@ -274,12 +271,7 @@ public class PortfolioService {
                 portfolioOutfitDao.setOutfitType(outfitType);
             }
             if (request.getSubOutfit() != null) {
-                int subOutfitType = request.getSubOutfit();
-                outfitType = OutfitType.getOutfitOrdinalEnumMap().get(request.getOutfitType());
-                Set<Integer> possibleSubOutfits = outfitService.getSubOutfitMap(outfitType).keySet();
-                if (!possibleSubOutfits.contains(subOutfitType)) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Sub Outfit Type!");
-                }
+                validateSubOutfits(request.getOutfitType(), request.getSubOutfit());
                 portfolioOutfitDao.setSubOutfitType(request.getSubOutfit());
             }
             if (!StringUtils.isEmpty(request.getTitle()) && request.getTitle() != null) {
@@ -347,6 +339,14 @@ public class PortfolioService {
         }
         response.setMessage("Portfolio outfit not found!");
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private void validateSubOutfits(Integer outfitOrdinal, Integer subOutfitOrdinal) throws Exception {
+        OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitOrdinal);
+        Set<Integer> possibleSubOutfits = outfitService.getSubOutfitMap(outfitType).keySet();
+        if(!possibleSubOutfits.contains(subOutfitOrdinal)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Sub Outfit Type!");
+        }
     }
 
     public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(Long tailorId) {
