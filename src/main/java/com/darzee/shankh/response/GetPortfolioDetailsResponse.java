@@ -22,6 +22,7 @@ public class GetPortfolioDetailsResponse {
     private Map<String, String> socialMedia;
     private String portfolioAbout;
     private String username;
+    private Integer usernameUpdatesCounts;
     private String profileImageLink;
     private String coverImageLink;
     private String profileImageReferenceId;

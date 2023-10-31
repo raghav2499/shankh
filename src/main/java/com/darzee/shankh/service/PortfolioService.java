@@ -167,7 +167,8 @@ public class PortfolioService {
 
             response = new GetPortfolioDetailsResponse(successfulMessage, tailorName, boutiqueName, portfolioDAO.getId(),
                     updatedPortfolio.getSocialMedia(), updatedPortfolio.getAboutDetails(), updatedPortfolio.getUsername(),
-                    portfolioProfileImageUrl, portfolioCoverImageUrl, portfolioProfileReference, portfolioCoverReference);
+                    updatedPortfolio.getUsernameUpdatesCounts(),portfolioProfileImageUrl, portfolioCoverImageUrl,
+                    portfolioProfileReference, portfolioCoverReference);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         response.setMessage("Sorry! Portfolio doesn't exist!");
@@ -370,8 +371,8 @@ public class PortfolioService {
             String successMessage = "Portfolio details fetched successfully";
             response = new GetPortfolioDetailsResponse(successMessage, tailorName,
                     boutiqueName, portfolioDAO.getId(), portfolioDAO.getSocialMedia(), portfolioDAO.getAboutDetails(),
-                    portfolioDAO.getUsername(), portfolioProfileImageUrl, portfolioCoverImageUrl,
-                    portfolioProfileReference, portfolioCoverReference);
+                    portfolioDAO.getUsername(), portfolioDAO.getUsernameUpdatesCounts(), portfolioProfileImageUrl,
+                    portfolioCoverImageUrl,portfolioProfileReference, portfolioCoverReference);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         String message = "Tailor's portfolio doesn't exist";

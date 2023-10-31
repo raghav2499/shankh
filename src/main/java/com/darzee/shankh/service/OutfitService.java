@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.enums.Gender;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.response.OutfitDetails;
+import com.darzee.shankh.response.PortfolioSubOutfit;
 import com.darzee.shankh.response.SubOutfitTypeDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,8 +36,11 @@ public class OutfitService {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeOrdinal);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         Map<Integer, String> subOutfitDetails = outfitTypeService.getSubOutfitMap();
+        List<PortfolioSubOutfit> subOutfits = subOutfitDetails.entrySet().stream()
+                .map(subOutfit -> new PortfolioSubOutfit(subOutfit.getKey(), subOutfit.getValue()))
+                .collect(Collectors.toList());
         String successMessage = "Details fetched successfully";
-        SubOutfitTypeDetailResponse response = new SubOutfitTypeDetailResponse(successMessage, subOutfitDetails);
+        SubOutfitTypeDetailResponse response = new SubOutfitTypeDetailResponse(successMessage, subOutfits);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
