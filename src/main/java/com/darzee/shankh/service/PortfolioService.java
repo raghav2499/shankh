@@ -167,7 +167,7 @@ public class PortfolioService {
 
             response = new GetPortfolioDetailsResponse(successfulMessage, tailorName, boutiqueName, portfolioDAO.getId(),
                     updatedPortfolio.getSocialMedia(), updatedPortfolio.getAboutDetails(), updatedPortfolio.getUsername(),
-                    updatedPortfolio.getUsernameUpdatesCounts(),portfolioProfileImageUrl, portfolioCoverImageUrl,
+                    updatedPortfolio.getUsernameUpdatesCounts(), portfolioProfileImageUrl, portfolioCoverImageUrl,
                     portfolioProfileReference, portfolioCoverReference);
             return new ResponseEntity(response, HttpStatus.OK);
         }
@@ -345,13 +345,18 @@ public class PortfolioService {
     private void validateSubOutfits(Integer outfitOrdinal, Integer subOutfitOrdinal) throws Exception {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitOrdinal);
         Set<Integer> possibleSubOutfits = outfitService.getSubOutfitMap(outfitType).keySet();
-        if(!possibleSubOutfits.contains(subOutfitOrdinal)){
+        if (subOutfitOrdinal != null && !possibleSubOutfits.contains(subOutfitOrdinal)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Sub Outfit Type!");
         }
     }
 
-    public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(Long tailorId) {
-        Optional<Portfolio> portfolio = portfolioRepo.findByTailorId(tailorId);
+    public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(Long tailorId, String username) {
+        Optional<Portfolio> portfolio = null;
+        if(tailorId != null) {
+            portfolio = portfolioRepo.findByTailorId(tailorId);
+        } else if(username != null) {
+            portfolio = portfolioRepo.findByUsername(username);
+        }
         GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse();
         if (portfolio.isPresent()) {
             PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(),
@@ -372,7 +377,7 @@ public class PortfolioService {
             response = new GetPortfolioDetailsResponse(successMessage, tailorName,
                     boutiqueName, portfolioDAO.getId(), portfolioDAO.getSocialMedia(), portfolioDAO.getAboutDetails(),
                     portfolioDAO.getUsername(), portfolioDAO.getUsernameUpdatesCounts(), portfolioProfileImageUrl,
-                    portfolioCoverImageUrl,portfolioProfileReference, portfolioCoverReference);
+                    portfolioCoverImageUrl, portfolioProfileReference, portfolioCoverReference);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         String message = "Tailor's portfolio doesn't exist";

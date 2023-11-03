@@ -17,6 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PortfolioOutfitDetails {
+
+    private Long id;
     private Integer subOutfitType;
     private String title;
     private List<String> imageUrl;
@@ -24,6 +26,7 @@ public class PortfolioOutfitDetails {
     private LocalDate creationTime;
 
     public PortfolioOutfitDetails(PortfolioOutfitsDAO portfolioOutfitsDAO) {
+        this.id = portfolioOutfitsDAO.getId();
         this.subOutfitType = portfolioOutfitsDAO.getSubOutfitType();
         this.title = portfolioOutfitsDAO.getTitle();
         this.creationTime = portfolioOutfitsDAO.getCreatedAt().toLocalDate();

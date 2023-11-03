@@ -48,8 +48,9 @@ public class PortfolioController {
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(@RequestParam("tailor_id") Long tailorId) {
-        return portfolioService.getPortfolio(tailorId);
+    public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(@RequestParam(value = "tailor_id", required = false) Long tailorId,
+                                                                   @RequestParam(value = "username", required = false) String username) {
+        return portfolioService.getPortfolio(tailorId, username);
     }
 
     @PutMapping(value = "/{portfolio_id}", produces = MediaType.APPLICATION_JSON_VALUE)
