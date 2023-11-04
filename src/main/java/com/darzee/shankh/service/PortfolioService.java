@@ -150,12 +150,12 @@ public class PortfolioService {
                     new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
             updateImageReference(request, portfolioDAO);
-            String portfolioProfileReference = objectImagesService.getPortfiolioProfileReference(portfolioDAO.getId());
+            String tailorImageReference = objectImagesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
             String portfolioCoverReference = objectImagesService.getProfileCoverReference(portfolioDAO.getId());
-            String portfolioProfileImageUrl = null;
+            String tailorImageReferenceUrl = null;
             String portfolioCoverImageUrl = null;
-            if (portfolioProfileReference != null) {
-                portfolioProfileImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioProfileReference);
+            if (tailorImageReference != null) {
+                tailorImageReferenceUrl = bucketService.getPortfolioImageShortLivedUrl(tailorImageReference);
             }
             if (portfolioCoverReference != null) {
                 portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
@@ -167,8 +167,8 @@ public class PortfolioService {
 
             response = new GetPortfolioDetailsResponse(successfulMessage, tailorName, boutiqueName, portfolioDAO.getId(),
                     updatedPortfolio.getSocialMedia(), updatedPortfolio.getAboutDetails(), updatedPortfolio.getUsername(),
-                    updatedPortfolio.getUsernameUpdatesCounts(), portfolioProfileImageUrl, portfolioCoverImageUrl,
-                    portfolioProfileReference, portfolioCoverReference);
+                    updatedPortfolio.getUsernameUpdatesCounts(), tailorImageReferenceUrl, portfolioCoverImageUrl,
+                    tailorImageReference, portfolioCoverReference);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         response.setMessage("Sorry! Portfolio doesn't exist!");
@@ -214,13 +214,6 @@ public class PortfolioService {
                     portfolioDAO.getId());
             objectImagesService.saveObjectImages(Arrays.asList(request.getCoverImageReference()),
                     ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
-        }
-        if (!StringUtils.isEmpty(request.getProfileImageReference())) {
-            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
-                    portfolioDAO.getId());
-            objectImagesService.saveObjectImages(Arrays.asList(request.getProfileImageReference()),
-                    ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
-                    portfolioDAO.getId());
         }
     }
 
@@ -363,12 +356,12 @@ public class PortfolioService {
                     new CycleAvoidingMappingContext());
             String tailorName = tailorRepo.findNameById(tailorId);
             String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
-            String portfolioProfileReference = objectImagesService.getPortfiolioProfileReference(portfolioDAO.getId());
+            String tailorImageReferenceId = objectImagesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
             String portfolioCoverReference = objectImagesService.getProfileCoverReference(portfolioDAO.getId());
-            String portfolioProfileImageUrl = null;
+            String tailorImageReferenceUrl = null;
             String portfolioCoverImageUrl = null;
-            if (portfolioProfileReference != null) {
-                portfolioProfileImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioProfileReference);
+            if (tailorImageReferenceId != null) {
+                tailorImageReferenceUrl = bucketService.getShortLivedUrl(tailorImageReferenceId);
             }
             if (portfolioCoverReference != null) {
                 portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
@@ -376,8 +369,8 @@ public class PortfolioService {
             String successMessage = "Portfolio details fetched successfully";
             response = new GetPortfolioDetailsResponse(successMessage, tailorName,
                     boutiqueName, portfolioDAO.getId(), portfolioDAO.getSocialMedia(), portfolioDAO.getAboutDetails(),
-                    portfolioDAO.getUsername(), portfolioDAO.getUsernameUpdatesCounts(), portfolioProfileImageUrl,
-                    portfolioCoverImageUrl, portfolioProfileReference, portfolioCoverReference);
+                    portfolioDAO.getUsername(), portfolioDAO.getUsernameUpdatesCounts(), tailorImageReferenceUrl,
+                    portfolioCoverImageUrl, tailorImageReferenceId, portfolioCoverReference);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         String message = "Tailor's portfolio doesn't exist";
@@ -481,6 +474,9 @@ public class PortfolioService {
         PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(),
                 new CycleAvoidingMappingContext());
         List<PortfolioOutfitsDAO> portfolioOutfits = portfolioDAO.getPortfolioOutfits();
+        portfolioOutfits = portfolioOutfits.stream()
+                .filter(outfit -> !Boolean.FALSE.equals(outfit.getIsActive()))
+                .collect(Collectors.toList());
         Map<OutfitType, OutfitFilter> outfitFilterMap = new HashMap<>();
         Map<String, String> colorFilterMap = new HashMap<>();
         for (PortfolioOutfitsDAO portfolioOutfitsDAO : portfolioOutfits) {

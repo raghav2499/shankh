@@ -13,5 +13,4 @@ public class UpdatePortfolioRequest {
     private String about;
     private List<String> socialMedia;
     private String coverImageReference;
-    private String profileImageReference;
 }

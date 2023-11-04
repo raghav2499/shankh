@@ -3,7 +3,6 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.ObjectImagesDAO;
 import com.darzee.shankh.entity.ObjectImages;
 import com.darzee.shankh.enums.ImageEntityType;
-import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.ObjectImagesRepo;
 import com.darzee.shankh.utils.CommonUtils;
@@ -94,17 +93,6 @@ public class ObjectImagesService {
         return null;
     }
 
-    @Nullable
-    public String getPortfiolioProfileReference(Long portfolioId) {
-        Optional<ObjectImages> profileCoverImage = repo.findByEntityIdAndEntityTypeAndIsValid(portfolioId,
-                ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
-                Boolean.TRUE);
-        if(profileCoverImage.isPresent()) {
-            ObjectImagesDAO objectImagesDAO = mapper.objectImagesToObjectImagesDAO(profileCoverImage.get());
-            return objectImagesDAO.getReferenceId();
-        }
-        return null;
-    }
 
     @Nullable
     public List<String> getPortfolioOutfitsReferenceIds(Long portfolioOutfitId) {
