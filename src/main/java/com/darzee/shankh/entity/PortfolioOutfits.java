@@ -34,9 +34,6 @@ public class PortfolioOutfits extends GenericEntity {
     @Enumerated(EnumType.ORDINAL)
     private ColorEnum color;
 
-    @Column(name = "is_active")
-    private Boolean isActive = Boolean.TRUE;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

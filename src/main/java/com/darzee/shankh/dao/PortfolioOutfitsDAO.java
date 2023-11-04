@@ -14,11 +14,7 @@ import java.time.LocalDateTime;
 public class PortfolioOutfitsDAO {
 
     private Long id;
-
     private String title;
-
-    private Boolean isActive;
-
     private OutfitType outfitType;
 
     private LocalDateTime createdAt;

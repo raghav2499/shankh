@@ -116,11 +116,6 @@ public class PortfolioService {
                     ImageEntityType.PORTFOLIO_COVER.getEntityType(),
                     portfolio.getId());
         }
-        if (!StringUtils.isEmpty(request.getProfileImageReference())) {
-            objectImagesService.saveObjectImages(Collections.singletonList(request.getProfileImageReference()),
-                    ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
-                    portfolio.getId());
-        }
         tailorDAO.setPortfolio(portfolio);
         tailorDAO = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
                         new CycleAvoidingMappingContext())),
@@ -475,7 +470,7 @@ public class PortfolioService {
                 new CycleAvoidingMappingContext());
         List<PortfolioOutfitsDAO> portfolioOutfits = portfolioDAO.getPortfolioOutfits();
         portfolioOutfits = portfolioOutfits.stream()
-                .filter(outfit -> !Boolean.FALSE.equals(outfit.getIsActive()))
+                .filter(outfit -> !Boolean.FALSE.equals(outfit.getIsValid()))
                 .collect(Collectors.toList());
         Map<OutfitType, OutfitFilter> outfitFilterMap = new HashMap<>();
         Map<String, String> colorFilterMap = new HashMap<>();
