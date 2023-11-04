@@ -340,9 +340,9 @@ public class PortfolioService {
 
     public ResponseEntity<GetBoutiqueDetailsResponse> getPortfolio(Long tailorId, String username) {
         Optional<Portfolio> portfolio = null;
-        if(tailorId != null) {
+        if (tailorId != null) {
             portfolio = portfolioRepo.findByTailorId(tailorId);
-        } else if(username != null) {
+        } else if (username != null) {
             portfolio = portfolioRepo.findByUsername(username);
         }
         GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse();
@@ -458,8 +458,13 @@ public class PortfolioService {
         return (!portfolioRepo.findByUsername(username).isPresent());
     }
 
-    public ResponseEntity<GetPortfolioFilterResponse> getFilters(Long tailorId) throws Exception {
-        Optional<Portfolio> portfolio = portfolioRepo.findByTailorId(tailorId);
+    public ResponseEntity<GetPortfolioFilterResponse> getFilters(Long tailorId, String username) throws Exception {
+        Optional<Portfolio> portfolio = null;
+        if (tailorId != null) {
+            portfolio = portfolioRepo.findByTailorId(tailorId);
+        } else if (username != null) {
+            portfolio = portfolioRepo.findByUsername(username);
+        }
         GetPortfolioFilterResponse response = null;
         if (!portfolio.isPresent()) {
             String message = "Portfolio doesn't exist";

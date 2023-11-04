@@ -68,9 +68,10 @@ public class PortfolioController {
 
     @GetMapping(value = "/filters", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<GetPortfolioFilterResponse> getPortfolioFilters(@RequestParam("tailor_id") Long tailorId)
+    public ResponseEntity<GetPortfolioFilterResponse> getPortfolioFilters(@RequestParam(value = "tailor_id", required = false) Long tailorId,
+                                                                          @RequestParam(value = "username", required = false) String username)
             throws Exception {
-        return portfolioService.getFilters(tailorId);
+        return portfolioService.getFilters(tailorId, username);
     }
 
     @GetMapping(value = "/colors", produces = MediaType.APPLICATION_JSON_VALUE)
