@@ -349,6 +349,9 @@ public class PortfolioService {
         if (portfolio.isPresent()) {
             PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(),
                     new CycleAvoidingMappingContext());
+            if(tailorId == null) {
+                tailorId = portfolioDAO.getTailor().getId();
+            }
             String tailorName = tailorRepo.findNameById(tailorId);
             String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
             String tailorImageReferenceId = objectImagesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
