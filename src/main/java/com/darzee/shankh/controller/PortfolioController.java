@@ -62,8 +62,9 @@ public class PortfolioController {
     @CrossOrigin
     public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(@PathVariable("id") Long portfolioId,
                                                                           @RequestParam(value = "outfit_type", required = false, defaultValue = "") String outfitType,
-                                                                          @RequestParam(value = "sub_outfit", required = false, defaultValue = "") String subOutfit) throws Exception {
-        return portfolioService.getPortfolioOutfit(portfolioId, outfitType, subOutfit);
+                                                                          @RequestParam(value = "sub_outfit", required = false, defaultValue = "") String subOutfit,
+                                                                          @RequestParam(value = "color", required = false, defaultValue = "") String color) throws Exception {
+        return portfolioService.getPortfolioOutfit(portfolioId, outfitType, subOutfit, color);
     }
 
     @GetMapping(value = "/filters", produces = MediaType.APPLICATION_JSON_VALUE)

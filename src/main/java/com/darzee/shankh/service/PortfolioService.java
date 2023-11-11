@@ -349,7 +349,7 @@ public class PortfolioService {
         if (portfolio.isPresent()) {
             PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio.get(),
                     new CycleAvoidingMappingContext());
-            if(tailorId == null) {
+            if (tailorId == null) {
                 tailorId = portfolioDAO.getTailor().getId();
             }
             String tailorName = tailorRepo.findNameById(tailorId);
@@ -377,7 +377,8 @@ public class PortfolioService {
     }
 
     public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(Long portfolioId, String outfitTypes,
-                                                                          String subOutfits) throws Exception {
+                                                                          String subOutfits,
+                                                                          String colorHexcodes) throws Exception {
         GetPortfolioOutfitsResponse response = new GetPortfolioOutfitsResponse();
         List<Integer> outfitTypeOrdinals = new ArrayList<>();
         List<Integer> subOutfitTypeOrdinals = new ArrayList<>();
@@ -422,6 +423,15 @@ public class PortfolioService {
 
         List<PortfolioOutfitsDAO> portfolioOutfitsDAOs = mapper.portfolioObjectListToDAOList(portfolioOutfits,
                 new CycleAvoidingMappingContext());
+        if (!StringUtils.isEmpty(colorHexcodes)) {
+            List<ColorEnum> colors = Arrays.stream(colorHexcodes.split(","))
+                    .map(colorHexcode -> ColorEnum.getHexcodeColorEnumMap().get(colorHexcode))
+                    .collect(Collectors.toList());
+            portfolioOutfitsDAOs = portfolioOutfitsDAOs.stream()
+                    .filter(outfit -> colors.contains(outfit.getColor()))
+                    .collect(Collectors.toList());
+
+        }
         Map<OutfitType, List<PortfolioOutfitsDAO>> portfolioOutfitMap = portfolioOutfitsDAOs
                 .stream()
                 .collect(

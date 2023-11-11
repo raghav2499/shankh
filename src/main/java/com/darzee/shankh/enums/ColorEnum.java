@@ -49,6 +49,15 @@ public enum ColorEnum {
         return colorEnumOrdinalMap;
     }
 
+    public static Map<String, ColorEnum> getHexcodeColorEnumMap() {
+        Map<String, ColorEnum> hexcodeColorMap = new HashMap<>();
+        for (ColorEnum color : ColorEnum.values()) {
+            hexcodeColorMap.put(color.hexcode, color);
+        }
+        return hexcodeColorMap;
+    }
+
+
     public String getName() {
         return name;
     }
