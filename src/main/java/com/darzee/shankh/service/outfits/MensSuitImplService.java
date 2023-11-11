@@ -315,4 +315,8 @@ public class MensSuitImplService implements OutfitTypeService {
         subOutfitMap.put(38, "Tuxedo");
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

@@ -248,4 +248,8 @@ public class ShirtImplService implements OutfitTypeService {
         subOutfitMap.put(84, "Nehrucollar Shirts");
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

@@ -293,4 +293,8 @@ public class RidaImplService implements OutfitTypeService {
         subOutfitMap.put(65, "Eid Special Rida");
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

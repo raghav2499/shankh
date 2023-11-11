@@ -200,6 +200,10 @@ public class DressImplService implements OutfitTypeService {
         return subOutfitMap;
     }
 
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
+
     private MeasurementDetails addLength(String value) {
         String imageLink = DRESS_LENGTH_IMAGE_LINK;
         String title = DRESS_LENGTH_TITLE;

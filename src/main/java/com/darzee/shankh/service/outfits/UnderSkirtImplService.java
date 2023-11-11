@@ -126,4 +126,8 @@ public class UnderSkirtImplService implements OutfitTypeService {
         subOutfitMap.put(91, "Drawstring Petticoats");
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

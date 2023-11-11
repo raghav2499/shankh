@@ -151,4 +151,8 @@ public class NehruJacketImplService implements OutfitTypeService {
         subOutfitMap.put(45, "Textured Nehru Jacket");
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

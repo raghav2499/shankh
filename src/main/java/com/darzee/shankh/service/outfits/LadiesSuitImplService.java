@@ -433,4 +433,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
         subOutfitMap.put(16, "Lehenga Suit");
         return subOutfitMap;
     }
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

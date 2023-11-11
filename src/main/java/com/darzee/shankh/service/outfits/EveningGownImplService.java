@@ -244,4 +244,8 @@ public class EveningGownImplService implements OutfitTypeService {
         subOutfitMap.put(50, "Maternity Nightgowns");
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

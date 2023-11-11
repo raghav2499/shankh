@@ -333,4 +333,8 @@ public class SareeBlouseImplService implements OutfitTypeService {
         subOutfitMap.put(75, "Printed Blouse");
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

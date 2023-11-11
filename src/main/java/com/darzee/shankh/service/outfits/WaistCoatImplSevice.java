@@ -142,5 +142,9 @@ public class WaistCoatImplSevice implements OutfitTypeService {
 
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }
 

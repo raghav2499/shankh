@@ -392,4 +392,8 @@ public class SherwaniImplService implements OutfitTypeService {
         Map<Integer, String> subOutfitMap = new HashMap<>();
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

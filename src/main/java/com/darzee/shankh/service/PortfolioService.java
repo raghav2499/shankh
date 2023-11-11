@@ -43,6 +43,9 @@ public class PortfolioService {
     private OutfitService outfitService;
 
     @Autowired
+    private OutfitTypeObjectService outfitTypeObjectService;
+
+    @Autowired
     private PortfolioRepo portfolioRepo;
 
     @Autowired
@@ -238,8 +241,7 @@ public class PortfolioService {
                     portfolioOutfit.getId());
         }
         String successMessage = "Portfolio outfit saved successfully";
-        response = new CreatePortfolioOutfitResponse(successMessage,
-                portfolioOutfit.getId());
+        response = new CreatePortfolioOutfitResponse(successMessage, portfolioOutfit.getId());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -278,8 +280,15 @@ public class PortfolioService {
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
             updatePortfolioOutfitImageReference(request, updatePortfolioOutfit);
+            OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
+            String subOutfitName = outfitTypeService.getSubOutfitName(updatePortfolioOutfit.getSubOutfitType());
+            OutfitType updatedOutfit = updatePortfolioOutfit.getOutfitType();
+            response = new CreatePortfolioOutfitResponse(portfolioOutfitId,
+                    updatedOutfit.getOrdinal(),
+                    updatedOutfit.getDisplayString(),
+                    updatePortfolioOutfit.getSubOutfitType(),
+                    subOutfitName);
             response.setMessage("Portfolio outfit updated successfully!");
-            response.setPortfolioOutfitId(portfolioOutfitId);
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         }

@@ -160,4 +160,8 @@ public class LehengaImplService implements OutfitTypeService {
         subOutfitMap.put(32, "Indowestern Lehenga");
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

@@ -219,4 +219,8 @@ public class PantImplService implements OutfitTypeService {
         subOutfitMap.put(57, "Formal Trousers With Ethnic Touch");
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }

@@ -331,4 +331,8 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
         subOutfitMap.put(9, "Designer Kurta Pyjama");
         return subOutfitMap;
     }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
+    }
 }
