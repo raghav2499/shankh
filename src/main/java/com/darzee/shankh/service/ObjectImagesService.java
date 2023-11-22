@@ -93,17 +93,6 @@ public class ObjectImagesService {
         return null;
     }
 
-    @Nullable
-    public String getProfileProfileReference(Long portfolioId) {
-        Optional<ObjectImages> profileCoverImage = repo.findByEntityIdAndEntityTypeAndIsValid(portfolioId,
-                ImageEntityType.PORTFOLIO_PROFILE.getEntityType(),
-                Boolean.TRUE);
-        if(profileCoverImage.isPresent()) {
-            ObjectImagesDAO objectImagesDAO = mapper.objectImagesToObjectImagesDAO(profileCoverImage.get());
-            return objectImagesDAO.getReferenceId();
-        }
-        return null;
-    }
 
     @Nullable
     public List<String> getPortfolioOutfitsReferenceIds(Long portfolioOutfitId) {
@@ -130,6 +119,18 @@ public class ObjectImagesService {
                     mapper::objectImagesToObjectImagesDAO);
             objectImagesDAOs.forEach(objectImage -> objectImage.setIsValid(Boolean.FALSE));
             repo.saveAll(CommonUtils.mapList(objectImagesDAOs, mapper::objectImageDAOToObjectImage));
+        }
+    }
+
+    public void invalidateExistingReferenceIds(List<String> invalidReferenceIds){
+        for (String referenceId : invalidReferenceIds){
+            Optional<ObjectImages> validImage = repo.findByReferenceIdAndIsValid(referenceId,
+                    Boolean.TRUE);
+            if(validImage.isPresent()){
+                ObjectImagesDAO objectImageDao = mapper.objectImagesToObjectImagesDAO(validImage.get());
+                objectImageDao.setIsValid(Boolean.FALSE);
+                repo.save(mapper.objectImageDAOToObjectImage(objectImageDao));
+            }
         }
     }
 

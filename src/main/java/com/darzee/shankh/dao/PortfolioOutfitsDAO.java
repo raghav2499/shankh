@@ -14,11 +14,7 @@ import java.time.LocalDateTime;
 public class PortfolioOutfitsDAO {
 
     private Long id;
-
     private String title;
-
-    private Boolean isActive;
-
     private OutfitType outfitType;
 
     private LocalDateTime createdAt;
@@ -26,7 +22,8 @@ public class PortfolioOutfitsDAO {
     private LocalDateTime updatedAt;
 
     private Integer subOutfitType;
-    private ColorEnum color;
+    private ColorEnum color = ColorEnum.WHITE;
+    private Boolean isValid = Boolean.TRUE;
 
     private PortfolioDAO portfolio;
 

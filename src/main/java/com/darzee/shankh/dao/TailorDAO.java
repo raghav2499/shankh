@@ -3,12 +3,14 @@ package com.darzee.shankh.dao;
 import com.darzee.shankh.enums.Language;
 import com.darzee.shankh.enums.TailorRole;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class TailorDAO {
     private Long id;
     private String name;
@@ -19,12 +21,23 @@ public class TailorDAO {
     private TailorRole role;
     private String phoneNumber;
     private BoutiqueDAO boutique;
+    private PortfolioDAO portfolio;
 
     public TailorDAO(String name, TailorRole role, Language language, String phoneNumber, BoutiqueDAO boutique) {
         this.name = name;
         this.role = role;
         this.language = language;
         this.boutique = boutique;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public TailorDAO(String name, TailorRole role, Language language, String phoneNumber,
+                     BoutiqueDAO boutique, PortfolioDAO portfolioDAO) {
+        this.name = name;
+        this.role = role;
+        this.language = language;
+        this.boutique = boutique;
+        this.portfolio = portfolioDAO;
         this.phoneNumber = phoneNumber;
     }
 

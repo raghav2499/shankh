@@ -454,6 +454,11 @@ public class ShararaImplService implements OutfitTypeService {
 
     @Override
     public Map<Integer, String> getSubOutfitMap() {
-        return null;
+        Map<Integer, String> subOutfitMap = new HashMap<>();
+        return subOutfitMap;
+    }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
     }
 }

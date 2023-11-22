@@ -1,6 +1,5 @@
 package com.darzee.shankh.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -13,9 +12,6 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetPortfolioOutfitsResponse {
-    private String message = "Details fetched successfully";
-
-    @JsonProperty(value = "outfit_details")
-    private List<OutfitTypeGroupedPortfolioDetails> outfitTypeGroupedPortfolioDetails;
+public class UploadMultipleImageResponse {
+    private List<UploadImageResponse> response;
 }

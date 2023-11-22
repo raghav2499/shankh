@@ -142,22 +142,26 @@ public class LehengaImplService implements OutfitTypeService {
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
 
-        subOutfitMap.put(17, "a_line_lehenga");
-        subOutfitMap.put(18, "circular_lehenga");
-        subOutfitMap.put(19, "mermaid_lehenga");
-        subOutfitMap.put(20, "panelled_lehenga");
-        subOutfitMap.put(21, "jacket_lehenga");
-        subOutfitMap.put(22, "sharara_lehenga");
-        subOutfitMap.put(23, "trail_lehenga");
-        subOutfitMap.put(24, "lehenga_saree");
-        subOutfitMap.put(25, "flared_lehenga");
-        subOutfitMap.put(26, "ruffled_lehenga");
-        subOutfitMap.put(27, "straight_cut_lehenga");
-        subOutfitMap.put(28, "half_saree_lehenga");
-        subOutfitMap.put(29, "lehenga_with_cape");
-        subOutfitMap.put(30, "asymmetric_lehenga");
-        subOutfitMap.put(31, "tiered_lehenga");
-        subOutfitMap.put(32, "indowestern_lehenga");
+        subOutfitMap.put(17, "A Line Lehenga");
+        subOutfitMap.put(18, "Circular Lehenga");
+        subOutfitMap.put(19, "Mermaid Lehenga");
+        subOutfitMap.put(20, "Panelled Lehenga");
+        subOutfitMap.put(21, "Jacket Lehenga");
+        subOutfitMap.put(22, "Sharara Lehenga");
+        subOutfitMap.put(23, "Trail Lehenga");
+        subOutfitMap.put(24, "Lehenga Saree");
+        subOutfitMap.put(25, "Flared Lehenga");
+        subOutfitMap.put(26, "Ruffled Lehenga");
+        subOutfitMap.put(27, "Straight Cut Lehenga");
+        subOutfitMap.put(28, "Half Saree Lehenga");
+        subOutfitMap.put(29, "Lehenga With Cape");
+        subOutfitMap.put(30, "Asymmetric Lehenga");
+        subOutfitMap.put(31, "Tiered Lehenga");
+        subOutfitMap.put(32, "Indowestern Lehenga");
         return subOutfitMap;
+    }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
     }
 }

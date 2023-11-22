@@ -34,14 +34,14 @@ public class PortfolioOutfits extends GenericEntity {
     @Enumerated(EnumType.ORDINAL)
     private ColorEnum color;
 
-    @Column(name = "is_active")
-    private Boolean isActive = Boolean.TRUE;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "is_valid")
+    private Boolean isValid;
     @ManyToOne
     @JoinColumn(name = "portfolio_id")
     private Portfolio portfolio;

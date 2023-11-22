@@ -323,12 +323,16 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
     }
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
-        subOutfitMap.put(4, "pathani_suit");
-        subOutfitMap.put(5, "sherwani");
-        subOutfitMap.put(6, "achkan");
-        subOutfitMap.put(7, "jodhpuri_suit");
-        subOutfitMap.put(8, "indo_western_kurta_pyjama");
-        subOutfitMap.put(9, "designer_kurta_pyjama");
+        subOutfitMap.put(4, "Pathani Suit");
+        subOutfitMap.put(5, "Sherwani");
+        subOutfitMap.put(6, "Achkan");
+        subOutfitMap.put(7, "Jodhpuri Suit");
+        subOutfitMap.put(8, "Indo Western Kurta Pyjama");
+        subOutfitMap.put(9, "Designer Kurta Pyjama");
         return subOutfitMap;
+    }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
     }
 }

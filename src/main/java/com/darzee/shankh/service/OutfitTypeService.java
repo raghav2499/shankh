@@ -23,4 +23,6 @@ public interface OutfitTypeService {
     public OutfitDetails getOutfitDetails();
 
     public Map<Integer, String> getSubOutfitMap();
+
+    public String getSubOutfitName(Integer ordinal);
 }

@@ -7,14 +7,16 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PortfolioOutfitsRepo extends JpaRepository<PortfolioOutfits, Long> {
-    @Nullable
-    List<PortfolioOutfits> findAllByPortfolioIdAndOutfitType(long portfolioId, OutfitType outfitType);
 
     @Nullable
-    List<PortfolioOutfits> findAllByPortfolioIdAndOutfitTypeInOrSubOutfitTypeIn(long portfolioId,
-                                                                                 List<OutfitType> outfitType,
-                                                                                 List<Integer> subOutfitType);
+    List<PortfolioOutfits> findAllByPortfolioIdAndOutfitTypeInAndSubOutfitTypeInAndIsValid(long portfolioId,
+                                                                                           List<OutfitType> outfitType,
+                                                                                           List<Integer> subOutfitType,
+                                                                                           Boolean isValid);
+
+    Optional<PortfolioOutfits> findByIdAndIsValid(Long portfolioOutfitId, Boolean isValid);
 }

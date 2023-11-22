@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.enums.Gender;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.response.OutfitDetails;
+import com.darzee.shankh.response.PortfolioSubOutfit;
 import com.darzee.shankh.response.SubOutfitTypeDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ public class OutfitService {
 
     @Autowired
     private OutfitTypeObjectService outfitTypeObjectService;
+
     public ResponseEntity getOutfitDetails(String gender) throws Exception {
         List<OutfitType> outfitTypes = getOutfitTypes(gender);
         List<OutfitDetails> outfitDetailsList = new ArrayList<>(outfitTypes.size());
@@ -34,8 +36,11 @@ public class OutfitService {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeOrdinal);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         Map<Integer, String> subOutfitDetails = outfitTypeService.getSubOutfitMap();
+        List<PortfolioSubOutfit> subOutfits = subOutfitDetails.entrySet().stream()
+                .map(subOutfit -> new PortfolioSubOutfit(subOutfit.getKey(), subOutfit.getValue()))
+                .collect(Collectors.toList());
         String successMessage = "Details fetched successfully";
-        SubOutfitTypeDetailResponse response = new SubOutfitTypeDetailResponse(successMessage, subOutfitDetails);
+        SubOutfitTypeDetailResponse response = new SubOutfitTypeDetailResponse(successMessage, subOutfits);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -52,5 +57,17 @@ public class OutfitService {
                     .collect(Collectors.toList());
         }
         return outfitTypes;
+    }
+
+    public Map<Integer, String> getSubOutfitMap(OutfitType outfitType) throws Exception {
+        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
+        Map<Integer, String> subOutfitMap = outfitTypeService.getSubOutfitMap();
+        return subOutfitMap;
+    }
+
+    public String getSubOutfitName(OutfitType outfitType, Integer subOutfitIdx) throws Exception {
+        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
+        String subOutfitString = outfitTypeService.getSubOutfitMap().get(subOutfitIdx);
+        return subOutfitString;
     }
 }

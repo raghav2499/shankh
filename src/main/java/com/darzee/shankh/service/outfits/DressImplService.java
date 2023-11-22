@@ -194,10 +194,14 @@ public class DressImplService implements OutfitTypeService {
     @Override
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
-        subOutfitMap.put(1, "short_dress");
-        subOutfitMap.put(2, "long_dress");
-        subOutfitMap.put(3, "maxi_dress");
+        subOutfitMap.put(1, "Short Dress");
+        subOutfitMap.put(2, "Long Dress");
+        subOutfitMap.put(3, "Maxi Dress");
         return subOutfitMap;
+    }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
     }
 
     private MeasurementDetails addLength(String value) {

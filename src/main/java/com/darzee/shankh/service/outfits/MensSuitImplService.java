@@ -307,12 +307,16 @@ public class MensSuitImplService implements OutfitTypeService {
 
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
-        subOutfitMap.put(33, "formal_business_suit");
-        subOutfitMap.put(34, "wedding_suit");
-        subOutfitMap.put(35, "bandhgala_suit");
-        subOutfitMap.put(36, "jodhpuri_suit");
-        subOutfitMap.put(37, "indo_western_suit");
-        subOutfitMap.put(38, "tuxedo");
+        subOutfitMap.put(33, "Formal Business Suit");
+        subOutfitMap.put(34, "Wedding Suit");
+        subOutfitMap.put(35, "Bandhgala Suit");
+        subOutfitMap.put(36, "Jodhpuri Suit");
+        subOutfitMap.put(37, "Indo Western Suit");
+        subOutfitMap.put(38, "Tuxedo");
         return subOutfitMap;
+    }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
     }
 }

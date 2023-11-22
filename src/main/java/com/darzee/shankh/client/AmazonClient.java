@@ -1,12 +1,11 @@
 package com.darzee.shankh.client;
 
-import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.darzee.shankh.enums.S3Bucket;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -84,17 +83,8 @@ public class AmazonClient {
     }
 
     private String generateShortLivedUrl(String bucketName, String fileName) {
-        java.util.Date expiration = new java.util.Date();
-        long expTimeMillis = expiration.getTime();
-        expTimeMillis += 1000 * 60 * 60 * 15; // 1 hour
-        expiration.setTime(expTimeMillis);
-
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest(bucketName, fileName)
-                        .withMethod(HttpMethod.GET)
-                        .withExpiration(expiration);
-
-        String shortLivedUrl = s3client.generatePresignedUrl(generatePresignedUrlRequest).toString();
+        String region = S3Bucket.getBucketRegionMap().get(bucketName);
+        String shortLivedUrl = "https://s3." + region + ".amazonaws.com/" + bucketName + "/" + fileName;
         return shortLivedUrl;
     }
 }

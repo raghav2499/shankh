@@ -237,11 +237,15 @@ public class EveningGownImplService implements OutfitTypeService {
     @Override
     public Map<Integer, String> getSubOutfitMap() {
         Map<Integer, String> subOutfitMap = new HashMap<>();
-        subOutfitMap.put(46, "short_nighties");
-        subOutfitMap.put(47, "long_nighties");
-        subOutfitMap.put(48, "printed_nighties");
-        subOutfitMap.put(49, "satin_nightgowns");
-        subOutfitMap.put(50, "maternity_nightgowns");
+        subOutfitMap.put(46, "Short Nighties");
+        subOutfitMap.put(47, "Long Nighties");
+        subOutfitMap.put(48, "Printed Nighties");
+        subOutfitMap.put(49, "Satin Nightgowns");
+        subOutfitMap.put(50, "Maternity Nightgowns");
         return subOutfitMap;
+    }
+
+    public String getSubOutfitName(Integer ordinal) {
+        return getSubOutfitMap().get(ordinal);
     }
 }
