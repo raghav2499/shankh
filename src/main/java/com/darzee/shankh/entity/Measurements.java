@@ -1,11 +1,14 @@
 package com.darzee.shankh.entity;
 
+import com.darzee.shankh.enums.OutfitType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.Map;
 
 @Table(name = "measurements")
 @Entity
@@ -19,6 +22,18 @@ public class Measurements extends GenericEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "measurement_revision_id")
-    private Long measurementRevisionId;
+    @Column(name = "outfit_type")
+    @Enumerated(EnumType.ORDINAL)
+    private OutfitType outfitType;
+
+    @Type(type = "jsonb")
+    @Column(name = "measurement_value", columnDefinition = "jsonb")
+    private Map<String, Double> measurementValue;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+//    @Column(name = "measurement_revision_id")
+//    private Long measurementRevisionId;
 }
