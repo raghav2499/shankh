@@ -14,6 +14,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class OutfitFilter {
     private String name;
+    private String subIndexName;
     private Integer index;
     private Map<Integer, String> subOutfits;
 }

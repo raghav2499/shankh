@@ -22,7 +22,7 @@ public class PortfolioOutfitsDAO {
     private LocalDateTime updatedAt;
 
     private Integer subOutfitType;
-    private ColorEnum color;
+    private ColorEnum color = ColorEnum.WHITE;
     private Boolean isValid = Boolean.TRUE;
 
     private PortfolioDAO portfolio;

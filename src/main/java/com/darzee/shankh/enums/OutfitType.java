@@ -76,6 +76,12 @@ public enum OutfitType {
         return this.displayString;
     }
 
+    public String getSubIndexString() {
+        String whitespaceRemovedString = this.name.replaceAll("\\s","");
+        String sanitisedString = whitespaceRemovedString.replaceAll("_", "-");
+        return sanitisedString;
+    }
+
     public List<Gender> getGenderList() {
         return this.gender;
     }

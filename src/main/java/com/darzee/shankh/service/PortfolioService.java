@@ -507,7 +507,8 @@ public class PortfolioService {
             if (outfitFilterMap.containsKey(outfitType)) {
                 outfitFilter = outfitFilterMap.get(outfitType);
             } else {
-                outfitFilter = new OutfitFilter(outfitType.getDisplayString(), outfitType.getOrdinal(), new HashMap<>());
+                outfitFilter = new OutfitFilter(outfitType.getDisplayString(), outfitType.getSubIndexString(),
+                        outfitType.getOrdinal(), new HashMap<>());
             }
             Map<Integer, String> totalSuboutfits = outfitService.getSubOutfitMap(outfitType);
             String portfolioSubOutfitString = totalSuboutfits.get(portfolioOutfitsDAO.getSubOutfitType());
