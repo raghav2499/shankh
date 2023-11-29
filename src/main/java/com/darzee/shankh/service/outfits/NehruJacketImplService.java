@@ -109,7 +109,7 @@ public class NehruJacketImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.NEHRU_JACKET;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitImageLinkService.getOutfitImageLink(outfitType), 1);
+                outfitImageLinkService.getOutfitImageLink(outfitType), 1, isPortfolioEligible());
     }
 
     private MeasurementDetails addLength(String value) {
@@ -154,5 +154,10 @@ public class NehruJacketImplService implements OutfitTypeService {
 
     public String getSubOutfitName(Integer ordinal) {
         return getSubOutfitMap().get(ordinal);
+    }
+
+    @Override
+    public boolean isPortfolioEligible() {
+        return false;
     }
 }

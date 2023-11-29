@@ -188,7 +188,7 @@ public class DressImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.DRESS;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitImageLinkService.getOutfitImageLink(outfitType), 1);
+                outfitImageLinkService.getOutfitImageLink(outfitType), 1, isPortfolioEligible());
     }
 
     @Override
@@ -319,4 +319,8 @@ public class DressImplService implements OutfitTypeService {
     }
 
 
+    @Override
+    public boolean isPortfolioEligible() {
+        return true;
+    }
 }

@@ -196,7 +196,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.SAREE_BLOUSE;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitImageLinkService.getOutfitImageLink(outfitType), 1);
+                outfitImageLinkService.getOutfitImageLink(outfitType), 1, isPortfolioEligible());
     }
 
     private MeasurementDetails addBlouseLength(String value) {
@@ -336,5 +336,10 @@ public class SareeBlouseImplService implements OutfitTypeService {
 
     public String getSubOutfitName(Integer ordinal) {
         return getSubOutfitMap().get(ordinal);
+    }
+
+    @Override
+    public boolean isPortfolioEligible() {
+        return true;
     }
 }

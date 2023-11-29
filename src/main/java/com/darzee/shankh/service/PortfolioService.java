@@ -525,10 +525,12 @@ public class PortfolioService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    private List<PortfolioOutfitDetails> getPortfolioOutfitDetails(List<PortfolioOutfitsDAO> portfolioOutfitsDAOs) {
+    private List<PortfolioOutfitDetails> getPortfolioOutfitDetails(List<PortfolioOutfitsDAO> portfolioOutfitsDAOs) throws Exception {
         List<PortfolioOutfitDetails> portfolioOutfitDetails = new ArrayList<>();
         for (PortfolioOutfitsDAO portfolioOutfit : portfolioOutfitsDAOs) {
-            PortfolioOutfitDetails outfitDetail = new PortfolioOutfitDetails(portfolioOutfit);
+            OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(portfolioOutfit.getOutfitType());
+            String subOutfitName = outfitTypeService.getSubOutfitName(portfolioOutfit.getSubOutfitType());
+            PortfolioOutfitDetails outfitDetail = new PortfolioOutfitDetails(portfolioOutfit, subOutfitName);
             List<String> portfolioOutfitReferences =
                     objectImagesService.getPortfolioOutfitsReferenceIds(portfolioOutfit.getId());
             List<String> portfolioOutfitImageLinks = getPortfolioOutfitImageLinks(portfolioOutfitReferences);

@@ -154,7 +154,7 @@ public class EveningGownImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.EVENING_GOWN;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitImageLinkService.getOutfitImageLink(outfitType), 1);
+                outfitImageLinkService.getOutfitImageLink(outfitType), 1, isPortfolioEligible());
     }
 
     private MeasurementDetails addGownLength(String value) {
@@ -247,5 +247,10 @@ public class EveningGownImplService implements OutfitTypeService {
 
     public String getSubOutfitName(Integer ordinal) {
         return getSubOutfitMap().get(ordinal);
+    }
+
+    @Override
+    public boolean isPortfolioEligible() {
+        return true;
     }
 }

@@ -20,15 +20,17 @@ public class PortfolioOutfitDetails {
 
     private Long id;
     private Integer subOutfitType;
+    private String subOutfitName;
     private String title;
     private Integer color;
     private List<String> imageUrl;
     private List<String> imageReferences;
     private LocalDate creationTime;
 
-    public PortfolioOutfitDetails(PortfolioOutfitsDAO portfolioOutfitsDAO) {
+    public PortfolioOutfitDetails(PortfolioOutfitsDAO portfolioOutfitsDAO, String subOutfitName) {
         this.id = portfolioOutfitsDAO.getId();
         this.subOutfitType = portfolioOutfitsDAO.getSubOutfitType();
+        this.subOutfitName = subOutfitName;
         this.title = portfolioOutfitsDAO.getTitle();
         this.creationTime = portfolioOutfitsDAO.getCreatedAt().toLocalDate();
         this.color = portfolioOutfitsDAO.getColor().getOrdinal();

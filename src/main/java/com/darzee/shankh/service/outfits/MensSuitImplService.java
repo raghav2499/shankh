@@ -170,7 +170,7 @@ public class MensSuitImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.MENS_SUIT;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitImageLinkService.getOutfitImageLink(outfitType), 2);
+                outfitImageLinkService.getOutfitImageLink(outfitType), 2, isPortfolioEligible());
     }
 
     private InnerMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementsDAO measurementsDAO,
@@ -318,5 +318,10 @@ public class MensSuitImplService implements OutfitTypeService {
 
     public String getSubOutfitName(Integer ordinal) {
         return getSubOutfitMap().get(ordinal);
+    }
+
+    @Override
+    public boolean isPortfolioEligible() {
+        return true;
     }
 }

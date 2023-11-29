@@ -141,7 +141,7 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.KURTA_PYJAMA;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitImageLinkService.getOutfitImageLink(outfitType), 2);
+                outfitImageLinkService.getOutfitImageLink(outfitType), 2, isPortfolioEligible());
     }
 
     private InnerMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementsDAO measurementsDAO,
@@ -334,5 +334,10 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
 
     public String getSubOutfitName(Integer ordinal) {
         return getSubOutfitMap().get(ordinal);
+    }
+
+    @Override
+    public boolean isPortfolioEligible() {
+        return true;
     }
 }

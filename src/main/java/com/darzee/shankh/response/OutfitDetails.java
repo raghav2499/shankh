@@ -16,4 +16,5 @@ public class OutfitDetails {
     private String outfitDetailsTitle;
     private String outfitLink;
     private Integer pieces;
+    private boolean isPortfolioEligible;
 }

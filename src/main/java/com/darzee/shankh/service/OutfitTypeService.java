@@ -25,4 +25,6 @@ public interface OutfitTypeService {
     public Map<Integer, String> getSubOutfitMap();
 
     public String getSubOutfitName(Integer ordinal);
+
+    public boolean isPortfolioEligible();
 }
