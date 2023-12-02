@@ -33,6 +33,8 @@ public class PortfolioOutfitDetails {
         this.subOutfitName = subOutfitName;
         this.title = portfolioOutfitsDAO.getTitle();
         this.creationTime = portfolioOutfitsDAO.getCreatedAt().toLocalDate();
-        this.color = portfolioOutfitsDAO.getColor().getOrdinal();
+        if(this.color != null) {
+            this.color = portfolioOutfitsDAO.getColor().getOrdinal();
+        }
     }
 }

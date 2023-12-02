@@ -516,7 +516,9 @@ public class PortfolioService {
             filteredSubOutfits.put(portfolioOutfitsDAO.getSubOutfitType(), portfolioSubOutfitString);
             outfitFilter.setSubOutfits(filteredSubOutfits);
             outfitFilterMap.put(outfitType, outfitFilter);
-            colorFilterMap.put(portfolioOutfitsDAO.getColor().getHexcode(), portfolioOutfitsDAO.getColor().getName());
+            if(portfolioOutfitsDAO.getColor() != null) {
+                colorFilterMap.put(portfolioOutfitsDAO.getColor().getHexcode(), portfolioOutfitsDAO.getColor().getName());
+            }
         }
 
         String successMessage = "Filters fetched successfully";
