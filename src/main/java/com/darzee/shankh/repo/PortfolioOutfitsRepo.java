@@ -12,6 +12,8 @@ import java.util.Optional;
 @Repository
 public interface PortfolioOutfitsRepo extends JpaRepository<PortfolioOutfits, Long> {
 
+    List<PortfolioOutfits> findAllByPortfolioIdAndIsValidTrue(Long portfolioId);
+
     @Nullable
     List<PortfolioOutfits> findAllByPortfolioIdAndOutfitTypeInAndSubOutfitTypeInAndIsValid(long portfolioId,
                                                                                            List<OutfitType> outfitType,

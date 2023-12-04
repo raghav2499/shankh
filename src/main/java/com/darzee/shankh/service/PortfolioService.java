@@ -387,7 +387,9 @@ public class PortfolioService {
 
     public ResponseEntity<GetPortfolioOutfitsResponse> getPortfolioOutfit(Long portfolioId, String outfitTypes,
                                                                           String subOutfits,
-                                                                          String colorHexcodes) throws Exception {
+                                                                          String colorHexcodes,
+                                                                          Integer pageNo,
+                                                                          Integer count) throws Exception {
         GetPortfolioOutfitsResponse response = new GetPortfolioOutfitsResponse();
         List<Integer> outfitTypeOrdinals = new ArrayList<>();
         List<Integer> subOutfitTypeOrdinals = new ArrayList<>();
@@ -406,7 +408,21 @@ public class PortfolioService {
                     .map(outfitTypeOrdinal -> OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeOrdinal))
                     .collect(Collectors.toList());
         } else {
-            outfits = Arrays.asList(OutfitType.values());
+            if (pageNo != null && count != null) {
+                List<PortfolioOutfits> portfolioOutfits = portfolioOutfitsRepo.findAllByPortfolioIdAndIsValidTrue(portfolioId);
+                List<OutfitType> eligibleOutfits = portfolioOutfits.stream().map(PortfolioOutfits::getOutfitType)
+                        .distinct().sorted(Comparator.comparing(OutfitType::getOrdinal))
+                        .collect(Collectors.toList());
+                if (pageNo * count < eligibleOutfits.size()) {
+                    Integer startIdx = pageNo * count;
+                    outfits = eligibleOutfits.subList(startIdx, Math.min(startIdx + count, eligibleOutfits.size()));
+                } else {
+                    outfits = new ArrayList<>();
+                }
+
+            } else {
+                outfits = Arrays.asList(OutfitType.values());
+            }
         }
         if (!StringUtils.isEmpty(subOutfits)) {
             subOutfitTypeOrdinals = Arrays.stream(subOutfits.split(","))
@@ -516,7 +532,7 @@ public class PortfolioService {
             filteredSubOutfits.put(portfolioOutfitsDAO.getSubOutfitType(), portfolioSubOutfitString);
             outfitFilter.setSubOutfits(filteredSubOutfits);
             outfitFilterMap.put(outfitType, outfitFilter);
-            if(portfolioOutfitsDAO.getColor() != null) {
+            if (portfolioOutfitsDAO.getColor() != null) {
                 colorFilterMap.put(portfolioOutfitsDAO.getColor().getHexcode(), portfolioOutfitsDAO.getColor().getName());
             }
         }
