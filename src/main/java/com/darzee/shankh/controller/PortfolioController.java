@@ -20,28 +20,33 @@ public class PortfolioController {
     private PortfolioService portfolioService;
 
     @GetMapping(value = "/username_available", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity<UsernameAvailableResponse> usernameAvailable(@RequestParam("username") String username) {
         return portfolioService.isUsernameAvailable(username);
     }
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity<CreatePortfolioResponse> createPortfolio(@RequestBody @Valid CreatePortfolioRequest request) {
         return portfolioService.createPortfolio(request);
     }
 
     @PostMapping(value = "/{portfolio_id}/portfolio_outfit", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity<CreatePortfolioOutfitResponse> createPortfolioOutfit(@RequestBody @Valid CreatePortfolioOutfitRequest request,
                                                                                @PathVariable("portfolio_id") Long portfolioId) throws Exception {
         return portfolioService.createPortfolioOutfits(request, portfolioId);
     }
 
     @PutMapping(value = "/portfolio_outfit/{portfolio_outfit_id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity<CreatePortfolioOutfitResponse> updatePortfolioOutfit(@RequestBody @Valid CreatePortfolioOutfitRequest request,
                                                                              @PathVariable("portfolio_outfit_id") Long portfolioOutfitId) throws Exception {
         return portfolioService.updatePortfolioOutfits(request, portfolioOutfitId);
     }
 
     @PutMapping(value = "/invalidate_portfolio_outfit/{portfolio_outfit_id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity<CreatePortfolioOutfitResponse> invalidatePortfolioOutfit(@PathVariable("portfolio_outfit_id") Long portfolioOutfitId) throws Exception {
         return portfolioService.invalidatePortfolioOutfit(portfolioOutfitId);
     }
@@ -54,6 +59,7 @@ public class PortfolioController {
     }
 
     @PutMapping(value = "/{portfolio_id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity updatePortfolio(@PathVariable("portfolio_id") Long portfolioId, @RequestBody @Valid UpdatePortfolioRequest request){
         return portfolioService.updatePortfolio(portfolioId, request);
     }
@@ -78,6 +84,7 @@ public class PortfolioController {
     }
 
     @GetMapping(value = "/colors", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity<GetPortfolioColorResponse> getPortfolioColors() {
         return portfolioService.getColors();
     }

@@ -26,6 +26,7 @@ public class BucketController {
     private SampleImageService sampleImageService;
 
     @PostMapping("/uploadFile")
+    @CrossOrigin
     public UploadImageResponse uploadFile(@RequestPart(value = "file") MultipartFile file,
                                           @RequestPart(value = "file_type", required = false) String uploadFileType)
             throws Exception {
@@ -33,6 +34,7 @@ public class BucketController {
     }
 
     @PostMapping("/upload_multiple")
+    @CrossOrigin
     public ResponseEntity<UploadMultipleImageResponse> uploadMultiple(@RequestPart(value = "files") List<MultipartFile> files,
                                                                       @RequestPart(value = "file_type", required = false) String uploadFileType)
             throws Exception {
@@ -40,11 +42,13 @@ public class BucketController {
     }
 
     @GetMapping("/downloadFile")
+    @CrossOrigin
     public DownloadImageResponse getFiles(@Valid @RequestBody DownloadImageRequest request) throws Exception {
         return bucketService.getFileUrls(request);
     }
 
     @GetMapping("/sample_images")
+    @CrossOrigin
     public ResponseEntity<GetSampleImageResponse> getSampleCoverImages(@RequestParam(value = "type") String type) {
         return sampleImageService.getSampleImages(type);
     }

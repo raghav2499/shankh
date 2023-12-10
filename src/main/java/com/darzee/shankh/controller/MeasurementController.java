@@ -17,6 +17,7 @@ public class MeasurementController {
     private MeasurementService measurementService;
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getMeasurementDetails(@RequestParam("customer_id") Long customerId,
                                                 @RequestParam("outfit_type") Integer outfitTypeIndex,
                                                 @RequestParam(value = "scale", defaultValue = "inch") String scale,
@@ -27,6 +28,7 @@ public class MeasurementController {
     }
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity saveMeasurementDetails(@RequestBody @Valid MeasurementDetails measurementDetails) throws Exception {
         return measurementService.setMeasurementDetails(measurementDetails);
     }
