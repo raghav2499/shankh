@@ -1,6 +1,7 @@
 package com.darzee.shankh.service.outfits;
 
 import com.darzee.shankh.constants.Constants;
+import com.darzee.shankh.dao.MeasurementRevisionsDAO;
 import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
@@ -26,6 +27,7 @@ import static com.darzee.shankh.constants.MeasurementTitles.*;
 
 @Service
 public class LadiesSuitImplService implements OutfitTypeService {
+
     @Autowired
     private DaoEntityMapper mapper;
 
@@ -36,15 +38,10 @@ public class LadiesSuitImplService implements OutfitTypeService {
     private OutfitImageLinkService outfitImageLinkService;
 
     @Override
-    public void setMeasurementDetailsInObject(MeasurementRequest measurementDetails,
-                                              MeasurementsDAO measurementsDAO,
-                                              MeasurementScale scale) {
+    public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId,
+                                                          Integer outfitId, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        Map<String, Double> measurementValue = measurementsDAO.getMeasurementValue();
-
-        if (measurementValue == null) {
-            measurementValue = new HashMap<>();
-        }
+        Map<String, Double> measurementValue = new HashMap<>();
 
         if (measurementDetails.getKameezLength() != null) {
             measurementValue.put(KAMEEZ_LENGTH_MEASUREMENT_KEY, measurementDetails.getKameezLength() * multiplyingFactor);
@@ -117,17 +114,16 @@ public class LadiesSuitImplService implements OutfitTypeService {
         if (measurementDetails.getCrotch() != null) {
             measurementValue.put(CROTCH_MEASUREMENT_KEY, measurementDetails.getCrotch() * multiplyingFactor);
         }
-        measurementsDAO.setMeasurementValue(measurementValue);
-
+        MeasurementRevisionsDAO revision = new MeasurementRevisionsDAO(customerId, outfitId, measurementValue);
+        return revision;
     }
 
     @Override
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
-        Map<String, Double> measurementValue =
-                (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
-                        ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
-                        : new HashMap<>();
+        Map<String, Double> measurementValue = (measurementsDAO != null && measurementsDAO.getMeasurementRevision().getMeasurementValue() != null)
+                ? objectMapper.convertValue(measurementsDAO.getMeasurementRevision().getMeasurementValue(), Map.class)
+                : new HashMap<>();
 
         outfitMeasurementDetails.setKameezLength(measurementValue.get(KAMEEZ_LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setUpperChest(measurementValue.get(UPPER_CHEST_MEASUREMENT_KEY));
@@ -171,7 +167,8 @@ public class LadiesSuitImplService implements OutfitTypeService {
                                                                      MeasurementScale scale,
                                                                      Boolean nonEmptyValuesOnly) {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
-        Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
+        MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
+        Map<String, Double> measurementValue = objectMapper.convertValue(revision.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
 
@@ -224,7 +221,8 @@ public class LadiesSuitImplService implements OutfitTypeService {
                                                                         MeasurementScale scale,
                                                                         Boolean nonEmptyValuesOnly) {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
-        Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
+        MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
+        Map<String, Double> measurementValue = objectMapper.convertValue(revision.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         if (measurementValue != null) {
@@ -317,6 +315,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
         String index = "8";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addBicep(String value) {
         String imageLink = LADIES_SUIT_BICEP_IMAGE_LINK;
         String title = LADIES_SUIT_BICEP_TITLE;
@@ -351,6 +350,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
         String index = "13";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addFrontNeckDepth(String value) {
         String imageLink = LADIES_SUIT_FRONT_NECK_DEPTH_IMAGE_LINK;
         String title = LADIES_SUIT_FRONT_NECK_DEPTH_TITLE;
@@ -372,6 +372,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
         String index = "1";
         return new MeasurementDetails(imageLink, title, value, index);
     }
+
     private MeasurementDetails addBottomWaist(String value) {
         String imageLink = LADIES_SUIT_SALWAR_WAIST_IMAGE_LINK;
         String title = LADIES_SUIT_SALWAR_WAIST_TITLE;
@@ -433,6 +434,7 @@ public class LadiesSuitImplService implements OutfitTypeService {
         subOutfitMap.put(16, "Lehenga Suit");
         return subOutfitMap;
     }
+
     public String getSubOutfitName(Integer ordinal) {
         return getSubOutfitMap().get(ordinal);
     }

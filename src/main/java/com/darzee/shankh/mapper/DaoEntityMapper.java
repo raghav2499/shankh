@@ -133,5 +133,22 @@ public interface DaoEntityMapper {
         return portfolioOutfitsDAOList;
     }
 
+    default List<MeasurementRevisionsDAO> measurementRevisionsListToDAOList(List<MeasurementRevisions> measurementRevisions) {
+        if (measurementRevisions == null) {
+            return null;
+        }
+        List<MeasurementRevisionsDAO> measurementRevisionsDAOs = new ArrayList<>();
+        for (MeasurementRevisions revision : measurementRevisions) {
+            MeasurementRevisionsDAO measurementRevisionsDAO = measurementRevisionsToMeasurementRevisionDAO(revision);
+            measurementRevisionsDAOs.add(measurementRevisionsDAO);
+        }
+        return measurementRevisionsDAOs;
+    }
+
+    MeasurementRevisions measurementRevisionsDAOToMeasurementRevision(MeasurementRevisionsDAO measurementRevisionsDAO);
+
+    MeasurementRevisionsDAO measurementRevisionsToMeasurementRevisionDAO(MeasurementRevisions measurementRevision);
+
+
 
 }

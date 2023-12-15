@@ -1,13 +1,12 @@
 package com.darzee.shankh.entity;
 
 import com.darzee.shankh.enums.OutfitType;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Table(name = "measurements")
@@ -15,7 +14,6 @@ import java.util.Map;
 @Getter
 @Setter
 @SequenceGenerator(name = "measurements-seq", sequenceName = "measurements_seq", allocationSize = 1)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class Measurements extends GenericEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "measurements-seq")
@@ -34,6 +32,14 @@ public class Measurements extends GenericEntity {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-//    @Column(name = "measurement_revision_id")
-//    private Long measurementRevisionId;
+    @OneToOne
+    @JoinColumn(name = "measurement_revision_id")
+    private MeasurementRevisions measurementRevision;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
 }
