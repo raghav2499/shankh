@@ -1,6 +1,7 @@
 package com.darzee.shankh.service.outfits;
 
 import com.darzee.shankh.constants.Constants;
+import com.darzee.shankh.dao.MeasurementRevisionsDAO;
 import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
@@ -34,15 +35,10 @@ public class EveningGownImplService implements OutfitTypeService {
     private OutfitImageLinkService outfitImageLinkService;
 
     @Override
-    public void setMeasurementDetailsInObject(MeasurementRequest measurementDetails,
-                                              MeasurementsDAO measurementsDAO,
-                                              MeasurementScale scale) {
+    public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId,
+                                                          Integer outfitId, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        Map<String, Double> measurementValue = measurementsDAO.getMeasurementValue();
-
-        if (measurementValue == null) {
-            measurementValue = new HashMap<>();
-        }
+        Map<String, Double> measurementValue = new HashMap<>();
 
         if (measurementDetails.getGownLength() != null) {
             measurementValue.put(GOWN_LENGTH_MEASUREMENT_KEY, measurementDetails.getGownLength() * multiplyingFactor);
@@ -79,15 +75,17 @@ public class EveningGownImplService implements OutfitTypeService {
         if (measurementDetails.getBackNeckDepth() != null) {
             measurementValue.put(BACK_NECK_DEPTH_MEASUREMENT_KEY, measurementDetails.getBackNeckDepth() * multiplyingFactor);
         }
-        measurementsDAO.setMeasurementValue(measurementValue);
+        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitId, measurementValue);
+        return revisions;
     }
 
     @Override
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
         Map<String, Double> measurementValue =
-                (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
-                        ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
+                (measurementsDAO != null && measurementsDAO.getMeasurementRevision().getMeasurementValue() != null)
+                        ? objectMapper.convertValue(measurementsDAO.getMeasurementRevision().getMeasurementValue(),
+                        Map.class)
                         : new HashMap<>();
 
         outfitMeasurementDetails.setGownLength(measurementValue.get(GOWN_LENGTH_MEASUREMENT_KEY));
@@ -106,10 +104,12 @@ public class EveningGownImplService implements OutfitTypeService {
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale, Boolean nonEmptyValuesOnly) {
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale,
+                                                           Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
-        Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
+        MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
+        Map<String, Double> measurementValue = objectMapper.convertValue(revision.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         if (measurementValue != null) {
