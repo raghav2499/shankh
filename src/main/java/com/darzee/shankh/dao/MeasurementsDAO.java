@@ -27,7 +27,8 @@ public class MeasurementsDAO implements Serializable {
 
     public String getMeasurement(String key, Double dividingFactor) {
         MeasurementRevisionsDAO revision = this.getMeasurementRevision();
-        if (!CollectionUtils.isEmpty(revision.getMeasurementValue()) && revision.getMeasurementValue().containsKey(key)) {
+        if (revision != null && !CollectionUtils.isEmpty(revision.getMeasurementValue())
+                && revision.getMeasurementValue().containsKey(key)) {
             return CommonUtils.doubleToString(revision.getMeasurementValue().get(key) / dividingFactor);
         }
         return "";

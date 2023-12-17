@@ -74,10 +74,9 @@ public class LehengaImplService implements OutfitTypeService {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
-        Map<String, Double> measurementValue = objectMapper.convertValue(revision.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if (measurementValue != null) {
+        if (revision != null) {
             measurementDetailsResponseList.add(
                     addWaistCircum(measurementsDAO.getMeasurement(WAIST_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
             measurementDetailsResponseList.add(

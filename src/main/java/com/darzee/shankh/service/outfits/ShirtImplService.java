@@ -105,35 +105,32 @@ public class ShirtImplService implements OutfitTypeService {
                                                            Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
-        MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
-        Map<String, Double> measurementValue = objectMapper.convertValue(revision.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if (measurementValue != null) {
-            measurementDetailsResponseList.add(
-                    addShirtLength(measurementsDAO.getMeasurement(SHIRT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addNeck(measurementsDAO.getMeasurement(NECK_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addShoulder(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addChest(measurementsDAO.getMeasurement(CHEST_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addSeat(measurementsDAO.getMeasurement(SEAT_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addSleeveLength(measurementsDAO.getMeasurement(SLEEVE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addBicep(measurementsDAO.getMeasurement(BICEP_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addElbowRound(measurementsDAO.getMeasurement(ELBOW_ROUND_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addSleeveCircumference(measurementsDAO.getMeasurement(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addArmhole(measurementsDAO.getMeasurement(ARM_HOLE_MEASUREMENT_KEY, dividingFactor)));
 
-        }
+        measurementDetailsResponseList.add(
+                addShirtLength(measurementsDAO.getMeasurement(SHIRT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addNeck(measurementsDAO.getMeasurement(NECK_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addShoulder(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addChest(measurementsDAO.getMeasurement(CHEST_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addSeat(measurementsDAO.getMeasurement(SEAT_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addSleeveLength(measurementsDAO.getMeasurement(SLEEVE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addBicep(measurementsDAO.getMeasurement(BICEP_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addElbowRound(measurementsDAO.getMeasurement(ELBOW_ROUND_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addSleeveCircumference(measurementsDAO.getMeasurement(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addArmhole(measurementsDAO.getMeasurement(ARM_HOLE_MEASUREMENT_KEY, dividingFactor)));
+
         if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
             measurementDetailsResponseList = measurementDetailsResponseList
                     .stream()

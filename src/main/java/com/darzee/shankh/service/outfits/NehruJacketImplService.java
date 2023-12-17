@@ -79,19 +79,18 @@ public class NehruJacketImplService implements OutfitTypeService {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
-        Map<String, Double> measurementValue = objectMapper.convertValue(revision.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if (measurementValue != null) {
-            measurementDetailsResponseList.add(
-                    addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addNeck(measurementsDAO.getMeasurement(NECK_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addChest(measurementsDAO.getMeasurement(CHEST_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
-        }
+
+        measurementDetailsResponseList.add(
+                addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addNeck(measurementsDAO.getMeasurement(NECK_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addChest(measurementsDAO.getMeasurement(CHEST_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
+
         if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
             measurementDetailsResponseList = measurementDetailsResponseList
                     .stream()

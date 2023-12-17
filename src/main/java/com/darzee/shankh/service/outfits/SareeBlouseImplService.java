@@ -140,46 +140,44 @@ public class SareeBlouseImplService implements OutfitTypeService {
                                                            Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
-        MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
-        Map<String, Double> measurementValue = objectMapper.convertValue(revision.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if (measurementValue != null) {
-            measurementDetailsResponseList.add(
-                    addBlouseLength(measurementsDAO.getMeasurement(BLOUSE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addBust(measurementsDAO.getMeasurement(BUST_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addUpperChest(measurementsDAO.getMeasurement(UPPER_CHEST_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addBelowBust(measurementsDAO.getMeasurement(BELOW_BUST_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addShoulder(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addArmHole(measurementsDAO.getMeasurement(ARM_HOLE_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addSleeveLength(measurementsDAO.getMeasurement(SLEEVE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addSleeveCircumference(measurementsDAO.getMeasurement(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addBicep(measurementsDAO.getMeasurement(BICEP_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addElbowRound(measurementsDAO.getMeasurement(ELBOW_ROUND_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addApexToApexLength(measurementsDAO.getMeasurement(APEX_TO_APEX_LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addShoulderToApexLength(measurementsDAO.getMeasurement(SHOULDER_TO_APEX_LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addFrontNeckDepth(measurementsDAO.getMeasurement(FRONT_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addBackNeckDepth(measurementsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addCrossFront(measurementsDAO.getMeasurement(CROSS_FRONT_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addCrossBack(measurementsDAO.getMeasurement(CROSS_BACK_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addDartPoint((measurementsDAO.getMeasurement(DART_POINT_MEASUREMENT_KEY, dividingFactor))));
-        }
+
+        measurementDetailsResponseList.add(
+                addBlouseLength(measurementsDAO.getMeasurement(BLOUSE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addBust(measurementsDAO.getMeasurement(BUST_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addUpperChest(measurementsDAO.getMeasurement(UPPER_CHEST_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addBelowBust(measurementsDAO.getMeasurement(BELOW_BUST_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addShoulder(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addArmHole(measurementsDAO.getMeasurement(ARM_HOLE_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addSleeveLength(measurementsDAO.getMeasurement(SLEEVE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addSleeveCircumference(measurementsDAO.getMeasurement(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addBicep(measurementsDAO.getMeasurement(BICEP_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addElbowRound(measurementsDAO.getMeasurement(ELBOW_ROUND_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addApexToApexLength(measurementsDAO.getMeasurement(APEX_TO_APEX_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addShoulderToApexLength(measurementsDAO.getMeasurement(SHOULDER_TO_APEX_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addFrontNeckDepth(measurementsDAO.getMeasurement(FRONT_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addBackNeckDepth(measurementsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addCrossFront(measurementsDAO.getMeasurement(CROSS_FRONT_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addCrossBack(measurementsDAO.getMeasurement(CROSS_BACK_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addDartPoint((measurementsDAO.getMeasurement(DART_POINT_MEASUREMENT_KEY, dividingFactor))));
+
         if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
             measurementDetailsResponseList = measurementDetailsResponseList
                     .stream()
