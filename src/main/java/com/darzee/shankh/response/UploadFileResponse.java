@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @AllArgsConstructor
 @NoArgsConstructor
-public class UploadImageResponse {
+public class UploadFileResponse {
     private String referenceId;
     private String shortLivedUrl;
 }

@@ -12,6 +12,6 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @AllArgsConstructor
 @NoArgsConstructor
-public class UploadMultipleImageResponse {
-    private List<UploadImageResponse> response;
+public class UploadMultipleFileResponse {
+    private List<UploadFileResponse> response;
 }

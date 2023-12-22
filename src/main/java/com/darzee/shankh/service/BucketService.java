@@ -8,8 +8,8 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.ImageReferenceRepo;
 import com.darzee.shankh.request.DownloadImageRequest;
 import com.darzee.shankh.response.DownloadImageResponse;
-import com.darzee.shankh.response.UploadImageResponse;
-import com.darzee.shankh.response.UploadMultipleImageResponse;
+import com.darzee.shankh.response.UploadFileResponse;
+import com.darzee.shankh.response.UploadMultipleFileResponse;
 import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.s3utils.FileUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -44,28 +44,39 @@ public class BucketService {
     @Value("invoice/")
     private String invoiceDirectory;
 
-    public UploadImageResponse uploadSingleImage(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
+    public UploadFileResponse uploadSingleImage(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
         try {
             Pair<String, String> fileUploadResult = uploadPhoto(multipartFile, uploadFileTypeOrdinal);
-            return new UploadImageResponse(fileUploadResult.getKey(), fileUploadResult.getValue());
+            return new UploadFileResponse(fileUploadResult.getKey(), fileUploadResult.getValue());
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
         }
     }
 
-    public ResponseEntity<UploadMultipleImageResponse> uploadMultipleImages(List<MultipartFile> files, String uploadFileType) {
-        List<UploadImageResponse> uploadImageResultList = new ArrayList<>();
+    public ResponseEntity<UploadMultipleFileResponse> uploadMultipleImages(List<MultipartFile> files, String uploadFileType) {
+        List<UploadFileResponse> uploadImageResultList = new ArrayList<>();
         try {
             for (MultipartFile file : files) {
                 Pair<String, String> fileUploadResult = uploadPhoto(file, uploadFileType);
-                uploadImageResultList.add(new UploadImageResponse(fileUploadResult.getKey(), fileUploadResult.getValue()));
+                uploadImageResultList.add(new UploadFileResponse(fileUploadResult.getKey(), fileUploadResult.getValue()));
             }
-            UploadMultipleImageResponse response = new UploadMultipleImageResponse(uploadImageResultList);
+            UploadMultipleFileResponse response = new UploadMultipleFileResponse(uploadImageResultList);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
         }
 
+    }
+
+    //for audio file
+    //check for data type, confirm!
+    public UploadFileResponse uploadAudioFile(MultipartFile multipartFile, String uploadFileType) {
+        try {
+            Pair<String, String> fileUploadResult = uploadAudio(multipartFile, uploadFileType);
+            return new UploadFileResponse(fileUploadResult.getKey(), fileUploadResult.getValue());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
+        }
     }
 
     public DownloadImageResponse getFileUrls(DownloadImageRequest request) {
@@ -134,6 +145,15 @@ public class BucketService {
                 fileName);
         imageReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
         file.delete();
+        return fileUploadResult;
+    }
+    private Pair<String, String> uploadAudio(MultipartFile multipartFile, String uploadFileTypeOrdinal) throws IOException {
+        File file = FileUtil.convertMultiPartToFile(multipartFile);
+        String fileName = FileUtil.generateFileName(multipartFile);
+        ImmutablePair<String, String> fileUploadResult = null;
+
+        fileUploadResult = client.uploadAudioFile(file, fileName); 
+        
         return fileUploadResult;
     }
 }

@@ -3,8 +3,8 @@ package com.darzee.shankh.controller;
 import com.darzee.shankh.request.DownloadImageRequest;
 import com.darzee.shankh.response.DownloadImageResponse;
 import com.darzee.shankh.response.GetSampleImageResponse;
-import com.darzee.shankh.response.UploadImageResponse;
-import com.darzee.shankh.response.UploadMultipleImageResponse;
+import com.darzee.shankh.response.UploadFileResponse;
+import com.darzee.shankh.response.UploadMultipleFileResponse;
 import com.darzee.shankh.service.BucketService;
 import com.darzee.shankh.service.SampleImageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,17 +26,25 @@ public class BucketController {
     private SampleImageService sampleImageService;
 
     @PostMapping("/uploadFile")
-    public UploadImageResponse uploadFile(@RequestPart(value = "file") MultipartFile file,
+    public UploadFileResponse uploadFile(@RequestPart(value = "file") MultipartFile file,
                                           @RequestPart(value = "file_type", required = false) String uploadFileType)
             throws Exception {
         return bucketService.uploadSingleImage(file, uploadFileType);
     }
 
     @PostMapping("/upload_multiple")
-    public ResponseEntity<UploadMultipleImageResponse> uploadMultiple(@RequestPart(value = "files") List<MultipartFile> files,
+    public ResponseEntity<UploadMultipleFileResponse> uploadMultiple(@RequestPart(value = "files") List<MultipartFile> files,
                                                                       @RequestPart(value = "file_type", required = false) String uploadFileType)
             throws Exception {
         return bucketService.uploadMultipleImages(files, uploadFileType);
+    }
+
+    //for audio file upload endpoint
+    @PostMapping("/upload_audio")
+    public UploadFileResponse uploadAudio(@RequestPart(value = "file") MultipartFile file,
+                                          @RequestPart(value = "file_type", required = false) String uploadFileType)
+            throws Exception {
+        return bucketService.uploadAudioFile(file, uploadFileType);
     }
 
     @GetMapping("/downloadFile")
