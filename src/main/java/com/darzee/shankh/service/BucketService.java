@@ -148,12 +148,18 @@ public class BucketService {
         return fileUploadResult;
     }
     private Pair<String, String> uploadAudio(MultipartFile multipartFile, String uploadFileTypeOrdinal) throws IOException {
-        File file = FileUtil.convertMultiPartToFile(multipartFile);
-        String fileName = FileUtil.generateFileName(multipartFile);
-        ImmutablePair<String, String> fileUploadResult = null;
+        try{
+            File file = FileUtil.convertMultiPartToFile(multipartFile);
+            String fileName = FileUtil.generateFileName(multipartFile);
+            ImmutablePair<String, String> fileUploadResult = null;
 
-        fileUploadResult = client.uploadAudioFile(file, fileName); 
-        
-        return fileUploadResult;
+            fileUploadResult = client.uploadAudioFile(file, fileName); 
+            
+            return fileUploadResult;
+        }
+        catch (Exception e) {
+            e.printStackTrace(); // You can use a logger instead
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception " + e.getMessage(), e);
+        }
     }
 }
