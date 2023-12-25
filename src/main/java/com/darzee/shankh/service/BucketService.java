@@ -70,10 +70,15 @@ public class BucketService {
 
     //for audio file
     //check for data type, confirm!
-    public UploadFileResponse uploadAudioFile(MultipartFile multipartFile, String uploadFileType) {
+    public ResponseEntity<UploadMultipleFileResponse>  uploadMultipleFile(List<MultipartFile> files, String uploadFileType) {
+        List<UploadFileResponse> uploadImageResultList = new ArrayList<>();
         try {
-            Pair<String, String> fileUploadResult = uploadAudio(multipartFile, uploadFileType);
-            return new UploadFileResponse(fileUploadResult.getKey(), fileUploadResult.getValue());
+            for (MultipartFile file : files) {
+                Pair<String, String> fileUploadResult = uploadFile(file, uploadFileType);
+                uploadImageResultList.add(new UploadFileResponse(fileUploadResult.getKey(), fileUploadResult.getValue()));
+            }
+            UploadMultipleFileResponse response = new UploadMultipleFileResponse(uploadImageResultList);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
         }
@@ -147,18 +152,33 @@ public class BucketService {
         file.delete();
         return fileUploadResult;
     }
-    private Pair<String, String> uploadAudio(MultipartFile multipartFile, String uploadFileTypeOrdinal) throws IOException {
+    private Pair<String, String> uploadFile(MultipartFile multipartFile, String uploadFileTypeOrdinal) throws IOException {
         try{
+
             File file = FileUtil.convertMultiPartToFile(multipartFile);
             String fileName = FileUtil.generateFileName(multipartFile);
             ImmutablePair<String, String> fileUploadResult = null;
 
-            fileUploadResult = client.uploadAudioFile(file, fileName); 
-            
+            switch(uploadFileTypeOrdinal) {
+                case "1":
+                  // for portfolio file
+                  fileUploadResult = client.uploadPortfolioFile(file, fileName);
+                  break;
+                case "2":
+                  // for audio file
+                  fileUploadResult = client.uploadAudioFile(file, fileName);
+                  break;
+                default:
+                  // for image file
+                  fileUploadResult = client.uploadFile(file, fileName);
+              }
+            ImageReferenceDAO imageReference = new ImageReferenceDAO(fileUploadResult.getKey(),fileName);
+            imageReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
+            file.delete();
             return fileUploadResult;
         }
         catch (Exception e) {
-            e.printStackTrace(); // You can use a logger instead
+            e.printStackTrace(); 
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception " + e.getMessage(), e);
         }
     }

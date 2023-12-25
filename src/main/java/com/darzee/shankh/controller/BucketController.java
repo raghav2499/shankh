@@ -39,12 +39,12 @@ public class BucketController {
         return bucketService.uploadMultipleImages(files, uploadFileType);
     }
 
-    //for audio file upload endpoint
-    @PostMapping("/upload_audio")
-    public UploadFileResponse uploadAudio(@RequestPart(value = "file") MultipartFile file,
+    //for audio/images file upload endpoint
+    @PostMapping("/upload_multiple_files")
+    public ResponseEntity<UploadMultipleFileResponse> uploadMultipleFiles(@RequestPart(value = "file") List<MultipartFile> files,
                                           @RequestPart(value = "file_type", required = false) String uploadFileType)
             throws Exception {
-        return bucketService.uploadAudioFile(file, uploadFileType);
+        return bucketService.uploadMultipleFile(files, uploadFileType);
     }
 
     @GetMapping("/downloadFile")
