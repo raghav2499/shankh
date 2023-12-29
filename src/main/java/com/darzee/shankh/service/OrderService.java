@@ -12,12 +12,11 @@ import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.CreateOrderRequest;
+import com.darzee.shankh.request.PriceBreakUpDetails;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
+import com.darzee.shankh.request.innerObjects.*;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
-import com.darzee.shankh.request.innerObjects.OrderDetails;
-import com.darzee.shankh.request.innerObjects.UpdateOrderAmountDetails;
-import com.darzee.shankh.request.innerObjects.UpdateOrderDetails;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.pdfutils.BillGenerator;
@@ -26,6 +25,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -85,7 +85,13 @@ public class OrderService {
     private BoutiqueLedgerService boutiqueLedgerService;
 
     @Autowired
+    private PriceBreakUpService priceBreakUpService;
+
+    @Autowired
     private ImageReferenceRepo imageReferenceRepo;
+
+    @Autowired
+    private OrderItemRepo orderItemRepo;
 
     @Autowired
     private AmazonClient s3Client;
@@ -108,6 +114,10 @@ public class OrderService {
     public OrderSummary createNewOrder(CreateOrderRequest request) {
         OrderDetails orderDetails = request.getOrderDetails();
         OrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
+        List<PriceBreakUpDetails> priceBreakUpDetails = orderDetails.getOrderItems()
+                .stream().map(orderItem -> orderItem.getPriceBreakUp()).collect(Collectors.toList());
+        validatePriceBreakup(priceBreakUpDetails, orderAmountDetails.getTotalOrderAmount());
+
         Optional<Customer> optionalCustomer = customerRepo.findById(orderDetails.getCustomerId());
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(orderDetails.getBoutiqueId());
         if (optionalCustomer.isPresent() && optionalBoutique.isPresent()) {
@@ -118,13 +128,9 @@ public class OrderService {
             OrderAmountDAO orderAmountDAO = setOrderAmountSpecificDetails(orderAmountDetails, orderDAO);
             orderDAO.setOrderAmount(orderAmountDAO);
             orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
-            String trialDate = orderDAO.getTrialDate() != null ? orderDAO.getTrialDate().toString() : null;
-
-//            boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
-
-            return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(), orderDAO.getOutfitType().getName(),
-                    trialDate, orderDAO.getDeliveryDate().toString(),
-                    orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString());
+            return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
+                    orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString(),
+                    orderDAO.getOrderItems());
         }
         return null;
     }
@@ -149,17 +155,22 @@ public class OrderService {
         if (optionalOrder.isPresent()) {
             OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
             OrderAmountDAO orderAmount = order.getOrderAmount();
-            OutfitType outfitType = order.getOutfitType();
             CustomerDAO customer = order.getCustomer();
-            MeasurementsDAO measurementsDAO = customer.getOutfitMeasurement(outfitType);
-            OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-            OutfitMeasurementDetails measurementDetails = outfitTypeService.extractMeasurementDetails(measurementsDAO);
-            List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
-            List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
-            String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
+            List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
+            for (OrderItemDAO orderItem : order.getOrderItems()) {
+                OutfitType outfitType = orderItem.getOutfitType();
+                String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
+                MeasurementsDAO measurementsDAO = customer.getOutfitMeasurement(outfitType);
+                OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
+                OutfitMeasurementDetails measurementDetails = outfitTypeService.extractMeasurementDetails(measurementsDAO);
+                List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
+                List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
+                OrderItemDetails orderItemDetails = new OrderItemDetails(measurementDetails, clothImagesReferenceIds,
+                        clothImageUrlLinks, outfitImageLink, orderItem);
+                orderItemDetailsList.add(orderItemDetails);
+            }
             String message = "Details fetched succesfully";
-            OrderDetailResponse response = new OrderDetailResponse(customer, order, measurementDetails, orderAmount,
-                    clothImagesReferenceIds, clothImageUrlLinks, outfitImageLink, message);
+            OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount, orderItemDetailsList, message);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
@@ -187,11 +198,10 @@ public class OrderService {
                 orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order,
                         order.getBoutique().getId());
             }
-            String trialDate = order.getTrialDate() != null ? order.getTrialDate().toString() : null;
 
             OrderSummary orderSummary = new OrderSummary(order.getId(), order.getInvoiceNo(),
-                    order.getOutfitType().getName(), trialDate, order.getDeliveryDate().toString(),
-                    orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString());
+                    orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString(),
+                    order.getOrderItems());
             CreateOrderResponse response = new CreateOrderResponse("Order updated successfully", orderSummary);
             return new ResponseEntity(response, HttpStatus.OK);
         }
@@ -327,33 +337,48 @@ public class OrderService {
                         + order.getOrderStatus() + " to " + targetStatus + " is not allowed");
             }
         }
-        if (order.isTrialDateUpdated(orderDetails.getTrialDate())) {
-            order.setTrialDate(orderDetails.getTrialDate());
-        }
-        if (order.isDeliveryDateUpdated(orderDetails.getDeliveryDate())) {
-            order.setDeliveryDate(orderDetails.getDeliveryDate());
-        }
-        if (order.isPriorityUpdated(orderDetails.getIsPriorityOrder())) {
-            order.setIsPriorityOrder(orderDetails.getIsPriorityOrder());
-        }
-        if (order.isInspirationUpdated(orderDetails.getInspiration())) {
-            order.setInspiration(orderDetails.getInspiration());
-        }
-        if (order.areSpecialInstructionsUpdated(orderDetails.getSpecialInstructions())) {
-            order.setSpecialInstructions(orderDetails.getSpecialInstructions());
-        }
 
         if (Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
             order.setIsDeleted(Boolean.TRUE);
             OrderStage orderStage = getOrderStage(order.getOrderStatus());
             resetOrderAmountForDeletedOrders(order, orderStage);
         }
-        if (!Collections.isEmpty(orderDetails.getClothImageReferenceIds())) {
-            Long orderId = order.getId();
-            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.ORDER.getEntityType(), orderId);
-            objectImagesService.saveObjectImages(orderDetails.getClothImageReferenceIds(), ImageEntityType.ORDER.getEntityType(), orderId);
+
+        Map<Long, OrderItemDAO> orderItemDAOMap = order.getOrderItemDAOMap();
+        List<OrderItemDAO> updatedItems = new ArrayList<>();
+        for (UpdateOrderItemDetails updateItemDetail : orderDetails.getUpdateOrderItemDetails()) {
+            Long orderItemId = updateItemDetail.getId();
+            if (!orderItemDAOMap.containsKey(orderItemId)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item ID is invalid");
+            }
+            OrderItemDAO orderItem = orderItemDAOMap.get(orderItemId);
+            if (orderItem.isTrialDateUpdated(updateItemDetail.getTrialDate())) {
+                orderItem.setTrialDate(updateItemDetail.getTrialDate());
+            }
+            if (orderItem.isDeliveryDateUpdated(updateItemDetail.getDeliveryDate())) {
+                orderItem.setDeliveryDate(updateItemDetail.getDeliveryDate());
+            }
+            if (orderItem.isPriorityUpdated(updateItemDetail.getIsPriorityOrder())) {
+                orderItem.setIsPriorityOrder(updateItemDetail.getIsPriorityOrder());
+            }
+            if (orderItem.isInspirationUpdated(updateItemDetail.getInspiration())) {
+                orderItem.setInspiration(updateItemDetail.getInspiration());
+            }
+            if (orderItem.areSpecialInstructionsUpdated(updateItemDetail.getSpecialInstructions())) {
+                orderItem.setSpecialInstructions(updateItemDetail.getSpecialInstructions());
+            }
+            updatedItems.add(orderItem);
+            if (!Collections.isEmpty(updateItemDetail.getClothImageReferenceIds())) {
+                objectImagesService.invalidateExistingReferenceIds(ImageEntityType.ORDER_ITEM.getEntityType(),
+                        orderItemId);
+                objectImagesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
+                        ImageEntityType.ORDER_ITEM.getEntityType(), orderItemId);
+            }
         }
-        order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        //todo : check here if the updated object is also getting saved
+        order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order,
+                new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
         return order;
     }
 
@@ -413,28 +438,55 @@ public class OrderService {
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
-        String outfitImageLink = outfitImageLinkService.getOutfitImageLink(orderDAO.getOutfitType());
-        return new OrderDetailResponse(orderDAO.getCustomer(),
-                orderDAO,
-                customerProfilePicLink,
-                orderDAO.getOrderAmount(),
-                outfitImageLink);
+        List<Pair<OrderItemDAO, String>> orderItemOutfitLinkPairList = new ArrayList<>();
+        for (OrderItemDAO orderItem : orderDAO.getOrderItems()) {
+            String outfitImgLink = outfitImageLinkService.getOutfitImageLink(orderItem.getOutfitType());
+            orderItemOutfitLinkPairList.add(Pair.of(orderItem, outfitImgLink));
+        }
+
+        return new OrderDetailResponse(orderDAO, orderItemOutfitLinkPairList, customerProfilePicLink);
     }
 
-    private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
+    private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO,
+                                             CustomerDAO customerDAO) {
+
         String invoiceNo = generateOrderInvoiceNo();
-        OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(orderDetails.getOutfitType());
-        if (outfitType == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid outfit type");
+        OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
+        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
+                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+
+        List<OrderItemDetailRequest> orderItems = orderDetails.getOrderItems();
+        Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
+        List<PriceBreakupDAO> priceBreakUpList = new ArrayList<>();
+        for (OrderItemDetailRequest itemDetail : orderItems) {
+            OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
+            if (outfitType == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Invalid outfit type " + itemDetail.getOutfitType());
+            }
+            OrderItemDAO orderItemDAO = new OrderItemDAO(itemDetail.getTrialDate(), itemDetail.getDeliveryDate(),
+                    itemDetail.getSpecialInstructions(), itemDetail.getOrderType(), outfitType,
+                    itemDetail.getInspiration(), itemDetail.getIsPriorityOrder(), orderDAO);
+            orderItemDAO = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItemDAO,
+                    new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+            PriceBreakupDAO priceBreakupDAO = new PriceBreakupDAO(itemDetail.getPriceBreakUp(), orderItemDAO);
+            priceBreakUpList.add(priceBreakupDAO);
+            for (String imageRef : itemDetail.getClothImageReferenceIds()) {
+                clothRefOrderItemIdMap.put(imageRef, orderItemDAO.getId());
+            }
         }
-        OrderDAO orderDAO = new OrderDAO(orderDetails.getTrialDate(), orderDetails.getDeliveryDate(), outfitType,
-                orderDetails.getSpecialInstructions(), orderDetails.getInspiration(), orderDetails.getOrderType(),
-                orderDetails.getIsPriorityOrder(), invoiceNo, boutiqueDAO, customerDAO);
-        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-        Long orderId = orderDAO.getId();
-        List<String> clothImageReferenceIds = orderDetails.getClothImageReferenceIds();
-        objectImagesService.saveObjectImages(clothImageReferenceIds, ImageEntityType.ORDER.getEntityType(), orderId);
+        priceBreakUpService.addPriceBreakUp(priceBreakUpList);
+        objectImagesService.saveObjectImages(clothRefOrderItemIdMap, ImageEntityType.ORDER_ITEM.getEntityType());
         return orderDAO;
+    }
+
+    private void validatePriceBreakup(List<PriceBreakUpDetails> allPriceBreakups, Double totalAmount) {
+        Double expectedTotalAmount = allPriceBreakups.stream()
+                .mapToDouble(priceBreakUp -> priceBreakUp.getValue() * priceBreakUp.getQuantity())
+                .sum();
+        if (!expectedTotalAmount.equals(totalAmount)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Total amount calculated is incorrect");
+        }
     }
 
     private OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
@@ -505,12 +557,21 @@ public class OrderService {
 
     /**
      * This is a throw-away code, front-end team to handle the week data dynamically
+     *
      * @param weekwiseSales
      */
     private void populateSalesIfRequired(List<WeekwiseSalesSplit> weekwiseSales) {
-        while(weekwiseSales.size() < 5) {
+        while (weekwiseSales.size() < 5) {
             weekwiseSales.add(new WeekwiseSalesSplit(0d, null));
         }
+    }
+
+    private List<OrderItemSummary> generateOrderItemSummaries(List<OrderItemDAO> orderItemDAOList) {
+        List<OrderItemSummary> orderItemSummaryList = new ArrayList<>();
+        for (OrderItemDAO item : orderItemDAOList) {
+            orderItemSummaryList.add(new OrderItemSummary(item));
+        }
+        return orderItemSummaryList;
     }
 
 }

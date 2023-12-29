@@ -48,6 +48,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/storage/upload_multiple").permitAll()
                   .anyRequest().authenticated()
                 .and()
+                .cors()
+                .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
