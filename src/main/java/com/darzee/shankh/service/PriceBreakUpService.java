@@ -42,6 +42,10 @@ public class PriceBreakUpService {
                 updatePriceBreakup(priceBreakupDAO, updatedPriceBreakUpMap.get(priceBreakupDAO.getId()));
             }
         }
+        priceBreakups = mapper.priceBreakUpListToPriceBreakUpDAOList(
+                priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakups,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
         return priceBreakups;
 
     }

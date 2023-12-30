@@ -382,7 +382,7 @@ public class OrderService {
                 orderItem.setPriceBreakup(updatedPriceBreakup);
             }
         }
-        //todo : check here if the updated object is also getting saved
+        orderItemRepo.saveAll(mapper.orderItemDAOListToOrderItemList(updatedItems, new CycleAvoidingMappingContext()));
         order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());

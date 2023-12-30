@@ -20,7 +20,7 @@ import java.util.Map;
 public class OrderDAO {
     private Long id;
     private String invoiceNo;
-    private OrderStatus orderStatus;
+    private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;
 
     private Boolean isDeleted = Boolean.FALSE;
     private BoutiqueDAO boutique;
