@@ -4,7 +4,6 @@ import com.darzee.shankh.dao.CustomerDAO;
 import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
-import com.darzee.shankh.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -15,7 +14,6 @@ import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Data
 @NoArgsConstructor
@@ -54,21 +52,9 @@ public class OrderDetailResponse {
                                List<OrderItemDetails> orderItemDetails, String message) {
         this.orderId = order.getId();
         this.orderStatus = order.getOrderStatus().getDisplayString();
-        this.isPriorityOrder = Optional.ofNullable(order.getIsPriorityOrder()).orElse(Boolean.FALSE);
-        this.outfitType = order.getOutfitType().getDisplayString();
-        this.outfitTypeName = order.getOutfitType().getName();
-        this.outfitTypeIndex = order.getOutfitType().getOrdinal();
-        this.outfitTypeImageLink = outfitImageLink;
-        this.trialDate = (order.getTrialDate() != null ? order.getTrialDate().toString() : null);
-        this.deliveryDate = order.getDeliveryDate().toString();
-        this.type = order.getOrderType().getDisplayName();
-        this.inspiration = order.getInspiration();
-        this.specialInstructions = order.getSpecialInstructions();
-        this.clothImageRefIds = clothImageRefIds;
-        this.clothImagesLink = clothImagesLink;
         this.orderAmountDetails = new OrderAmountDetails(orderAmountDAO);
         this.customerDetails = new CustomerDetails(customer);
-        this.measurementDetails = outfitMeasurementDetails;
+        this.orderItemDetails = orderItemDetails;
         this.message = message;
     }
 

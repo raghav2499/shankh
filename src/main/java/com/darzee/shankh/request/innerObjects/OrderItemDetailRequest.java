@@ -22,8 +22,10 @@ public class OrderItemDetailRequest {
     private Integer outfitType;
     @NotNull(message = "Either order_type is not present or is invalid")
     private OrderType orderType;
+    private Integer itemQuantity = 1;
     private List<String> clothImageReferenceIds;
     private String inspiration;
     private String specialInstructions;
-    private PriceBreakUpDetails priceBreakUp;
+    @NotNull(message = "price_breakup cannot be null")
+    private List<PriceBreakUpDetails> priceBreakup;
 }

@@ -27,25 +27,24 @@ public class OrderItemDetails {
     private String inspiration;
     private String specialInstructions;
     private String type;
+
+    private Integer itemQuantity;
     private List<String> clothImageRefIds;
     private List<String> clothImagesLink;
     private String outfitTypeImageLink;
-    private OutfitMeasurementDetails measurementDetails;
-
-
     public OrderItemDetails(OrderItemDAO orderItem, String outfitTypeImgLink) {
         OutfitType outfitType = orderItem.getOutfitType();
         this.isPriorityOrder = Optional.ofNullable(orderItem.getIsPriorityOrder()).orElse(Boolean.FALSE);
         this.outfitType = outfitType.getDisplayString();
         this.trialDate = (orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null);
         this.deliveryDate = orderItem.getDeliveryDate().toString();
+        this.itemQuantity = orderItem.getQuantity();
         this.outfitTypeIndex = outfitType.getOrdinal();
         this.outfitTypeImageLink = outfitTypeImgLink;
     }
 
-    public OrderItemDetails(OutfitMeasurementDetails measurementDetails, List<String> clothImagesReferenceIds,
-                            List<String> clothImageUrlLinks, String outfitImageLink, OrderItemDAO orderItem) {
-        this.measurementDetails = measurementDetails;
+    public OrderItemDetails(List<String> clothImagesReferenceIds, List<String> clothImageUrlLinks,
+                            String outfitImageLink, OrderItemDAO orderItem) {
         this.clothImageRefIds = clothImagesReferenceIds;
         this.clothImagesLink = clothImageUrlLinks;
         this.isPriorityOrder = Optional.ofNullable(orderItem.getIsPriorityOrder()).orElse(Boolean.FALSE);
@@ -56,6 +55,7 @@ public class OrderItemDetails {
         this.trialDate = (orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null);
         this.deliveryDate = orderItem.getDeliveryDate().toString();
         this.type = orderItem.getOrderType().getDisplayName();
+        this.itemQuantity = orderItem.getQuantity();
         this.inspiration = orderItem.getInspiration();
         this.specialInstructions = orderItem.getSpecialInstructions();
     }

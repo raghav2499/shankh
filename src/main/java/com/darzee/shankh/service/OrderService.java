@@ -3,10 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.*;
-import com.darzee.shankh.entity.Boutique;
-import com.darzee.shankh.entity.Customer;
-import com.darzee.shankh.entity.ImageReference;
-import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.entity.*;
 import com.darzee.shankh.enums.*;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -37,6 +34,8 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 
 @Service
 public class OrderService {
@@ -114,9 +113,10 @@ public class OrderService {
     public OrderSummary createNewOrder(CreateOrderRequest request) {
         OrderDetails orderDetails = request.getOrderDetails();
         OrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
-        List<PriceBreakUpDetails> priceBreakUpDetails = orderDetails.getOrderItems()
-                .stream().map(orderItem -> orderItem.getPriceBreakUp()).collect(Collectors.toList());
-        validatePriceBreakup(priceBreakUpDetails, orderAmountDetails.getTotalOrderAmount());
+        List<PriceBreakUpDetails> allItemsPriceBreakUpDetails = orderDetails.getOrderItems()
+                .stream().map(orderItem -> orderItem.getPriceBreakup()).flatMap(List::stream)
+                .collect(Collectors.toList());
+        validatePriceBreakup(allItemsPriceBreakUpDetails, orderAmountDetails.getTotalOrderAmount());
 
         Optional<Customer> optionalCustomer = customerRepo.findById(orderDetails.getCustomerId());
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(orderDetails.getBoutiqueId());
@@ -160,17 +160,15 @@ public class OrderService {
             for (OrderItemDAO orderItem : order.getOrderItems()) {
                 OutfitType outfitType = orderItem.getOutfitType();
                 String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
-                MeasurementsDAO measurementsDAO = customer.getOutfitMeasurement(outfitType);
-                OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-                OutfitMeasurementDetails measurementDetails = outfitTypeService.extractMeasurementDetails(measurementsDAO);
                 List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
                 List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
-                OrderItemDetails orderItemDetails = new OrderItemDetails(measurementDetails, clothImagesReferenceIds,
+                OrderItemDetails orderItemDetails = new OrderItemDetails(clothImagesReferenceIds,
                         clothImageUrlLinks, outfitImageLink, orderItem);
                 orderItemDetailsList.add(orderItemDetails);
             }
             String message = "Details fetched succesfully";
-            OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount, orderItemDetailsList, message);
+            OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount,
+                    orderItemDetailsList, message);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
@@ -198,7 +196,9 @@ public class OrderService {
                 orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order,
                         order.getBoutique().getId());
             }
-
+            List<PriceBreakupDAO> priceBreakupDAOList = order.getOrderItems().stream()
+                    .map(OrderItemDAO::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
+            postUpdateOrderValidation(orderAmountDAO.getTotalAmount(), priceBreakupDAOList);
             OrderSummary orderSummary = new OrderSummary(order.getId(), order.getInvoiceNo(),
                     orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString(),
                     order.getOrderItems());
@@ -346,7 +346,7 @@ public class OrderService {
 
         Map<Long, OrderItemDAO> orderItemDAOMap = order.getOrderItemDAOMap();
         List<OrderItemDAO> updatedItems = new ArrayList<>();
-        for (UpdateOrderItemDetails updateItemDetail : orderDetails.getUpdateOrderItemDetails()) {
+        for (UpdateOrderItemDetails updateItemDetail : orderDetails.getOrderItemDetails()) {
             Long orderItemId = updateItemDetail.getId();
             if (!orderItemDAOMap.containsKey(orderItemId)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item ID is invalid");
@@ -367,6 +367,9 @@ public class OrderService {
             if (orderItem.areSpecialInstructionsUpdated(updateItemDetail.getSpecialInstructions())) {
                 orderItem.setSpecialInstructions(updateItemDetail.getSpecialInstructions());
             }
+            if (orderItem.isQuantityUpdated(updateItemDetail.getItemQuantity())) {
+                orderItem.setQuantity(updateItemDetail.getItemQuantity());
+            }
             updatedItems.add(orderItem);
             if (!Collections.isEmpty(updateItemDetail.getClothImageReferenceIds())) {
                 objectImagesService.invalidateExistingReferenceIds(ImageEntityType.ORDER_ITEM.getEntityType(),
@@ -374,10 +377,14 @@ public class OrderService {
                 objectImagesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
                         ImageEntityType.ORDER_ITEM.getEntityType(), orderItemId);
             }
+            if (!Collections.isEmpty(updateItemDetail.getPriceBreakupDetails())) {
+                List<PriceBreakupDAO> updatedPriceBreakup = priceBreakUpService.updatePriceBreakups(updateItemDetail.getPriceBreakupDetails(), orderItem);
+                orderItem.setPriceBreakup(updatedPriceBreakup);
+            }
         }
         //todo : check here if the updated object is also getting saved
         order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order,
-                new CycleAvoidingMappingContext())),
+                        new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         return order;
     }
@@ -447,6 +454,7 @@ public class OrderService {
         return new OrderDetailResponse(orderDAO, orderItemOutfitLinkPairList, customerProfilePicLink);
     }
 
+    @Transactional(REQUIRES_NEW)
     private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO,
                                              CustomerDAO customerDAO) {
 
@@ -458,6 +466,7 @@ public class OrderService {
         List<OrderItemDetailRequest> orderItems = orderDetails.getOrderItems();
         Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
         List<PriceBreakupDAO> priceBreakUpList = new ArrayList<>();
+        List<OrderItemDAO> orderItemList = new ArrayList<>();
         for (OrderItemDetailRequest itemDetail : orderItems) {
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
             if (outfitType == null) {
@@ -466,23 +475,27 @@ public class OrderService {
             }
             OrderItemDAO orderItemDAO = new OrderItemDAO(itemDetail.getTrialDate(), itemDetail.getDeliveryDate(),
                     itemDetail.getSpecialInstructions(), itemDetail.getOrderType(), outfitType,
-                    itemDetail.getInspiration(), itemDetail.getIsPriorityOrder(), orderDAO);
+                    itemDetail.getInspiration(), itemDetail.getIsPriorityOrder(), itemDetail.getItemQuantity(),
+                    orderDAO);
             orderItemDAO = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItemDAO,
                     new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-            PriceBreakupDAO priceBreakupDAO = new PriceBreakupDAO(itemDetail.getPriceBreakUp(), orderItemDAO);
-            priceBreakUpList.add(priceBreakupDAO);
+            orderItemList.add(orderItemDAO);
+            List<PriceBreakupDAO> priceBreakupDAOList =
+                    priceBreakUpService.generatePriceBreakupList(itemDetail.getPriceBreakup(), orderItemDAO);
+            priceBreakUpList.addAll(priceBreakupDAOList);
             for (String imageRef : itemDetail.getClothImageReferenceIds()) {
                 clothRefOrderItemIdMap.put(imageRef, orderItemDAO.getId());
             }
         }
-        priceBreakUpService.addPriceBreakUp(priceBreakUpList);
+        orderDAO.setOrderItems(orderItemList);
+        priceBreakUpService.savePriceBreakUp(priceBreakUpList);
         objectImagesService.saveObjectImages(clothRefOrderItemIdMap, ImageEntityType.ORDER_ITEM.getEntityType());
         return orderDAO;
     }
 
     private void validatePriceBreakup(List<PriceBreakUpDetails> allPriceBreakups, Double totalAmount) {
         Double expectedTotalAmount = allPriceBreakups.stream()
-                .mapToDouble(priceBreakUp -> priceBreakUp.getValue() * priceBreakUp.getQuantity())
+                .mapToDouble(priceBreakUp -> priceBreakUp.getValue() * priceBreakUp.getComponentQuantity())
                 .sum();
         if (!expectedTotalAmount.equals(totalAmount)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Total amount calculated is incorrect");
@@ -574,4 +587,11 @@ public class OrderService {
         return orderItemSummaryList;
     }
 
+    private void postUpdateOrderValidation(Double totalOrderAmount, List<PriceBreakupDAO> allItemsPriceBreakup) {
+        Double itemsPriceBreakupSum = allItemsPriceBreakup.stream().mapToDouble(PriceBreakupDAO::getValue).sum();
+        if (!itemsPriceBreakupSum.equals(totalOrderAmount)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Either price break up or total order amount is incorrect");
+        }
+    }
 }

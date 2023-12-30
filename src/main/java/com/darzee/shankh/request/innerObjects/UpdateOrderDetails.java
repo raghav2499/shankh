@@ -14,5 +14,5 @@ public class UpdateOrderDetails {
 
     private Integer status;
     private Boolean deleteOrder;
-    private List<UpdateOrderItemDetails> updateOrderItemDetails;
+    private List<UpdateOrderItemDetails> orderItemDetails;
 }

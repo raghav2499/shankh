@@ -19,6 +19,8 @@ public class UpdateOrderItemDetails {
     private LocalDateTime trialDate;
     private LocalDateTime deliveryDate;
     private String inspiration;
+    private Integer itemQuantity;
     private String specialInstructions;
     private List<String> clothImageReferenceIds;
+    private List<UpdatePriceBreakupDetails> priceBreakupDetails;
 }

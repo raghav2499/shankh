@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,7 +32,11 @@ public class OrderItemDAO {
 
     private String inspiration;
 
-    private Boolean isPriorityOrder = Boolean.FALSE;
+    private Boolean isPriorityOrder;
+
+    private Integer quantity;
+
+    private List<PriceBreakupDAO> priceBreakup;
 
     private LocalDateTime createdAt;
 
@@ -41,7 +46,7 @@ public class OrderItemDAO {
 
     public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions,
                         OrderType orderType, OutfitType outfitType, String inspiration, Boolean isPriorityOrder,
-                        OrderDAO orderDAO) {
+                        Integer quantity, OrderDAO orderDAO) {
         this.trialDate = trialDate;
         this.deliveryDate = deliveryDate;
         this.specialInstructions = specialInstructions;
@@ -49,6 +54,7 @@ public class OrderItemDAO {
         this.outfitType = outfitType;
         this.inspiration = inspiration;
         this.isPriorityOrder = isPriorityOrder;
+        this.quantity = quantity;
         this.order = orderDAO;
     }
 
@@ -72,4 +78,9 @@ public class OrderItemDAO {
     public boolean isPriorityUpdated(Boolean value) {
         return value != null && !value.equals(this.getIsPriorityOrder());
     }
+
+    public boolean isQuantityUpdated(Integer value) {
+        return value != null && !value.equals(this.getQuantity());
+    }
+
 }

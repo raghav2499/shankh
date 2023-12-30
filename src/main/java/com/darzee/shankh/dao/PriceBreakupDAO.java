@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class PriceBreakupDAO {
+
+    private Long id;
     private String component;
     private Double value;
     private Integer quantity;
@@ -17,7 +19,21 @@ public class PriceBreakupDAO {
     public PriceBreakupDAO(PriceBreakUpDetails priceBreakUpDetails, OrderItemDAO orderItem) {
         this.component = priceBreakUpDetails.getComponent();;
         this.value = priceBreakUpDetails.getValue();
-        this.quantity = priceBreakUpDetails.getQuantity();
+        this.quantity = priceBreakUpDetails.getComponentQuantity();
         this.orderItem = orderItem;
     }
+
+    public boolean isComponentStringUpdated(String value) {
+        return value != null && !this.component.equals(value);
+    }
+
+    public boolean isValueUpdated(Double value) {
+        return value != null && !this.value.equals(value);
+    }
+    public boolean isQuantityUpdated(Integer value) {
+        return value != null && !this.quantity.equals(value);
+    }
+
+
+
 }

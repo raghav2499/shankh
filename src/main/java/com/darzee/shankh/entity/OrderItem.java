@@ -9,8 +9,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Table(name = "orders")
+@Table(name = "order_item")
 @Entity
 @Getter
 @Setter
@@ -48,6 +49,9 @@ public class OrderItem {
     @Column(name = "is_priority_order")
     private Boolean isPriorityOrder = Boolean.FALSE;
 
+    @Column(name = "quantity")
+    private Integer quantity;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -56,9 +60,8 @@ public class OrderItem {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @OneToOne
-    @JoinColumn(name = "price_breakup_id")
-    private PriceBreakup priceBreakup;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderItem")
+    private List<PriceBreakup> priceBreakup;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

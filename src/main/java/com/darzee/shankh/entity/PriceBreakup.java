@@ -26,7 +26,7 @@ public class PriceBreakup {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "order_item_id")
     private OrderItem orderItem;
 }
