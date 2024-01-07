@@ -62,17 +62,19 @@ public class OrderOrderItemCommonService {
         } else {
             orderDAO = orderService.createNewOrder(orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
             orderAmountDAO = new OrderAmountDAO();
-            orderDAO.setOrderAmount(orderAmountDAO);
             orderAmountDAO.setOrder(orderDAO);
         }
-        List<OrderItemDAO> newOrderItems = orderItemService.createOrderItems(orderDetails.getOrderItems(), orderDAO);
-        List<OrderItemDAO> allOrderItems = orderDAO.getOrderItems();
+        List<OrderItemDAO> allOrderItems = orderItemService.createOrderItems(orderDetails.getOrderItems(), orderDAO);
         List<PriceBreakUpDetails> priceBreakUpDetailsList = orderDetails.getOrderItems().stream()
                 .map(OrderItemDetailRequest::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
         calculateOrderAmount(orderAmountDAO, priceBreakUpDetailsList);
         orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(
                 orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
                         new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        if (orderDAO.getOrderAmount() == null) {
+            orderDAO.setOrderAmount(orderAmountDAO);
+            orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
+        }
         OrderSummary orderSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), allOrderItems);
         return orderSummary;

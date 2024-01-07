@@ -38,7 +38,7 @@ public class OrderItemService {
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
         Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
         List<PriceBreakupDAO> priceBreakUpList = new ArrayList<>();
-        List<OrderItemDAO> orderItemList = new ArrayList<>();
+        List<OrderItemDAO> orderItemList = Optional.ofNullable(order.getOrderItems()).orElse(new ArrayList<>());
         for (OrderItemDetailRequest itemDetail : orderItemDetails) {
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
             if (outfitType == null) {
