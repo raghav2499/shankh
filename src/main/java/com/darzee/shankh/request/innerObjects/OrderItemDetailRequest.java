@@ -26,6 +26,7 @@ public class OrderItemDetailRequest {
     private List<String> clothImageReferenceIds;
     private String inspiration;
     private String specialInstructions;
+    private Long measurementRevisionId;
     @NotNull(message = "price_breakup cannot be null")
     private List<PriceBreakUpDetails> priceBreakup;
 }

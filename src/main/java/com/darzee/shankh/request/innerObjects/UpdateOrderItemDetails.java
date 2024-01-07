@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,14 +12,13 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Valid
 public class UpdateOrderItemDetails {
-    @NotNull
-    private Long id;
     private Boolean isPriorityOrder;
     private LocalDateTime trialDate;
     private LocalDateTime deliveryDate;
     private String inspiration;
     private Integer itemQuantity;
     private String specialInstructions;
+    private Long measurementRevisionId;
     private List<String> clothImageReferenceIds;
     private List<UpdatePriceBreakupDetails> priceBreakupDetails;
 }

@@ -3,17 +3,19 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.*;
-import com.darzee.shankh.entity.*;
+import com.darzee.shankh.entity.Boutique;
+import com.darzee.shankh.entity.Customer;
+import com.darzee.shankh.entity.ImageReference;
+import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.enums.*;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
-import com.darzee.shankh.request.CreateOrderRequest;
 import com.darzee.shankh.request.PriceBreakUpDetails;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
-import com.darzee.shankh.request.innerObjects.*;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
+import com.darzee.shankh.request.innerObjects.*;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.pdfutils.BillGenerator;
@@ -84,55 +86,75 @@ public class OrderService {
     private BoutiqueLedgerService boutiqueLedgerService;
 
     @Autowired
-    private PriceBreakUpService priceBreakUpService;
+    private OrderItemService orderItemService;
 
     @Autowired
     private ImageReferenceRepo imageReferenceRepo;
 
     @Autowired
-    private OrderItemRepo orderItemRepo;
-
-    @Autowired
     private AmazonClient s3Client;
 
-    public ResponseEntity createOrderAndGenerateInvoice(CreateOrderRequest request) {
-        CreateOrderResponse response = null;
-        OrderSummary orderSummary = createNewOrder(request);
-        if (orderSummary != null) {
-            generateInvoice(orderSummary.getOrderId());
-            String successMessage = "Order created successfully";
-            response = new CreateOrderResponse(successMessage, orderSummary);
-            return new ResponseEntity(response, HttpStatus.CREATED);
-        }
-        String failureMessage = "No eligible boutique/customer found";
-        response = new CreateOrderResponse(failureMessage);
-        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
-    }
+    @Autowired
+    private PriceBreakUpService priceBreakUpService;
+
+    @Autowired
+    private OrderItemRepo orderItemRepo;
+
+//    public ResponseEntity createOrderAndGenerateInvoice(CreateOrderRequest request) {
+//        CreateOrderResponse response = null;
+//        OrderSummary orderSummary = createNewOrder(request);
+//        if (orderSummary != null) {
+//            generateInvoice(orderSummary.getOrderId());
+//            String successMessage = "Order created successfully";
+//            response = new CreateOrderResponse(successMessage, orderSummary);
+//            return new ResponseEntity(response, HttpStatus.CREATED);
+//        }
+//        String failureMessage = "No eligible boutique/customer found";
+//        response = new CreateOrderResponse(failureMessage);
+//        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+//    }
+
+//    @Transactional
+//    public OrderSummary createNewOrder(CreateOrderRequest request) {
+//        OrderDetails orderDetails = request.getOrderDetails();
+//        OrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
+//        List<PriceBreakUpDetails> allItemsPriceBreakUpDetails = orderDetails.getOrderItems()
+//                .stream().map(orderItem -> orderItem.getPriceBreakup()).flatMap(List::stream)
+//                .collect(Collectors.toList());
+//        validatePriceBreakup(allItemsPriceBreakUpDetails, orderAmountDetails.getTotalOrderAmount());
+//
+//        Optional<Customer> optionalCustomer = customerRepo.findById(orderDetails.getCustomerId());
+//        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(orderDetails.getBoutiqueId());
+//        if (optionalCustomer.isPresent() && optionalBoutique.isPresent()) {
+//            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(), new CycleAvoidingMappingContext());
+//            CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
+//
+//            OrderDAO orderDAO = setOrderSpecificDetails(orderDetails, boutiqueDAO, customerDAO);
+//            OrderAmountDAO orderAmountDAO = setOrderAmountSpecificDetails(orderAmountDetails, orderDAO);
+//            orderDAO.setOrderAmount(orderAmountDAO);
+//            orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
+//            return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
+//                    orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
+//                    orderDAO.getOrderItems());
+//        }
+//        return null;
+//    }
 
     @Transactional
-    public OrderSummary createNewOrder(CreateOrderRequest request) {
-        OrderDetails orderDetails = request.getOrderDetails();
-        OrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
-        List<PriceBreakUpDetails> allItemsPriceBreakUpDetails = orderDetails.getOrderItems()
-                .stream().map(orderItem -> orderItem.getPriceBreakup()).flatMap(List::stream)
-                .collect(Collectors.toList());
-        validatePriceBreakup(allItemsPriceBreakUpDetails, orderAmountDetails.getTotalOrderAmount());
-
-        Optional<Customer> optionalCustomer = customerRepo.findById(orderDetails.getCustomerId());
-        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(orderDetails.getBoutiqueId());
+    public OrderDAO createNewOrder(Long boutiqueId, Long customerId) {
+        Optional<Customer> optionalCustomer = customerRepo.findById(customerId);
+        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(boutiqueId);
         if (optionalCustomer.isPresent() && optionalBoutique.isPresent()) {
-            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(), new CycleAvoidingMappingContext());
-            CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
-
-            OrderDAO orderDAO = setOrderSpecificDetails(orderDetails, boutiqueDAO, customerDAO);
-            OrderAmountDAO orderAmountDAO = setOrderAmountSpecificDetails(orderAmountDetails, orderDAO);
-            orderDAO.setOrderAmount(orderAmountDAO);
-            orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
-            return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
-                    orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString(),
-                    orderDAO.getOrderItems());
+            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(),
+                    new CycleAvoidingMappingContext());
+            CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(),
+                    new CycleAvoidingMappingContext());
+            OrderDAO orderDAO = setOrderSpecificDetails(boutiqueDAO, customerDAO);
+            orderDAO = mapper.orderObjectToDao(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()),
+                    new CycleAvoidingMappingContext());
+            return orderDAO;
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid customer id or boutique id");
     }
 
     public ResponseEntity<GetOrderResponse> getOrder(Map<String, Object> filterMap, Map<String, Object> pagingSortingMap) {
@@ -200,7 +222,7 @@ public class OrderService {
                     .map(OrderItemDAO::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
             postUpdateOrderValidation(orderAmountDAO.getTotalAmount(), priceBreakupDAOList);
             OrderSummary orderSummary = new OrderSummary(order.getId(), order.getInvoiceNo(),
-                    orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString(),
+                    orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
                     order.getOrderItems());
             CreateOrderResponse response = new CreateOrderResponse("Order updated successfully", orderSummary);
             return new ResponseEntity(response, HttpStatus.OK);
@@ -346,46 +368,8 @@ public class OrderService {
 
         Map<Long, OrderItemDAO> orderItemDAOMap = order.getOrderItemDAOMap();
         List<OrderItemDAO> updatedItems = new ArrayList<>();
-        for (UpdateOrderItemDetails updateItemDetail : orderDetails.getOrderItemDetails()) {
-            Long orderItemId = updateItemDetail.getId();
-            if (!orderItemDAOMap.containsKey(orderItemId)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item ID is invalid");
-            }
-            OrderItemDAO orderItem = orderItemDAOMap.get(orderItemId);
-            if (orderItem.isTrialDateUpdated(updateItemDetail.getTrialDate())) {
-                orderItem.setTrialDate(updateItemDetail.getTrialDate());
-            }
-            if (orderItem.isDeliveryDateUpdated(updateItemDetail.getDeliveryDate())) {
-                orderItem.setDeliveryDate(updateItemDetail.getDeliveryDate());
-            }
-            if (orderItem.isPriorityUpdated(updateItemDetail.getIsPriorityOrder())) {
-                orderItem.setIsPriorityOrder(updateItemDetail.getIsPriorityOrder());
-            }
-            if (orderItem.isInspirationUpdated(updateItemDetail.getInspiration())) {
-                orderItem.setInspiration(updateItemDetail.getInspiration());
-            }
-            if (orderItem.areSpecialInstructionsUpdated(updateItemDetail.getSpecialInstructions())) {
-                orderItem.setSpecialInstructions(updateItemDetail.getSpecialInstructions());
-            }
-            if (orderItem.isQuantityUpdated(updateItemDetail.getItemQuantity())) {
-                orderItem.setQuantity(updateItemDetail.getItemQuantity());
-            }
-            updatedItems.add(orderItem);
-            if (!Collections.isEmpty(updateItemDetail.getClothImageReferenceIds())) {
-                objectImagesService.invalidateExistingReferenceIds(ImageEntityType.ORDER_ITEM.getEntityType(),
-                        orderItemId);
-                objectImagesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
-                        ImageEntityType.ORDER_ITEM.getEntityType(), orderItemId);
-            }
-            if (!Collections.isEmpty(updateItemDetail.getPriceBreakupDetails())) {
-                List<PriceBreakupDAO> updatedPriceBreakup = priceBreakUpService.updatePriceBreakups(updateItemDetail.getPriceBreakupDetails(), orderItem);
-                orderItem.setPriceBreakup(updatedPriceBreakup);
-            }
-        }
-        orderItemRepo.saveAll(mapper.orderItemDAOListToOrderItemList(updatedItems, new CycleAvoidingMappingContext()));
         order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order,
-                        new CycleAvoidingMappingContext())),
-                new CycleAvoidingMappingContext());
+                        new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return order;
     }
 
@@ -463,33 +447,20 @@ public class OrderService {
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
                 new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
-        List<OrderItemDetailRequest> orderItems = orderDetails.getOrderItems();
-        Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
-        List<PriceBreakupDAO> priceBreakUpList = new ArrayList<>();
-        List<OrderItemDAO> orderItemList = new ArrayList<>();
-        for (OrderItemDetailRequest itemDetail : orderItems) {
-            OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
-            if (outfitType == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Invalid outfit type " + itemDetail.getOutfitType());
-            }
-            OrderItemDAO orderItemDAO = new OrderItemDAO(itemDetail.getTrialDate(), itemDetail.getDeliveryDate(),
-                    itemDetail.getSpecialInstructions(), itemDetail.getOrderType(), outfitType,
-                    itemDetail.getInspiration(), itemDetail.getIsPriorityOrder(), itemDetail.getItemQuantity(),
-                    orderDAO);
-            orderItemDAO = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItemDAO,
-                    new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-            orderItemList.add(orderItemDAO);
-            List<PriceBreakupDAO> priceBreakupDAOList =
-                    priceBreakUpService.generatePriceBreakupList(itemDetail.getPriceBreakup(), orderItemDAO);
-            priceBreakUpList.addAll(priceBreakupDAOList);
-            for (String imageRef : itemDetail.getClothImageReferenceIds()) {
-                clothRefOrderItemIdMap.put(imageRef, orderItemDAO.getId());
-            }
-        }
-        orderDAO.setOrderItems(orderItemList);
-        priceBreakUpService.savePriceBreakUp(priceBreakUpList);
-        objectImagesService.saveObjectImages(clothRefOrderItemIdMap, ImageEntityType.ORDER_ITEM.getEntityType());
+        List<OrderItemDetailRequest> orderItemDetails = orderDetails.getOrderItems();
+        List<OrderItemDAO> orderItems = orderItemService.createOrderItems(orderItemDetails, orderDAO);
+        orderDAO.setOrderItems(orderItems);
+        return orderDAO;
+    }
+
+
+    @Transactional(REQUIRES_NEW)
+    private OrderDAO setOrderSpecificDetails(BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
+
+        String invoiceNo = generateOrderInvoiceNo();
+        OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
+        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
+                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return orderDAO;
     }
 

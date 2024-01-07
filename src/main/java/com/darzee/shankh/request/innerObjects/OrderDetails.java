@@ -15,5 +15,6 @@ public class OrderDetails {
     private Long customerId;
     @NotNull(message = "boutique_id cannot be null")
     private Long boutiqueId;
+    private Long orderId;
     private List<OrderItemDetailRequest> orderItems;
 }

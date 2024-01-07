@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -14,5 +13,4 @@ public class UpdateOrderDetails {
 
     private Integer status;
     private Boolean deleteOrder;
-    private List<UpdateOrderItemDetails> orderItemDetails;
 }

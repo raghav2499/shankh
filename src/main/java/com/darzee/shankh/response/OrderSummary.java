@@ -22,11 +22,11 @@ public class OrderSummary {
     private String invoiceNo;
 
     private List<OrderItemSummary> orderItemSummaryList = new ArrayList<>();
-    private String totalOrderAmount;
+    private Double totalOrderAmount;
 
-    private String orderAdvanceRecieved;
+    private Double orderAdvanceRecieved;
 
-    public OrderSummary(Long orderId, String invoiceNo, String totalOrderAmount, String orderAdvanceRecieved,
+    public OrderSummary(Long orderId, String invoiceNo, Double totalOrderAmount, Double orderAdvanceRecieved,
                         List<OrderItemDAO> orderItemDAOs) {
         this.orderId = orderId;
         this.invoiceNo = invoiceNo;

@@ -36,6 +36,8 @@ public class OrderItemDAO {
 
     private Integer quantity;
 
+    private Long measurementRevisionId;
+
     private List<PriceBreakupDAO> priceBreakup;
 
     private LocalDateTime createdAt;
@@ -46,7 +48,7 @@ public class OrderItemDAO {
 
     public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions,
                         OrderType orderType, OutfitType outfitType, String inspiration, Boolean isPriorityOrder,
-                        Integer quantity, OrderDAO orderDAO) {
+                        Integer quantity, Long measurementRevisionId, OrderDAO orderDAO) {
         this.trialDate = trialDate;
         this.deliveryDate = deliveryDate;
         this.specialInstructions = specialInstructions;
@@ -55,6 +57,7 @@ public class OrderItemDAO {
         this.inspiration = inspiration;
         this.isPriorityOrder = isPriorityOrder;
         this.quantity = quantity;
+        this.measurementRevisionId = measurementRevisionId;
         this.order = orderDAO;
     }
 
@@ -81,6 +84,10 @@ public class OrderItemDAO {
 
     public boolean isQuantityUpdated(Integer value) {
         return value != null && !value.equals(this.getQuantity());
+    }
+
+    public boolean isMeasurementRevisionUpdated(Long value) {
+        return value != null && !value.equals(this.getMeasurementRevisionId());
     }
 
 }
