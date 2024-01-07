@@ -73,27 +73,26 @@ public class LehengaImplService implements OutfitTypeService {
     public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO, MeasurementScale scale, Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
-        MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if (revision != null) {
-            measurementDetailsResponseList.add(
-                    addWaistCircum(measurementsDAO.getMeasurement(WAIST_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addHipCircum(measurementsDAO.getMeasurement(HIP_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addWaistToKnee(measurementsDAO.getMeasurement(WAIST_TO_KNEE_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
-        }
+
+        measurementDetailsResponseList.add(
+                addWaistCircum(measurementsDAO.getMeasurement(WAIST_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addHipCircum(measurementsDAO.getMeasurement(HIP_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addWaistToKnee(measurementsDAO.getMeasurement(WAIST_TO_KNEE_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
+
         if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
             measurementDetailsResponseList = measurementDetailsResponseList
                     .stream()
                     .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
                     .collect(Collectors.toList());
         }
-
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
+
         innerMeasurementDetails.setOutfitImageLink(LEHENGA_OUTFIT_IMAGE_LINK);
         innerMeasurementDetails.setOutfitTypeHeading(LEHENGA_OUTFIT_TYPE_HEADING);
         overallMeasurementDetails.setInnerMeasurementDetails(Arrays.asList(innerMeasurementDetails));
