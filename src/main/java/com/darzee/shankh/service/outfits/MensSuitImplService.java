@@ -39,7 +39,7 @@ public class MensSuitImplService implements OutfitTypeService {
 
     @Override
     public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId,
-                                                          Integer outfitId, MeasurementScale scale) {
+                                                          OutfitType outfitType, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
         Map<String, Double> measurementValue = new HashMap<>();
         if (measurementDetails.getShirtLength() != null) {
@@ -85,7 +85,7 @@ public class MensSuitImplService implements OutfitTypeService {
         if (measurementDetails.getBottomWaist() != null) {
             measurementValue.put(BOTTOM_WAIST_MEASUREMENT_KEY, measurementDetails.getBottomWaist() * multiplyingFactor);
         }
-        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitId, measurementValue);
+        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitType, measurementValue);
         return revisions;
     }
 

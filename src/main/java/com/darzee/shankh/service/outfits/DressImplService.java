@@ -36,7 +36,7 @@ public class DressImplService implements OutfitTypeService {
 
     @Override
     public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId,
-                                                          Integer outfitId, MeasurementScale scale) {
+                                                          OutfitType outfitType, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
         Map<String, Double> measurementValue = new HashMap<>();
 
@@ -94,7 +94,7 @@ public class DressImplService implements OutfitTypeService {
             measurementValue.put(DART_POINT_MEASUREMENT_KEY,
                     measurementDetails.getDartPoint() * multiplyingFactor);
         }
-        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitId, measurementValue);
+        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitType, measurementValue);
         return revisions;
     }
 

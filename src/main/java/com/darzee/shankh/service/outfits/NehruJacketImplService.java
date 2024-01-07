@@ -36,7 +36,7 @@ public class NehruJacketImplService implements OutfitTypeService {
 
     @Override
     public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId,
-                                                          Integer outfitId, MeasurementScale scale) {
+                                                          OutfitType outfitType, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
         Map<String, Double> measurementValue = new HashMap<>();
 
@@ -55,7 +55,7 @@ public class NehruJacketImplService implements OutfitTypeService {
         if (measurementDetails.getWaist() != null) {
             measurementValue.put(WAIST_MEASUREMENT_KEY, measurementDetails.getWaist() * multiplyingFactor);
         }
-        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitId, measurementValue);
+        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitType, measurementValue);
         return revisions;
     }
 

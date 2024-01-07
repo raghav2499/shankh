@@ -36,7 +36,7 @@ public class EveningGownImplService implements OutfitTypeService {
 
     @Override
     public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId,
-                                                          Integer outfitId, MeasurementScale scale) {
+                                                          OutfitType outfitType, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
         Map<String, Double> measurementValue = new HashMap<>();
 
@@ -75,7 +75,7 @@ public class EveningGownImplService implements OutfitTypeService {
         if (measurementDetails.getBackNeckDepth() != null) {
             measurementValue.put(BACK_NECK_DEPTH_MEASUREMENT_KEY, measurementDetails.getBackNeckDepth() * multiplyingFactor);
         }
-        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitId, measurementValue);
+        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitType, measurementValue);
         return revisions;
     }
 

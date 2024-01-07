@@ -27,7 +27,7 @@
 //            MeasurementRevisions revision = new MeasurementRevisions();
 //
 //            revision.setMeasurementValue(measurement.getMeasurementValue());
-//            revision.setOutfitType(measurement.getOutfitType().ordinal());
+//            revision.setOutfitType(measurement.getOutfitType());
 //            revision.setCustomerId(measurement.getCustomer().getId());
 //            revision.setCreatedAt(measurement.getCreatedAt());
 //

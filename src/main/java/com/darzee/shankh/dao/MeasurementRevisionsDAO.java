@@ -1,5 +1,6 @@
 package com.darzee.shankh.dao;
 
+import com.darzee.shankh.enums.OutfitType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,11 +15,11 @@ public class MeasurementRevisionsDAO {
 
     private Long id;
     private Long customerId;
-    private Integer outfitType;
+    private OutfitType outfitType;
     private Map<String, Double> measurementValue;
     private LocalDateTime createdAt;
 
-    public MeasurementRevisionsDAO(Long customerId, Integer outfitType, Map<String, Double> measurementValue) {
+    public MeasurementRevisionsDAO(Long customerId, OutfitType outfitType, Map<String, Double> measurementValue) {
         this.customerId = customerId;
         this.outfitType = outfitType;
         this.measurementValue = measurementValue;
