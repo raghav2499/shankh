@@ -31,7 +31,7 @@ import java.util.Optional;
 public class BoutiqueService {
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private BoutiqueLedgerService boutiqueLedgerService;
@@ -112,7 +112,7 @@ public class BoutiqueService {
     }
 
     private List<String> getBoutiqueImagesReferenceIds(Long boutiqueId) {
-        List<String> boutiqueImages = objectImagesService.getBoutiqueImageReferenceId(boutiqueId);
+        List<String> boutiqueImages = objectFilesService.getBoutiqueImageReferenceId(boutiqueId);
         if (Collections.isEmpty(boutiqueImages)) {
             return new ArrayList<>();
         }
@@ -120,15 +120,15 @@ public class BoutiqueService {
     }
 
     private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.BOUTIQUE.getEntityType(), boutique.getId());
-        objectImagesService.saveObjectImages(imageReferences,
+        objectFilesService.invalidateExistingReferenceIds(ImageEntityType.BOUTIQUE.getEntityType(), boutique.getId());
+        objectFilesService.saveObjectImages(imageReferences,
                 ImageEntityType.BOUTIQUE.getEntityType(),
                 boutique.getId());
     }
 
     private GetBoutiqueDetailsResponse generateBoutiqueDetailResponse(BoutiqueDAO boutiqueDAO, TailorDAO tailorDAO) {
         List<String> shopImageReferenceIds = getBoutiqueImagesReferenceIds(boutiqueDAO.getId());
-        String adminTailorImageReferenceId = objectImagesService.getTailorImageReferenceId(boutiqueDAO.getAdminTailor().getId());
+        String adminTailorImageReferenceId = objectFilesService.getTailorImageReferenceId(boutiqueDAO.getAdminTailor().getId());
 
         List<String> shopImageUrls = new ArrayList<>();
         String adminTailorImageUrl = null;

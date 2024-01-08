@@ -4,7 +4,7 @@ import com.darzee.shankh.dao.ObjectImagesDAO;
 import com.darzee.shankh.entity.ObjectImages;
 import com.darzee.shankh.enums.ImageEntityType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.ObjectImagesRepo;
+import com.darzee.shankh.repo.ObjectFilesRepo;
 import com.darzee.shankh.utils.CommonUtils;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +18,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ObjectImagesService {
+public class ObjectFilesService {
 
     @Autowired
-    private ObjectImagesRepo repo;
+    private ObjectFilesRepo repo;
 
     @Autowired
     private DaoEntityMapper mapper;

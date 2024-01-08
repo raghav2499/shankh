@@ -22,7 +22,7 @@ import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.enums.UploadFileType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.ImageReferenceRepo;
+import com.darzee.shankh.repo.FileReferenceRepo;
 import com.darzee.shankh.request.DownloadImageRequest;
 import com.darzee.shankh.response.DownloadImageResponse;
 import com.darzee.shankh.response.UploadFileResponse;
@@ -37,7 +37,7 @@ public class BucketService {
     private AmazonClient client;
 
     @Autowired
-    private ImageReferenceRepo imageReferenceRepo;
+    private FileReferenceRepo fileReferenceRepo;
 
     @Autowired
     private DaoEntityMapper mapper;
@@ -88,7 +88,7 @@ public class BucketService {
     public DownloadImageResponse getFileUrls(DownloadImageRequest request) {
         List<String> fileReferenceIds = request.getFileReferenceIds();
         List<ImageReferenceDAO> imageReferences = CommonUtils.mapList(
-                imageReferenceRepo.findAllByReferenceIdIn(fileReferenceIds),
+                fileReferenceRepo.findAllByReferenceIdIn(fileReferenceIds),
                 mapper::imageReferenceToImageReferenceDAO);
         List<String> shortLivedUrls = imageReferences.stream()
                 .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName()))
@@ -98,7 +98,7 @@ public class BucketService {
 
     public List<String> getShortLivedUrls(List<String> imageReferenceIds) {
         List<ImageReferenceDAO> imageReferences = CommonUtils.mapList(
-                imageReferenceRepo.findAllByReferenceIdIn(imageReferenceIds),
+                fileReferenceRepo.findAllByReferenceIdIn(imageReferenceIds),
                 mapper::imageReferenceToImageReferenceDAO);
         List<String> shortLivedUrls = imageReferences.stream()
                 .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName()))
@@ -107,7 +107,7 @@ public class BucketService {
     }
 
     public String getShortLivedUrl(String imageReferenceId) {
-        Optional<ImageReference> imageReference = imageReferenceRepo.findByReferenceId(imageReferenceId);
+        Optional<ImageReference> imageReference = fileReferenceRepo.findByReferenceId(imageReferenceId);
         if (imageReference.isPresent()) {
             ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(imageReference.get());
             String shortLivedUrl = client.generateShortLivedUrl(imageReferenceDAO.getImageName());
@@ -117,7 +117,7 @@ public class BucketService {
     }
 
     public String getPortfolioImageShortLivedUrl(String imageReferenceId) {
-        Optional<ImageReference> imageReference = imageReferenceRepo.findByReferenceId(imageReferenceId);
+        Optional<ImageReference> imageReference = fileReferenceRepo.findByReferenceId(imageReferenceId);
         if (imageReference.isPresent()) {
             ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(imageReference.get());
             String shortLivedUrl = client.generateShortLivedUrlForPortfolio(imageReferenceDAO.getImageName());
@@ -149,7 +149,7 @@ public class BucketService {
         }
         ImageReferenceDAO imageReference = new ImageReferenceDAO(fileUploadResult.getKey(),
                 fileName);
-        imageReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
+        fileReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
         file.delete();
         return fileUploadResult;
     }
@@ -174,7 +174,7 @@ public class BucketService {
                   fileUploadResult = client.uploadFile(file, fileName);
               }
             ImageReferenceDAO imageReference = new ImageReferenceDAO(fileUploadResult.getKey(),fileName);
-            imageReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
+            fileReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
             file.delete();
             return fileUploadResult;
         }

@@ -14,7 +14,7 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueLedgerRepo;
 import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.repo.CustomerRepo;
-import com.darzee.shankh.repo.ImageReferenceRepo;
+import com.darzee.shankh.repo.FileReferenceRepo;
 import com.darzee.shankh.request.CreateCustomerRequest;
 import com.darzee.shankh.request.UpdateCustomerRequest;
 import com.darzee.shankh.response.CreateCustomerResponse;
@@ -43,7 +43,7 @@ public class CustomerService {
     private MeasurementService measurementService;
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private BoutiqueRepo boutiqueRepo;
@@ -52,7 +52,7 @@ public class CustomerService {
     private CustomerRepo customerRepo;
 
     @Autowired
-    private ImageReferenceRepo imageReferenceRepo;
+    private FileReferenceRepo fileReferenceRepo;
 
     @Autowired
     private AmazonClient s3Client;
@@ -197,7 +197,7 @@ public class CustomerService {
     }
 
     public String getCustomerProfilePicLink(Long customerId) {
-        String customerImageReferenceId = objectImagesService.getCustomerImageReferenceId(customerId);
+        String customerImageReferenceId = objectFilesService.getCustomerImageReferenceId(customerId);
         if (customerImageReferenceId != null) {
             return getCustomerProfilePicLink(customerImageReferenceId);
         }
@@ -205,7 +205,7 @@ public class CustomerService {
     }
 
         public String getCustomerProfilePicRefId(Long customerId) {
-        String customerImageReferenceId = objectImagesService.getCustomerImageReferenceId(customerId);
+        String customerImageReferenceId = objectFilesService.getCustomerImageReferenceId(customerId);
         return Optional.ofNullable(customerImageReferenceId).orElse("");
     }
 
@@ -233,7 +233,7 @@ public class CustomerService {
         if (StringUtils.isBlank(customerImageReferenceId)) {
             return "";
         }
-        Optional<ImageReference> optionalImageReference = imageReferenceRepo.findByReferenceId(customerImageReferenceId);
+        Optional<ImageReference> optionalImageReference = fileReferenceRepo.findByReferenceId(customerImageReferenceId);
         if (optionalImageReference.isPresent()) {
             ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(optionalImageReference.get());
             String fileName = imageReferenceDAO.getImageName();
@@ -254,18 +254,18 @@ public class CustomerService {
     }
 
     private void saveCustomerImages(CustomerDAO customerDAO, String imageReferenceId) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
-        objectImagesService.saveObjectImages(Arrays.asList(imageReferenceId),
+        objectFilesService.invalidateExistingReferenceIds(ImageEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
+        objectFilesService.saveObjectImages(Arrays.asList(imageReferenceId),
                 ImageEntityType.CUSTOMER.getEntityType(),
                 customerDAO.getId());
     }
 
     private void removeCustomerImages(CustomerDAO customerDAO) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
+        objectFilesService.invalidateExistingReferenceIds(ImageEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
     }
 
     private boolean isImageUpdated(Long customerId, String referenceId) {
-      String existingImageReferenceId  =  objectImagesService.getCustomerImageReferenceId(customerId);
+      String existingImageReferenceId  =  objectFilesService.getCustomerImageReferenceId(customerId);
       return existingImageReferenceId != referenceId;
     }
 

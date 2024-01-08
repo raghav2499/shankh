@@ -25,7 +25,11 @@ public class OrderDetails {
     private Integer outfitType;
     @NotNull(message = "Either order_type is not present or is invalid")
     private OrderType orderType;
-    private List<String> clothImageReferenceIds;
+    private List<String> clothImageReferenceIds; 
+    
+    //audio reference ids
+    private List<String> audioReferenceIds; 
+    
     private String inspiration;
     private String specialInstructions;
 }

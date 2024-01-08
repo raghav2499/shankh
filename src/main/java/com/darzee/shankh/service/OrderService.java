@@ -74,7 +74,7 @@ public class OrderService {
     private OutfitImageLinkService outfitImageLinkService;
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private BucketService bucketService;
@@ -85,7 +85,7 @@ public class OrderService {
     private BoutiqueLedgerService boutiqueLedgerService;
 
     @Autowired
-    private ImageReferenceRepo imageReferenceRepo;
+    private FileReferenceRepo fileReferenceRepo;
 
     @Autowired
     private AmazonClient s3Client;
@@ -154,7 +154,7 @@ public class OrderService {
             MeasurementsDAO measurementsDAO = customer.getOutfitMeasurement(outfitType);
             OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
             OutfitMeasurementDetails measurementDetails = outfitTypeService.extractMeasurementDetails(measurementsDAO);
-            List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
+            List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(order.getId());
             List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
             String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
             String message = "Details fetched succesfully";
@@ -350,9 +350,10 @@ public class OrderService {
         }
         if (!Collections.isEmpty(orderDetails.getClothImageReferenceIds())) {
             Long orderId = order.getId();
-            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.ORDER.getEntityType(), orderId);
-            objectImagesService.saveObjectImages(orderDetails.getClothImageReferenceIds(), ImageEntityType.ORDER.getEntityType(), orderId);
+            objectFilesService.invalidateExistingReferenceIds(ImageEntityType.ORDER.getEntityType(), orderId);
+            objectFilesService.saveObjectImages(orderDetails.getClothImageReferenceIds(), ImageEntityType.ORDER.getEntityType(), orderId);
         }
+
         order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return order;
     }
@@ -433,7 +434,11 @@ public class OrderService {
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         Long orderId = orderDAO.getId();
         List<String> clothImageReferenceIds = orderDetails.getClothImageReferenceIds();
-        objectImagesService.saveObjectImages(clothImageReferenceIds, ImageEntityType.ORDER.getEntityType(), orderId);
+        List<String> audioReferenceIds = orderDetails.getAudioReferenceIds();
+        
+        objectFilesService.saveObjectImages(clothImageReferenceIds, ImageEntityType.ORDER.getEntityType(), orderId);
+        objectFilesService.saveObjectImages(audioReferenceIds, ImageEntityType.ORDER.getEntityType(), orderId);
+ 
         return orderDAO;
     }
 
@@ -474,7 +479,7 @@ public class OrderService {
         if (Collections.isEmpty(clothImageReferenceId)) {
             return new ArrayList<>();
         }
-        List<ImageReference> clothImageReferences = imageReferenceRepo.findAllByReferenceIdIn(clothImageReferenceId);
+        List<ImageReference> clothImageReferences = fileReferenceRepo.findAllByReferenceIdIn(clothImageReferenceId);
         if (!Collections.isEmpty(clothImageReferences)) {
             List<ImageReferenceDAO> imageReferenceDAOs = CommonUtils.mapList(clothImageReferences, mapper::imageReferenceToImageReferenceDAO);
             List<String> clothImageFileNames = imageReferenceDAOs.stream().map(imageRef -> imageRef.getImageName()).collect(Collectors.toList());

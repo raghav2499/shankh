@@ -29,7 +29,7 @@ public class BoutiqueTailorService {
     private PortfolioService portfolioService;
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private TailorRepo tailorRepo;
@@ -65,8 +65,8 @@ public class BoutiqueTailorService {
     }
 
     public void saveTailorImageReference(String imageReference, Long tailorId) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.TAILOR.getEntityType(), tailorId);
-        objectImagesService.saveObjectImages(Arrays.asList(imageReference),
+        objectFilesService.invalidateExistingReferenceIds(ImageEntityType.TAILOR.getEntityType(), tailorId);
+        objectFilesService.saveObjectImages(Arrays.asList(imageReference),
                 ImageEntityType.TAILOR.getEntityType(),
                 tailorId);
     }
@@ -77,8 +77,8 @@ public class BoutiqueTailorService {
     }
 
     private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.BOUTIQUE.getEntityType(), boutique.getId());
-        objectImagesService.saveObjectImages(imageReferences,
+        objectFilesService.invalidateExistingReferenceIds(ImageEntityType.BOUTIQUE.getEntityType(), boutique.getId());
+        objectFilesService.saveObjectImages(imageReferences,
                 ImageEntityType.BOUTIQUE.getEntityType(),
                 boutique.getId());
     }

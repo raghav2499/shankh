@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ObjectImagesRepo extends JpaRepository<ObjectImages, Long> {
+public interface ObjectFilesRepo extends JpaRepository<ObjectImages, Long> {
 
     Optional<ObjectImages> findByEntityIdAndEntityTypeAndIsValid(Long entityId, String entityType, boolean isValid);
 
