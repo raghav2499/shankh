@@ -24,11 +24,13 @@ public class TailorController {
     private BoutiqueTailorCommonService boutiqueTailorService;
 
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity boutiqueLogin(@Valid @RequestBody TailorLoginRequest request) {
         return tailorService.tailorLogin(request);
     }
 
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity tailorSignUp(@Valid @RequestBody TailorSignUpRequest request) {
         return tailorService.tailorSignup(request);
     }

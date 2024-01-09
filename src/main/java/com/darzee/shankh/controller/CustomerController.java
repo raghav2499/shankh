@@ -21,21 +21,25 @@ public class CustomerController {
     private CustomerRepo customerRepo;
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getCustomerDetails(@RequestParam("boutique_id") Long boutiqueId) {
         return customerService.getCustomers(boutiqueId);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getCustomerDetail(@PathVariable("id") Long customerId) {
         return customerService.getCustomer(customerId);
     }
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity createCustomer(@RequestBody @Valid CreateCustomerRequest request) {
         return customerService.createCustomer(request);
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity updateCustomer(@PathVariable("id") Long customerId,
                                          @RequestBody @Valid UpdateCustomerRequest request) {
         return customerService.updateCustomer(customerId, request);

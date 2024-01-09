@@ -1,5 +1,6 @@
 package com.darzee.shankh.entity;
 
+import com.darzee.shankh.enums.OutfitType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +32,8 @@ public class MeasurementRevisions {
     private Long customerId;
 
     @Column(name = "outfit_type")
-    private Integer outfitType;
+    @Enumerated(EnumType.ORDINAL)
+    private OutfitType outfitType;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

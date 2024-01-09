@@ -28,6 +28,7 @@ public class BoutiqueController {
     private BoutiqueRepo boutiqueRepo;
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity updateBoutique(@PathVariable("id") Long boutiqueId,
                                          @Valid @RequestBody UpdateBoutiqueDetails request) {
         return boutiqueService.updateBoutiqueDetails(boutiqueId, request);
@@ -35,16 +36,19 @@ public class BoutiqueController {
 
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getBoutiqueDetails(@PathVariable("id") Long id) {
         return boutiqueService.getBoutiqueDetails(id);
     }
 
     @GetMapping(value = "/{id}/ledger", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getLedgerData(@PathVariable("id") String id) {
         return boutiqueLedgerService.getLedgerData(id);
     }
 
     @GetMapping(value = "/{id}/report", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getBoutiqueReport(@PathVariable("id") String id,
                                             @RequestParam("month") Integer month,
                                             @RequestParam("year") Integer year) {
@@ -53,6 +57,7 @@ public class BoutiqueController {
 
 
     @PostMapping(value = "/{id}/ledger/reset", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity resetBoutiqueLedgerData(@PathVariable("id") String boutiqueId) {
         return boutiqueLedgerService.resetBoutiqueLedgerData(boutiqueId);
     }

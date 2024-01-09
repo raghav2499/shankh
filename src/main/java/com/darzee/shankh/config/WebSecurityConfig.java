@@ -46,7 +46,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/storage/uploadFile", "/storage/downloadFile", "/actuator/prometheus", "/portfolio/**",
                         "/outfit/sub_outfit", "/outfit/", "/portfolio/filters",
                         "/storage/upload_multiple").permitAll()
-                  .anyRequest().authenticated()
+                .anyRequest().authenticated()
+                .and()
+                .cors()
                 .and()
                 .cors()
                 .and()

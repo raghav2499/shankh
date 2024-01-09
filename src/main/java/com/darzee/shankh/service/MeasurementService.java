@@ -83,7 +83,7 @@ public class MeasurementService {
             OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
             MeasurementsDAO measurementsDAO = Optional.ofNullable(customerDAO.getOutfitMeasurement(outfitType)).orElse(new MeasurementsDAO());
             MeasurementRevisionsDAO revision = outfitTypeService.addMeasurementRevision(measurementRequest, customerDAO.getId(),
-                    outfitType.getOrdinal(), measurementDetails.getScale());
+                    outfitType, measurementDetails.getScale());
             revision = mapper.measurementRevisionsToMeasurementRevisionDAO(
                     measurementRevisionsRepo.save(mapper.measurementRevisionsDAOToMeasurementRevision(revision)));
             measurementsDAO.setMeasurementRevision(revision);

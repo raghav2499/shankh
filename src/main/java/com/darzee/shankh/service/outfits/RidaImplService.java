@@ -38,7 +38,7 @@ public class RidaImplService implements OutfitTypeService {
     private OutfitImageLinkService outfitImageLinkService;
 
     @Override
-    public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId, Integer outfitId, MeasurementScale scale) {
+    public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId, OutfitType outfitType, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
         Map<String, Double> measurementValue = new HashMap<>();
 
@@ -84,7 +84,7 @@ public class RidaImplService implements OutfitTypeService {
             measurementValue.put(LENGA_GHER_MEASUREMENT_KEY,
                     measurementDetails.getLengaGher() * multiplyingFactor);
         }
-        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitId, measurementValue);
+        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitType, measurementValue);
         return revisions;
     }
 
@@ -134,24 +134,22 @@ public class RidaImplService implements OutfitTypeService {
                                                                      MeasurementScale scale,
                                                                      Boolean nonEmptyValuesOnly) {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
-        MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
-        Map<String, Double> measurementValue = objectMapper.convertValue(revision.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if (measurementValue != null) {
-            measurementDetailsResponseList.add(
-                    addAboveHead(measurementsDAO.getMeasurement(ABOVE_HEAD_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addPardiShoulder(measurementsDAO.getMeasurement(PARDI_SHOULDER_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addAroundShoulder(measurementsDAO.getMeasurement(AROUND_SHOULDER_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addPardiLength(measurementsDAO.getMeasurement(PARDI_LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addPardiGher(measurementsDAO.getMeasurement(PARDI_GHER_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addKas(measurementsDAO.getMeasurement(KAS_MEASUREMENT_KEY, dividingFactor)));
-        }
+
+        measurementDetailsResponseList.add(
+                addAboveHead(measurementsDAO.getMeasurement(ABOVE_HEAD_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addPardiShoulder(measurementsDAO.getMeasurement(PARDI_SHOULDER_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addAroundShoulder(measurementsDAO.getMeasurement(AROUND_SHOULDER_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addPardiLength(measurementsDAO.getMeasurement(PARDI_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addPardiGher(measurementsDAO.getMeasurement(PARDI_GHER_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addKas(measurementsDAO.getMeasurement(KAS_MEASUREMENT_KEY, dividingFactor)));
+
         if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
             measurementDetailsResponseList = measurementDetailsResponseList
                     .stream()
@@ -168,24 +166,22 @@ public class RidaImplService implements OutfitTypeService {
                                                                         MeasurementScale scale,
                                                                         Boolean nonEmptyValuesOnly) {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
-        MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
-        Map<String, Double> measurementValue = objectMapper.convertValue(revision.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if (measurementValue != null) {
-            measurementDetailsResponseList.add(
-                    addLengaShoulder(measurementsDAO.getMeasurement(LENGA_SHOULDER_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addBust(measurementsDAO.getMeasurement(BUST_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addHips(measurementsDAO.getMeasurement(HIP_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addLengaLength(measurementsDAO.getMeasurement(LENGA_LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addLengaGher(measurementsDAO.getMeasurement(LENGA_GHER_MEASUREMENT_KEY, dividingFactor)));
-        }
+
+        measurementDetailsResponseList.add(
+                addLengaShoulder(measurementsDAO.getMeasurement(LENGA_SHOULDER_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addBust(measurementsDAO.getMeasurement(BUST_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addHips(measurementsDAO.getMeasurement(HIP_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addLengaLength(measurementsDAO.getMeasurement(LENGA_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addLengaGher(measurementsDAO.getMeasurement(LENGA_GHER_MEASUREMENT_KEY, dividingFactor)));
+
         if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
             measurementDetailsResponseList = measurementDetailsResponseList
                     .stream()

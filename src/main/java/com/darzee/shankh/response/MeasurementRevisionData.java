@@ -22,7 +22,7 @@ public class MeasurementRevisionData {
 
     public MeasurementRevisionData(MeasurementRevisionsDAO measurementRevisions) {
         this.customerId = measurementRevisions.getCustomerId();
-        this.outfitType = measurementRevisions.getOutfitType();
+        this.outfitType = measurementRevisions.getOutfitType().getOrdinal();
         this.measurementValue = measurementRevisions.getMeasurementValue();
         this.createdAt = measurementRevisions.getCreatedAt();
     }
