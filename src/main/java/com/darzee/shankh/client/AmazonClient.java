@@ -36,6 +36,9 @@ public class AmazonClient {
     @Value("${amazonProperties.s3.secretKey}")
     private String secretKey;
 
+    @Value("${amazonProperties.s3.audioBucketName}")
+    private String audioBucketName;
+
     @PostConstruct
     private void initializeAmazon() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);

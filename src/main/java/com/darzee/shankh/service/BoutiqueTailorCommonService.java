@@ -3,7 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.enums.BoutiqueType;
-import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueLedgerRepo;
@@ -29,7 +29,7 @@ public class BoutiqueTailorCommonService {
     private PortfolioService portfolioService;
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private TailorRepo tailorRepo;
@@ -65,9 +65,9 @@ public class BoutiqueTailorCommonService {
     }
 
     public void saveTailorImageReference(String imageReference, Long tailorId) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.TAILOR.getEntityType(), tailorId);
-        objectImagesService.saveObjectImages(Arrays.asList(imageReference),
-                ImageEntityType.TAILOR.getEntityType(),
+        objectFilesService.invalidateExistingReferenceIds(FileEntityType.TAILOR.getEntityType(), tailorId);
+        objectFilesService.saveObjectFiles(Arrays.asList(imageReference),
+                FileEntityType.TAILOR.getEntityType(),
                 tailorId);
     }
 
@@ -77,9 +77,9 @@ public class BoutiqueTailorCommonService {
     }
 
     private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.BOUTIQUE.getEntityType(), boutique.getId());
-        objectImagesService.saveObjectImages(imageReferences,
-                ImageEntityType.BOUTIQUE.getEntityType(),
+        objectFilesService.invalidateExistingReferenceIds(FileEntityType.BOUTIQUE.getEntityType(), boutique.getId());
+        objectFilesService.saveObjectFiles(imageReferences,
+                FileEntityType.BOUTIQUE.getEntityType(),
                 boutique.getId());
     }
 

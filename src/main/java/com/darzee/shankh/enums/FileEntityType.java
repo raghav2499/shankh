@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum ImageEntityType {
+public enum FileEntityType {
 
     @JsonProperty("boutique")
     BOUTIQUE("boutique"),
@@ -28,7 +28,7 @@ public enum ImageEntityType {
 
     private String entityType;
 
-    ImageEntityType(String entityType) {
+    FileEntityType(String entityType) {
         this.entityType = entityType;
     }
 

@@ -8,7 +8,7 @@ import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.ImageReference;
-import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueLedgerRepo;
@@ -43,7 +43,7 @@ public class CustomerService {
     private MeasurementService measurementService;
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private BoutiqueRepo boutiqueRepo;
@@ -197,7 +197,7 @@ public class CustomerService {
     }
 
     public String getCustomerProfilePicLink(Long customerId) {
-        String customerImageReferenceId = objectImagesService.getCustomerImageReferenceId(customerId);
+        String customerImageReferenceId = objectFilesService.getCustomerImageReferenceId(customerId);
         if (customerImageReferenceId != null) {
             return getCustomerProfilePicLink(customerImageReferenceId);
         }
@@ -205,7 +205,7 @@ public class CustomerService {
     }
 
         public String getCustomerProfilePicRefId(Long customerId) {
-        String customerImageReferenceId = objectImagesService.getCustomerImageReferenceId(customerId);
+        String customerImageReferenceId = objectFilesService.getCustomerImageReferenceId(customerId);
         return Optional.ofNullable(customerImageReferenceId).orElse("");
     }
 
@@ -254,18 +254,18 @@ public class CustomerService {
     }
 
     private void saveCustomerImages(CustomerDAO customerDAO, String imageReferenceId) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
-        objectImagesService.saveObjectImages(Arrays.asList(imageReferenceId),
-                ImageEntityType.CUSTOMER.getEntityType(),
+        objectFilesService.invalidateExistingReferenceIds(FileEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
+        objectFilesService.saveObjectFiles(Arrays.asList(imageReferenceId),
+                FileEntityType.CUSTOMER.getEntityType(),
                 customerDAO.getId());
     }
 
     private void removeCustomerImages(CustomerDAO customerDAO) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
+        objectFilesService.invalidateExistingReferenceIds(FileEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
     }
 
     private boolean isImageUpdated(Long customerId, String referenceId) {
-      String existingImageReferenceId  =  objectImagesService.getCustomerImageReferenceId(customerId);
+      String existingImageReferenceId  =  objectFilesService.getCustomerImageReferenceId(customerId);
       return existingImageReferenceId != referenceId;
     }
 

@@ -75,7 +75,7 @@ public class OrderService {
     private OutfitImageLinkService outfitImageLinkService;
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private BucketService bucketService;
@@ -182,7 +182,7 @@ public class OrderService {
             for (OrderItemDAO orderItem : order.getOrderItems()) {
                 OutfitType outfitType = orderItem.getOutfitType();
                 String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
-                List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
+                List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(order.getId());
                 List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
                 OrderItemDetails orderItemDetails = new OrderItemDetails(clothImagesReferenceIds,
                         clothImageUrlLinks, outfitImageLink, orderItem);
