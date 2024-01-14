@@ -1,6 +1,7 @@
 package com.darzee.shankh.service.outfits;
 
 import com.darzee.shankh.constants.Constants;
+import com.darzee.shankh.dao.MeasurementRevisionsDAO;
 import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
@@ -34,15 +35,9 @@ public class WaistCoatImplSevice implements OutfitTypeService {
     private OutfitImageLinkService outfitImageLinkService;
 
     @Override
-    public void setMeasurementDetailsInObject(MeasurementRequest measurementDetails,
-                                              MeasurementsDAO measurementsDAO,
-                                              MeasurementScale scale) {
+    public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId, OutfitType outfitType, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        Map<String, Double> measurementValue = measurementsDAO.getMeasurementValue();
-
-        if (measurementValue == null) {
-            measurementValue = new HashMap<>();
-        }
+        Map<String, Double> measurementValue = new HashMap<>();
         if (measurementDetails.getLength() != null) {
             measurementValue.put(LENGTH_MEASUREMENT_KEY, measurementDetails.getLength() * multiplyingFactor);
         }
@@ -52,16 +47,16 @@ public class WaistCoatImplSevice implements OutfitTypeService {
         if (measurementDetails.getWaist() != null) {
             measurementValue.put(WAIST_MEASUREMENT_KEY, measurementDetails.getWaist() * multiplyingFactor);
         }
+        MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitType, measurementValue);
+        return revisions;
     }
 
     @Override
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
-        Map<String, Double> measurementValue =
-                (measurementsDAO != null && measurementsDAO.getMeasurementValue() != null)
-                        ? objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class)
-                        : new HashMap<>();
-
+        Map<String, Double> measurementValue = (measurementsDAO != null && measurementsDAO.getMeasurementRevision().getMeasurementValue() != null)
+                ? objectMapper.convertValue(measurementsDAO.getMeasurementRevision().getMeasurementValue(), Map.class)
+                : new HashMap<>();
         outfitMeasurementDetails.setLength(measurementValue.get(LENGTH_MEASUREMENT_KEY));
         outfitMeasurementDetails.setChest(measurementValue.get(CHEST_MEASUREMENT_KEY));
         outfitMeasurementDetails.setWaist(measurementValue.get(WAIST_MEASUREMENT_KEY));
@@ -75,17 +70,14 @@ public class WaistCoatImplSevice implements OutfitTypeService {
                                                            Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
-        Map<String, Double> measurementValue = objectMapper.convertValue(measurementsDAO.getMeasurementValue(), Map.class);
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
-        if (measurementValue != null) {
-            measurementDetailsResponseList.add(
-                    addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addChest(measurementsDAO.getMeasurement(CHEST_MEASUREMENT_KEY, dividingFactor)));
-            measurementDetailsResponseList.add(
-                    addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
-        }
+        measurementDetailsResponseList.add(
+                addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addChest(measurementsDAO.getMeasurement(CHEST_MEASUREMENT_KEY, dividingFactor)));
+        measurementDetailsResponseList.add(
+                addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
         if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
             measurementDetailsResponseList = measurementDetailsResponseList
                     .stream()
