@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class OrderAmountDAO {
     private Long id;
-    private Double totalAmount;
-    private Double amountRecieved;
+    private Double totalAmount = 0d;
+    private Double amountRecieved=  0d;
     private OrderDAO order;
 
     public OrderAmountDAO(Double totalAmount, Double amountRecieved, OrderDAO orderDAO) {

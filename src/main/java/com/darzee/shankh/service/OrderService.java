@@ -11,13 +11,11 @@ import com.darzee.shankh.enums.*;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
-import com.darzee.shankh.request.CreateOrderRequest;
+import com.darzee.shankh.request.PriceBreakUpDetails;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
-import com.darzee.shankh.request.innerObjects.OrderDetails;
-import com.darzee.shankh.request.innerObjects.UpdateOrderAmountDetails;
-import com.darzee.shankh.request.innerObjects.UpdateOrderDetails;
+import com.darzee.shankh.request.innerObjects.*;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.pdfutils.BillGenerator;
@@ -26,6 +24,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -37,6 +36,8 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 
 @Service
 public class OrderService {
@@ -85,48 +86,75 @@ public class OrderService {
     private BoutiqueLedgerService boutiqueLedgerService;
 
     @Autowired
+    private OrderItemService orderItemService;
+
+    @Autowired
     private ImageReferenceRepo imageReferenceRepo;
 
     @Autowired
     private AmazonClient s3Client;
 
-    public ResponseEntity createOrderAndGenerateInvoice(CreateOrderRequest request) {
-        CreateOrderResponse response = null;
-        OrderSummary orderSummary = createNewOrder(request);
-        if (orderSummary != null) {
-            generateInvoice(orderSummary.getOrderId());
-            String successMessage = "Order created successfully";
-            response = new CreateOrderResponse(successMessage, orderSummary);
-            return new ResponseEntity(response, HttpStatus.CREATED);
-        }
-        String failureMessage = "No eligible boutique/customer found";
-        response = new CreateOrderResponse(failureMessage);
-        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
-    }
+    @Autowired
+    private PriceBreakUpService priceBreakUpService;
+
+    @Autowired
+    private OrderItemRepo orderItemRepo;
+
+//    public ResponseEntity createOrderAndGenerateInvoice(CreateOrderRequest request) {
+//        CreateOrderResponse response = null;
+//        OrderSummary orderSummary = createNewOrder(request);
+//        if (orderSummary != null) {
+//            generateInvoice(orderSummary.getOrderId());
+//            String successMessage = "Order created successfully";
+//            response = new CreateOrderResponse(successMessage, orderSummary);
+//            return new ResponseEntity(response, HttpStatus.CREATED);
+//        }
+//        String failureMessage = "No eligible boutique/customer found";
+//        response = new CreateOrderResponse(failureMessage);
+//        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+//    }
+
+//    @Transactional
+//    public OrderSummary createNewOrder(CreateOrderRequest request) {
+//        OrderDetails orderDetails = request.getOrderDetails();
+//        OrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
+//        List<PriceBreakUpDetails> allItemsPriceBreakUpDetails = orderDetails.getOrderItems()
+//                .stream().map(orderItem -> orderItem.getPriceBreakup()).flatMap(List::stream)
+//                .collect(Collectors.toList());
+//        validatePriceBreakup(allItemsPriceBreakUpDetails, orderAmountDetails.getTotalOrderAmount());
+//
+//        Optional<Customer> optionalCustomer = customerRepo.findById(orderDetails.getCustomerId());
+//        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(orderDetails.getBoutiqueId());
+//        if (optionalCustomer.isPresent() && optionalBoutique.isPresent()) {
+//            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(), new CycleAvoidingMappingContext());
+//            CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
+//
+//            OrderDAO orderDAO = setOrderSpecificDetails(orderDetails, boutiqueDAO, customerDAO);
+//            OrderAmountDAO orderAmountDAO = setOrderAmountSpecificDetails(orderAmountDetails, orderDAO);
+//            orderDAO.setOrderAmount(orderAmountDAO);
+//            orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
+//            return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
+//                    orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
+//                    orderDAO.getOrderItems());
+//        }
+//        return null;
+//    }
 
     @Transactional
-    public OrderSummary createNewOrder(CreateOrderRequest request) {
-        OrderDetails orderDetails = request.getOrderDetails();
-        OrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
-        Optional<Customer> optionalCustomer = customerRepo.findById(orderDetails.getCustomerId());
-        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(orderDetails.getBoutiqueId());
+    public OrderDAO createNewOrder(Long boutiqueId, Long customerId) {
+        Optional<Customer> optionalCustomer = customerRepo.findById(customerId);
+        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(boutiqueId);
         if (optionalCustomer.isPresent() && optionalBoutique.isPresent()) {
-            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(), new CycleAvoidingMappingContext());
-            CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
-
-            OrderDAO orderDAO = setOrderSpecificDetails(orderDetails, boutiqueDAO, customerDAO);
-            OrderAmountDAO orderAmountDAO = setOrderAmountSpecificDetails(orderAmountDetails, orderDAO);
-            orderDAO.setOrderAmount(orderAmountDAO);
-            orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
-            String trialDate = orderDAO.getTrialDate() != null ? orderDAO.getTrialDate().toString() : null;
-
-//            boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO, new CycleAvoidingMappingContext()));
-
-            return new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(), orderDAO.getOutfitType().getName(),
-                    trialDate, orderDAO.getDeliveryDate().toString(),
-                    orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString());
+            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(),
+                    new CycleAvoidingMappingContext());
+            CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(),
+                    new CycleAvoidingMappingContext());
+            OrderDAO orderDAO = setOrderSpecificDetails(boutiqueDAO, customerDAO);
+            orderDAO = mapper.orderObjectToDao(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()),
+                    new CycleAvoidingMappingContext());
+            return orderDAO;
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid customer id or boutique id");
     }
 
     public ResponseEntity<GetOrderResponse> getOrder(Map<String, Object> filterMap, Map<String, Object> pagingSortingMap) {
@@ -149,17 +177,20 @@ public class OrderService {
         if (optionalOrder.isPresent()) {
             OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
             OrderAmountDAO orderAmount = order.getOrderAmount();
-            OutfitType outfitType = order.getOutfitType();
             CustomerDAO customer = order.getCustomer();
-            MeasurementsDAO measurementsDAO = customer.getOutfitMeasurement(outfitType);
-            OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-            OutfitMeasurementDetails measurementDetails = outfitTypeService.extractMeasurementDetails(measurementsDAO);
-            List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
-            List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
-            String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
+            List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
+            for (OrderItemDAO orderItem : order.getOrderItems()) {
+                OutfitType outfitType = orderItem.getOutfitType();
+                String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
+                List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
+                List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
+                OrderItemDetails orderItemDetails = new OrderItemDetails(clothImagesReferenceIds,
+                        clothImageUrlLinks, outfitImageLink, orderItem);
+                orderItemDetailsList.add(orderItemDetails);
+            }
             String message = "Details fetched succesfully";
-            OrderDetailResponse response = new OrderDetailResponse(customer, order, measurementDetails, orderAmount,
-                    clothImagesReferenceIds, clothImageUrlLinks, outfitImageLink, message);
+            OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount,
+                    orderItemDetailsList, message);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
@@ -187,11 +218,12 @@ public class OrderService {
                 orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order,
                         order.getBoutique().getId());
             }
-            String trialDate = order.getTrialDate() != null ? order.getTrialDate().toString() : null;
-
+            List<PriceBreakupDAO> priceBreakupDAOList = order.getOrderItems().stream()
+                    .map(OrderItemDAO::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
+            postUpdateOrderValidation(orderAmountDAO.getTotalAmount(), priceBreakupDAOList);
             OrderSummary orderSummary = new OrderSummary(order.getId(), order.getInvoiceNo(),
-                    order.getOutfitType().getName(), trialDate, order.getDeliveryDate().toString(),
-                    orderAmountDAO.getTotalAmount().toString(), orderAmountDAO.getAmountRecieved().toString());
+                    orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
+                    order.getOrderItems());
             CreateOrderResponse response = new CreateOrderResponse("Order updated successfully", orderSummary);
             return new ResponseEntity(response, HttpStatus.OK);
         }
@@ -327,33 +359,17 @@ public class OrderService {
                         + order.getOrderStatus() + " to " + targetStatus + " is not allowed");
             }
         }
-        if (order.isTrialDateUpdated(orderDetails.getTrialDate())) {
-            order.setTrialDate(orderDetails.getTrialDate());
-        }
-        if (order.isDeliveryDateUpdated(orderDetails.getDeliveryDate())) {
-            order.setDeliveryDate(orderDetails.getDeliveryDate());
-        }
-        if (order.isPriorityUpdated(orderDetails.getIsPriorityOrder())) {
-            order.setIsPriorityOrder(orderDetails.getIsPriorityOrder());
-        }
-        if (order.isInspirationUpdated(orderDetails.getInspiration())) {
-            order.setInspiration(orderDetails.getInspiration());
-        }
-        if (order.areSpecialInstructionsUpdated(orderDetails.getSpecialInstructions())) {
-            order.setSpecialInstructions(orderDetails.getSpecialInstructions());
-        }
 
         if (Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
             order.setIsDeleted(Boolean.TRUE);
             OrderStage orderStage = getOrderStage(order.getOrderStatus());
             resetOrderAmountForDeletedOrders(order, orderStage);
         }
-        if (!Collections.isEmpty(orderDetails.getClothImageReferenceIds())) {
-            Long orderId = order.getId();
-            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.ORDER.getEntityType(), orderId);
-            objectImagesService.saveObjectImages(orderDetails.getClothImageReferenceIds(), ImageEntityType.ORDER.getEntityType(), orderId);
-        }
-        order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+
+        Map<Long, OrderItemDAO> orderItemDAOMap = order.getOrderItemDAOMap();
+        List<OrderItemDAO> updatedItems = new ArrayList<>();
+        order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order,
+                        new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return order;
     }
 
@@ -413,28 +429,48 @@ public class OrderService {
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
-        String outfitImageLink = outfitImageLinkService.getOutfitImageLink(orderDAO.getOutfitType());
-        return new OrderDetailResponse(orderDAO.getCustomer(),
-                orderDAO,
-                customerProfilePicLink,
-                orderDAO.getOrderAmount(),
-                outfitImageLink);
+        List<Pair<OrderItemDAO, String>> orderItemOutfitLinkPairList = new ArrayList<>();
+        for (OrderItemDAO orderItem : orderDAO.getOrderItems()) {
+            String outfitImgLink = outfitImageLinkService.getOutfitImageLink(orderItem.getOutfitType());
+            orderItemOutfitLinkPairList.add(Pair.of(orderItem, outfitImgLink));
+        }
+
+        return new OrderDetailResponse(orderDAO, orderItemOutfitLinkPairList, customerProfilePicLink);
     }
 
-    private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
+    @Transactional(REQUIRES_NEW)
+    private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO,
+                                             CustomerDAO customerDAO) {
+
         String invoiceNo = generateOrderInvoiceNo();
-        OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(orderDetails.getOutfitType());
-        if (outfitType == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid outfit type");
-        }
-        OrderDAO orderDAO = new OrderDAO(orderDetails.getTrialDate(), orderDetails.getDeliveryDate(), outfitType,
-                orderDetails.getSpecialInstructions(), orderDetails.getInspiration(), orderDetails.getOrderType(),
-                orderDetails.getIsPriorityOrder(), invoiceNo, boutiqueDAO, customerDAO);
-        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-        Long orderId = orderDAO.getId();
-        List<String> clothImageReferenceIds = orderDetails.getClothImageReferenceIds();
-        objectImagesService.saveObjectImages(clothImageReferenceIds, ImageEntityType.ORDER.getEntityType(), orderId);
+        OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
+        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
+                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+
+        List<OrderItemDetailRequest> orderItemDetails = orderDetails.getOrderItems();
+        List<OrderItemDAO> orderItems = orderItemService.createOrderItems(orderItemDetails, orderDAO);
+        orderDAO.setOrderItems(orderItems);
         return orderDAO;
+    }
+
+
+    @Transactional(REQUIRES_NEW)
+    private OrderDAO setOrderSpecificDetails(BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
+
+        String invoiceNo = generateOrderInvoiceNo();
+        OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
+        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
+                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        return orderDAO;
+    }
+
+    private void validatePriceBreakup(List<PriceBreakUpDetails> allPriceBreakups, Double totalAmount) {
+        Double expectedTotalAmount = allPriceBreakups.stream()
+                .mapToDouble(priceBreakUp -> priceBreakUp.getValue() * priceBreakUp.getComponentQuantity())
+                .sum();
+        if (!expectedTotalAmount.equals(totalAmount)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Total amount calculated is incorrect");
+        }
     }
 
     private OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
@@ -505,12 +541,28 @@ public class OrderService {
 
     /**
      * This is a throw-away code, front-end team to handle the week data dynamically
+     *
      * @param weekwiseSales
      */
     private void populateSalesIfRequired(List<WeekwiseSalesSplit> weekwiseSales) {
-        while(weekwiseSales.size() < 5) {
+        while (weekwiseSales.size() < 5) {
             weekwiseSales.add(new WeekwiseSalesSplit(0d, null));
         }
     }
 
+    private List<OrderItemSummary> generateOrderItemSummaries(List<OrderItemDAO> orderItemDAOList) {
+        List<OrderItemSummary> orderItemSummaryList = new ArrayList<>();
+        for (OrderItemDAO item : orderItemDAOList) {
+            orderItemSummaryList.add(new OrderItemSummary(item));
+        }
+        return orderItemSummaryList;
+    }
+
+    private void postUpdateOrderValidation(Double totalOrderAmount, List<PriceBreakupDAO> allItemsPriceBreakup) {
+        Double itemsPriceBreakupSum = allItemsPriceBreakup.stream().mapToDouble(PriceBreakupDAO::getValue).sum();
+        if (!itemsPriceBreakupSum.equals(totalOrderAmount)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Either price break up or total order amount is incorrect");
+        }
+    }
 }

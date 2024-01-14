@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 import org.thymeleaf.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -68,7 +69,7 @@ public class ObjectImagesService {
     @Nullable
     public List<String> getClothReferenceIds(Long orderId) {
         List<ObjectImages> clothImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(orderId,
-                ImageEntityType.ORDER.getEntityType(),
+                ImageEntityType.ORDER_ITEM.getEntityType(),
                 Boolean.TRUE);
         if (!Collections.isEmpty(clothImages)) {
             List<ObjectImagesDAO> clothImagesDAO = CommonUtils.mapList(clothImages,
@@ -141,5 +142,13 @@ public class ObjectImagesService {
                 .map(imageReferenceId -> new ObjectImagesDAO(imageReferenceId, entityType, entityId))
                 .collect(Collectors.toList());
         repo.saveAll(CommonUtils.mapList(objectImagesDAOList, mapper::objectImageDAOToObjectImage));
+    }
+
+    public void saveObjectImages(Map<String, Long> refEntityIdMap, String entityType) {
+        List<ObjectImagesDAO> objectImages = refEntityIdMap.entrySet().stream()
+                .map(refEntityIdValue -> new ObjectImagesDAO(refEntityIdValue.getKey(),
+                        entityType, refEntityIdValue.getValue()))
+                .collect(Collectors.toList());
+        repo.saveAll(CommonUtils.mapList(objectImages, mapper::objectImageDAOToObjectImage));
     }
 }

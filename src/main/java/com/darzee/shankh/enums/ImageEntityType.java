@@ -8,8 +8,8 @@ public enum ImageEntityType {
 
     @JsonProperty("boutique")
     BOUTIQUE("boutique"),
-    @JsonProperty("order")
-    ORDER("order"),
+    @JsonProperty("order_item")
+    ORDER_ITEM("order_item"),
 
     @JsonProperty("customer")
     CUSTOMER("customer"),

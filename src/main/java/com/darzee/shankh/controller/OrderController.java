@@ -1,10 +1,8 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.request.CreateOrderRequest;
 import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
-import com.darzee.shankh.response.CreateOrderResponse;
 import com.darzee.shankh.response.GetOrderResponse;
 import com.darzee.shankh.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +22,12 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    @CrossOrigin
-    public ResponseEntity<CreateOrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) throws Exception {
-        ResponseEntity<CreateOrderResponse> response = orderService.createOrderAndGenerateInvoice(request);
-        return response;
-    }
+//    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @CrossOrigin
+//    public ResponseEntity<CreateOrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) throws Exception {
+//        ResponseEntity<CreateOrderResponse> response = orderService.createOrderAndGenerateInvoice(request);
+//        return response;
+//    }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin

@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.darzee</groupId>
     <artifactId>shankh</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1-test-SNAPSHOT</version>
     <name>shankh</name>
     <description>Spring Boot Project</description>
     <properties>
