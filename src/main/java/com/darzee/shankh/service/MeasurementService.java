@@ -54,10 +54,6 @@ public class MeasurementService {
 
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-        MeasurementRevisionsDAO measurementRevisionsDAO = null;
-        if(orderItemId != null && revisionPresent()) {
-            measurementRevisionsDAO =
-        }
         Optional<Customer> customer = customerRepo.findById(customerId);
         Optional<Measurements> measurements = measurementsRepo.findByCustomerIdAndOutfitType(customerId, outfitType);
         OverallMeasurementDetails overallMeasurementDetails = null;
@@ -125,9 +121,6 @@ public class MeasurementService {
         return measurementRevisionsDAO;
     }
 
-    public boolean revisionPresent(Long orderItemId) {
-        measurementRevisionsRepo.findAllByCustomerIdAndOutfitType()
-    }
     private String getMeasurementDetailsMessage(boolean mandatoryParamsSet) {
         String message = mandatoryParamsSet
                 ? "Measurement details fetched sucessfully"
