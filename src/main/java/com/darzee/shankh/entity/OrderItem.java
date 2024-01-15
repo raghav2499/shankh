@@ -60,8 +60,15 @@ public class OrderItem {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @OneToOne
+    @JoinColumn(name = "measurement_revision_id")
+    private MeasurementRevisions measurementRevision;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderItem")
     private List<PriceBreakup> priceBreakup;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderItem")
+    private List<OrderStitchOptions> stitchOptions;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

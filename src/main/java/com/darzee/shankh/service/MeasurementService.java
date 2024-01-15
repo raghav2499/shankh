@@ -4,6 +4,7 @@ import com.darzee.shankh.dao.CustomerDAO;
 import com.darzee.shankh.dao.MeasurementRevisionsDAO;
 import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.entity.Customer;
+import com.darzee.shankh.entity.MeasurementRevisions;
 import com.darzee.shankh.entity.Measurements;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
@@ -45,7 +46,7 @@ public class MeasurementService {
     @Autowired
     private CustomerRepo customerRepo;
 
-    public ResponseEntity getMeasurementDetails(Long customerId,
+    public ResponseEntity getMeasurementDetails(Long customerId, Long orderItemId,
                                                 Integer outfitTypeIndex,
                                                 String scale,
                                                 Boolean nonEmptyValuesOnly) throws Exception {
@@ -53,6 +54,10 @@ public class MeasurementService {
 
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
+        MeasurementRevisionsDAO measurementRevisionsDAO = null;
+        if(orderItemId != null && revisionPresent()) {
+            measurementRevisionsDAO =
+        }
         Optional<Customer> customer = customerRepo.findById(customerId);
         Optional<Measurements> measurements = measurementsRepo.findByCustomerIdAndOutfitType(customerId, outfitType);
         OverallMeasurementDetails overallMeasurementDetails = null;
@@ -111,6 +116,18 @@ public class MeasurementService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    public MeasurementRevisionsDAO getMeasurementRevisionById(Long measurmentRevId) {
+        MeasurementRevisionsDAO measurementRevisionsDAO = null;
+        Optional<MeasurementRevisions> mRevision = measurementRevisionsRepo.findById(measurmentRevId);
+        if(mRevision.isPresent()) {
+            measurementRevisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(mRevision.get());
+        }
+        return measurementRevisionsDAO;
+    }
+
+    public boolean revisionPresent(Long orderItemId) {
+        measurementRevisionsRepo.findAllByCustomerIdAndOutfitType()
+    }
     private String getMeasurementDetailsMessage(boolean mandatoryParamsSet) {
         String message = mandatoryParamsSet
                 ? "Measurement details fetched sucessfully"

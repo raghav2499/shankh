@@ -18,6 +18,7 @@ public class MeasurementRevisionsDAO {
     private OutfitType outfitType;
     private Map<String, Double> measurementValue;
     private LocalDateTime createdAt;
+    private Long orderItemId;
 
     public MeasurementRevisionsDAO(Long customerId, OutfitType outfitType, Map<String, Double> measurementValue) {
         this.customerId = customerId;

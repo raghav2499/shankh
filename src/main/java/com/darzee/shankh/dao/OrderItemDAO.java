@@ -1,5 +1,6 @@
 package com.darzee.shankh.dao;
 
+import com.darzee.shankh.entity.OrderStitchOptions;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -36,7 +37,7 @@ public class OrderItemDAO {
 
     private Integer quantity;
 
-    private Long measurementRevisionId;
+    private MeasurementRevisionsDAO measurementRevision;
 
     private List<PriceBreakupDAO> priceBreakup;
 
@@ -45,10 +46,11 @@ public class OrderItemDAO {
     private LocalDateTime updatedAt;
 
     private OrderDAO order;
+    private List<OrderStitchOptions> stitchOptions;
 
     public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions,
                         OrderType orderType, OutfitType outfitType, String inspiration, Boolean isPriorityOrder,
-                        Integer quantity, Long measurementRevisionId, OrderDAO orderDAO) {
+                        Integer quantity, MeasurementRevisionsDAO measurementRevision, OrderDAO orderDAO) {
         this.trialDate = trialDate;
         this.deliveryDate = deliveryDate;
         this.specialInstructions = specialInstructions;
@@ -57,7 +59,7 @@ public class OrderItemDAO {
         this.inspiration = inspiration;
         this.isPriorityOrder = isPriorityOrder;
         this.quantity = quantity;
-        this.measurementRevisionId = measurementRevisionId;
+        this.measurementRevision = measurementRevision;
         this.order = orderDAO;
     }
 
@@ -87,7 +89,9 @@ public class OrderItemDAO {
     }
 
     public boolean isMeasurementRevisionUpdated(Long value) {
-        return value != null && !value.equals(this.getMeasurementRevisionId());
+        return (this.measurementRevision == null && value != null)
+                || (this.measurementRevision != null && value != null && !value.equals(
+                        this.getMeasurementRevision().getId()));
     }
 
 }

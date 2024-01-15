@@ -6,8 +6,10 @@ import com.darzee.shankh.response.TailorLoginResponse;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -79,6 +81,8 @@ public interface DaoEntityMapper {
     DeviceInfo deviceInfoDAOToDeviceInfo(DeviceInfoDAO deviceInfoDAO);
 
     MeasurementsDAO measurementsToMeasurementDAO(Measurements measurements, @Context CycleAvoidingMappingContext context);
+
+    StitchOptionsDAO stitchOptionsToDAO(StitchOptions stitchOptions);
 
     Measurements measurementsDAOToMeasurement(MeasurementsDAO measurements, @Context CycleAvoidingMappingContext context);
 
@@ -206,6 +210,18 @@ public interface DaoEntityMapper {
             orderItems.add(orderItem);
         }
         return orderItems;
+    }
+
+    default List<StitchOptionsDAO> stitchOptionListToStitchOptionDAOList(List<StitchOptions> stitchOptions) {
+        if(CollectionUtils.isEmpty(stitchOptions)) {
+            return Collections.emptyList();
+        }
+        List<StitchOptionsDAO> stitchOptionsDAOS = new ArrayList<>();
+        for(StitchOptions stitchOption : stitchOptions) {
+            StitchOptionsDAO stitchOptionsDAO = stitchOptionsToDAO(stitchOption);
+            stitchOptionsDAOS.add(stitchOptionsDAO);
+        }
+        return stitchOptionsDAOS;
     }
 
 

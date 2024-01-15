@@ -1,5 +1,6 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.dao.MeasurementRevisionsDAO;
 import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
 import com.darzee.shankh.dao.PriceBreakupDAO;
@@ -34,6 +35,8 @@ public class OrderItemService {
 
     @Autowired
     private DaoEntityMapper mapper;
+    @Autowired
+    private MeasurementService measurementService;
 
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
         Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
@@ -45,10 +48,16 @@ public class OrderItemService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Invalid outfit type " + itemDetail.getOutfitType());
             }
+
+            MeasurementRevisionsDAO measurementRevisionsDAO = null;
+            if(itemDetail.getMeasurementRevisionId() != null) {
+                measurementRevisionsDAO = measurementService.getMeasurementRevisionById(itemDetail.getMeasurementRevisionId());
+            }
+
             OrderItemDAO orderItemDAO = new OrderItemDAO(itemDetail.getTrialDate(), itemDetail.getDeliveryDate(),
                     itemDetail.getSpecialInstructions(), itemDetail.getOrderType(), outfitType,
                     itemDetail.getInspiration(), itemDetail.getIsPriorityOrder(), itemDetail.getItemQuantity(),
-                    itemDetail.getMeasurementRevisionId(), order);
+                    measurementRevisionsDAO, order);
             orderItemDAO = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItemDAO,
                     new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
             orderItemList.add(orderItemDAO);
@@ -92,7 +101,8 @@ public class OrderItemService {
             orderItem.setQuantity(updateItemDetail.getItemQuantity());
         }
         if(orderItem.isMeasurementRevisionUpdated(updateItemDetail.getMeasurementRevisionId())) {
-            orderItem.setMeasurementRevisionId(updateItemDetail.getMeasurementRevisionId());
+            MeasurementRevisionsDAO measurementRevisionsDAO = measurementService.getMeasurementRevisionById(updateItemDetail.getMeasurementRevisionId());
+            orderItem.setMeasurementRevision(measurementRevisionsDAO);
         }
         if (!Collections.isEmpty(updateItemDetail.getClothImageReferenceIds())) {
             objectImagesService.invalidateExistingReferenceIds(ImageEntityType.ORDER_ITEM.getEntityType(),

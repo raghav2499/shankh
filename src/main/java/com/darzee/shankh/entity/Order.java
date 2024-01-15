@@ -26,29 +26,6 @@ public class Order {
     @Column(name = "invoice_no", nullable = false)
     private String invoiceNo;
 
-//    @Column(name = "trial_date")
-//    private LocalDateTime trialDate;
-//
-//    @Column(name = "delivery_date")
-//    private LocalDateTime deliveryDate;
-//
-//    @Column(name = "special_instructions")
-//    private String specialInstructions;
-//
-//    @Column(name = "order_type")
-//    @Enumerated(EnumType.ORDINAL)
-//    private OrderType orderType;
-//
-//    @Column(name = "outfit_type")
-//    @Enumerated(EnumType.ORDINAL)
-//    private OutfitType outfitType;
-//
-//    @Column(name = "is_deleted")
-//    private Boolean isDeleted = Boolean.FALSE;
-//
-//    @Column(name = "inspiration")
-//    private String inspiration;
-
     @Column(name = "order_status")
     @Enumerated(EnumType.ORDINAL)
     private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;

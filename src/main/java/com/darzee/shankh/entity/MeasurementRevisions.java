@@ -35,6 +35,9 @@ public class MeasurementRevisions {
     @Enumerated(EnumType.ORDINAL)
     private OutfitType outfitType;
 
+    @Column(name = "order_item_id")
+    private Long orderItemId;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
