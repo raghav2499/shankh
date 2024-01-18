@@ -1,18 +1,20 @@
 package com.darzee.shankh.service;
 
-import com.darzee.shankh.dao.MeasurementRevisionsDAO;
-import com.darzee.shankh.dao.OrderDAO;
-import com.darzee.shankh.dao.OrderItemDAO;
-import com.darzee.shankh.dao.PriceBreakupDAO;
+import com.darzee.shankh.client.AmazonClient;
+import com.darzee.shankh.dao.*;
+import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.OrderItem;
 import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
+import com.darzee.shankh.repo.FileReferenceRepo;
 import com.darzee.shankh.repo.ObjectFilesRepo;
 import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetails;
+import com.darzee.shankh.response.OrderItemDetails;
+import com.darzee.shankh.utils.CommonUtils;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderItemService {
@@ -34,6 +37,14 @@ public class OrderItemService {
     @Autowired
     private ObjectFilesService objectFilesService;
 
+    @Autowired
+    private OutfitImageLinkService outfitImageLinkService;
+
+    @Autowired
+    private FileReferenceRepo fileReferenceRepo;
+
+    @Autowired
+    private AmazonClient s3Client;
     @Autowired
     private DaoEntityMapper mapper;
     @Autowired
@@ -54,7 +65,7 @@ public class OrderItemService {
             }
 
             MeasurementRevisionsDAO measurementRevisionsDAO = null;
-            if(itemDetail.getMeasurementRevisionId() != null) {
+            if (itemDetail.getMeasurementRevisionId() != null) {
                 measurementRevisionsDAO = measurementService.getMeasurementRevisionById(itemDetail.getMeasurementRevisionId());
             }
 
@@ -71,7 +82,7 @@ public class OrderItemService {
             for (String imageRef : itemDetail.getClothImageReferenceIds()) {
                 clothRefOrderItemIdMap.put(imageRef, orderItemDAO.getId());
             }
-            for(String audioRef : itemDetail.getAudioReferenceIds()) {
+            for (String audioRef : itemDetail.getAudioReferenceIds()) {
                 audioRefOrderItemIdMap.put(audioRef, orderItemDAO.getId());
             }
         }
@@ -108,7 +119,7 @@ public class OrderItemService {
         if (orderItem.isQuantityUpdated(updateItemDetail.getItemQuantity())) {
             orderItem.setQuantity(updateItemDetail.getItemQuantity());
         }
-        if(orderItem.isMeasurementRevisionUpdated(updateItemDetail.getMeasurementRevisionId())) {
+        if (orderItem.isMeasurementRevisionUpdated(updateItemDetail.getMeasurementRevisionId())) {
             MeasurementRevisionsDAO measurementRevisionsDAO = measurementService.getMeasurementRevisionById(updateItemDetail.getMeasurementRevisionId());
             orderItem.setMeasurementRevision(measurementRevisionsDAO);
         }
@@ -117,6 +128,12 @@ public class OrderItemService {
                     orderItemId);
             objectFilesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
                     FileEntityType.ORDER_ITEM.getEntityType(), orderItemId);
+        }
+        if (!Collections.isEmpty(updateItemDetail.getAudioImageReferenceIds())) {
+            objectFilesService.invalidateExistingReferenceIds(FileEntityType.AUDIO.getEntityType(),
+                    orderItemId);
+            objectFilesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
+                    FileEntityType.AUDIO.getEntityType(), orderItemId);
         }
         if (!Collections.isEmpty(updateItemDetail.getPriceBreakupDetails())) {
             List<PriceBreakupDAO> updatedPriceBreakup =
@@ -128,4 +145,36 @@ public class OrderItemService {
         return orderItem;
     }
 
+    public OrderItemDetails getOrderItemDetails(Long orderItemId) {
+        Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
+        if(!orderItem.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect order item id");
+        }
+        OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
+        return getOrderItemDetails(orderItemDAO);
+    }
+    public OrderItemDetails getOrderItemDetails(OrderItemDAO orderItem) {
+        OutfitType outfitType = orderItem.getOutfitType();
+        String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
+        List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(orderItem.getId());
+        List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
+        OrderItemDetails orderItemDetails = new OrderItemDetails(clothImagesReferenceIds,
+                clothImageUrlLinks, outfitImageLink, orderItem);
+        return orderItemDetails;
+    }
+
+    private List<String> getClothProfilePicLink(List<String> clothImageReferenceId) {
+        if (Collections.isEmpty(clothImageReferenceId)) {
+            return new ArrayList<>();
+        }
+        List<ImageReference> clothImageReferences = fileReferenceRepo.findAllByReferenceIdIn(clothImageReferenceId);
+        if (!Collections.isEmpty(clothImageReferences)) {
+            List<ImageReferenceDAO> imageReferenceDAOs = CommonUtils.mapList(clothImageReferences,
+                    mapper::imageReferenceToImageReferenceDAO);
+            List<String> clothImageFileNames = imageReferenceDAOs.stream().map(imageRef ->
+                    imageRef.getImageName()).collect(Collectors.toList());
+            return s3Client.generateShortLivedUrls(clothImageFileNames);
+        }
+        return new ArrayList<>();
+    }
 }

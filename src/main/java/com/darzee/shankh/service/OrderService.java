@@ -3,8 +3,13 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.*;
-import com.darzee.shankh.entity.*;
-import com.darzee.shankh.enums.*;
+import com.darzee.shankh.entity.Boutique;
+import com.darzee.shankh.entity.Customer;
+import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.enums.OrderStage;
+import com.darzee.shankh.enums.OrderStatus;
+import com.darzee.shankh.enums.OrderType;
+import com.darzee.shankh.enums.PaymentMode;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
@@ -16,7 +21,6 @@ import com.darzee.shankh.request.innerObjects.*;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.pdfutils.BillGenerator;
-import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -177,12 +181,7 @@ public class OrderService {
             CustomerDAO customer = order.getCustomer();
             List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
             for (OrderItemDAO orderItem : order.getOrderItems()) {
-                OutfitType outfitType = orderItem.getOutfitType();
-                String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
-                List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(order.getId());
-                List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
-                OrderItemDetails orderItemDetails = new OrderItemDetails(clothImagesReferenceIds,
-                        clothImageUrlLinks, outfitImageLink, orderItem);
+                OrderItemDetails orderItemDetails = orderItemService.getOrderItemDetails(orderItem);
                 orderItemDetailsList.add(orderItemDetails);
             }
             String message = "Details fetched succesfully";
@@ -500,20 +499,6 @@ public class OrderService {
                 pendingOrderAmount,
                 amountRecieved,
                 orderStage);
-    }
-
-
-    private List<String> getClothProfilePicLink(List<String> clothImageReferenceId) {
-        if (Collections.isEmpty(clothImageReferenceId)) {
-            return new ArrayList<>();
-        }
-        List<ImageReference> clothImageReferences = fileReferenceRepo.findAllByReferenceIdIn(clothImageReferenceId);
-        if (!Collections.isEmpty(clothImageReferences)) {
-            List<ImageReferenceDAO> imageReferenceDAOs = CommonUtils.mapList(clothImageReferences, mapper::imageReferenceToImageReferenceDAO);
-            List<String> clothImageFileNames = imageReferenceDAOs.stream().map(imageRef -> imageRef.getImageName()).collect(Collectors.toList());
-            return s3Client.generateShortLivedUrls(clothImageFileNames);
-        }
-        return new ArrayList<>();
     }
 
     private String generateOrderInvoiceNo() {

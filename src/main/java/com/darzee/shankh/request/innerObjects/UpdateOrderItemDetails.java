@@ -20,5 +20,6 @@ public class UpdateOrderItemDetails {
     private String specialInstructions;
     private Long measurementRevisionId;
     private List<String> clothImageReferenceIds;
+    private List<String> audioImageReferenceIds;
     private List<UpdatePriceBreakupDetails> priceBreakupDetails;
 }

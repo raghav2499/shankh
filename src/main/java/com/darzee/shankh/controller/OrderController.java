@@ -2,7 +2,6 @@ package com.darzee.shankh.controller;
 
 import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
-import com.darzee.shankh.request.UpdateOrderRequest;
 import com.darzee.shankh.response.GetOrderResponse;
 import com.darzee.shankh.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Map;
 
 
@@ -53,12 +51,12 @@ public class OrderController {
         return orderService.getOrderDetails(orderId);
     }
 
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @CrossOrigin
-    public ResponseEntity updateOrder(@PathVariable("id") Long orderId,
-                                      @Valid @RequestBody UpdateOrderRequest request) {
-        return orderService.updateOrder(orderId, request);
-    }
+//    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @CrossOrigin
+//    public ResponseEntity updateOrder(@PathVariable("id") Long orderId,
+//                                      @Valid @RequestBody UpdateOrderRequest request) {
+//        return orderService.updateOrder(orderId, request);
+//    }
 
     @PostMapping(value = "/{id}/recieve_payment" , produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
