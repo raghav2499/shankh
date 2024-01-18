@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -21,8 +20,6 @@ public class BoutiqueDAO {
     private BoutiqueType boutiqueType;
     private Integer tailorCount;
     private TailorDAO adminTailor;
-    private List<CustomerDAO> customers;
-    private List<OrderDAO> orders;
 
     public BoutiqueDAO(String boutiqueName, String boutiqueType, String boutiqueReferenceId) {
         this.name = boutiqueName;

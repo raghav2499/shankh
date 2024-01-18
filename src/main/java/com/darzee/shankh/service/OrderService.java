@@ -3,10 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.*;
-import com.darzee.shankh.entity.Boutique;
-import com.darzee.shankh.entity.Customer;
-import com.darzee.shankh.entity.ImageReference;
-import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.entity.*;
 import com.darzee.shankh.enums.*;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -90,6 +87,9 @@ public class OrderService {
     @Autowired
     private AmazonClient s3Client;
 
+    @Autowired
+    private CustomerMeasurementService customerMeasurementService;
+
     public ResponseEntity createOrderAndGenerateInvoice(CreateOrderRequest request) {
         CreateOrderResponse response = null;
         OrderSummary orderSummary = createNewOrder(request);
@@ -151,7 +151,7 @@ public class OrderService {
             OrderAmountDAO orderAmount = order.getOrderAmount();
             OutfitType outfitType = order.getOutfitType();
             CustomerDAO customer = order.getCustomer();
-            MeasurementsDAO measurementsDAO = customer.getOutfitMeasurement(outfitType);
+            MeasurementsDAO measurementsDAO = customerMeasurementService.getCustomerMeasurements(customer.getId(), outfitType);
             OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
             OutfitMeasurementDetails measurementDetails = outfitTypeService.extractMeasurementDetails(measurementsDAO);
             List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());

@@ -34,6 +34,9 @@ public class MeasurementService {
     private DaoEntityMapper mapper;
 
     @Autowired
+    private CustomerMeasurementService customerMeasurementService;
+
+    @Autowired
     private OutfitTypeObjectService outfitTypeObjectService;
 
     @Autowired
@@ -54,7 +57,7 @@ public class MeasurementService {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         Optional<Customer> customer = customerRepo.findById(customerId);
-        Optional<Measurements> measurements = measurementsRepo.findByCustomerIdAndOutfitType(customerId, outfitType);
+        Optional<Measurements> measurements = measurementsRepo.findOneByCustomerIdAndOutfitType(customerId, outfitType);
         OverallMeasurementDetails overallMeasurementDetails = null;
         if (customer.isPresent()) {
             boolean mandatoryParamsSet = measurements.isPresent() ? true : false;
@@ -81,7 +84,7 @@ public class MeasurementService {
             CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(measurementDetails.getOutfitType());
             OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-            MeasurementsDAO measurementsDAO = Optional.ofNullable(customerDAO.getOutfitMeasurement(outfitType)).orElse(new MeasurementsDAO());
+            MeasurementsDAO measurementsDAO = customerMeasurementService.getCustomerMeasurements(customerDAO.getId(), outfitType);
             MeasurementRevisionsDAO revision = outfitTypeService.addMeasurementRevision(measurementRequest, customerDAO.getId(),
                     outfitType, measurementDetails.getScale());
             revision = mapper.measurementRevisionsToMeasurementRevisionDAO(

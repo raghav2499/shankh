@@ -1,13 +1,11 @@
 package com.darzee.shankh.dao;
 
 import com.darzee.shankh.enums.Gender;
-import com.darzee.shankh.enums.OutfitType;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -23,7 +21,6 @@ public class CustomerDAO {
     private LocalDateTime updatedAt;
     private BoutiqueDAO boutique;
     private List<OrderDAO> orders;
-    private List<MeasurementsDAO> measurements;
 
     public CustomerDAO(Integer age, String phoneNumber, String firstName, String lastName, Gender gender, BoutiqueDAO boutiqueDAO) {
         this.age = age;
@@ -48,17 +45,6 @@ public class CustomerDAO {
 
     public boolean isAgeUpdated(Integer value) {
         return (value != null && !value.equals(this.age)) || (value == null && this.age != null);
-    }
-
-    public MeasurementsDAO getOutfitMeasurement(OutfitType outfitType) {
-        Optional<MeasurementsDAO> optionalMeasurement = this.getMeasurements()
-                        .stream()
-                        .filter(measurement -> outfitType.equals(measurement.getOutfitType()))
-                .findFirst();
-        if(optionalMeasurement.isPresent()) {
-            return optionalMeasurement.get();
-        }
-        return null;
     }
 
 }
