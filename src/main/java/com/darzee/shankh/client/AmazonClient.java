@@ -4,6 +4,7 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.darzee.shankh.enums.S3Bucket;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +39,9 @@ public class AmazonClient {
     @Value("${amazonProperties.s3.secretKey}")
     private String secretKey;
 
+    @Value("${amazonProperties.s3.audioBucketName}")
+    private String audioBucketName;
+
     @PostConstruct
     private void initializeAmazon() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
@@ -53,6 +59,14 @@ public class AmazonClient {
         s3client.putObject(new PutObjectRequest(portfolioBucketName, fileName, file));
         String referenceId = UUID.randomUUID().toString();
         String shortLivedUrl = generateShortLivedUrl(portfolioBucketName, fileName);
+        return new ImmutablePair(referenceId, shortLivedUrl);
+    }
+
+    //to upload audio to amazon s3 bucket
+    public ImmutablePair<String, String> uploadAudioFile(File file, String fileName) {
+        s3client.putObject(new PutObjectRequest(audioBucketName, fileName, file));
+        String referenceId = UUID.randomUUID().toString();
+        String shortLivedUrl = generateShortLivedUrl(audioBucketName, fileName);
         return new ImmutablePair(referenceId, shortLivedUrl);
     }
 

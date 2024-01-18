@@ -72,7 +72,7 @@ public class OrderService {
     private OutfitImageLinkService outfitImageLinkService;
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private BucketService bucketService;
@@ -86,7 +86,7 @@ public class OrderService {
     private OrderItemService orderItemService;
 
     @Autowired
-    private ImageReferenceRepo imageReferenceRepo;
+    private FileReferenceRepo fileReferenceRepo;
 
     @Autowired
     private AmazonClient s3Client;
@@ -179,7 +179,7 @@ public class OrderService {
             for (OrderItemDAO orderItem : order.getOrderItems()) {
                 OutfitType outfitType = orderItem.getOutfitType();
                 String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
-                List<String> clothImagesReferenceIds = objectImagesService.getClothReferenceIds(order.getId());
+                List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(order.getId());
                 List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
                 OrderItemDetails orderItemDetails = new OrderItemDetails(clothImagesReferenceIds,
                         clothImageUrlLinks, outfitImageLink, orderItem);
@@ -507,7 +507,7 @@ public class OrderService {
         if (Collections.isEmpty(clothImageReferenceId)) {
             return new ArrayList<>();
         }
-        List<ImageReference> clothImageReferences = imageReferenceRepo.findAllByReferenceIdIn(clothImageReferenceId);
+        List<ImageReference> clothImageReferences = fileReferenceRepo.findAllByReferenceIdIn(clothImageReferenceId);
         if (!Collections.isEmpty(clothImageReferences)) {
             List<ImageReferenceDAO> imageReferenceDAOs = CommonUtils.mapList(clothImageReferences, mapper::imageReferenceToImageReferenceDAO);
             List<String> clothImageFileNames = imageReferenceDAOs.stream().map(imageRef -> imageRef.getImageName()).collect(Collectors.toList());

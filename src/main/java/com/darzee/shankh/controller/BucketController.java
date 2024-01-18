@@ -3,8 +3,7 @@ package com.darzee.shankh.controller;
 import com.darzee.shankh.request.DownloadImageRequest;
 import com.darzee.shankh.response.DownloadImageResponse;
 import com.darzee.shankh.response.GetSampleImageResponse;
-import com.darzee.shankh.response.UploadImageResponse;
-import com.darzee.shankh.response.UploadMultipleImageResponse;
+import com.darzee.shankh.response.UploadMultipleFileResponse;
 import com.darzee.shankh.service.BucketService;
 import com.darzee.shankh.service.SampleImageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,20 +24,28 @@ public class BucketController {
     @Autowired
     private SampleImageService sampleImageService;
 
-    @PostMapping("/uploadFile")
-    @CrossOrigin
-    public UploadImageResponse uploadFile(@RequestPart(value = "file") MultipartFile file,
-                                          @RequestPart(value = "file_type", required = false) String uploadFileType)
-            throws Exception {
-        return bucketService.uploadSingleImage(file, uploadFileType);
-    }
+//    @PostMapping("/uploadFile")
+//    @CrossOrigin
+//    public UploadFileResponse uploadFile(@RequestPart(value = "file") MultipartFile file,
+//                                          @RequestPart(value = "file_type", required = false) String uploadFileType)
+//            throws Exception {
+//        return bucketService.uploadSingleImage(file, uploadFileType);
+//    }
 
     @PostMapping("/upload_multiple")
     @CrossOrigin
-    public ResponseEntity<UploadMultipleImageResponse> uploadMultiple(@RequestPart(value = "files") List<MultipartFile> files,
-                                                                      @RequestPart(value = "file_type", required = false) String uploadFileType)
+    public ResponseEntity<UploadMultipleFileResponse> uploadMultiple(@RequestPart(value = "files") List<MultipartFile> files,
+                                                                     @RequestPart(value = "file_type", required = false) String uploadFileType)
             throws Exception {
         return bucketService.uploadMultipleImages(files, uploadFileType);
+    }
+
+    //for audio/images file upload endpoint
+    @PostMapping("/upload_multiple_files")
+    public ResponseEntity<UploadMultipleFileResponse> uploadMultipleFiles(@RequestPart(value = "file") List<MultipartFile> files,
+                                          @RequestPart(value = "file_type", required = false) String uploadFileType)
+            throws Exception {
+        return bucketService.uploadMultipleFile(files, uploadFileType);
     }
 
     @GetMapping("/downloadFile")

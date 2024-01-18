@@ -17,4 +17,5 @@ public class OrderDetails {
     private Long boutiqueId;
     private Long orderId;
     private List<OrderItemDetailRequest> orderItems;
+
 }

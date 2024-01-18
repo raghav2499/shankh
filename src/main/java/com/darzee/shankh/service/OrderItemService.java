@@ -5,10 +5,11 @@ import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
 import com.darzee.shankh.dao.PriceBreakupDAO;
 import com.darzee.shankh.entity.OrderItem;
-import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
+import com.darzee.shankh.repo.ObjectFilesRepo;
 import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetails;
@@ -31,15 +32,18 @@ public class OrderItemService {
     private PriceBreakUpService priceBreakUpService;
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private DaoEntityMapper mapper;
     @Autowired
     private MeasurementService measurementService;
+    @Autowired
+    private ObjectFilesRepo objectFilesRepo;
 
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
         Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
+        Map<String, Long> audioRefOrderItemIdMap = new HashMap<>();
         List<PriceBreakupDAO> priceBreakUpList = new ArrayList<>();
         List<OrderItemDAO> orderItemList = Optional.ofNullable(order.getOrderItems()).orElse(new ArrayList<>());
         for (OrderItemDetailRequest itemDetail : orderItemDetails) {
@@ -67,9 +71,13 @@ public class OrderItemService {
             for (String imageRef : itemDetail.getClothImageReferenceIds()) {
                 clothRefOrderItemIdMap.put(imageRef, orderItemDAO.getId());
             }
+            for(String audioRef : itemDetail.getAudioReferenceIds()) {
+                audioRefOrderItemIdMap.put(audioRef, orderItemDAO.getId());
+            }
         }
         priceBreakUpService.savePriceBreakUp(priceBreakUpList);
-        objectImagesService.saveObjectImages(clothRefOrderItemIdMap, ImageEntityType.ORDER_ITEM.getEntityType());
+        objectFilesService.saveObjectImages(clothRefOrderItemIdMap, FileEntityType.ORDER_ITEM.getEntityType());
+        objectFilesService.saveObjectImages(audioRefOrderItemIdMap, FileEntityType.AUDIO.getEntityType());
         return orderItemList;
     }
 
@@ -105,10 +113,10 @@ public class OrderItemService {
             orderItem.setMeasurementRevision(measurementRevisionsDAO);
         }
         if (!Collections.isEmpty(updateItemDetail.getClothImageReferenceIds())) {
-            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.ORDER_ITEM.getEntityType(),
+            objectFilesService.invalidateExistingReferenceIds(FileEntityType.ORDER_ITEM.getEntityType(),
                     orderItemId);
-            objectImagesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
-                    ImageEntityType.ORDER_ITEM.getEntityType(), orderItemId);
+            objectFilesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
+                    FileEntityType.ORDER_ITEM.getEntityType(), orderItemId);
         }
         if (!Collections.isEmpty(updateItemDetail.getPriceBreakupDetails())) {
             List<PriceBreakupDAO> updatedPriceBreakup =
