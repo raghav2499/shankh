@@ -3,7 +3,6 @@ package com.darzee.shankh.controller;
 import com.darzee.shankh.request.DownloadImageRequest;
 import com.darzee.shankh.response.DownloadImageResponse;
 import com.darzee.shankh.response.GetSampleImageResponse;
-import com.darzee.shankh.response.UploadFileResponse;
 import com.darzee.shankh.response.UploadMultipleFileResponse;
 import com.darzee.shankh.service.BucketService;
 import com.darzee.shankh.service.SampleImageService;
@@ -41,12 +40,12 @@ public class BucketController {
         return bucketService.uploadMultipleImages(files, uploadFileType);
     }
 
-    //for audio file upload endpoint
-    @PostMapping("/upload_audio")
-    public UploadFileResponse uploadAudio(@RequestPart(value = "file") MultipartFile file,
+    //for audio/images file upload endpoint
+    @PostMapping("/upload_multiple_files")
+    public ResponseEntity<UploadMultipleFileResponse> uploadMultipleFiles(@RequestPart(value = "file") List<MultipartFile> files,
                                           @RequestPart(value = "file_type", required = false) String uploadFileType)
             throws Exception {
-        return bucketService.uploadAudioFile(file, uploadFileType);
+        return bucketService.uploadMultipleFile(files, uploadFileType);
     }
 
     @GetMapping("/downloadFile")

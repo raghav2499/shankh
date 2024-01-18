@@ -55,7 +55,7 @@ public class TailorService {
     private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private PortfolioService portfolioService;

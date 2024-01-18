@@ -24,6 +24,7 @@ public class OrderItemDetailRequest {
     private OrderType orderType;
     private Integer itemQuantity = 1;
     private List<String> clothImageReferenceIds;
+    private List<String> audioReferenceIds;
     private String inspiration;
     private String specialInstructions;
     private Long measurementRevisionId;

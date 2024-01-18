@@ -8,7 +8,7 @@ import com.darzee.shankh.entity.SampleImageReference;
 import com.darzee.shankh.enums.BucketName;
 import com.darzee.shankh.enums.SampleImageType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.ImageReferenceRepo;
+import com.darzee.shankh.repo.FileReferenceRepo;
 import com.darzee.shankh.repo.SampleImageRefRepo;
 import com.darzee.shankh.response.GetSampleImageResponse;
 import com.darzee.shankh.response.SampleImageDetail;
@@ -31,7 +31,7 @@ public class SampleImageService {
     private SampleImageRefRepo sampleImageRefRepo;
 
     @Autowired
-    private ImageReferenceRepo imageReferenceRepo;
+    private FileReferenceRepo fileReferenceRepo;
 
     @Autowired
     private DaoEntityMapper mapper;
@@ -54,7 +54,7 @@ public class SampleImageService {
                     .stream()
                     .map(imageRef -> imageRef.getImageReferenceId())
                     .collect(Collectors.toList());
-            List<ImageReference> imageReferences = imageReferenceRepo.findAllByReferenceIdIn(imageReferenceIds);
+            List<ImageReference> imageReferences = fileReferenceRepo.findAllByReferenceIdIn(imageReferenceIds);
             List<ImageReferenceDAO> imageReferenceDAOs = CommonUtils.mapList(imageReferences,
                     mapper::imageReferenceToImageReferenceDAO);
             List<SampleImageDetail> imageDetails = new ArrayList<>(imageReferenceDAOs.size());

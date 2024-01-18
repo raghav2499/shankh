@@ -2,9 +2,9 @@ package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.ObjectImagesDAO;
 import com.darzee.shankh.entity.ObjectImages;
-import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.ObjectImagesRepo;
+import com.darzee.shankh.repo.ObjectFilesRepo;
 import com.darzee.shankh.utils.CommonUtils;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +19,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ObjectImagesService {
+public class ObjectFilesService {
 
     @Autowired
-    private ObjectImagesRepo repo;
+    private ObjectFilesRepo repo;
 
     @Autowired
     private DaoEntityMapper mapper;
@@ -30,7 +30,7 @@ public class ObjectImagesService {
     @Nullable
     public String getCustomerImageReferenceId(Long customerId) {
         Optional<ObjectImages> optionalCustomerImage = repo.findByEntityIdAndEntityTypeAndIsValid(customerId,
-                ImageEntityType.CUSTOMER.getEntityType(),
+                FileEntityType.CUSTOMER.getEntityType(),
                 Boolean.TRUE);
         if (optionalCustomerImage.isPresent()) {
             ObjectImagesDAO customerImage = mapper.objectImagesToObjectImagesDAO(optionalCustomerImage.get());
@@ -42,7 +42,7 @@ public class ObjectImagesService {
     @Nullable
     public String getTailorImageReferenceId(Long tailorId) {
         Optional<ObjectImages> optionalTailorImage = repo.findByEntityIdAndEntityTypeAndIsValid(tailorId,
-                ImageEntityType.TAILOR.getEntityType(),
+                FileEntityType.TAILOR.getEntityType(),
                 Boolean.TRUE);
         if (optionalTailorImage.isPresent()) {
             ObjectImagesDAO tailorImage = mapper.objectImagesToObjectImagesDAO(optionalTailorImage.get());
@@ -54,7 +54,7 @@ public class ObjectImagesService {
     @Nullable
     public List<String> getBoutiqueImageReferenceId(Long boutiqueId) {
         List<ObjectImages> boutiqueImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(boutiqueId,
-                ImageEntityType.BOUTIQUE.getEntityType(),
+                FileEntityType.BOUTIQUE.getEntityType(),
                 Boolean.TRUE);
         if (!Collections.isEmpty(boutiqueImages)) {
             List<ObjectImagesDAO> boutiqueImagesDAO = CommonUtils.mapList(boutiqueImages, mapper::objectImagesToObjectImagesDAO);
@@ -69,7 +69,7 @@ public class ObjectImagesService {
     @Nullable
     public List<String> getClothReferenceIds(Long orderId) {
         List<ObjectImages> clothImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(orderId,
-                ImageEntityType.ORDER_ITEM.getEntityType(),
+                FileEntityType.ORDER_ITEM.getEntityType(),
                 Boolean.TRUE);
         if (!Collections.isEmpty(clothImages)) {
             List<ObjectImagesDAO> clothImagesDAO = CommonUtils.mapList(clothImages,
@@ -85,7 +85,7 @@ public class ObjectImagesService {
     @Nullable
     public String getProfileCoverReference(Long portfolioId) {
         Optional<ObjectImages> profileCoverImage = repo.findByEntityIdAndEntityTypeAndIsValid(portfolioId,
-                ImageEntityType.PORTFOLIO_COVER.getEntityType(),
+                FileEntityType.PORTFOLIO_COVER.getEntityType(),
                 Boolean.TRUE);
         if(profileCoverImage.isPresent()) {
             ObjectImagesDAO objectImagesDAO = mapper.objectImagesToObjectImagesDAO(profileCoverImage.get());
@@ -98,7 +98,7 @@ public class ObjectImagesService {
     @Nullable
     public List<String> getPortfolioOutfitsReferenceIds(Long portfolioOutfitId) {
         List<ObjectImages> portfolioOutfitImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(portfolioOutfitId,
-                ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(),
+                FileEntityType.PORTFOLIO_OUTFIT.getEntityType(),
                 Boolean.TRUE);
         if (!Collections.isEmpty(portfolioOutfitImages)) {
             List<ObjectImagesDAO> portfolioOutfitImagesDAO = CommonUtils.mapList(portfolioOutfitImages,
