@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Table(name = "boutique")
 @SequenceGenerator(name = "boutique-seq", sequenceName = "boutique_seq", allocationSize = 1)
@@ -37,9 +35,9 @@ public class Boutique extends GenericEntity {
     @JoinColumn(name = "admin_tailor_id")
     private Tailor adminTailor;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
-    private List<Order> orders = new ArrayList<>();
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
+//    private List<Order> orders = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
-    private List<Customer> customers = new ArrayList<>();
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
+//    private List<Customer> customers = new ArrayList<>();
 }

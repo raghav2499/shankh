@@ -27,7 +27,7 @@ public class OrderItemDetails {
     private String inspiration;
     private String specialInstructions;
     private String type;
-
+    private Integer pieces;
     private Integer itemQuantity;
     private List<String> clothImageRefIds;
     private List<String> clothImagesLink;
@@ -41,6 +41,7 @@ public class OrderItemDetails {
         this.itemQuantity = orderItem.getQuantity();
         this.outfitTypeIndex = outfitType.getOrdinal();
         this.outfitTypeImageLink = outfitTypeImgLink;
+        this.pieces = outfitType.getPieces();
     }
 
     public OrderItemDetails(List<String> clothImagesReferenceIds, List<String> clothImageUrlLinks,
@@ -58,5 +59,6 @@ public class OrderItemDetails {
         this.itemQuantity = orderItem.getQuantity();
         this.inspiration = orderItem.getInspiration();
         this.specialInstructions = orderItem.getSpecialInstructions();
+        this.pieces = orderItem.getOutfitType().getPieces();
     }
 }

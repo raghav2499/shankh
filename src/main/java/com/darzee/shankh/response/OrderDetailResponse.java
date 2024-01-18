@@ -24,7 +24,6 @@ public class OrderDetailResponse {
 
     private Long orderId;
     private String orderStatus;
-
     private List<OrderItemDetails> orderItemDetails = new ArrayList<>();
     private OrderAmountDetails orderAmountDetails;
     private CustomerDetails customerDetails;
