@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface MeasurementsRepo extends JpaRepository<Measurements, Long> {
 
     @Nullable
-    Optional<Measurements> findByCustomerIdAndOutfitType(Long customerId, OutfitType outfitType);
+    Optional<Measurements> findOneByCustomerIdAndOutfitType(Long customerId, OutfitType outfitType);
 }

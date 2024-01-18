@@ -1,10 +1,8 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.request.CreateOrderRequest;
 import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
-import com.darzee.shankh.response.CreateOrderResponse;
 import com.darzee.shankh.response.GetOrderResponse;
 import com.darzee.shankh.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +22,15 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CreateOrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) throws Exception {
-        ResponseEntity<CreateOrderResponse> response = orderService.createOrderAndGenerateInvoice(request);
-        return response;
-    }
+//    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @CrossOrigin
+//    public ResponseEntity<CreateOrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) throws Exception {
+//        ResponseEntity<CreateOrderResponse> response = orderService.createOrderAndGenerateInvoice(request);
+//        return response;
+//    }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity<GetOrderResponse> getOrder(@RequestParam(name = "boutique_id") Long boutiqueId,
                                                      @RequestParam(name = "status_list") String statusList,
                                                      @RequestParam(name = "customer_id", required = false) Long customerId,
@@ -48,23 +48,27 @@ public class OrderController {
 
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getOrderDetails(@PathVariable("id") Long orderId) throws Exception {
         return orderService.getOrderDetails(orderId);
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity updateOrder(@PathVariable("id") Long orderId,
                                       @Valid @RequestBody UpdateOrderRequest request) {
         return orderService.updateOrder(orderId, request);
     }
 
     @PostMapping(value = "/{id}/recieve_payment" , produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity recievePayment(@PathVariable("id") Long orderId,
                                          @Validated @RequestBody RecievePaymentRequest request) {
         return orderService.recieveOrderPayment(orderId, request);
     }
 
     @GetMapping(value = "/{id}/invoice", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getInvoice(@PathVariable("id") Long orderId) {
         return orderService.getOrderInvoiceLink(orderId);
     }

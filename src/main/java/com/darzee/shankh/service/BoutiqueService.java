@@ -40,7 +40,7 @@ public class BoutiqueService {
     private BucketService bucketService;
 
     @Autowired
-    private BoutiqueTailorService boutiqueTailorService;
+    private BoutiqueTailorCommonService boutiqueTailorService;
 
     @Autowired
     private BoutiqueRepo boutiqueRepo;

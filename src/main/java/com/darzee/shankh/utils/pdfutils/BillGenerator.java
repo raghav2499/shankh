@@ -46,18 +46,18 @@ public class BillGenerator {
             Context context = new Context();
 
             DateTimeFormatter createdAtFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
-            String orderCreatedAt = order.getCreatedAt().format(createdAtFormatter);
+//            String orderCreatedAt = order.getCreatedAt().format(createdAtFormatter);
 
             DateTimeFormatter deliveryDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            String deliveryDate = order.getDeliveryDate().format(deliveryDateFormatter);
+//            String deliveryDate = order.getDeliveryDate().format(deliveryDateFormatter);
 
             // Create a JavaScript object and set the dynamic data
             context.setVariable("businessName", boutiqueDAO.getName());
             context.setVariable("customerName", customerName);
             context.setVariable("customerContactNo", customerContactNo);
-            context.setVariable("orderCreationDate", orderCreatedAt);
-            context.setVariable("expectedDeliveryDate", deliveryDate);
-            context.setVariable("outfitType", order.getOutfitType().getDisplayString());
+//            context.setVariable("orderCreationDate", orderCreatedAt);
+//            context.setVariable("expectedDeliveryDate", deliveryDate);
+//            context.setVariable("outfitType", order.getOutfitType().getDisplayString());
             context.setVariable("orderId", order.getId());
             context.setVariable("orderInvoiceNo", order.getInvoiceNo());
             context.setVariable("totalAmount", orderAmount.getTotalAmount());

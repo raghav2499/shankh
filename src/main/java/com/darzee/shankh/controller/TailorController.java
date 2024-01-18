@@ -2,7 +2,7 @@ package com.darzee.shankh.controller;
 
 import com.darzee.shankh.request.TailorLoginRequest;
 import com.darzee.shankh.request.TailorSignUpRequest;
-import com.darzee.shankh.service.BoutiqueTailorService;
+import com.darzee.shankh.service.BoutiqueTailorCommonService;
 import com.darzee.shankh.service.TailorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,14 +21,16 @@ public class TailorController {
     private TailorService tailorService;
 
     @Autowired
-    private BoutiqueTailorService boutiqueTailorService;
+    private BoutiqueTailorCommonService boutiqueTailorService;
 
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity boutiqueLogin(@Valid @RequestBody TailorLoginRequest request) {
         return tailorService.tailorLogin(request);
     }
 
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity tailorSignUp(@Valid @RequestBody TailorSignUpRequest request) {
         return tailorService.tailorSignup(request);
     }

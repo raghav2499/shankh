@@ -17,17 +17,27 @@ public class MeasurementController {
     private MeasurementService measurementService;
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getMeasurementDetails(@RequestParam("customer_id") Long customerId,
                                                 @RequestParam("outfit_type") Integer outfitTypeIndex,
+                                                @RequestParam("order_item_id") Long orderItemId,
                                                 @RequestParam(value = "scale", defaultValue = "inch") String scale,
                                                 @RequestParam(value = "non_empty_values_only", required = false)
                                                     Boolean nonEmptyValuesOnly)
             throws Exception {
-        return measurementService.getMeasurementDetails(customerId, outfitTypeIndex, scale, nonEmptyValuesOnly);
+        return measurementService.getMeasurementDetails(customerId, orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
     }
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity saveMeasurementDetails(@RequestBody @Valid MeasurementDetails measurementDetails) throws Exception {
         return measurementService.setMeasurementDetails(measurementDetails);
     }
+
+    @GetMapping(value = "/revisions", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getMeasurementRevisions(@RequestParam("customer_id") Long customerId,
+                                                  @RequestParam("outfit_type") Integer outfitTypeIndex) {
+        return measurementService.getMeasurementRevisions(customerId, outfitTypeIndex);
+    }
+
 }

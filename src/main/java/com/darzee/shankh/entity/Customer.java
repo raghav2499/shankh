@@ -56,7 +56,7 @@ public class Customer {
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
-    private List<Measurements> measurements;
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+//    private List<Measurements> measurements;
 
 }
