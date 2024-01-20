@@ -1,7 +1,7 @@
 package com.darzee.shankh.service;
 
-import com.darzee.shankh.dao.ObjectImagesDAO;
-import com.darzee.shankh.entity.ObjectImages;
+import com.darzee.shankh.dao.ObjectFilesDAO;
+import com.darzee.shankh.entity.ObjectFiles;
 import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.ObjectFilesRepo;
@@ -29,11 +29,11 @@ public class ObjectFilesService {
 
     @Nullable
     public String getCustomerImageReferenceId(Long customerId) {
-        Optional<ObjectImages> optionalCustomerImage = repo.findByEntityIdAndEntityTypeAndIsValid(customerId,
+        Optional<ObjectFiles> optionalCustomerImage = repo.findByEntityIdAndEntityTypeAndIsValid(customerId,
                 FileEntityType.CUSTOMER.getEntityType(),
                 Boolean.TRUE);
         if (optionalCustomerImage.isPresent()) {
-            ObjectImagesDAO customerImage = mapper.objectImagesToObjectImagesDAO(optionalCustomerImage.get());
+            ObjectFilesDAO customerImage = mapper.objectImagesToObjectImagesDAO(optionalCustomerImage.get());
             return customerImage.getReferenceId();
         }
         return null;
@@ -41,11 +41,11 @@ public class ObjectFilesService {
 
     @Nullable
     public String getTailorImageReferenceId(Long tailorId) {
-        Optional<ObjectImages> optionalTailorImage = repo.findByEntityIdAndEntityTypeAndIsValid(tailorId,
+        Optional<ObjectFiles> optionalTailorImage = repo.findByEntityIdAndEntityTypeAndIsValid(tailorId,
                 FileEntityType.TAILOR.getEntityType(),
                 Boolean.TRUE);
         if (optionalTailorImage.isPresent()) {
-            ObjectImagesDAO tailorImage = mapper.objectImagesToObjectImagesDAO(optionalTailorImage.get());
+            ObjectFilesDAO tailorImage = mapper.objectImagesToObjectImagesDAO(optionalTailorImage.get());
             return tailorImage.getReferenceId();
         }
         return null;
@@ -53,11 +53,11 @@ public class ObjectFilesService {
 
     @Nullable
     public List<String> getBoutiqueImageReferenceId(Long boutiqueId) {
-        List<ObjectImages> boutiqueImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(boutiqueId,
+        List<ObjectFiles> boutiqueImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(boutiqueId,
                 FileEntityType.BOUTIQUE.getEntityType(),
                 Boolean.TRUE);
         if (!Collections.isEmpty(boutiqueImages)) {
-            List<ObjectImagesDAO> boutiqueImagesDAO = CommonUtils.mapList(boutiqueImages, mapper::objectImagesToObjectImagesDAO);
+            List<ObjectFilesDAO> boutiqueImagesDAO = CommonUtils.mapList(boutiqueImages, mapper::objectImagesToObjectImagesDAO);
             List<String> referenceIds = boutiqueImagesDAO.stream()
                     .map(boutiqueImage -> boutiqueImage.getReferenceId())
                     .collect(Collectors.toList());
@@ -68,11 +68,11 @@ public class ObjectFilesService {
 
     @Nullable
     public List<String> getClothReferenceIds(Long orderId) {
-        List<ObjectImages> clothImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(orderId,
+        List<ObjectFiles> clothImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(orderId,
                 FileEntityType.ORDER_ITEM.getEntityType(),
                 Boolean.TRUE);
         if (!Collections.isEmpty(clothImages)) {
-            List<ObjectImagesDAO> clothImagesDAO = CommonUtils.mapList(clothImages,
+            List<ObjectFilesDAO> clothImagesDAO = CommonUtils.mapList(clothImages,
                     mapper::objectImagesToObjectImagesDAO);
             List<String> clothImagesReferenceIds = clothImagesDAO.stream()
                     .map(clothImage -> clothImage.getReferenceId())
@@ -84,11 +84,11 @@ public class ObjectFilesService {
 
     @Nullable
     public String getProfileCoverReference(Long portfolioId) {
-        Optional<ObjectImages> profileCoverImage = repo.findByEntityIdAndEntityTypeAndIsValid(portfolioId,
+        Optional<ObjectFiles> profileCoverImage = repo.findByEntityIdAndEntityTypeAndIsValid(portfolioId,
                 FileEntityType.PORTFOLIO_COVER.getEntityType(),
                 Boolean.TRUE);
         if(profileCoverImage.isPresent()) {
-            ObjectImagesDAO objectImagesDAO = mapper.objectImagesToObjectImagesDAO(profileCoverImage.get());
+            ObjectFilesDAO objectImagesDAO = mapper.objectImagesToObjectImagesDAO(profileCoverImage.get());
             return objectImagesDAO.getReferenceId();
         }
         return null;
@@ -97,11 +97,11 @@ public class ObjectFilesService {
 
     @Nullable
     public List<String> getPortfolioOutfitsReferenceIds(Long portfolioOutfitId) {
-        List<ObjectImages> portfolioOutfitImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(portfolioOutfitId,
+        List<ObjectFiles> portfolioOutfitImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(portfolioOutfitId,
                 FileEntityType.PORTFOLIO_OUTFIT.getEntityType(),
                 Boolean.TRUE);
         if (!Collections.isEmpty(portfolioOutfitImages)) {
-            List<ObjectImagesDAO> portfolioOutfitImagesDAO = CommonUtils.mapList(portfolioOutfitImages,
+            List<ObjectFilesDAO> portfolioOutfitImagesDAO = CommonUtils.mapList(portfolioOutfitImages,
                     mapper::objectImagesToObjectImagesDAO);
             List<String> portfolioOutfitImageReferenceIds = portfolioOutfitImagesDAO.stream()
                     .map(portfolioOutfitImage -> portfolioOutfitImage.getReferenceId())
@@ -112,11 +112,11 @@ public class ObjectFilesService {
     }
 
     public void invalidateExistingReferenceIds(String entityType, Long entityId) {
-        List<ObjectImages> validImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(entityId,
+        List<ObjectFiles> validImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(entityId,
                 entityType,
                 Boolean.TRUE);
         if (!CollectionUtils.isEmpty(validImages)) {
-            List<ObjectImagesDAO> objectImagesDAOs = CommonUtils.mapList(validImages,
+            List<ObjectFilesDAO> objectImagesDAOs = CommonUtils.mapList(validImages,
                     mapper::objectImagesToObjectImagesDAO);
             objectImagesDAOs.forEach(objectImage -> objectImage.setIsValid(Boolean.FALSE));
             repo.saveAll(CommonUtils.mapList(objectImagesDAOs, mapper::objectImageDAOToObjectImage));
@@ -125,10 +125,10 @@ public class ObjectFilesService {
 
     public void invalidateExistingReferenceIds(List<String> invalidReferenceIds){
         for (String referenceId : invalidReferenceIds){
-            Optional<ObjectImages> validImage = repo.findByReferenceIdAndIsValid(referenceId,
+            Optional<ObjectFiles> validImage = repo.findByReferenceIdAndIsValid(referenceId,
                     Boolean.TRUE);
             if(validImage.isPresent()){
-                ObjectImagesDAO objectImageDao = mapper.objectImagesToObjectImagesDAO(validImage.get());
+                ObjectFilesDAO objectImageDao = mapper.objectImagesToObjectImagesDAO(validImage.get());
                 objectImageDao.setIsValid(Boolean.FALSE);
                 repo.save(mapper.objectImageDAOToObjectImage(objectImageDao));
             }
@@ -136,17 +136,17 @@ public class ObjectFilesService {
     }
 
     public void saveObjectImages(List<String> imageReferences, String entityType, Long entityId) {
-        List<ObjectImagesDAO> objectImagesDAOList = imageReferences
+        List<ObjectFilesDAO> objectImagesDAOList = imageReferences
                 .stream()
                 .filter(imageReference -> Boolean.FALSE.equals(StringUtils.isEmpty(imageReference)))
-                .map(imageReferenceId -> new ObjectImagesDAO(imageReferenceId, entityType, entityId))
+                .map(imageReferenceId -> new ObjectFilesDAO(imageReferenceId, entityType, entityId))
                 .collect(Collectors.toList());
         repo.saveAll(CommonUtils.mapList(objectImagesDAOList, mapper::objectImageDAOToObjectImage));
     }
 
     public void saveObjectImages(Map<String, Long> refEntityIdMap, String entityType) {
-        List<ObjectImagesDAO> objectImages = refEntityIdMap.entrySet().stream()
-                .map(refEntityIdValue -> new ObjectImagesDAO(refEntityIdValue.getKey(),
+        List<ObjectFilesDAO> objectImages = refEntityIdMap.entrySet().stream()
+                .map(refEntityIdValue -> new ObjectFilesDAO(refEntityIdValue.getKey(),
                         entityType, refEntityIdValue.getValue()))
                 .collect(Collectors.toList());
         repo.saveAll(CommonUtils.mapList(objectImages, mapper::objectImageDAOToObjectImage));

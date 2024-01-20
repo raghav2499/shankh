@@ -12,13 +12,14 @@ import com.darzee.shankh.repo.FileReferenceRepo;
 import com.darzee.shankh.repo.ObjectFilesRepo;
 import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
-import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetails;
+import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetailRequest;
 import com.darzee.shankh.response.OrderItemDetails;
 import com.darzee.shankh.utils.CommonUtils;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
@@ -87,13 +88,17 @@ public class OrderItemService {
             }
         }
         priceBreakUpService.savePriceBreakUp(priceBreakUpList);
-        objectFilesService.saveObjectImages(clothRefOrderItemIdMap, FileEntityType.ORDER_ITEM.getEntityType());
-        objectFilesService.saveObjectImages(audioRefOrderItemIdMap, FileEntityType.AUDIO.getEntityType());
+        if (!CollectionUtils.isEmpty(clothRefOrderItemIdMap)) {
+            objectFilesService.saveObjectImages(clothRefOrderItemIdMap, FileEntityType.ORDER_ITEM.getEntityType());
+        }
+        if (!CollectionUtils.isEmpty(audioRefOrderItemIdMap)) {
+            objectFilesService.saveObjectImages(audioRefOrderItemIdMap, FileEntityType.AUDIO.getEntityType());
+        }
         return orderItemList;
     }
 
     @Transactional
-    public OrderItemDAO updateOrderItem(Long orderItemId, UpdateOrderItemDetails updateItemDetail) {
+    public OrderItemDAO updateOrderItem(Long orderItemId, UpdateOrderItemDetailRequest updateItemDetail) {
         OrderItemDAO orderItem = null;
         Optional<OrderItem> orderItemOb = orderItemRepo.findById(orderItemId);
         if (orderItemOb.isPresent()) {
@@ -129,15 +134,15 @@ public class OrderItemService {
             objectFilesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
                     FileEntityType.ORDER_ITEM.getEntityType(), orderItemId);
         }
-        if (!Collections.isEmpty(updateItemDetail.getAudioImageReferenceIds())) {
+        if (!Collections.isEmpty(updateItemDetail.getAudioReferenceIds())) {
             objectFilesService.invalidateExistingReferenceIds(FileEntityType.AUDIO.getEntityType(),
                     orderItemId);
             objectFilesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
                     FileEntityType.AUDIO.getEntityType(), orderItemId);
         }
-        if (!Collections.isEmpty(updateItemDetail.getPriceBreakupDetails())) {
+        if (!Collections.isEmpty(updateItemDetail.getPriceBreakup())) {
             List<PriceBreakupDAO> updatedPriceBreakup =
-                    priceBreakUpService.updatePriceBreakups(updateItemDetail.getPriceBreakupDetails(), orderItem);
+                    priceBreakUpService.updatePriceBreakups(updateItemDetail.getPriceBreakup(), orderItem);
             orderItem.setPriceBreakup(updatedPriceBreakup);
         }
         orderItem = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItem,
@@ -147,12 +152,13 @@ public class OrderItemService {
 
     public OrderItemDetails getOrderItemDetails(Long orderItemId) {
         Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
-        if(!orderItem.isPresent()) {
+        if (!orderItem.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect order item id");
         }
         OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
         return getOrderItemDetails(orderItemDAO);
     }
+
     public OrderItemDetails getOrderItemDetails(OrderItemDAO orderItem) {
         OutfitType outfitType = orderItem.getOutfitType();
         String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);

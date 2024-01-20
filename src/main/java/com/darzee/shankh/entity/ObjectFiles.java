@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @SequenceGenerator(name = "shop-images-seq", sequenceName = "shop_images_seq", allocationSize = 1)
-public class ObjectImages extends GenericEntity {
+public class ObjectFiles extends GenericEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "shop-images-seq")

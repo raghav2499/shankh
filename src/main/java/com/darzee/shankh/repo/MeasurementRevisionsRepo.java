@@ -8,7 +8,4 @@ import java.util.List;
 public interface MeasurementRevisionsRepo extends JpaRepository<MeasurementRevisions, Long> {
 
     List<MeasurementRevisions> findAllByCustomerIdAndOutfitType(Long customerId, Integer outfitType);
-
-
-    MeasurementRevisions findByOrderItemId(Long orderItem);
 }

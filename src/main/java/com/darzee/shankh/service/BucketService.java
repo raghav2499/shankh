@@ -1,12 +1,18 @@
 package com.darzee.shankh.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.darzee.shankh.client.AmazonClient;
+import com.darzee.shankh.dao.ImageReferenceDAO;
+import com.darzee.shankh.entity.ImageReference;
+import com.darzee.shankh.enums.FileType;
+import com.darzee.shankh.enums.UploadFileType;
+import com.darzee.shankh.mapper.DaoEntityMapper;
+import com.darzee.shankh.repo.FileReferenceRepo;
+import com.darzee.shankh.request.DownloadImageRequest;
+import com.darzee.shankh.response.DownloadImageResponse;
+import com.darzee.shankh.response.UploadFileResponse;
+import com.darzee.shankh.response.UploadMultipleFileResponse;
+import com.darzee.shankh.utils.CommonUtils;
+import com.darzee.shankh.utils.s3utils.FileUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +23,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.ImageReferenceDAO;
-import com.darzee.shankh.entity.ImageReference;
-import com.darzee.shankh.enums.UploadFileType;
-import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.FileReferenceRepo;
-import com.darzee.shankh.request.DownloadImageRequest;
-import com.darzee.shankh.response.DownloadImageResponse;
-import com.darzee.shankh.response.UploadFileResponse;
-import com.darzee.shankh.response.UploadMultipleFileResponse;
-import com.darzee.shankh.utils.CommonUtils;
-import com.darzee.shankh.utils.s3utils.FileUtil;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BucketService {
@@ -44,6 +44,9 @@ public class BucketService {
 
     @Value("invoice/")
     private String invoiceDirectory;
+
+    @Value("measurement_revision/")
+    private String measurementRevisionDirectory;
 
     public UploadFileResponse uploadSingleImage(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
         try {
@@ -71,7 +74,7 @@ public class BucketService {
 
     //for audio file
     //check for data type, confirm!
-    public ResponseEntity<UploadMultipleFileResponse>  uploadMultipleFile(List<MultipartFile> files, String uploadFileType) {
+    public ResponseEntity<UploadMultipleFileResponse> uploadMultipleFiles(List<MultipartFile> files, String uploadFileType) {
         List<UploadFileResponse> uploadImageResultList = new ArrayList<>();
         try {
             for (MultipartFile file : files) {
@@ -81,7 +84,7 @@ public class BucketService {
             UploadMultipleFileResponse response = new UploadMultipleFileResponse(uploadImageResultList);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Audio upload failed wtith exception {}", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed wtith exception {}", e);
         }
     }
 
@@ -153,32 +156,34 @@ public class BucketService {
         file.delete();
         return fileUploadResult;
     }
-    private Pair<String, String> uploadFile(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
-        try{
 
+    public Pair<String, String> uploadFile(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
+        try {
             File file = FileUtil.convertMultiPartToFile(multipartFile);
             String fileName = FileUtil.generateFileName(multipartFile);
             ImmutablePair<String, String> fileUploadResult = null;
-
-            switch(uploadFileTypeOrdinal) {
-                case "1":
-                  // for portfolio file
-                  fileUploadResult = client.uploadPortfolioFile(file, fileName);
-                  break;
-                case "2":
-                  // for audio file
-                  fileUploadResult = client.uploadAudioFile(file, fileName);
-                  break;
+            FileType fileType = FileType.getFileTypeFromOrdinal(uploadFileTypeOrdinal);
+            switch (fileType) {
+                case PORTFOLIO:
+                    // for portfolio file
+                    fileUploadResult = client.uploadPortfolioFile(file, fileName);
+                    break;
+                case AUDIO:
+                    // for audio file
+                    fileUploadResult = client.uploadAudioFile(file, fileName);
+                    break;
+                case MEASUREMENT:
+                    //for measurement file
+                    fileUploadResult = client.uploadFile(file, measurementRevisionDirectory + fileName);
                 default:
-                  // for image file
-                  fileUploadResult = client.uploadFile(file, fileName);
-              }
-            ImageReferenceDAO imageReference = new ImageReferenceDAO(fileUploadResult.getKey(),fileName);
+                    // for image file
+                    fileUploadResult = client.uploadFile(file, fileName);
+            }
+            ImageReferenceDAO imageReference = new ImageReferenceDAO(fileUploadResult.getKey(), fileName);
             fileReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
             file.delete();
             return fileUploadResult;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception " + e.getMessage(), e);
         }
     }
