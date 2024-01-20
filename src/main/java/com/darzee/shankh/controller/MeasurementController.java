@@ -23,7 +23,7 @@ public class MeasurementController {
                                                 @RequestParam("order_item_id") Long orderItemId,
                                                 @RequestParam(value = "scale", defaultValue = "inch") String scale,
                                                 @RequestParam(value = "non_empty_values_only", required = false)
-                                                    Boolean nonEmptyValuesOnly)
+                                                Boolean nonEmptyValuesOnly)
             throws Exception {
         return measurementService.getMeasurementDetails(customerId, orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
     }
@@ -31,13 +31,13 @@ public class MeasurementController {
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity saveMeasurementDetails(@RequestBody @Valid MeasurementDetails measurementDetails) throws Exception {
-        return measurementService.setMeasurementDetails(measurementDetails);
+        return measurementService.saveMeasurementDetails(measurementDetails);
     }
 
     @GetMapping(value = "/revisions", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getMeasurementRevisions(@RequestParam("customer_id") Long customerId,
                                                   @RequestParam("outfit_type") Integer outfitTypeIndex) {
         return measurementService.getMeasurementRevisions(customerId, outfitTypeIndex);
     }
-
 }

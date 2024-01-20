@@ -27,7 +27,10 @@ public enum FileEntityType {
     PORTFOLIO_OUTFIT("portfolio_outfit"),
 
     @JsonProperty("audio")
-    AUDIO("audio");
+    AUDIO("audio"),
+
+    @JsonProperty("measurement_revision")
+    MEASUREMENT_REVISION("measurement_revision");
 
     private String entityType;
 

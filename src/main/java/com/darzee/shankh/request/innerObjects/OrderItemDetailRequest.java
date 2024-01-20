@@ -28,6 +28,7 @@ public class OrderItemDetailRequest {
     private String inspiration;
     private String specialInstructions;
     private Long measurementRevisionId;
+    private List<Long> stitchOptionReferences;
     @NotNull(message = "price_breakup cannot be null")
     private List<PriceBreakUpDetails> priceBreakup;
 }
