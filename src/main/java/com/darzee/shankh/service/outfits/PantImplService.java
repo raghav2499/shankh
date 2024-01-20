@@ -72,7 +72,7 @@ public class PantImplService implements OutfitTypeService {
     @Override
     public OutfitMeasurementDetails extractMeasurementDetails(MeasurementsDAO measurementsDAO) {
         OutfitMeasurementDetails outfitMeasurementDetails = new OutfitMeasurementDetails();
-        Map<String, Double> measurementValue = (measurementsDAO != null && measurementsDAO.getMeasurementRevision().getMeasurementValue() != null)
+        Map<String, Double> measurementValue = (measurementsDAO != null && measurementsDAO.getMeasurementRevision() != null && measurementsDAO.getMeasurementRevision().getMeasurementValue() != null)
                 ? objectMapper.convertValue(measurementsDAO.getMeasurementRevision().getMeasurementValue(), Map.class)
                 : new HashMap<>();
         outfitMeasurementDetails.setBottomWaist(measurementValue.get(BOTTOM_WAIST_MEASUREMENT_KEY));
