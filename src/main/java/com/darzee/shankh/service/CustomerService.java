@@ -1,20 +1,14 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.dao.BoutiqueDAO;
-import com.darzee.shankh.dao.CustomerDAO;
-import com.darzee.shankh.dao.ImageReferenceDAO;
-import com.darzee.shankh.dao.OrderAmountDAO;
+import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.BoutiqueLedgerRepo;
-import com.darzee.shankh.repo.BoutiqueRepo;
-import com.darzee.shankh.repo.CustomerRepo;
-import com.darzee.shankh.repo.FileReferenceRepo;
+import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.CreateCustomerRequest;
 import com.darzee.shankh.request.UpdateCustomerRequest;
 import com.darzee.shankh.response.CreateCustomerResponse;
@@ -56,6 +50,9 @@ public class CustomerService {
 
     @Autowired
     private AmazonClient s3Client;
+
+    @Autowired
+    private OrderRepo orderRepo;
 
     @Autowired
     private DaoEntityMapper mapper;
@@ -211,9 +208,9 @@ public class CustomerService {
 
     public Double getCustomerRevenue(CustomerDAO customerDAO) {
         Double sum = 0d;
-        sum = customerDAO.getOrders()
-                .stream()
-                .filter(order -> !Boolean.TRUE.equals(order.getIsDeleted()))
+        List<OrderDAO> orders = mapper.orderObjectListToDAOList(orderRepo.findAllByCustomerId(customerDAO.getId()),
+                new CycleAvoidingMappingContext());
+        sum = orders.stream().filter(order -> !Boolean.TRUE.equals(order.getIsDeleted()))
                 .map(order -> order.getOrderAmount())
                 .mapToDouble(OrderAmountDAO::getTotalAmount)
                 .sum();
