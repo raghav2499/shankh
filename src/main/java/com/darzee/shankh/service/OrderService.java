@@ -70,9 +70,6 @@ public class OrderService {
     private OutfitTypeObjectService outfitTypeObjectService;
 
     @Autowired
-    private OrderStateMachineService orderStateMachineService;
-
-    @Autowired
     private OutfitImageLinkService outfitImageLinkService;
 
     @Autowired
@@ -340,21 +337,21 @@ public class OrderService {
 
     @Transactional
     private OrderDAO updateOrderDetails(UpdateOrderDetails orderDetails, OrderDAO order) {
-        if (order.isOrderStatusUpdated(orderDetails.getStatus())) {
-            Integer targetStatusOrdinal = orderDetails.getStatus();
-            OrderStatus initialStatus = order.getOrderStatus();
-            OrderStatus targetStatus = OrderStatus.getOrderTypeEnumOrdinalMap().get(targetStatusOrdinal);
-            if (targetStatus == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status " + targetStatusOrdinal + " is not valid status");
-            }
-            if (orderStateMachineService.isTransitionAllowed(order.getOrderStatus(), targetStatus)) {
-                order.setOrderStatus(targetStatus);
-                updateLedgerIfApplicable(order, initialStatus);
-            } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "State transition from "
-                        + order.getOrderStatus() + " to " + targetStatus + " is not allowed");
-            }
-        }
+//        if (order.isOrderStatusUpdated(orderDetails.getStatus())) {
+//            Integer targetStatusOrdinal = orderDetails.getStatus();
+//            OrderStatus initialStatus = order.getOrderStatus();
+//            OrderStatus targetStatus = OrderStatus.getOrderTypeEnumOrdinalMap().get(targetStatusOrdinal);
+//            if (targetStatus == null) {
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status " + targetStatusOrdinal + " is not valid status");
+//            }
+//            if (orderStateMachineService.isTransitionAllowed(order.getOrderStatus(), targetStatus)) {
+//                order.setOrderStatus(targetStatus);
+//                updateLedgerIfApplicable(order, initialStatus);
+//            } else {
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "State transition from "
+//                        + order.getOrderStatus() + " to " + targetStatus + " is not allowed");
+//            }
+//        }
 
         if (Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
             order.setIsDeleted(Boolean.TRUE);

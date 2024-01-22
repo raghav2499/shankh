@@ -1,5 +1,6 @@
 package com.darzee.shankh.entity;
 
+import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
 import lombok.Getter;
@@ -59,6 +60,9 @@ public class OrderItem {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @Column(name = "order_item_status")
+    private OrderItemStatus orderItemStatus;
 
     @OneToOne
     @JoinColumn(name = "measurement_revision_id")

@@ -127,8 +127,9 @@ public class MeasurementService {
     }
 
     public ResponseEntity<GetMeasurementRevisionsResponse> getMeasurementRevisions(Long customerId, Integer outfitOrdinal) {
+        OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitOrdinal);
         List<MeasurementRevisionsDAO> measurementRevisions = mapper.measurementRevisionsListToDAOList(
-                measurementRevisionsRepo.findAllByCustomerIdAndOutfitType(customerId, outfitOrdinal));
+                measurementRevisionsRepo.findAllByCustomerIdAndOutfitType(customerId, outfitType));
         List<MeasurementRevisionData> data = new ArrayList<>(measurementRevisions.size());
         for (MeasurementRevisionsDAO revision : measurementRevisions) {
             MeasurementRevisionData revisionData = new MeasurementRevisionData(revision);

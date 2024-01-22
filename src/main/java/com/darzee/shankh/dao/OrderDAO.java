@@ -20,7 +20,7 @@ import java.util.Map;
 public class OrderDAO {
     private Long id;
     private String invoiceNo;
-    private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;
+    private OrderStatus orderStatus = OrderStatus.DRAFTED;
 
     private Boolean isDeleted = Boolean.FALSE;
     private BoutiqueDAO boutique;
@@ -34,11 +34,6 @@ public class OrderDAO {
         this.boutique = boutique;
         this.customer = customer;
     }
-
-    public boolean isOrderStatusUpdated(Integer value) {
-        return value != null && !value.equals(this.getOrderStatus().getOrdinal());
-    }
-
     public Map<Long, OrderItemDAO> getOrderItemDAOMap() {
         Map<Long, OrderItemDAO> orderItemDAOMap = new HashMap<>();
         for(OrderItemDAO orderItem : orderItems) {
