@@ -3,25 +3,38 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
+import com.darzee.shankh.dao.OrderStitchOptionDAO;
+import com.darzee.shankh.dao.StitchOptionsDAO;
 import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.entity.OrderStitchOptions;
+import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.OrderAmountRepo;
 import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.repo.OrderRepo;
 import com.darzee.shankh.request.CreateOrderItemRequest;
+import com.darzee.shankh.request.CreateStitchOptionRequest;
 import com.darzee.shankh.request.PriceBreakUpDetails;
 import com.darzee.shankh.request.innerObjects.OrderDetails;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
+import com.darzee.shankh.request.innerObjects.StitchDetails;
 import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetails;
+import com.darzee.shankh.response.CreateStitchResponse;
 import com.darzee.shankh.response.OrderItemSummary;
+import com.darzee.shankh.response.OrderStitchOption;
 import com.darzee.shankh.response.OrderSummary;
+import com.darzee.shankh.response.StitchOptionDetail;
+import com.darzee.shankh.response.StitchSummary;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -91,4 +104,28 @@ public class OrderOrderItemCommonService {
         Double updatedAmount = orderAmountDAO.getTotalAmount() + newItemsPrice;
         orderAmountDAO.setTotalAmount(updatedAmount);
     }
+
+   
+    @Transactional
+    public StitchSummary createStitchOptions(CreateStitchOptionRequest createStitchOptionRequest) {
+        Long orderItemId = createStitchOptionRequest.getOrderItemId();
+        List<StitchDetails> stitchDetails = createStitchOptionRequest.getStitchDetails();
+        List<OrderStitchOptionDAO> orderStitchOptionDAOs = new ArrayList<>();
+
+        for (StitchDetails stitchDetail : stitchDetails) {
+            //create orderStitchOptionDAO with arguments passed and add to orderStitchOptionDAOs
+            OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(stitchDetail.getStitchOptionId());
+            if (outfitType == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Invalid outfit type " + stitchDetail.getOutfitType());
+            }
+
+            // Add the result to the list
+        }
+
+        StitchSummary stitchSummary = new StitchSummary(orderStitchOptionDAOs);
+
+        return stitchSummary;
+    }
+
 }

@@ -4,6 +4,8 @@ import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.OrderItem;
+import com.darzee.shankh.entity.OrderStitchOptions;
+import com.darzee.shankh.entity.StitchOptions;
 import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
@@ -11,6 +13,8 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.FileReferenceRepo;
 import com.darzee.shankh.repo.ObjectFilesRepo;
 import com.darzee.shankh.repo.OrderItemRepo;
+import com.darzee.shankh.repo.StitchOptionsRepo;
+import com.darzee.shankh.request.CreateStitchOptionRequest;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetails;
 import com.darzee.shankh.response.OrderItemDetails;
@@ -22,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,6 +36,9 @@ public class OrderItemService {
 
     @Autowired
     private OrderItemRepo orderItemRepo;
+
+    @Autowired
+    private StitchOptionsRepo stitchOptionsRepo;
 
     @Autowired
     private PriceBreakUpService priceBreakUpService;
@@ -177,4 +186,5 @@ public class OrderItemService {
         }
         return new ArrayList<>();
     }
+
 }

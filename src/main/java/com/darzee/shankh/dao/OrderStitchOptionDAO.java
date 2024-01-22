@@ -19,4 +19,12 @@ public class OrderStitchOptionDAO {
     private Long stitchOptionId;
     private List<String> values;
     private Long orderItemId;
+    private String referenceId;
+
+    public OrderStitchOptionDAO(Long stitchOptionId, List<String> values, Long orderItemId, String referenceId) {
+        this.stitchOptionId = stitchOptionId;
+        this.values = values;
+        this.orderItemId = orderItemId;
+        this.referenceId = referenceId;
+    }
 }
