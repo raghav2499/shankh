@@ -1,6 +1,7 @@
 package com.darzee.shankh.dao;
 
 import com.darzee.shankh.entity.OrderStitchOptions;
+import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -34,6 +35,8 @@ public class OrderItemDAO {
     private String inspiration;
 
     private Boolean isPriorityOrder;
+
+    private OrderItemStatus orderItemStatus = OrderItemStatus.DRAFTED;
 
     private Integer quantity;
 

@@ -28,7 +28,7 @@ public class Order {
 
     @Column(name = "order_status")
     @Enumerated(EnumType.ORDINAL)
-    private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;
+    private OrderStatus orderStatus = OrderStatus.DRAFTED;
 
     @Column(name = "created_at")
     @CreationTimestamp

@@ -1,6 +1,6 @@
 package com.darzee.shankh.request;
 
-import com.darzee.shankh.enums.OrderStatus;
+import com.darzee.shankh.enums.OrderItemStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -44,8 +44,8 @@ public class GetOrderDetailsRequest {
                             .split(","))
                     .stream()
                     .map(Integer::parseInt)
-                    .map(requestOrdinal -> OrderStatus.getOrderTypeEnumOrdinalMap().get(requestOrdinal))
-                    .map(orderStatus -> orderStatus.ordinal())
+                    .map(requestOrdinal -> OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(requestOrdinal))
+                    .map(orderItemStatus -> orderItemStatus.ordinal())
                     .collect(Collectors.toList());
             filterMap.put(STATUS.getFilterName(), statusList);
         }
