@@ -19,12 +19,10 @@ import java.util.List;
 public class OrderStitchOption {
     private Long stitchOptionId;
     private List<String> values;
-    private Long orderItemId;
 
     public OrderStitchOption(OrderStitchOptionDAO orderStitchOptionDAO) {
         this.stitchOptionId = orderStitchOptionDAO.getStitchOptionId();
         this.values = orderStitchOptionDAO.getValues();
-        this.orderItemId = orderStitchOptionDAO.getOrderItemId();
     }
 }
 

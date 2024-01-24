@@ -60,6 +60,7 @@ public class OrderItemController {
     @PostMapping(value = "/create_stitch_options", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<CreateStitchResponse> createStitchOptions(@Valid @RequestBody CreateStitchOptionRequest request) {
+        System.out.println("request: " + request);
         StitchSummary stitchSummary  = orderOrderItemCommonService.createStitchOptions(request);
         CreateStitchResponse createStitchResponse = new CreateStitchResponse("Stitch options created successfully",
                 stitchSummary);

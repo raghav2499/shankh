@@ -224,6 +224,24 @@ public interface DaoEntityMapper {
         return stitchOptionsDAOS;
     }
 
+    default OrderStitchOptions createStitchOptionDaoToObject(OrderStitchOptionDAO orderStitchOptionDAO,
+                    @Context CycleAvoidingMappingContext context) {
+                if(orderStitchOptionDAO == null) {
+                    return null;
+                }
+                OrderStitchOptions orderStitchOptions = new OrderStitchOptions();
+                orderStitchOptions.setId(orderStitchOptionDAO.getId());
+                orderStitchOptions.setStitchOptionId(orderStitchOptionDAO.getStitchOptionId());
+                orderStitchOptions.setValues(orderStitchOptionDAO.getValues());
+                // orderStitchOptions.setOrderItem( orderaDaoToObject( orderStitchOptionDAO.getOrderItemId(), context ) );
+                // orderStitchOptions.setOrderItem(new Order()); 
+
+                System.out.println("orderStitchOptions: " + orderStitchOptions.toString());
+                System.out.println("orderstitch value " + orderStitchOptions.getValues().toString());
+
+                return orderStitchOptions;
+            };
+    
 
     MeasurementRevisions measurementRevisionsDAOToMeasurementRevision(MeasurementRevisionsDAO measurementRevisionsDAO);
 
@@ -232,5 +250,6 @@ public interface DaoEntityMapper {
     PriceBreakup priceBreakupDAOToPriceBreakup(PriceBreakupDAO priceBreakupDAO, @Context CycleAvoidingMappingContext context);
 
     PriceBreakupDAO priceBreakupToPriceBreakupDAO(PriceBreakup priceBreakup, @Context CycleAvoidingMappingContext context);
+
 
 }

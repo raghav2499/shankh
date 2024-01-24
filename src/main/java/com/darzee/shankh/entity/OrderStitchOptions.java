@@ -27,5 +27,5 @@ public class OrderStitchOptions {
 
     @ManyToOne
     @JoinColumn(name = "order_item_id")
-    private OrderItem orderItem;
+    private Order orderItem;
 }

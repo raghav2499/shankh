@@ -13,6 +13,8 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.OrderAmountRepo;
 import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.repo.OrderRepo;
+import com.darzee.shankh.repo.OrderStitchOptionsRepo;
+import com.darzee.shankh.repo.StitchOptionsRepo;
 import com.darzee.shankh.request.CreateOrderItemRequest;
 import com.darzee.shankh.request.CreateStitchOptionRequest;
 import com.darzee.shankh.request.PriceBreakUpDetails;
@@ -52,12 +54,18 @@ public class OrderOrderItemCommonService {
     private OrderRepo orderRepo;
 
     @Autowired
+    private StitchOptionsRepo stitchOptionsRepo;
+
+    @Autowired
     private OrderAmountRepo orderAmountRepo;
 
     @Autowired
     private DaoEntityMapper mapper;
     @Autowired
     private OrderItemRepo orderItemRepo;
+
+    @Autowired
+    private OrderStitchOptionsRepo orderStitchOptionsRepo;
 
     @Transactional
     public OrderSummary createOrderItem(CreateOrderItemRequest createOrderItemRequest) {
@@ -113,17 +121,19 @@ public class OrderOrderItemCommonService {
         List<OrderStitchOptionDAO> orderStitchOptionDAOs = new ArrayList<>();
 
         for (StitchDetails stitchDetail : stitchDetails) {
-            //create orderStitchOptionDAO with arguments passed and add to orderStitchOptionDAOs
-            OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(stitchDetail.getStitchOptionId());
-            if (outfitType == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Invalid outfit type " + stitchDetail.getOutfitType());
-            }
-
-            // Add the result to the list
+            //generate a 6digit reference id for the stitch option using math rand
+            String stitchOptionReferenceId = String.valueOf((int) (Math.random() * (999999 - 100000 + 1) + 100000));
+            orderStitchOptionDAOs.add(new OrderStitchOptionDAO(stitchDetail.getStitchOptionId(), stitchDetail.getValues(), orderItemId, stitchOptionReferenceId));
         }
 
-        StitchSummary stitchSummary = new StitchSummary(orderStitchOptionDAOs);
+        StitchSummary stitchSummary = new StitchSummary(orderItemId,orderStitchOptionDAOs);
+        // System.out.println(stitchSummary.toString());
+        // print orderStitchOptionDAOs list
+        for (OrderStitchOptionDAO orderStitchOptionDAO : orderStitchOptionDAOs) {
+            // System.out.println(orderStitchOptionDAO.toString());
+            //save in repo and use a mapper to convert to response object
+            orderStitchOptionsRepo.save(mapper.createStitchOptionDaoToObject(orderStitchOptionDAO, new CycleAvoidingMappingContext()));
+        }
 
         return stitchSummary;
     }
