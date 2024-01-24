@@ -41,6 +41,9 @@ public class OrderItem {
     @Enumerated(EnumType.ORDINAL)
     private OutfitType outfitType;
 
+    @Column(name = "outfit_alias")
+    private String outfitAlias;
+
     @Column(name = "is_deleted")
     private Boolean isDeleted = Boolean.FALSE;
 

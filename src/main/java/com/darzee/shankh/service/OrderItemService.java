@@ -73,7 +73,7 @@ public class OrderItemService {
             OrderItemDAO orderItemDAO = new OrderItemDAO(itemDetail.getTrialDate(), itemDetail.getDeliveryDate(),
                     itemDetail.getSpecialInstructions(), itemDetail.getOrderType(), outfitType,
                     itemDetail.getInspiration(), itemDetail.getIsPriorityOrder(), itemDetail.getItemQuantity(),
-                    measurementRevisionsDAO, order);
+                    itemDetail.getOutfitAlias(), measurementRevisionsDAO, order);
             orderItemDAO = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItemDAO,
                     new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
             orderItemList.add(orderItemDAO);
