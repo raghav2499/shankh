@@ -19,7 +19,7 @@ public class MeasurementController {
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity getMeasurementDetails(@RequestParam(value = "customer_id", required = false) Long customerId,
-                                                @RequestParam("outfit_type") Integer outfitTypeIndex,
+                                                @RequestParam(value = "outfit_type", required = false) Integer outfitTypeIndex,
                                                 @RequestParam(value = "order_item_id", required = false) Long orderItemId,
                                                 @RequestParam(value = "scale", defaultValue = "inch") String scale,
                                                 @RequestParam(value = "non_empty_values_only", required = false)

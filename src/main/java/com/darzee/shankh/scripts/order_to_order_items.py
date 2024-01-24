@@ -18,7 +18,7 @@ cursor = conn.cursor()
 columns_to_copy = [
     'trial_date', 'delivery_date', 'special_instructions', 'order_type',
     'outfit_type', 'is_deleted', 'inspiration', 'is_priority_order',
-    'created_at', 'updated_at', 'status'
+    'created_at', 'updated_at', 'order_status'
 ]
 
 # Define the SELECT query for fetching data from the orders table
@@ -35,7 +35,7 @@ insert_query = """
     INSERT INTO order_item (
         id, trial_date, delivery_date, special_instructions, order_type,
         outfit_type, is_deleted, inspiration, is_priority_order,
-        created_at, updated_at, status, order_id, quantity
+        created_at, updated_at, order_item_status, order_id, quantity
     ) VALUES %s
 """
 

@@ -97,6 +97,8 @@ public class OrderService {
 
     @Autowired
     private OrderItemRepo orderItemRepo;
+    @Autowired
+    private PaymentRepo paymentRepo;
 
 //    public ResponseEntity createOrderAndGenerateInvoice(CreateOrderRequest request) {
 //        CreateOrderResponse response = null;
@@ -370,8 +372,9 @@ public class OrderService {
     private OrderAmountDAO updateOrderAmountDetails(UpdateOrderAmountDetails orderAmountDetails,
                                                     OrderAmountDAO orderAmount, OrderDAO order, Long boutiqueId) {
         Double totalAmount = Optional.ofNullable(orderAmountDetails.getTotalOrderAmount()).orElse(orderAmount.getTotalAmount());
-        Double advancePaid = getAdvancePaid(order);
-        Double totalAmountPaid = getTotalAmountPaid(order);
+        List<PaymentDAO> payments = mapper.paymentToPaymentDAOList(paymentRepo.findAllByOrderId(order.getId()));
+        Double advancePaid = getAdvancePaid(payments);
+        Double totalAmountPaid = getTotalAmountPaid(payments);
         Double advancePayment = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(advancePaid);
         if (orderAmount.getTotalAmount().equals(totalAmount)
                 && advancePaid.equals(advancePayment)) {
@@ -403,20 +406,18 @@ public class OrderService {
         return orderAmount;
     }
 
-    private Double getAdvancePaid(OrderDAO orderDAO) {
+    private Double getAdvancePaid(List<PaymentDAO> payments) {
         Double advancePaid = 0d;
-        advancePaid = orderDAO.getPayment().stream()
+        advancePaid = payments.stream()
                 .filter(paymentDAO -> Boolean.TRUE.equals(paymentDAO.getIsAdvancePayment()))
                 .mapToDouble(PaymentDAO::getAmount)
                 .sum();
         return advancePaid;
     }
 
-    private Double getTotalAmountPaid(OrderDAO orderDAO) {
+    private Double getTotalAmountPaid(List<PaymentDAO> payments) {
         Double totalAmountPaid = 0d;
-        totalAmountPaid = orderDAO.getPayment().stream()
-                .mapToDouble(PaymentDAO::getAmount)
-                .sum();
+        totalAmountPaid = payments.stream().mapToDouble(PaymentDAO::getAmount).sum();
         return totalAmountPaid;
     }
 

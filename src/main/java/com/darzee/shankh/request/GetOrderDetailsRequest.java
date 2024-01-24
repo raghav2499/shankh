@@ -13,15 +13,15 @@ import java.util.stream.Collectors;
 
 import static com.darzee.shankh.constants.Constants.*;
 import static com.darzee.shankh.enums.OrderFilter.*;
-import static com.darzee.shankh.enums.OrderSort.DELIVERY_DATE;
-import static com.darzee.shankh.enums.OrderSort.TRIAL_DATE;
+import static com.darzee.shankh.enums.OrderItemSort.DELIVERY_DATE;
+import static com.darzee.shankh.enums.OrderItemSort.TRIAL_DATE;
 
 public class GetOrderDetailsRequest {
 
-    public static Map<String, Object> getPagingAndSortCriteria(String sortKey, Integer countPerPage, Integer pageCount) {
+    public static Map<String, Object> getPagingCriteria(Integer countPerPage, Integer pageCount) {
         Map<String, Object> finalParamsMap = new HashMap<>();
         pageCount = pageCount - 1;//pageCount is 0 indexed
-        setSortingCriteria(finalParamsMap, sortKey);
+//        setSortingCriteria(finalParamsMap, sortKey);
         setPagingCriteria(finalParamsMap, countPerPage, pageCount);
         return finalParamsMap;
     }
