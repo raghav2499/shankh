@@ -160,7 +160,7 @@ public class MeasurementService {
 
     private void validateGetMeasurementRequestParams(Long customerId, Long orderItemId,
                                                      Integer outfitTypeIndex, String scale) {
-        if(orderItemId == null && (customerId == null || outfitTypeIndex != null)) {
+        if(orderItemId == null && (customerId == null || outfitTypeIndex == null)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either send order item id or (outfit type and customer id)");
         }
         if (outfitTypeIndex != null && !OutfitType.getOutfitOrdinalEnumMap().containsKey(outfitTypeIndex)) {
