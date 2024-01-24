@@ -27,7 +27,7 @@ public class OrderDAO {
     private OrderAmountDAO orderAmount;
     private CustomerDAO customer;
     private List<OrderItemDAO> orderItems;
-    private List<PaymentDAO> payment;
+//    private List<PaymentDAO> payment;
 
     public OrderDAO(String invoiceNo, BoutiqueDAO boutique, CustomerDAO customer) {
         this.invoiceNo = invoiceNo;

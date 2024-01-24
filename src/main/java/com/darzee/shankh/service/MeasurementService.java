@@ -15,6 +15,7 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.CustomerRepo;
 import com.darzee.shankh.repo.MeasurementRevisionsRepo;
 import com.darzee.shankh.repo.MeasurementsRepo;
+import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.request.MeasurementDetails;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.CreateMeasurementResponse;
@@ -58,12 +59,14 @@ public class MeasurementService {
 
     @Autowired
     private CustomerRepo customerRepo;
+    @Autowired
+    private OrderItemRepo orderItemRepo;
 
     public ResponseEntity getMeasurementDetails(Long customerId, Long orderItemId,
                                                 Integer outfitTypeIndex,
                                                 String scale,
                                                 Boolean nonEmptyValuesOnly) throws Exception {
-        validateGetMeasurementRequestParams(outfitTypeIndex, scale);
+        validateGetMeasurementRequestParams(customerId, orderItemId, outfitTypeIndex, scale);
 
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
@@ -155,10 +158,15 @@ public class MeasurementService {
         return message;
     }
 
-    private void validateGetMeasurementRequestParams(Integer outfitTypeIndex, String scale) {
-        if (!OutfitType.getOutfitOrdinalEnumMap().containsKey(outfitTypeIndex)) {
+    private void validateGetMeasurementRequestParams(Long customerId, Long orderItemId,
+                                                     Integer outfitTypeIndex, String scale) {
+        if(orderItemId == null && (customerId == null || outfitTypeIndex != null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either send order item id or (outfit type and customer id)");
+        }
+        if (outfitTypeIndex != null && !OutfitType.getOutfitOrdinalEnumMap().containsKey(outfitTypeIndex)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Outfit Type not supported");
-        } else if (scale != null && !MeasurementScale.getEnumMap().containsKey(scale)) {
+        }
+        if (scale != null && !MeasurementScale.getEnumMap().containsKey(scale)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Measurement Scale");
         }
     }

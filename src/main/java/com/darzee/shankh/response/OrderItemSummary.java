@@ -18,6 +18,8 @@ public class OrderItemSummary {
     private String trialDate;
     private String deliveryDate;
 
+    private String outfitAlias;
+
     private Integer quantity;
 
     public OrderItemSummary(OrderItemDAO orderItem) {
@@ -25,5 +27,6 @@ public class OrderItemSummary {
         this.outfitType = orderItem.getOutfitType().getDisplayString();
         this.trialDate = orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null;
         this.quantity = orderItem.getQuantity();
+        this.outfitAlias = orderItem.getOutfitAlias();
     }
 }

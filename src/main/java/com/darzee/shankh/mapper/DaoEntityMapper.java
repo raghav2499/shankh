@@ -224,6 +224,17 @@ public interface DaoEntityMapper {
         return stitchOptionsDAOS;
     }
 
+    default List<PaymentDAO> paymentToPaymentDAOList(List<Payment> payments) {
+        if(CollectionUtils.isEmpty(payments)) {
+            return Collections.emptyList();
+        }
+        List<PaymentDAO> paymentDAOs = new ArrayList<>();
+        for(Payment payment : payments) {
+            paymentDAOs.add(paymentToPaymentDAO(payment, new CycleAvoidingMappingContext()));
+        }
+        return paymentDAOs;
+    }
+
 
     MeasurementRevisions measurementRevisionsDAOToMeasurementRevision(MeasurementRevisionsDAO measurementRevisionsDAO);
 
