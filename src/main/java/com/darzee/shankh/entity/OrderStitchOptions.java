@@ -6,7 +6,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.List;
-@Table(name = "order_stitch_option")
+@Table(name = "order_stitch_options")
 @Entity
 @Getter
 @Setter
@@ -27,5 +27,5 @@ public class OrderStitchOptions {
 
     @ManyToOne
     @JoinColumn(name = "order_item_id")
-    private Order orderItem;
+    private OrderItem orderItem;
 }
