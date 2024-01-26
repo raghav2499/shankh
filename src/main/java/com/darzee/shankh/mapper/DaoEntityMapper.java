@@ -248,4 +248,16 @@ public interface DaoEntityMapper {
         return orderStitchOptions;
     }
 
+    default List<PaymentDAO> paymentToPaymentDAOList(List<Payment> payments, @Context CycleAvoidingMappingContext context) {
+        if(CollectionUtils.isEmpty(payments)) {
+            return Collections.emptyList();
+        }
+        List<PaymentDAO> paymentDAOs = new ArrayList<>();
+        for(Payment payment : payments) {
+            PaymentDAO paymentDAO = paymentToPaymentDAO(payment, context);
+            paymentDAOs.add(paymentDAO);
+        }
+        return paymentDAOs;
+    }
+
 }
