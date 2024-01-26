@@ -83,8 +83,20 @@ public interface DaoEntityMapper {
     MeasurementsDAO measurementsToMeasurementDAO(Measurements measurements, @Context CycleAvoidingMappingContext context);
 
     StitchOptionsDAO stitchOptionsToDAO(StitchOptions stitchOptions);
+    OrderStitchOptions orderStitchOptionsDAOToOrderStitchOption(OrderStitchOptionDAO stitchOptionsDAO);
 
     Measurements measurementsDAOToMeasurement(MeasurementsDAO measurements, @Context CycleAvoidingMappingContext context);
+
+    OrderStitchOptions createStitchOptionDaoToObject(OrderStitchOptionDAO orderStitchOptionDAO);
+
+
+    MeasurementRevisions measurementRevisionsDAOToMeasurementRevision(MeasurementRevisionsDAO measurementRevisionsDAO);
+
+    MeasurementRevisionsDAO measurementRevisionsToMeasurementRevisionDAO(MeasurementRevisions measurementRevision);
+
+    PriceBreakup priceBreakupDAOToPriceBreakup(PriceBreakupDAO priceBreakupDAO, @Context CycleAvoidingMappingContext context);
+
+    PriceBreakupDAO priceBreakupToPriceBreakupDAO(PriceBreakup priceBreakup, @Context CycleAvoidingMappingContext context);
 
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if (orderList == null) {
@@ -224,17 +236,16 @@ public interface DaoEntityMapper {
         return stitchOptionsDAOS;
     }
 
-    OrderStitchOptions createStitchOptionDaoToObject(OrderStitchOptionDAO orderStitchOptionDAO,
-                    @Context CycleAvoidingMappingContext context);
-    
-
-    MeasurementRevisions measurementRevisionsDAOToMeasurementRevision(MeasurementRevisionsDAO measurementRevisionsDAO);
-
-    MeasurementRevisionsDAO measurementRevisionsToMeasurementRevisionDAO(MeasurementRevisions measurementRevision);
-
-    PriceBreakup priceBreakupDAOToPriceBreakup(PriceBreakupDAO priceBreakupDAO, @Context CycleAvoidingMappingContext context);
-
-    PriceBreakupDAO priceBreakupToPriceBreakupDAO(PriceBreakup priceBreakup, @Context CycleAvoidingMappingContext context);
-
+    default List<OrderStitchOptions> orderStitchOptionDAOListToOrderStitchOptionList(List<OrderStitchOptionDAO> orderStitchOptionsDAOs) {
+        if(CollectionUtils.isEmpty(orderStitchOptionsDAOs)) {
+            return Collections.emptyList();
+        }
+        List<OrderStitchOptions> orderStitchOptions = new ArrayList<>();
+        for(OrderStitchOptionDAO orderStitchOptionDAO : orderStitchOptionsDAOs) {
+            OrderStitchOptions orderStitchOption = orderStitchOptionsDAOToOrderStitchOption(orderStitchOptionDAO);
+            orderStitchOptions.add(orderStitchOption);
+        }
+        return orderStitchOptions;
+    }
 
 }

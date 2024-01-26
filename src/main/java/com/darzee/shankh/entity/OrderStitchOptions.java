@@ -6,7 +6,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.List;
-@Table(name = "order_stitch_options")
+@Table(name = "order_stitch_option")
 @Entity
 @Getter
 @Setter
@@ -25,7 +25,6 @@ public class OrderStitchOptions {
     @Column(name = "value", columnDefinition = "jsonb")
     private List<String> values;
 
-    @ManyToOne
-    @JoinColumn(name = "order_item_id")
-    private OrderItem orderItem;
+    @Column(name = "order_item_id")
+    private Long orderItemId;
 }

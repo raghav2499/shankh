@@ -2,7 +2,8 @@ package com.darzee.shankh.enums;
 
 public enum StitchOptionType {
 
-    RADIO("radio");
+    RADIO("radio"),
+    COUNTER("counter");
     private String name;
 
     StitchOptionType(String name) {

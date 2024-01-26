@@ -1,19 +1,12 @@
 package com.darzee.shankh.controller;
 
-import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.darzee.shankh.request.CreateOrderItemRequest;
 import com.darzee.shankh.request.CreateStitchOptionRequest;
 import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetails;
-import com.darzee.shankh.response.CreateOrderResponse;
-import com.darzee.shankh.response.StitchSummary;
-import com.darzee.shankh.response.CreateStitchResponse;
-import com.darzee.shankh.response.OrderItemSummary;
-import com.darzee.shankh.response.OrderStitchOption;
-import com.darzee.shankh.response.OrderSummary;
-import com.darzee.shankh.response.StitchOptionDetail;
+import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.OrderItemService;
 import com.darzee.shankh.service.OrderOrderItemCommonService;
-
+import com.darzee.shankh.service.StitchOptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +24,9 @@ public class OrderItemController {
 
     @Autowired
     private OrderOrderItemCommonService orderOrderItemCommonService;
+
+    @Autowired
+    private StitchOptionService stitchOptionService;
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
@@ -57,11 +53,10 @@ public class OrderItemController {
         return new ResponseEntity<>(orderItemService.getOrderItemDetails(orderItemId), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/create_stitch_options", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/stitch_options", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<CreateStitchResponse> createStitchOptions(@Valid @RequestBody CreateStitchOptionRequest request) {
-        System.out.println("request: " + request);
-        StitchSummary stitchSummary  = orderOrderItemCommonService.createStitchOptions(request);
+        StitchSummary stitchSummary  = stitchOptionService.createStitchOptions(request);
         CreateStitchResponse createStitchResponse = new CreateStitchResponse("Stitch options created successfully",
                 stitchSummary);
         return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);

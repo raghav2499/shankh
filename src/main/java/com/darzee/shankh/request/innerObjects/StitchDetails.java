@@ -1,15 +1,17 @@
 package com.darzee.shankh.request.innerObjects;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class StitchDetails {
-    @Valid
-    @NotNull(message = "stitch option id is mandatory for stitch creation")
+
+    @NotNull(message = "ID is mandatory to create stitch options")
     private Long stitchOptionId;
-    @Valid
+    @NotNull(message = "Values are mandatory to create stitch options")
     private List<String> values;
     
     public Long getStitchOptionId() {

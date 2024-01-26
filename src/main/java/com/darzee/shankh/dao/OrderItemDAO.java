@@ -1,6 +1,5 @@
 package com.darzee.shankh.dao;
 
-import com.darzee.shankh.entity.OrderStitchOptions;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -46,7 +45,6 @@ public class OrderItemDAO {
     private LocalDateTime updatedAt;
 
     private OrderDAO order;
-    private List<OrderStitchOptions> stitchOptions;
 
     public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions,
                         OrderType orderType, OutfitType outfitType, String inspiration, Boolean isPriorityOrder,

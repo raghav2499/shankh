@@ -67,9 +67,6 @@ public class OrderItem {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderItem")
     private List<PriceBreakup> priceBreakup;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderItem")
-    private List<OrderStitchOptions> stitchOptions;
-
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
