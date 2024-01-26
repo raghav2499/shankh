@@ -6,9 +6,7 @@ import com.darzee.shankh.dao.OrderItemDAO;
 import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.OrderAmountRepo;
-import com.darzee.shankh.repo.OrderItemRepo;
-import com.darzee.shankh.repo.OrderRepo;
+import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.CreateOrderItemRequest;
 import com.darzee.shankh.request.PriceBreakUpDetails;
 import com.darzee.shankh.request.innerObjects.OrderDetails;
@@ -39,12 +37,18 @@ public class OrderOrderItemCommonService {
     private OrderRepo orderRepo;
 
     @Autowired
+    private StitchOptionsRepo stitchOptionsRepo;
+
+    @Autowired
     private OrderAmountRepo orderAmountRepo;
 
     @Autowired
     private DaoEntityMapper mapper;
     @Autowired
     private OrderItemRepo orderItemRepo;
+
+    @Autowired
+    private OrderStitchOptionsRepo orderStitchOptionsRepo;
 
     @Transactional
     public OrderSummary createOrderItem(CreateOrderItemRequest createOrderItemRequest) {
@@ -91,4 +95,5 @@ public class OrderOrderItemCommonService {
         Double updatedAmount = orderAmountDAO.getTotalAmount() + newItemsPrice;
         orderAmountDAO.setTotalAmount(updatedAmount);
     }
+
 }

@@ -25,7 +25,6 @@ public class OrderStitchOptions {
     @Column(name = "value", columnDefinition = "jsonb")
     private List<String> values;
 
-    @ManyToOne
-    @JoinColumn(name = "order_item_id")
-    private OrderItem orderItem;
+    @Column(name = "order_item_id")
+    private Long orderItemId;
 }

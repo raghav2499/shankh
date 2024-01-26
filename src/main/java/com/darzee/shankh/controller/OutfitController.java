@@ -3,7 +3,7 @@ package com.darzee.shankh.controller;
 import com.darzee.shankh.response.GetStitchOptionsResponse;
 import com.darzee.shankh.response.SubOutfitTypeDetailResponse;
 import com.darzee.shankh.service.OutfitService;
-import com.darzee.shankh.service.StitchOptionsService;
+import com.darzee.shankh.service.StitchOptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,7 +18,7 @@ public class OutfitController {
     private OutfitService outfitService;
 
     @Autowired
-    private StitchOptionsService stitchOptionsService;
+    private StitchOptionService stitchOptionsService;
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin

@@ -50,7 +50,6 @@ public class OrderItemDAO {
     private LocalDateTime updatedAt;
 
     private OrderDAO order;
-    private List<OrderStitchOptions> stitchOptions;
 
     public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions,
                         OrderType orderType, OutfitType outfitType, String inspiration, Boolean isPriorityOrder,

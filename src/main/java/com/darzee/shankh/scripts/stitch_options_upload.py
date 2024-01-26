@@ -2,13 +2,17 @@ import csv
 import psycopg2
 from psycopg2.extras import Json
 
-DB_HOST = 'ec2-13-233-164-214.ap-south-1.compute.amazonaws.com'
+DB_HOST = 'ec2-15-206-72-30.ap-south-1.compute.amazonaws.com'
 DB_PORT = '5432'
-DB_NAME = 'darzee_stage'
+DB_NAME = 'darzee_prod'
 DB_USER = 'postgres'
 DB_PASSWORD = '0nDsUUY7pMyNCgMnvipI'
 
-CSV_FILE_PATH = 'C://Users/HP/Desktop/stitch_options_upload.csv'
+# spring.datasource.url=jdbc:postgresql://ec2-15-206-72-30.ap-south-1.compute.amazonaws.com/darzee_prod?sslmode=disable
+# spring.datasource.username=postgres
+# spring.datasource.password=0nDsUUY7pMyNCgMnvipI
+
+CSV_FILE_PATH = '/home/shivam/Desktop/Stitch-options.csv'
 
 conn = psycopg2.connect(host=DB_HOST, port=DB_PORT, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD)
 cursor = conn.cursor()

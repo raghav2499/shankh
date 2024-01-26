@@ -1,12 +1,19 @@
 package com.darzee.shankh.controller;
 
 import com.darzee.shankh.request.CreateOrderItemRequest;
+<<<<<<< HEAD
+import com.darzee.shankh.request.CreateStitchOptionRequest;
+import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetails;
+import com.darzee.shankh.response.*;
+=======
 import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetailRequest;
 import com.darzee.shankh.response.CreateOrderResponse;
 import com.darzee.shankh.response.OrderItemSummary;
 import com.darzee.shankh.response.OrderSummary;
+>>>>>>> acc2ce8b52ff86ee10ada897ef550f2a920c0547
 import com.darzee.shankh.service.OrderItemService;
 import com.darzee.shankh.service.OrderOrderItemCommonService;
+import com.darzee.shankh.service.StitchOptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,6 +31,9 @@ public class OrderItemController {
 
     @Autowired
     private OrderOrderItemCommonService orderOrderItemCommonService;
+
+    @Autowired
+    private StitchOptionService stitchOptionService;
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
@@ -46,5 +56,14 @@ public class OrderItemController {
     @CrossOrigin
     public ResponseEntity getOrderItem(@PathVariable("id") Long orderItemId) {
         return new ResponseEntity<>(orderItemService.getOrderItemDetails(orderItemId), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/stitch_options", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity<CreateStitchResponse> createStitchOptions(@Valid @RequestBody CreateStitchOptionRequest request) {
+        StitchSummary stitchSummary  = stitchOptionService.createStitchOptions(request);
+        CreateStitchResponse createStitchResponse = new CreateStitchResponse("Stitch options created successfully",
+                stitchSummary);
+        return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);
     }
 }
