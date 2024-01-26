@@ -20,6 +20,7 @@ public class OrderItemDetailRequest {
     private LocalDateTime deliveryDate;
     @NotNull(message = "outfit_type cannot be null")
     private Integer outfitType;
+    private String outfitAlias;
     @NotNull(message = "Either order_type is not present or is invalid")
     private OrderType orderType;
     private Integer itemQuantity = 1;
@@ -28,6 +29,7 @@ public class OrderItemDetailRequest {
     private String inspiration;
     private String specialInstructions;
     private Long measurementRevisionId;
+    private List<Long> stitchOptionReferences;
     @NotNull(message = "price_breakup cannot be null")
     private List<PriceBreakUpDetails> priceBreakup;
 }

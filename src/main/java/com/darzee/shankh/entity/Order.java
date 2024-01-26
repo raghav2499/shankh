@@ -8,7 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "orders")
@@ -28,7 +27,10 @@ public class Order {
 
     @Column(name = "order_status")
     @Enumerated(EnumType.ORDINAL)
-    private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;
+    private OrderStatus orderStatus = OrderStatus.DRAFTED;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -53,7 +55,7 @@ public class Order {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
     private List<OrderItem> orderItems;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
-    private List<Payment> payment = new ArrayList<>();
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
+//    private List<Payment> payment = new ArrayList<>();
 
 }

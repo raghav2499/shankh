@@ -30,17 +30,17 @@ public class OrderController {
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<GetOrderResponse> getOrder(@RequestParam(name = "boutique_id") Long boutiqueId,
-                                                     @RequestParam(name = "status_list") String statusList,
+                                                     @RequestParam(name = "order_item_status_list") String orderItemStatusList,
                                                      @RequestParam(name = "customer_id", required = false) Long customerId,
                                                      @RequestParam(name = "delivery_date_from", required = false) String deliveryDateFrom,
                                                      @RequestParam(name = "delivery_date_till", required = false) String deliveryDateTill,
                                                      @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
-                                                     @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
+//                                                     @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
                                                      @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                      @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
-        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, statusList, priorityOrdersOnly,
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList, priorityOrdersOnly,
                 customerId, deliveryDateFrom, deliveryDateTill);
-        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingAndSortCriteria(sortKey, countPerPage, pageCount);
+        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount);
         return orderService.getOrder(filterMap, pagingCriteriaMap);
     }
 

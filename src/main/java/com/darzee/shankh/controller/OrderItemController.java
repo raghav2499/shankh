@@ -1,9 +1,16 @@
 package com.darzee.shankh.controller;
 
 import com.darzee.shankh.request.CreateOrderItemRequest;
+<<<<<<< HEAD
 import com.darzee.shankh.request.CreateStitchOptionRequest;
 import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetails;
 import com.darzee.shankh.response.*;
+=======
+import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetailRequest;
+import com.darzee.shankh.response.CreateOrderResponse;
+import com.darzee.shankh.response.OrderItemSummary;
+import com.darzee.shankh.response.OrderSummary;
+>>>>>>> acc2ce8b52ff86ee10ada897ef550f2a920c0547
 import com.darzee.shankh.service.OrderItemService;
 import com.darzee.shankh.service.OrderOrderItemCommonService;
 import com.darzee.shankh.service.StitchOptionService;
@@ -40,10 +47,8 @@ public class OrderItemController {
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<OrderItemSummary> updateOrderItem(@PathVariable("id") Long orderItemId,
-                                                            @Valid @RequestBody UpdateOrderItemDetails
-                                                                    updateOrderItemDetails) {
-        OrderItemSummary orderItemSummary = orderOrderItemCommonService.updateOrderItem(orderItemId,
-                updateOrderItemDetails);
+                                                            @Valid @RequestBody UpdateOrderItemDetailRequest orderItemDetails) {
+        OrderItemSummary orderItemSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
         return new ResponseEntity<>(orderItemSummary, HttpStatus.OK);
     }
 

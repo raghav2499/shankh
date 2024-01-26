@@ -1,11 +1,13 @@
 package com.darzee.shankh.service;
 
+import com.amazonaws.util.StringUtils;
 import com.darzee.shankh.dao.CustomerDAO;
 import com.darzee.shankh.dao.MeasurementRevisionsDAO;
 import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.MeasurementRevisions;
 import com.darzee.shankh.entity.Measurements;
+import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
@@ -13,6 +15,7 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.CustomerRepo;
 import com.darzee.shankh.repo.MeasurementRevisionsRepo;
 import com.darzee.shankh.repo.MeasurementsRepo;
+import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.request.MeasurementDetails;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.CreateMeasurementResponse;
@@ -26,11 +29,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class MeasurementService {
+
+    @Autowired
+    private BucketService bucketService;
+
+    @Autowired
+    private ObjectFilesService objectFilesService;
+
     @Autowired
     private DaoEntityMapper mapper;
 
@@ -48,12 +59,14 @@ public class MeasurementService {
 
     @Autowired
     private CustomerRepo customerRepo;
+    @Autowired
+    private OrderItemRepo orderItemRepo;
 
     public ResponseEntity getMeasurementDetails(Long customerId, Long orderItemId,
                                                 Integer outfitTypeIndex,
                                                 String scale,
                                                 Boolean nonEmptyValuesOnly) throws Exception {
-        validateGetMeasurementRequestParams(outfitTypeIndex, scale);
+        validateGetMeasurementRequestParams(customerId, orderItemId, outfitTypeIndex, scale);
 
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
@@ -78,7 +91,13 @@ public class MeasurementService {
         return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);
     }
 
-    public ResponseEntity setMeasurementDetails(MeasurementDetails measurementDetails) throws Exception {
+    public ResponseEntity saveMeasurementDetails(MeasurementDetails measurementDetails) throws Exception {
+        MeasurementsDAO measurementsDAO = setMeasurementDetails(measurementDetails);
+        CreateMeasurementResponse response = generateCreateMeasurementResponse(measurementsDAO, measurementDetails.getCustomerId());
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    public MeasurementsDAO setMeasurementDetails(MeasurementDetails measurementDetails) throws Exception {
         MeasurementRequest measurementRequest = measurementDetails.getMeasurements();
         Optional<Customer> optionalCustomer = customerRepo.findById(measurementDetails.getCustomerId());
         if (optionalCustomer.isPresent()) {
@@ -86,8 +105,17 @@ public class MeasurementService {
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(measurementDetails.getOutfitType());
             OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
             MeasurementsDAO measurementsDAO = customerMeasurementService.getCustomerMeasurements(customerDAO.getId(), outfitType);
-            MeasurementRevisionsDAO revision = outfitTypeService.addMeasurementRevision(measurementRequest, customerDAO.getId(),
-                    outfitType, measurementDetails.getScale());
+            MeasurementRevisionsDAO revision = null;
+            if (!StringUtils.isNullOrEmpty(measurementDetails.getReferenceId())) {
+                String referenceId = measurementDetails.getReferenceId();
+                revision = outfitTypeService.addMeasurementRevision(measurementRequest, customerDAO.getId(),
+                        outfitType, measurementDetails.getScale());
+                objectFilesService.saveObjectImages(Arrays.asList(referenceId),
+                        FileEntityType.MEASUREMENT_REVISION.getEntityType(), revision.getId());
+            } else {
+                revision = outfitTypeService.addMeasurementRevision(measurementRequest, customerDAO.getId(),
+                        outfitType, measurementDetails.getScale());
+            }
             revision = mapper.measurementRevisionsToMeasurementRevisionDAO(
                     measurementRevisionsRepo.save(mapper.measurementRevisionsDAOToMeasurementRevision(revision)));
             measurementsDAO.setMeasurementRevision(revision);
@@ -96,18 +124,17 @@ public class MeasurementService {
             measurementsDAO = mapper.measurementsToMeasurementDAO(
                     measurementsRepo.save(mapper.measurementsDAOToMeasurement(measurementsDAO,
                             new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-            CreateMeasurementResponse response = generateCreateMeasurementResponse(measurementsDAO, customerDAO.getId());
-
-            return new ResponseEntity(response, HttpStatus.OK);
+            return measurementsDAO;
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer id is invalid");
     }
 
     public ResponseEntity<GetMeasurementRevisionsResponse> getMeasurementRevisions(Long customerId, Integer outfitOrdinal) {
+        OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitOrdinal);
         List<MeasurementRevisionsDAO> measurementRevisions = mapper.measurementRevisionsListToDAOList(
-                        measurementRevisionsRepo.findAllByCustomerIdAndOutfitType(customerId, outfitOrdinal));
+                measurementRevisionsRepo.findAllByCustomerIdAndOutfitType(customerId, outfitType));
         List<MeasurementRevisionData> data = new ArrayList<>(measurementRevisions.size());
-        for(MeasurementRevisionsDAO revision : measurementRevisions) {
+        for (MeasurementRevisionsDAO revision : measurementRevisions) {
             MeasurementRevisionData revisionData = new MeasurementRevisionData(revision);
             data.add(revisionData);
         }
@@ -118,7 +145,7 @@ public class MeasurementService {
     public MeasurementRevisionsDAO getMeasurementRevisionById(Long measurmentRevId) {
         MeasurementRevisionsDAO measurementRevisionsDAO = null;
         Optional<MeasurementRevisions> mRevision = measurementRevisionsRepo.findById(measurmentRevId);
-        if(mRevision.isPresent()) {
+        if (mRevision.isPresent()) {
             measurementRevisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(mRevision.get());
         }
         return measurementRevisionsDAO;
@@ -131,10 +158,15 @@ public class MeasurementService {
         return message;
     }
 
-    private void validateGetMeasurementRequestParams(Integer outfitTypeIndex, String scale) {
-        if (!OutfitType.getOutfitOrdinalEnumMap().containsKey(outfitTypeIndex)) {
+    private void validateGetMeasurementRequestParams(Long customerId, Long orderItemId,
+                                                     Integer outfitTypeIndex, String scale) {
+        if(orderItemId == null && (customerId == null || outfitTypeIndex == null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either send order item id or (outfit type and customer id)");
+        }
+        if (outfitTypeIndex != null && !OutfitType.getOutfitOrdinalEnumMap().containsKey(outfitTypeIndex)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Outfit Type not supported");
-        } else if (scale != null && !MeasurementScale.getEnumMap().containsKey(scale)) {
+        }
+        if (scale != null && !MeasurementScale.getEnumMap().containsKey(scale)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Measurement Scale");
         }
     }

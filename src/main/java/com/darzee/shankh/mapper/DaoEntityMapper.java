@@ -37,7 +37,7 @@ public interface DaoEntityMapper {
 
     BoutiqueLedger boutiqueLedgerDAOToObject(BoutiqueLedgerDAO boutiqueLedgerDAO, @Context CycleAvoidingMappingContext context);
 
-    ObjectImages objectImageDAOToObjectImage(ObjectImagesDAO objectImages);
+    ObjectFiles objectImageDAOToObjectImage(ObjectFilesDAO objectImages);
 
     OrderItemDAO orderItemToOrderItemDAO(OrderItem orderItem, @Context CycleAvoidingMappingContext context);
 
@@ -48,7 +48,7 @@ public interface DaoEntityMapper {
     @Mapping(source = "tailorDAO.boutique.id", target = "boutiqueId")
     TailorLoginResponse tailorDAOToLoginResponse(TailorDAO tailorDAO, String token);
 
-    ObjectImages boutiqueImagesImagesDAOToBoutiqueImages(ObjectImagesDAO ObjectImagesDAO);
+    ObjectFiles boutiqueImagesImagesDAOToBoutiqueImages(ObjectFilesDAO ObjectFilesDAO);
 
     ImageReferenceDAO imageReferenceToImageReferenceDAO(ImageReference imageReference);
 
@@ -58,7 +58,7 @@ public interface DaoEntityMapper {
 
     OrderAmount orderAmountDaoToOrderAmountObject(OrderAmountDAO orderAmount, @Context CycleAvoidingMappingContext context);
 
-    ObjectImagesDAO objectImagesToObjectImagesDAO(ObjectImages objectImages);
+    ObjectFilesDAO objectImagesToObjectImagesDAO(ObjectFiles objectImages);
 
     Payment paymentDAOToPayment(PaymentDAO paymentDAO, @Context CycleAvoidingMappingContext context);
 

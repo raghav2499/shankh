@@ -32,20 +32,20 @@ public class BucketController {
 //        return bucketService.uploadSingleImage(file, uploadFileType);
 //    }
 
-    @PostMapping("/upload_multiple")
-    @CrossOrigin
-    public ResponseEntity<UploadMultipleFileResponse> uploadMultiple(@RequestPart(value = "files") List<MultipartFile> files,
-                                                                     @RequestPart(value = "file_type", required = false) String uploadFileType)
-            throws Exception {
-        return bucketService.uploadMultipleImages(files, uploadFileType);
-    }
+//    @PostMapping("/upload_multiple")
+//    @CrossOrigin
+//    public ResponseEntity<UploadMultipleFileResponse> uploadMultiple(@RequestPart(value = "files") List<MultipartFile> files,
+//                                                                     @RequestPart(value = "file_type", required = false) String uploadFileType)
+//            throws Exception {
+//        return bucketService.uploadMultipleImages(files, uploadFileType);
+//    }
 
     //for audio/images file upload endpoint
     @PostMapping("/upload_multiple_files")
     public ResponseEntity<UploadMultipleFileResponse> uploadMultipleFiles(@RequestPart(value = "file") List<MultipartFile> files,
-                                          @RequestPart(value = "file_type", required = false) String uploadFileType)
+                                          @RequestParam(value = "file_type", required = false) String uploadFileType)
             throws Exception {
-        return bucketService.uploadMultipleFile(files, uploadFileType);
+        return bucketService.uploadMultipleFiles(files, uploadFileType);
     }
 
     @GetMapping("/downloadFile")

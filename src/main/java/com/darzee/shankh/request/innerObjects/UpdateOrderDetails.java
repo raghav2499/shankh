@@ -24,7 +24,6 @@ public class UpdateOrderDetails {
 
     private List<String> clothImageReferenceIds;
 
-    //audio reference ids
     private List<String> audioReferenceIds;
     private Boolean deleteOrder;
 }

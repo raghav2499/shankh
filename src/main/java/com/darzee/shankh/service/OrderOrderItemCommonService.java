@@ -11,7 +11,7 @@ import com.darzee.shankh.request.CreateOrderItemRequest;
 import com.darzee.shankh.request.PriceBreakUpDetails;
 import com.darzee.shankh.request.innerObjects.OrderDetails;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
-import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetails;
+import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetailRequest;
 import com.darzee.shankh.response.OrderItemSummary;
 import com.darzee.shankh.response.OrderSummary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,8 +84,8 @@ public class OrderOrderItemCommonService {
         return orderSummary;
     }
 
-    public OrderItemSummary updateOrderItem(Long orderItemId, UpdateOrderItemDetails updateOrderItemDetails) {
-        OrderItemDAO updatedItem = orderItemService.updateOrderItem(orderItemId, updateOrderItemDetails);
+    public OrderItemSummary updateOrderItem(Long orderItemId, UpdateOrderItemDetailRequest orderItemDetails) {
+        OrderItemDAO updatedItem = orderItemService.updateOrderItem(orderItemId, orderItemDetails);
         OrderItemSummary orderItemSummary = new OrderItemSummary(updatedItem);
         return orderItemSummary;
     }
