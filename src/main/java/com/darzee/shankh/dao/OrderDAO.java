@@ -7,10 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -34,12 +34,22 @@ public class OrderDAO {
         this.boutique = boutique;
         this.customer = customer;
     }
+
     public Map<Long, OrderItemDAO> getOrderItemDAOMap() {
         Map<Long, OrderItemDAO> orderItemDAOMap = new HashMap<>();
-        for(OrderItemDAO orderItem : orderItems) {
+        for (OrderItemDAO orderItem : orderItems) {
             orderItemDAOMap.put(orderItem.getId(), orderItem);
         }
         return orderItemDAOMap;
+    }
+
+    public List<OrderItemDAO> getNonDeletedItems() {
+        if (!CollectionUtils.isEmpty(this.orderItems)) {
+            return this.orderItems.stream().filter(item -> !Boolean.TRUE.equals(item.getIsDeleted()))
+                    .collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+
     }
 
 }

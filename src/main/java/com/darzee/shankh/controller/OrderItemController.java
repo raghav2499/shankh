@@ -1,13 +1,9 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.request.CreateOrderItemRequest;
 import com.darzee.shankh.request.CreateStitchOptionRequest;
-import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetailRequest;
-import com.darzee.shankh.response.CreateOrderResponse;
-import com.darzee.shankh.response.CreateStitchResponse;
-import com.darzee.shankh.response.OrderItemSummary;
-import com.darzee.shankh.response.OrderSummary;
-import com.darzee.shankh.response.StitchSummary;
+import com.darzee.shankh.request.OrderCreationRequest;
+import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
+import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.OrderItemService;
 import com.darzee.shankh.service.OrderOrderItemCommonService;
 import com.darzee.shankh.service.StitchOptionService;
@@ -34,7 +30,7 @@ public class OrderItemController {
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<CreateOrderResponse> createOrderItem(@Valid @RequestBody CreateOrderItemRequest request) {
+    public ResponseEntity<CreateOrderResponse> createOrderItem(@Valid @RequestBody OrderCreationRequest request) {
         OrderSummary orderSummary = orderOrderItemCommonService.createOrderItem(request);
         CreateOrderResponse createOrderResponse = new CreateOrderResponse("Order created successfully",
                 orderSummary);
@@ -43,10 +39,10 @@ public class OrderItemController {
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<OrderItemSummary> updateOrderItem(@PathVariable("id") Long orderItemId,
-                                                            @Valid @RequestBody UpdateOrderItemDetailRequest orderItemDetails) {
-        OrderItemSummary orderItemSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
-        return new ResponseEntity<>(orderItemSummary, HttpStatus.OK);
+    public ResponseEntity<OrderSummary> updateOrderItem(@PathVariable("id") Long orderItemId,
+                                                            @Valid @RequestBody OrderItemDetailRequest orderItemDetails) {
+        OrderSummary orderSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
+        return new ResponseEntity<>(orderSummary, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

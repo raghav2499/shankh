@@ -4,7 +4,6 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.darzee.shankh.enums.S3Bucket;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -12,8 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +39,20 @@ public class AmazonClient {
     @Value("${amazonProperties.s3.audioBucketName}")
     private String audioBucketName;
 
+    @Value("measurement_revision/")
+    private String measurementRevisionDirectory;
+
     @PostConstruct
     private void initializeAmazon() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
         this.s3client = new AmazonS3Client(credentials);
+    }
+
+    public ImmutablePair<String, String> uploadMeasurementFile(File file, String fileName) {
+        s3client.putObject(new PutObjectRequest(privateBucketName, measurementRevisionDirectory + fileName, file));
+        String referenceId = UUID.randomUUID().toString();
+        String shortLivedUrl = generateShortLivedUrl(privateBucketName, measurementRevisionDirectory + fileName);
+        return new ImmutablePair(referenceId, shortLivedUrl);
     }
 
     public ImmutablePair<String, String> uploadFile(File file, String fileName) {
@@ -77,6 +84,11 @@ public class AmazonClient {
             urlList.add(url);
         }
         return urlList;
+    }
+
+    public String generateShortLivedUrlForMeasurementRevision(String fileName) {
+        String shortLivedUrl = generateShortLivedUrl(privateBucketName, measurementRevisionDirectory + fileName);
+        return shortLivedUrl;
     }
 
     public String generateShortLivedUrl(String fileName) {

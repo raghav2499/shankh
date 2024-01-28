@@ -3,26 +3,23 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
-import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
-import com.darzee.shankh.request.CreateOrderItemRequest;
-import com.darzee.shankh.request.PriceBreakUpDetails;
+import com.darzee.shankh.request.OrderCreationRequest;
+import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.OrderDetails;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
-import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetailRequest;
-import com.darzee.shankh.response.OrderItemSummary;
 import com.darzee.shankh.response.OrderSummary;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 
 @Service
 public class OrderOrderItemCommonService {
@@ -44,6 +41,7 @@ public class OrderOrderItemCommonService {
 
     @Autowired
     private DaoEntityMapper mapper;
+
     @Autowired
     private OrderItemRepo orderItemRepo;
 
@@ -51,49 +49,57 @@ public class OrderOrderItemCommonService {
     private OrderStitchOptionsRepo orderStitchOptionsRepo;
 
     @Transactional
-    public OrderSummary createOrderItem(CreateOrderItemRequest createOrderItemRequest) {
-        OrderDetails orderDetails = createOrderItemRequest.getOrderDetails();
-        OrderDAO orderDAO = null;
-        OrderAmountDAO orderAmountDAO = null;
-        if (orderDetails.getOrderId() != null) {
-            Optional<Order> order = orderRepo.findById(orderDetails.getOrderId());
-            if (order.isPresent()) {
-                orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
-                orderAmountDAO = orderDAO.getOrderAmount();
-            } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
-            }
-        } else {
-            orderDAO = orderService.createNewOrder(orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
-            orderAmountDAO = new OrderAmountDAO();
-            orderAmountDAO.setOrder(orderDAO);
+    public OrderSummary createOrder(OrderCreationRequest orderCreationRequest) {
+        OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
+        OrderDAO orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(),
+                orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
+        List<OrderItemDetailRequest> alreadySavedItems = orderDetails.getOrderItems()
+                .stream().filter(itemDetail -> itemDetail.getId() != null).collect(Collectors.toList());
+        List<OrderItemDetailRequest> newItems = orderDetails.getOrderItems()
+                .stream().filter(itemDetail -> itemDetail.getId() == null).collect(Collectors.toList());
+        List<OrderItemDAO> newOrderItems = orderItemService.createOrderItems(newItems, orderDAO);
+
+        List<OrderItemDAO> savedItems = new ArrayList<>();
+        for (OrderItemDetailRequest itemDetailRequest : alreadySavedItems) {
+            OrderItemDAO orderItemDAO = orderItemService.updateOrderItem(itemDetailRequest.getId(), itemDetailRequest);
+            savedItems.add(orderItemDAO);
         }
-        List<OrderItemDAO> allOrderItems = orderItemService.createOrderItems(orderDetails.getOrderItems(), orderDAO);
-        List<PriceBreakUpDetails> priceBreakUpDetailsList = orderDetails.getOrderItems().stream()
-                .map(OrderItemDetailRequest::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
-        calculateOrderAmount(orderAmountDAO, priceBreakUpDetailsList);
+        List<OrderItemDAO> allItems = new ArrayList<>();
+        allItems.addAll(newOrderItems);
+        allItems.addAll(savedItems);
+        orderDAO.setOrderItems(allItems);
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        orderAmountDAO = orderService.setOrderAmountSpecificDetails(orderDetails.getOrderAmountDetails(), orderDAO);
+        OrderSummary orderSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
+                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
+        return orderSummary;
+    }
+
+    @Transactional(REQUIRES_NEW)
+    public OrderSummary createOrderItem(OrderCreationRequest orderCreationRequest) {
+        OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
+        OrderDAO orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(), orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
+        List<OrderItemDAO> orderItems = orderItemService.createOrderItems(orderDetails.getOrderItems(), orderDAO);
+        OrderAmountDAO orderAmountDAO = orderService.setOrderAmountSpecificDetails(new OrderAmountDetails(), orderDAO);
         orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(
-                orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
-                        new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+                orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
         if (orderDAO.getOrderAmount() == null) {
             orderDAO.setOrderAmount(orderAmountDAO);
             orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
         }
         OrderSummary orderSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
-                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), allOrderItems);
+                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderItems);
         return orderSummary;
     }
 
-    public OrderItemSummary updateOrderItem(Long orderItemId, UpdateOrderItemDetailRequest orderItemDetails) {
+    public OrderSummary updateOrderItem(Long orderItemId, OrderItemDetailRequest orderItemDetails) {
         OrderItemDAO updatedItem = orderItemService.updateOrderItem(orderItemId, orderItemDetails);
-        OrderItemSummary orderItemSummary = new OrderItemSummary(updatedItem);
+        OrderDAO orderDAO = updatedItem.getOrder();
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        OrderSummary orderItemSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
+                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getOrderItems());
         return orderItemSummary;
-    }
-
-    private void calculateOrderAmount(OrderAmountDAO orderAmountDAO, List<PriceBreakUpDetails> priceBreakups) {
-        Double newItemsPrice = priceBreakups.stream().mapToDouble(PriceBreakUpDetails::getValue).sum();
-        Double updatedAmount = orderAmountDAO.getTotalAmount() + newItemsPrice;
-        orderAmountDAO.setTotalAmount(updatedAmount);
     }
 
 }

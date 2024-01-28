@@ -84,6 +84,7 @@ public interface DaoEntityMapper {
 
     StitchOptionsDAO stitchOptionsToDAO(StitchOptions stitchOptions);
     OrderStitchOptions orderStitchOptionsDAOToOrderStitchOption(OrderStitchOptionDAO stitchOptionsDAO);
+    OrderStitchOptionDAO orderStitchOptionsToOrderStitchOptionDAO(OrderStitchOptions stitchOption);
 
     Measurements measurementsDAOToMeasurement(MeasurementsDAO measurements, @Context CycleAvoidingMappingContext context);
 
@@ -246,6 +247,18 @@ public interface DaoEntityMapper {
             orderStitchOptions.add(orderStitchOption);
         }
         return orderStitchOptions;
+    }
+
+    default List<OrderStitchOptionDAO> orderStitchOptionListToOrderStitchOptionDAOList(List<OrderStitchOptions> orderStitchOptions) {
+        if(CollectionUtils.isEmpty(orderStitchOptions)) {
+            return Collections.emptyList();
+        }
+        List<OrderStitchOptionDAO> orderStitchOptionDAOs = new ArrayList<>();
+        for(OrderStitchOptions orderStitchOption : orderStitchOptions) {
+            OrderStitchOptionDAO orderStitchOptionDAO = orderStitchOptionsToOrderStitchOptionDAO(orderStitchOption);
+            orderStitchOptionDAOs.add(orderStitchOptionDAO);
+        }
+        return orderStitchOptionDAOs;
     }
 
     default List<PaymentDAO> paymentToPaymentDAOList(List<Payment> payments, @Context CycleAvoidingMappingContext context) {

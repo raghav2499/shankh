@@ -1,10 +1,13 @@
 package com.darzee.shankh.service;
 
 import com.amazonaws.util.StringUtils;
+import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.CustomerDAO;
+import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.dao.MeasurementRevisionsDAO;
 import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.entity.Customer;
+import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.MeasurementRevisions;
 import com.darzee.shankh.entity.Measurements;
 import com.darzee.shankh.enums.FileEntityType;
@@ -12,16 +15,10 @@ import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.CustomerRepo;
-import com.darzee.shankh.repo.MeasurementRevisionsRepo;
-import com.darzee.shankh.repo.MeasurementsRepo;
-import com.darzee.shankh.repo.OrderItemRepo;
+import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.MeasurementDetails;
 import com.darzee.shankh.request.MeasurementRequest;
-import com.darzee.shankh.response.CreateMeasurementResponse;
-import com.darzee.shankh.response.GetMeasurementRevisionsResponse;
-import com.darzee.shankh.response.MeasurementRevisionData;
-import com.darzee.shankh.response.OverallMeasurementDetails;
+import com.darzee.shankh.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,12 +52,18 @@ public class MeasurementService {
     private MeasurementsRepo measurementsRepo;
 
     @Autowired
+    private FileReferenceRepo fileReferenceRepo;
+
+    @Autowired
     private MeasurementRevisionsRepo measurementRevisionsRepo;
 
     @Autowired
     private CustomerRepo customerRepo;
     @Autowired
     private OrderItemRepo orderItemRepo;
+
+    @Autowired
+    private AmazonClient s3Client;
 
     public ResponseEntity getMeasurementDetails(Long customerId, Long orderItemId,
                                                 Integer outfitTypeIndex,
@@ -135,7 +138,15 @@ public class MeasurementService {
                 measurementRevisionsRepo.findAllByCustomerIdAndOutfitType(customerId, outfitType));
         List<MeasurementRevisionData> data = new ArrayList<>(measurementRevisions.size());
         for (MeasurementRevisionsDAO revision : measurementRevisions) {
-            MeasurementRevisionData revisionData = new MeasurementRevisionData(revision);
+            MeasurementRevisionData revisionData = null;
+            if(!revision.getMeasurementValue().isEmpty()) {
+                revisionData = new MeasurementRevisionData(revision);
+            } else {
+                String referenceId = objectFilesService.getMeasurementRevisionReferenceId(revision.getId());
+                String measurementRevImageUrl = getMeasurementRevisionImageLink(referenceId);
+                MeasurementRevisionImageDetail measurementRevisionImageDetail = new MeasurementRevisionImageDetail(referenceId, measurementRevImageUrl);
+                revisionData = new MeasurementRevisionData(revision, referenceId, measurementRevImageUrl);
+            }
             data.add(revisionData);
         }
         GetMeasurementRevisionsResponse response = new GetMeasurementRevisionsResponse(data);
@@ -173,7 +184,18 @@ public class MeasurementService {
 
     private CreateMeasurementResponse generateCreateMeasurementResponse(MeasurementsDAO measurementDAO, Long customerId) {
         String successMessage = "Measurement details saved successfully";
-        CreateMeasurementResponse response = new CreateMeasurementResponse(successMessage, customerId, measurementDAO.getId());
+        CreateMeasurementResponse response = new CreateMeasurementResponse(successMessage,
+                customerId, measurementDAO.getId(), measurementDAO.getMeasurementRevision().getId());
         return response;
+    }
+
+    private String getMeasurementRevisionImageLink(String measurementRevisionReferenceId) {
+        Optional<ImageReference> measurementRevisionRef = fileReferenceRepo.findByReferenceId(measurementRevisionReferenceId);
+        if (measurementRevisionRef.isPresent()) {
+            ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(measurementRevisionRef.get());
+            String measurementRevRefFileName = imageReferenceDAO.getImageName();
+            return s3Client.generateShortLivedUrlForMeasurementRevision(measurementRevRefFileName);
+        }
+        return null;
     }
 }

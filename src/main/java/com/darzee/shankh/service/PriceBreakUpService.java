@@ -2,19 +2,22 @@ package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.OrderItemDAO;
 import com.darzee.shankh.dao.PriceBreakupDAO;
+import com.darzee.shankh.entity.PriceBreakup;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.PriceBreakUpRepo;
 import com.darzee.shankh.request.PriceBreakUpDetails;
-import com.darzee.shankh.request.innerObjects.UpdatePriceBreakupDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Optional;
+
+import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 
 @Service
 public class PriceBreakUpService {
@@ -33,20 +36,29 @@ public class PriceBreakUpService {
 
     }
 
-    public List<PriceBreakupDAO> updatePriceBreakups(List<UpdatePriceBreakupDetails> priceBreakupList, OrderItemDAO orderItemDAO) {
-        List<PriceBreakupDAO> priceBreakups = orderItemDAO.getPriceBreakup();
-        Map<Long, UpdatePriceBreakupDetails> updatedPriceBreakUpMap = priceBreakupList.stream()
-                .collect(Collectors.toMap(UpdatePriceBreakupDetails::getId, Function.identity()));
-        for(PriceBreakupDAO priceBreakupDAO : priceBreakups) {
-            if(updatedPriceBreakUpMap.containsKey(priceBreakupDAO.getId())) {
-                updatePriceBreakup(priceBreakupDAO, updatedPriceBreakUpMap.get(priceBreakupDAO.getId()));
+    @Transactional(REQUIRES_NEW)
+    public List<PriceBreakupDAO> updatePriceBreakups(List<PriceBreakUpDetails> priceBreakupList, OrderItemDAO orderItem) {
+        List<PriceBreakupDAO> priceBreakupDAOList = new ArrayList<>();
+        for (PriceBreakUpDetails priceBreakUpDetail : priceBreakupList) {
+            if (priceBreakUpDetail.getId() != null) {
+                Optional<PriceBreakup> priceBreakup = priceBreakUpRepo.findById(priceBreakUpDetail.getId());
+                if (priceBreakup.isPresent()) {
+                    PriceBreakupDAO priceBreakupDAO = mapper.priceBreakupToPriceBreakupDAO(priceBreakup.get(), new CycleAvoidingMappingContext());
+                    updatePriceBreakup(priceBreakupDAO, priceBreakUpDetail);
+                    priceBreakupDAOList.add(priceBreakupDAO);
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price Breakup ID is incorrect");
+                }
+            } else {
+                PriceBreakupDAO priceBreakupDAO = new PriceBreakupDAO(priceBreakUpDetail, orderItem);
+                priceBreakupDAOList.add(priceBreakupDAO);
             }
         }
-        priceBreakups = mapper.priceBreakUpListToPriceBreakUpDAOList(
-                priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakups,
+        priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(
+                priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
-        return priceBreakups;
+        return priceBreakupDAOList;
 
     }
 
@@ -59,14 +71,14 @@ public class PriceBreakUpService {
         return priceBreakupDAOList;
     }
 
-    private void updatePriceBreakup(PriceBreakupDAO priceBreakupDAO, UpdatePriceBreakupDetails updatedDetails) {
-        if(priceBreakupDAO.isComponentStringUpdated(updatedDetails.getComponent())) {
+    private void updatePriceBreakup(PriceBreakupDAO priceBreakupDAO, PriceBreakUpDetails updatedDetails) {
+        if (priceBreakupDAO.isComponentStringUpdated(updatedDetails.getComponent())) {
             priceBreakupDAO.setComponent(updatedDetails.getComponent());
         }
-        if(priceBreakupDAO.isValueUpdated(updatedDetails.getValue())) {
+        if (priceBreakupDAO.isValueUpdated(updatedDetails.getValue())) {
             priceBreakupDAO.setValue(updatedDetails.getValue());
         }
-        if(priceBreakupDAO.isQuantityUpdated(updatedDetails.getComponentQuantity())) {
+        if (priceBreakupDAO.isQuantityUpdated(updatedDetails.getComponentQuantity())) {
             priceBreakupDAO.setQuantity(updatedDetails.getComponentQuantity());
         }
     }

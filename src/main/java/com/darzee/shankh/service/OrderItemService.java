@@ -4,9 +4,8 @@ import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.OrderItem;
-import com.darzee.shankh.entity.OrderStitchOptions;
-import com.darzee.shankh.entity.StitchOptions;
 import com.darzee.shankh.enums.FileEntityType;
+import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -14,9 +13,7 @@ import com.darzee.shankh.repo.FileReferenceRepo;
 import com.darzee.shankh.repo.ObjectFilesRepo;
 import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.repo.StitchOptionsRepo;
-import com.darzee.shankh.request.CreateStitchOptionRequest;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
-import com.darzee.shankh.request.innerObjects.UpdateOrderItemDetailRequest;
 import com.darzee.shankh.response.OrderItemDetails;
 import com.darzee.shankh.utils.CommonUtils;
 import io.jsonwebtoken.lang.Collections;
@@ -27,13 +24,20 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderItemService {
+
+    @Autowired
+    private StitchOptionService stitchOptionService;
+
+    @Autowired
+    private BoutiqueLedgerService ledgerService;
+
+    @Autowired
+    private OrderItemStateMachineService orderItemStateMachineService;
 
     @Autowired
     private OrderItemRepo orderItemRepo;
@@ -62,11 +66,12 @@ public class OrderItemService {
     @Autowired
     private ObjectFilesRepo objectFilesRepo;
 
+    @Transactional
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
         Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
         Map<String, Long> audioRefOrderItemIdMap = new HashMap<>();
         List<PriceBreakupDAO> priceBreakUpList = new ArrayList<>();
-        List<OrderItemDAO> orderItemList = Optional.ofNullable(order.getOrderItems()).orElse(new ArrayList<>());
+        List<OrderItemDAO> orderItemList = Optional.ofNullable(order.getNonDeletedItems()).orElse(new ArrayList<>());
         for (OrderItemDetailRequest itemDetail : orderItemDetails) {
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
             if (outfitType == null) {
@@ -85,7 +90,6 @@ public class OrderItemService {
                     itemDetail.getOutfitAlias(), measurementRevisionsDAO, order);
             orderItemDAO = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItemDAO,
                     new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-            orderItemList.add(orderItemDAO);
             List<PriceBreakupDAO> priceBreakupDAOList =
                     priceBreakUpService.generatePriceBreakupList(itemDetail.getPriceBreakup(), orderItemDAO);
             priceBreakUpList.addAll(priceBreakupDAOList);
@@ -95,25 +99,44 @@ public class OrderItemService {
             for (String audioRef : itemDetail.getAudioReferenceIds()) {
                 audioRefOrderItemIdMap.put(audioRef, orderItemDAO.getId());
             }
+            if (!CollectionUtils.isEmpty(itemDetail.getStitchOptionReferences())) {
+                stitchOptionService.addOrderItemId(itemDetail.getStitchOptionReferences(), orderItemDAO.getId());
+            }
+            orderItemDAO.setPriceBreakup(priceBreakUpList);
+            orderItemList.add(orderItemDAO);
         }
-        priceBreakUpService.savePriceBreakUp(priceBreakUpList);
+        if (!CollectionUtils.isEmpty(priceBreakUpList)) {
+            priceBreakUpService.savePriceBreakUp(priceBreakUpList);
+        }
         if (!CollectionUtils.isEmpty(clothRefOrderItemIdMap)) {
             objectFilesService.saveObjectImages(clothRefOrderItemIdMap, FileEntityType.ORDER_ITEM.getEntityType());
         }
         if (!CollectionUtils.isEmpty(audioRefOrderItemIdMap)) {
             objectFilesService.saveObjectImages(audioRefOrderItemIdMap, FileEntityType.AUDIO.getEntityType());
         }
+        order.setOrderItems(orderItemList);
         return orderItemList;
     }
 
     @Transactional
-    public OrderItemDAO updateOrderItem(Long orderItemId, UpdateOrderItemDetailRequest updateItemDetail) {
+    public OrderItemDAO updateOrderItem(Long orderItemId, OrderItemDetailRequest updateItemDetail) {
         OrderItemDAO orderItem = null;
         Optional<OrderItem> orderItemOb = orderItemRepo.findById(orderItemId);
         if (orderItemOb.isPresent()) {
             orderItem = mapper.orderItemToOrderItemDAO(orderItemOb.get(), new CycleAvoidingMappingContext());
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item ID is invalid");
+        }
+        if (orderItem.isStatusUpdated(updateItemDetail.getItemStatus())) {
+            OrderItemStatus status = OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(updateItemDetail.getItemStatus());
+            OrderItemStatus initialState = orderItem.getOrderItemStatus();
+            orderItemStateMachineService.isTransitionAllowed(initialState, status);
+            orderItem.setOrderItemStatus(status);
+            ledgerService.handleBoutiqueLedgerOnOrderItemUpdation(orderItem.getOrder().getBoutique().getId(), initialState, status);
+        }
+        if (Boolean.TRUE.equals(updateItemDetail.getIsDeleted())) {
+            orderItem.setIsDeleted(Boolean.TRUE);
+            ledgerService.handleBoutiqueLedgerOnOrderItemDeletion(orderItem.getOrder().getBoutique().getId(), orderItem);
         }
         if (orderItem.isTrialDateUpdated(updateItemDetail.getTrialDate())) {
             orderItem.setTrialDate(updateItemDetail.getTrialDate());
