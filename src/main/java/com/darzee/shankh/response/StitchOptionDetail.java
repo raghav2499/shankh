@@ -24,9 +24,9 @@ public class StitchOptionDetail {
         this.id = stitchOptionsDAO.getId();
         this.type = stitchOptionsDAO.getType().getName();
         this.label = stitchOptionsDAO.getKey();
-        if(StitchOptionType.COUNTER.equals(this.type)) {
-            this.minValue = value.get(0);
-            this.maxValue = value.get(value.size()-1);
+        if (StitchOptionType.COUNTER.getName().equals(this.type)) {
+            this.minValue = stitchOptionsDAO.getValue().get(0);
+            this.maxValue = stitchOptionsDAO.getValue().get(stitchOptionsDAO.getValue().size() - 1);
         } else {
             this.value = stitchOptionsDAO.getValue();
         }
