@@ -1,15 +1,20 @@
 package com.darzee.shankh.controller;
 
 import com.darzee.shankh.request.GetOrderDetailsRequest;
+import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.response.GetOrderResponse;
+import com.darzee.shankh.response.OrderSummary;
+import com.darzee.shankh.service.OrderOrderItemCommonService;
 import com.darzee.shankh.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Map;
 
 
@@ -20,12 +25,15 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-//    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @CrossOrigin
-//    public ResponseEntity<CreateOrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) throws Exception {
-//        ResponseEntity<CreateOrderResponse> response = orderService.createOrderAndGenerateInvoice(request);
-//        return response;
-//    }
+    @Autowired
+    private OrderOrderItemCommonService orderOrderItemCommonService;
+
+    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity<OrderSummary> createOrder(@Valid @RequestBody OrderCreationRequest request) throws Exception {
+        OrderSummary response = orderOrderItemCommonService.createOrder(request);
+        return new ResponseEntity(response, HttpStatus.CREATED);
+    }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin

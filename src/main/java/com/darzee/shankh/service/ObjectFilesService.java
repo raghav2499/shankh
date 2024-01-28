@@ -111,6 +111,18 @@ public class ObjectFilesService {
         return null;
     }
 
+    @Nullable
+    public String getMeasurementRevisionReferenceId(Long measurementRevisionId) {
+        Optional<ObjectFiles> measurementRevImage = repo.findByEntityIdAndEntityTypeAndIsValid(measurementRevisionId,
+                FileEntityType.MEASUREMENT_REVISION.getEntityType(),
+                Boolean.TRUE);
+        if (measurementRevImage.isPresent()) {
+            ObjectFilesDAO measurementRevImageDAO = mapper.objectImagesToObjectImagesDAO(measurementRevImage.get());
+            return measurementRevImageDAO.getReferenceId();
+        }
+        return null;
+    }
+
     public void invalidateExistingReferenceIds(String entityType, Long entityId) {
         List<ObjectFiles> validImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(entityId,
                 entityType,

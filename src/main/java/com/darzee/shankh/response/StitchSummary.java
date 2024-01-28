@@ -16,13 +16,11 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 
 public class StitchSummary {
-    private Long orderItemId;
     List<OrderStitchOptionResponse> orderStitchOptionList = new ArrayList<>();
 
-    public StitchSummary(Long orderItemId, List<OrderStitchOptionDAO> stitchOptionDAOs) {
-        this.orderItemId = orderItemId;
-        for(OrderStitchOptionDAO stitchOption : stitchOptionDAOs) {
-            orderStitchOptionList.add(new OrderStitchOptionResponse(stitchOption));
+    public StitchSummary(List<OrderStitchOptionDAO> orderStitchOptionDAOs) {
+        for(OrderStitchOptionDAO orderStitchOption : orderStitchOptionDAOs) {
+            orderStitchOptionList.add(new OrderStitchOptionResponse(orderStitchOption));
         }
     }
 }

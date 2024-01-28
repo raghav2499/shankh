@@ -14,14 +14,15 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderItemDetailRequest {
 
+    private Long id;
     private Boolean isPriorityOrder;
     private LocalDateTime trialDate;
-    @NotNull(message = "delivery_date cannot be null")
+    private Integer itemStatus;
     private LocalDateTime deliveryDate;
     @NotNull(message = "outfit_type cannot be null")
     private Integer outfitType;
     private String outfitAlias;
-    @NotNull(message = "Either order_type is not present or is invalid")
+    private Boolean isDeleted;
     private OrderType orderType;
     private Integer itemQuantity = 1;
     private List<String> clothImageReferenceIds;
@@ -30,6 +31,5 @@ public class OrderItemDetailRequest {
     private String specialInstructions;
     private Long measurementRevisionId;
     private List<Long> stitchOptionReferences;
-    @NotNull(message = "price_breakup cannot be null")
     private List<PriceBreakUpDetails> priceBreakup;
 }

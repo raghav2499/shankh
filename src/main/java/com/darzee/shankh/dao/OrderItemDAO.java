@@ -1,6 +1,5 @@
 package com.darzee.shankh.dao;
 
-import com.darzee.shankh.entity.OrderStitchOptions;
 import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
@@ -36,6 +35,7 @@ public class OrderItemDAO {
     private String inspiration;
 
     private Boolean isPriorityOrder;
+    private Boolean isDeleted;
 
     private OrderItemStatus orderItemStatus = OrderItemStatus.DRAFTED;
 
@@ -65,6 +65,11 @@ public class OrderItemDAO {
         this.measurementRevision = measurementRevision;
         this.outfitAlias = outfitAlias;
         this.order = orderDAO;
+    }
+
+    public boolean isStatusUpdated(Integer valueOrd) {
+        OrderItemStatus value = OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(valueOrd);
+        return value != null && !value.equals(this.getOrderItemStatus());
     }
 
     public boolean isTrialDateUpdated(LocalDateTime value) {

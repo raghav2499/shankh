@@ -45,9 +45,6 @@ public class BucketService {
     @Value("invoice/")
     private String invoiceDirectory;
 
-    @Value("measurement_revision/")
-    private String measurementRevisionDirectory;
-
     public UploadFileResponse uploadSingleImage(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
         try {
             Pair<String, String> fileUploadResult = uploadPhoto(multipartFile, uploadFileTypeOrdinal);
@@ -174,7 +171,7 @@ public class BucketService {
                     break;
                 case MEASUREMENT:
                     //for measurement file
-                    fileUploadResult = client.uploadFile(file, measurementRevisionDirectory + fileName);
+                    fileUploadResult = client.uploadMeasurementFile(file, fileName);
                 default:
                     // for image file
                     fileUploadResult = client.uploadFile(file, fileName);

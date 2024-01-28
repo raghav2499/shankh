@@ -9,6 +9,5 @@ import java.util.List;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateStitchOptionRequest {
-    private Long orderItemId;
     List<StitchDetails> stitchDetails;
 }

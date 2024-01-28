@@ -1,12 +1,10 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
-import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.Order;
-import com.darzee.shankh.enums.OrderStage;
 import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.PaymentMode;
@@ -29,6 +27,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
@@ -141,6 +140,21 @@ public class OrderService {
 //    }
 
     @Transactional
+    public OrderDAO findOrCreateNewOrder(Long orderId, Long boutiqueId, Long customerId) {
+        OrderDAO orderDAO = null;
+        if (orderId != null) {
+            Optional<Order> optionalOrder = orderRepo.findById(orderId);
+            if (optionalOrder.isPresent()) {
+                orderDAO = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
+            }
+        }
+        if (orderDAO == null) {
+            orderDAO = createNewOrder(boutiqueId, customerId);
+        }
+        return orderDAO;
+    }
+
+    @Transactional(REQUIRES_NEW)
     public OrderDAO createNewOrder(Long boutiqueId, Long customerId) {
         Optional<Customer> optionalCustomer = customerRepo.findById(customerId);
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(boutiqueId);
@@ -150,7 +164,14 @@ public class OrderService {
             CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(),
                     new CycleAvoidingMappingContext());
             OrderDAO orderDAO = setOrderSpecificDetails(boutiqueDAO, customerDAO);
-            orderDAO = mapper.orderObjectToDao(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()),
+            OrderAmountDAO orderAmountDAO = new OrderAmountDAO();
+            orderAmountDAO.setOrder(orderDAO);
+            orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(
+                    mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext());
+            orderDAO.setOrderAmount(orderAmountDAO);
+            orderDAO = mapper.orderObjectToDao(
+                    orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
             return orderDAO;
         }
@@ -179,7 +200,7 @@ public class OrderService {
             OrderAmountDAO orderAmount = order.getOrderAmount();
             CustomerDAO customer = order.getCustomer();
             List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
-            for (OrderItemDAO orderItem : order.getOrderItems()) {
+            for (OrderItemDAO orderItem : order.getNonDeletedItems()) {
                 OrderItemDetails orderItemDetails = orderItemService.getOrderItemDetails(orderItem);
                 orderItemDetailsList.add(orderItemDetails);
             }
@@ -213,12 +234,12 @@ public class OrderService {
                 orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order,
                         order.getBoutique().getId());
             }
-            List<PriceBreakupDAO> priceBreakupDAOList = order.getOrderItems().stream()
+            List<PriceBreakupDAO> priceBreakupDAOList = order.getNonDeletedItems().stream()
                     .map(OrderItemDAO::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
             postUpdateOrderValidation(orderAmountDAO.getTotalAmount(), priceBreakupDAOList);
             OrderSummary orderSummary = new OrderSummary(order.getId(), order.getInvoiceNo(),
                     orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
-                    order.getOrderItems());
+                    order.getNonDeletedItems());
             CreateOrderResponse response = new CreateOrderResponse("Order updated successfully", orderSummary);
             return new ResponseEntity(response, HttpStatus.OK);
         }
@@ -357,14 +378,13 @@ public class OrderService {
 
         if (Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
             order.setIsDeleted(Boolean.TRUE);
-            OrderStage orderStage = getOrderStage(order.getOrderStatus());
-            resetOrderAmountForDeletedOrders(order, orderStage);
+            resetOrderAmountForDeletedOrders(order, order.getOrderStatus());
         }
 
         Map<Long, OrderItemDAO> orderItemDAOMap = order.getOrderItemDAOMap();
         List<OrderItemDAO> updatedItems = new ArrayList<>();
         order = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(order,
-                        new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return order;
     }
 
@@ -424,7 +444,7 @@ public class OrderService {
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
         List<Pair<OrderItemDAO, String>> orderItemOutfitLinkPairList = new ArrayList<>();
-        for (OrderItemDAO orderItem : orderDAO.getOrderItems()) {
+        for (OrderItemDAO orderItem : orderDAO.getNonDeletedItems()) {
             String outfitImgLink = outfitImageLinkService.getOutfitImageLink(orderItem.getOutfitType());
             orderItemOutfitLinkPairList.add(Pair.of(orderItem, outfitImgLink));
         }
@@ -433,7 +453,7 @@ public class OrderService {
     }
 
     @Transactional(REQUIRES_NEW)
-    private OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO,
+    public OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO,
                                              CustomerDAO customerDAO) {
 
         String invoiceNo = generateOrderInvoiceNo();
@@ -448,7 +468,7 @@ public class OrderService {
     }
 
 
-    @Transactional(REQUIRES_NEW)
+    @Transactional
     private OrderDAO setOrderSpecificDetails(BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
 
         String invoiceNo = generateOrderInvoiceNo();
@@ -467,26 +487,48 @@ public class OrderService {
         }
     }
 
-    private OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
-        Double advanceRecieved = Optional.ofNullable(orderAmountDetails.getAdvanceOrderAmount()).orElse(0d);
-        Double totalOrderAmount = orderAmountDetails.getTotalOrderAmount();
-        OrderAmountDAO orderAmountDAO = new OrderAmountDAO(totalOrderAmount, advanceRecieved, orderDAO);
-        orderAmountDAO.setOrder(orderDAO);
+    @Transactional
+    public OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
+        Double amountRecieved = 0d;
+        if(orderAmountDetails != null && orderAmountDetails.getAdvanceOrderAmount() != null) {
+            amountRecieved = orderAmountDetails.getAdvanceOrderAmount();
+        }
+        Double totalOrderAmount = calculateTotalOrderAmount(orderDAO.getNonDeletedItems());
+
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        Double oldTotal = Optional.ofNullable(orderAmountDAO.getTotalAmount()).orElse(0d);
+        Double oldAmountRecieved = Optional.ofNullable(orderAmountDAO.getAmountRecieved()).orElse(0d);
+        orderAmountDAO.setTotalAmount(totalOrderAmount);
+        orderAmountDAO.setAmountRecieved(amountRecieved);
+
         orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
-        Double pendingAmount = totalOrderAmount - advanceRecieved;
-        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(pendingAmount, advanceRecieved,
+        Double deltaAmountRecieved = amountRecieved - oldAmountRecieved;
+        Double deltaPending = (totalOrderAmount - oldTotal) - deltaAmountRecieved;
+        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(deltaPending, deltaAmountRecieved,
                 orderDAO.getBoutique().getId());
 
-        if (advanceRecieved > 0) {
-            paymentService.recordPayment(advanceRecieved, PaymentMode.CASH, Boolean.TRUE, orderDAO);
+        if (deltaAmountRecieved > 0) {
+            paymentService.recordPayment(deltaAmountRecieved, PaymentMode.CASH, Boolean.TRUE, orderDAO);
         }
         return orderAmountDAO;
     }
 
+    private Double calculateTotalOrderAmount(List<OrderItemDAO> orderItems) {
+        List<PriceBreakupDAO> priceBreakups = orderItems.stream().map(item -> item.getPriceBreakup())
+                .flatMap(List::stream).collect(Collectors.toList());
+        Double totalAmount = 0d;
+        if(!CollectionUtils.isEmpty(priceBreakups)) {
+            for(PriceBreakupDAO priceBreakupDAO : priceBreakups) {
+                totalAmount += priceBreakupDAO.getValue() * priceBreakupDAO.getQuantity();
+            }
+        }
+        return totalAmount;
+    }
+
     @Transactional
-    private void resetOrderAmountForDeletedOrders(OrderDAO orderDAO, OrderStage orderStage) {
+    private void resetOrderAmountForDeletedOrders(OrderDAO orderDAO, OrderStatus status) {
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         Double pendingOrderAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
         Double amountRecieved = orderAmountDAO.getAmountRecieved();
@@ -496,28 +538,28 @@ public class OrderService {
         boutiqueLedgerService.handleBoutiqueLedgerForDeletedOrder(orderDAO.getBoutique().getId(),
                 pendingOrderAmount,
                 amountRecieved,
-                orderStage);
+                status);
     }
 
     private String generateOrderInvoiceNo() {
         return RandomStringUtils.randomAlphanumeric(6);
     }
 
-    @Transactional
-    private void updateLedgerIfApplicable(OrderDAO order, OrderStatus initialStatus) {
-        OrderStatus currentStatus = order.getOrderStatus();
-        Long boutiqueId = order.getBoutique().getId();
-        boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueId, initialStatus, currentStatus);
-    }
+//    @Transactional
+//    private void updateLedgerIfApplicable(OrderDAO order, OrderStatus initialStatus) {
+//        OrderStatus currentStatus = order.getOrderStatus();
+//        Long boutiqueId = order.getBoutique().getId();
+//        boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueId, initialStatus, currentStatus);
+//    }
 
-    private OrderStage getOrderStage(OrderStatus status) {
-        if (Constants.ACTIVE_ORDER_STATUS_LIST.contains(status)) {
-            return OrderStage.ACTIVE;
-        } else if (Constants.CLOSED_ORDER_STATUS_LIST.contains(status)) {
-            return OrderStage.CLOSED;
-        }
-        return OrderStage.OTHER;
-    }
+//    private OrderStage getOrderStage(OrderStatus status) {
+//        if (Constants.ACTIVE_ORDER_STATUS_LIST.contains(status)) {
+//            return OrderStage.ACTIVE;
+//        } else if (Constants.CLOSED_ORDER_STATUS_LIST.contains(status)) {
+//            return OrderStage.CLOSED;
+//        }
+//        return OrderStage.OTHER;
+//    }
 
     /**
      * This is a throw-away code, front-end team to handle the week data dynamically
