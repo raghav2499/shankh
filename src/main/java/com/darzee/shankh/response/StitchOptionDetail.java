@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -16,7 +17,7 @@ public class StitchOptionDetail {
     private Long id;
     private String type;
     private String label;
-    private List<String> value;
+    private List<OptionDetail> options;
     private String minValue;
     private String maxValue;
 
@@ -28,7 +29,11 @@ public class StitchOptionDetail {
             this.minValue = stitchOptionsDAO.getValue().get(0);
             this.maxValue = stitchOptionsDAO.getValue().get(stitchOptionsDAO.getValue().size() - 1);
         } else {
-            this.value = stitchOptionsDAO.getValue();
+            List<OptionDetail> optionDetails = new ArrayList<>();
+            for (String value : stitchOptionsDAO.getValue()) {
+                optionDetails.add(new OptionDetail(value));
+            }
+            this.options = optionDetails;
         }
     }
 }

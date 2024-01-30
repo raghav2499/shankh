@@ -182,6 +182,7 @@ public class OrderService {
         Specification<Order> orderSpecification = OrderSpecificationClause.getSpecificationBasedOnFilters(filterMap);
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingSortingMap);
         List<Order> orderDetails = orderRepo.findAll(orderSpecification, pagingCriteria).getContent();
+        Long totalRecordsCount = orderRepo.count(orderSpecification);
         List<OrderDAO> orderDAOList = Optional.ofNullable(orderDetails).orElse(new ArrayList<>())
                 .stream()
                 .map(order -> mapper.orderObjectToDao(order, new CycleAvoidingMappingContext()))
@@ -189,7 +190,7 @@ public class OrderService {
         List<OrderDetailResponse> orderDetailsList = orderDAOList.stream()
                 .map(order -> getOrderDetails(order))
                 .collect(Collectors.toList());
-        GetOrderResponse response = new GetOrderResponse(orderDetailsList);
+        GetOrderResponse response = new GetOrderResponse(orderDetailsList, totalRecordsCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
