@@ -100,11 +100,15 @@ public class OrderItemService {
             List<PriceBreakupDAO> priceBreakupDAOList =
                     priceBreakUpService.generatePriceBreakupList(itemDetail.getPriceBreakup(), orderItemDAO);
             priceBreakUpList.addAll(priceBreakupDAOList);
-            for (String imageRef : itemDetail.getClothImageReferenceIds()) {
-                clothRefOrderItemIdMap.put(imageRef, orderItemDAO.getId());
+            if (!CollectionUtils.isEmpty(itemDetail.getClothImageReferenceIds())) {
+                for (String imageRef : itemDetail.getClothImageReferenceIds()) {
+                    clothRefOrderItemIdMap.put(imageRef, orderItemDAO.getId());
+                }
             }
-            for (String audioRef : itemDetail.getAudioReferenceIds()) {
-                audioRefOrderItemIdMap.put(audioRef, orderItemDAO.getId());
+            if (!CollectionUtils.isEmpty(itemDetail.getAudioReferenceIds())) {
+                for (String audioRef : itemDetail.getAudioReferenceIds()) {
+                    audioRefOrderItemIdMap.put(audioRef, orderItemDAO.getId());
+                }
             }
             if (!CollectionUtils.isEmpty(itemDetail.getStitchOptionReferences())) {
                 stitchOptionService.addOrderItemId(itemDetail.getStitchOptionReferences(), orderItemDAO.getId());
@@ -200,10 +204,11 @@ public class OrderItemService {
 
     public ResponseEntity<GetOrderItemResponse> getOrderItemDetails(Long boutiqueId, Long orderId, String orderItemStatusList,
                                                                     Boolean priorityOrdersOnly, String sortKey,
-                                                                    Integer countPerPage, Integer pageCount) {
+                                                                    Integer countPerPage, Integer pageCount, String deliveryDateFrom,
+                                                                    String deliveryDateTill) {
         validateGetOrderItemRequest(boutiqueId, orderId);
         Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList,
-                priorityOrdersOnly, null, null, null, orderId);
+                priorityOrdersOnly, null, deliveryDateFrom, deliveryDateTill, orderId);
         Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, sortKey);
         Specification<OrderItem> orderItemSpecification = OrderItemSpecificationClause.getSpecificationBasedOnFilters(filterMap);
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingCriteriaMap);
@@ -241,9 +246,21 @@ public class OrderItemService {
     }
 
     private void validateGetOrderItemRequest(Long boutiqueId, Long orderId) {
-        if(boutiqueId == null && orderId == null) {
+        if (boutiqueId == null && orderId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either Order ID or Boutique ID is mandatory");
-        };
+        }
+    }
+
+    public boolean validateMandatoryOrderItemFields(List<OrderItemDAO> orderItems) {
+        for (OrderItemDAO orderItem : orderItems) {
+            orderItem.mandatoryFieldsPresent();
+        }
+        return true;
+    }
+
+    public void acceptOrderItems(List<OrderItemDAO> orderItems) {
+        orderItems.forEach(orderItem -> orderItem.setOrderItemStatus(OrderItemStatus.ACCEPTED));
+        orderItemRepo.saveAll(mapper.orderItemDAOListToOrderItemList(orderItems, new CycleAvoidingMappingContext()));
     }
 
 }

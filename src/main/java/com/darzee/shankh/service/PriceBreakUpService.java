@@ -10,6 +10,7 @@ import com.darzee.shankh.request.PriceBreakUpDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
@@ -65,8 +66,10 @@ public class PriceBreakUpService {
     public List<PriceBreakupDAO> generatePriceBreakupList(List<PriceBreakUpDetails> priceBreakUpDetails,
                                                           OrderItemDAO orderItemDAO) {
         List<PriceBreakupDAO> priceBreakupDAOList = new ArrayList<>();
-        for (PriceBreakUpDetails priceBreakUpDetail : priceBreakUpDetails) {
-            priceBreakupDAOList.add(new PriceBreakupDAO(priceBreakUpDetail, orderItemDAO));
+        if (!CollectionUtils.isEmpty(priceBreakUpDetails)) {
+            for (PriceBreakUpDetails priceBreakUpDetail : priceBreakUpDetails) {
+                priceBreakupDAOList.add(new PriceBreakupDAO(priceBreakUpDetail, orderItemDAO));
+            }
         }
         return priceBreakupDAOList;
     }

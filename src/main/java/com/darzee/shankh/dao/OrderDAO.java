@@ -52,4 +52,22 @@ public class OrderDAO {
 
     }
 
+    public boolean validateMandatoryOrderFields() {
+        if (this.boutique != null && this.customer != null) {
+            return true;
+        }
+        return false;
+    }
+
+    public Double getPriceBreakupSum() {
+        Double priceBreakupSum = 0d;
+        if(Boolean.TRUE.equals(isDeleted)) {
+            return priceBreakupSum;
+        }
+        priceBreakupSum = getNonDeletedItems().stream()
+                .map(item -> item.getPriceBreakup()).flatMap(List::stream)
+                .mapToDouble(pb -> pb.getValue()).sum();
+        return priceBreakupSum;
+    }
+
 }

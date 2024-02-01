@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +40,18 @@ public class OrderItemSpecificationClause {
         };
     }
 
+    public static Specification<OrderItem> findOrderItemsByDeliveryDateFrom(LocalDateTime value) {
+        return (root, cq, cb) -> cb.greaterThanOrEqualTo(root.get("deliveryDate"), value);
+    }
+
+    public static Specification<OrderItem> findOrderItemsByDeliveryDateTill(LocalDateTime value) {
+        return (root, cq, cb) -> cb.lessThanOrEqualTo(root.get("deliveryDate"), value);
+    }
+
+
     public static Specification<OrderItem> findNonDeletedOrderItems() {
         return (root, cq, cb) -> cb.equal(root.get("isDeleted"), false);
     }
-
     private static Specification<OrderItem> getAppropriatePredicate(String key, Object value) {
         OrderFilter filter = OrderFilter.getFilter(key);
         if (filter == null) {
@@ -57,6 +66,10 @@ public class OrderItemSpecificationClause {
                 return findPriorityOrderItem((Boolean) value);
             case ORDER_ID:
                 return findOrderItemsByOrderId((Long) value);
+            case DELIVERY_DATE_FROM:
+                return findOrderItemsByDeliveryDateFrom((LocalDateTime) value);
+            case DELIVERY_DATE_TILL:
+                return findOrderItemsByDeliveryDateTill((LocalDateTime) value);
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We've not started grouping on " + filter);
         }

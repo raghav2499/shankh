@@ -68,9 +68,12 @@ public class OrderItemController {
                                                               @RequestParam(name = "order_id", required = false) Long orderId,
                                                               @RequestParam(name = "order_item_status_list") String orderItemStatusList,
                                                               @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
+                                                              @RequestParam(name = "delivery_date_from", required = false) String deliveryDateFrom,
+                                                              @RequestParam(name = "delivery_date_till", required = false) String deliveryDateTill,
                                                               @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
                                                               @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                               @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
-        return orderItemService.getOrderItemDetails(boutiqueId, orderId, orderItemStatusList, priorityOrdersOnly, sortKey, countPerPage, pageCount);
+        return orderItemService.getOrderItemDetails(boutiqueId, orderId, orderItemStatusList,
+                priorityOrdersOnly, sortKey, countPerPage, pageCount, deliveryDateFrom, deliveryDateTill);
     }
 }

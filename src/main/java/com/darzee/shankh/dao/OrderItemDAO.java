@@ -9,9 +9,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -101,6 +105,21 @@ public class OrderItemDAO {
         return (this.measurementRevision == null && value != null)
                 || (this.measurementRevision != null && value != null && !value.equals(
                 this.getMeasurementRevision().getId()));
+    }
+
+    public boolean mandatoryFieldsPresent() {
+        String outfitAlias = Optional.ofNullable(this.outfitAlias).orElse(this.outfitType.getDisplayString());
+        if (this.deliveryDate == null || this.orderType == null || this.outfitType == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Some Mandatory fields in Order Item "
+                            + outfitAlias
+                            + "are missing. Delivery date, Order type, Outfit Type are Mandatory params");
+        }
+        if (CollectionUtils.isEmpty(this.priceBreakup)) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Price Break Up of Order Item " + outfitAlias + " is missing");
+        }
+        return true;
     }
 
 }

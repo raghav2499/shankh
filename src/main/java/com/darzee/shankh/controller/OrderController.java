@@ -78,4 +78,10 @@ public class OrderController {
     public ResponseEntity getInvoice(@PathVariable("id") Long orderId) {
         return orderService.getOrderInvoiceLink(orderId);
     }
+
+    @PostMapping(value = "/{id}/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity confirmOrder(@PathVariable("id") Long orderId) {
+        return orderService.confirmOrder(orderId);
+    }
 }

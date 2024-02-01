@@ -166,7 +166,7 @@ public class OrderService {
             OrderAmountDAO orderAmountDAO = new OrderAmountDAO();
             orderAmountDAO.setOrder(orderDAO);
             orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(
-                    mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
+                            mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
             orderDAO.setOrderAmount(orderAmountDAO);
             orderDAO = mapper.orderObjectToDao(
@@ -243,6 +243,34 @@ public class OrderService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
     }
 
+    @Transactional
+    public ResponseEntity<OrderSummary> confirmOrder(Long orderId) {
+        Optional<Order> order = orderRepo.findById(orderId);
+        if (!order.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order with ID " + orderId + " doesn't exist");
+        }
+        OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
+
+        if (!orderDAO.validateMandatoryOrderFields()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Some mandatory fields in order are missing." +
+                    " Boutique ID and customer ID are mandatory fields");
+        }
+        orderItemService.validateMandatoryOrderItemFields(orderDAO.getOrderItems());
+        Double priceBreakupSum = orderDAO.getPriceBreakupSum();
+        Double totalOrderAmount = orderDAO.getOrderAmount().getTotalAmount();
+        if (!priceBreakupSum.equals(totalOrderAmount)) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Items' Price Breakups are not summing up to total amount. " +
+                            "Total amount " + totalOrderAmount + " and price break up sum "
+                            + priceBreakupSum);
+        }
+        orderDAO.setOrderStatus(OrderStatus.ACCEPTED);
+        orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
+        orderItemService.acceptOrderItems(orderDAO.getNonDeletedItems());
+        OrderSummary summary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(), totalOrderAmount,
+                orderDAO.getOrderAmount().getAmountRecieved(), orderDAO.getNonDeletedItems());
+        return new ResponseEntity<>(summary, HttpStatus.OK);
+    }
 
     public SalesDashboard getWeekWiseSales(Long boutiqueId, int month, int year) {
         LocalDate monthStart = LocalDate.of(year, month, 1);
@@ -451,7 +479,7 @@ public class OrderService {
 
     @Transactional(REQUIRES_NEW)
     public OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO,
-                                             CustomerDAO customerDAO) {
+                                            CustomerDAO customerDAO) {
 
         String invoiceNo = generateOrderInvoiceNo();
         OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
@@ -487,7 +515,7 @@ public class OrderService {
     @Transactional
     public OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
         Double amountRecieved = 0d;
-        if(orderAmountDetails != null && orderAmountDetails.getAdvanceOrderAmount() != null) {
+        if (orderAmountDetails != null && orderAmountDetails.getAdvanceOrderAmount() != null) {
             amountRecieved = orderAmountDetails.getAdvanceOrderAmount();
         }
         Double totalOrderAmount = calculateTotalOrderAmount(orderDAO.getNonDeletedItems());
@@ -516,8 +544,8 @@ public class OrderService {
         List<PriceBreakupDAO> priceBreakups = orderItems.stream().map(item -> item.getPriceBreakup())
                 .flatMap(List::stream).collect(Collectors.toList());
         Double totalAmount = 0d;
-        if(!CollectionUtils.isEmpty(priceBreakups)) {
-            for(PriceBreakupDAO priceBreakupDAO : priceBreakups) {
+        if (!CollectionUtils.isEmpty(priceBreakups)) {
+            for (PriceBreakupDAO priceBreakupDAO : priceBreakups) {
                 totalAmount += priceBreakupDAO.getValue() * priceBreakupDAO.getQuantity();
             }
         }
