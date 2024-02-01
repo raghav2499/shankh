@@ -101,7 +101,7 @@ public interface DaoEntityMapper {
 
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if (orderList == null) {
-            return null;
+            return new ArrayList<>();
         }
         List<OrderDAO> orderDAOList = new ArrayList<>();
         for (Order order : orderList) {

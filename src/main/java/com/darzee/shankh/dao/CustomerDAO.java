@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -44,6 +45,10 @@ public class CustomerDAO {
 
     public boolean isAgeUpdated(Integer value) {
         return (value != null && !value.equals(this.age)) || (value == null && this.age != null);
+    }
+
+    public String constructName() {
+        return (Optional.ofNullable(this.firstName).orElse("") + " " + Optional.ofNullable(this.lastName).orElse("")).trim();
     }
 
 }

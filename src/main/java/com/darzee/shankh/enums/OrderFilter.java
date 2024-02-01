@@ -12,7 +12,9 @@ public enum OrderFilter {
 
     DELIVERY_DATE_FROM("deliveryDateFrom"),
 
-    DELIVERY_DATE_TILL("deliveryDateTill");
+    DELIVERY_DATE_TILL("deliveryDateTill"),
+
+    ORDER_ID("order_id");
 
     OrderFilter(String filterName) {
         this.filterName = filterName;

@@ -17,7 +17,6 @@ import com.darzee.shankh.request.UpdateOrderRequest;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.*;
 import com.darzee.shankh.response.*;
-import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.pdfutils.BillGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -183,10 +182,7 @@ public class OrderService {
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingSortingMap);
         List<Order> orderDetails = orderRepo.findAll(orderSpecification, pagingCriteria).getContent();
         Long totalRecordsCount = orderRepo.count(orderSpecification);
-        List<OrderDAO> orderDAOList = Optional.ofNullable(orderDetails).orElse(new ArrayList<>())
-                .stream()
-                .map(order -> mapper.orderObjectToDao(order, new CycleAvoidingMappingContext()))
-                .collect(Collectors.toList());
+        List<OrderDAO> orderDAOList = mapper.orderObjectListToDAOList(orderDetails, new CycleAvoidingMappingContext());
         List<OrderDetailResponse> orderDetailsList = orderDAOList.stream()
                 .map(order -> getOrderDetails(order))
                 .collect(Collectors.toList());
@@ -344,7 +340,7 @@ public class OrderService {
         if (order.isPresent()) {
             OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
             CustomerDAO customerDAO = orderDAO.getCustomer();
-            String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+            String customerName = customerDAO.constructName();
             OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
             BoutiqueDAO boutique = orderDAO.getBoutique();
             File bill = billGenerator.generateBill(customerName,

@@ -1,5 +1,6 @@
 package com.darzee.shankh.controller;
 
+import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.request.CreateStitchOptionRequest;
 import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/order_item")
 public class OrderItemController {
 
     @Autowired
@@ -27,8 +27,10 @@ public class OrderItemController {
 
     @Autowired
     private StitchOptionService stitchOptionService;
+    @Autowired
+    private OrderItemRepo orderItemRepo;
 
-    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/order_item/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<CreateOrderResponse> createOrderItem(@Valid @RequestBody OrderCreationRequest request) {
         OrderSummary orderSummary = orderOrderItemCommonService.createOrderItem(request);
@@ -37,26 +39,38 @@ public class OrderItemController {
         return new ResponseEntity<>(createOrderResponse, HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/order_item/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<OrderSummary> updateOrderItem(@PathVariable("id") Long orderItemId,
-                                                            @Valid @RequestBody OrderItemDetailRequest orderItemDetails) {
+                                                        @Valid @RequestBody OrderItemDetailRequest orderItemDetails) {
         OrderSummary orderSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
         return new ResponseEntity<>(orderSummary, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/order_item/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity getOrderItem(@PathVariable("id") Long orderItemId) {
         return new ResponseEntity<>(orderItemService.getOrderItemDetails(orderItemId), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/stitch_options", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/order_item/stitch_options", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<CreateStitchResponse> createStitchOptions(@Valid @RequestBody CreateStitchOptionRequest request) {
-        StitchSummary stitchSummary  = stitchOptionService.createStitchOptions(request);
+        StitchSummary stitchSummary = stitchOptionService.createStitchOptions(request);
         CreateStitchResponse createStitchResponse = new CreateStitchResponse("Stitch options created successfully",
                 stitchSummary);
         return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "/order_item", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity<GetOrderItemResponse> getOrderItems(@RequestParam(name = "boutique_id", required = false) Long boutiqueId,
+                                                              @RequestParam(name = "order_id", required = false) Long orderId,
+                                                              @RequestParam(name = "order_item_status_list") String orderItemStatusList,
+                                                              @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
+                                                              @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
+                                                              @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
+                                                              @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
+        return orderItemService.getOrderItemDetails(boutiqueId, orderId, orderItemStatusList, priorityOrdersOnly, sortKey, countPerPage, pageCount);
     }
 }

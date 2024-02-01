@@ -47,8 +47,8 @@ public class OrderController {
                                                      @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                      @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
         Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList, priorityOrdersOnly,
-                customerId, deliveryDateFrom, deliveryDateTill);
-        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount);
+                customerId, deliveryDateFrom, deliveryDateTill, null);
+        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, null);
         return orderService.getOrder(filterMap, pagingCriteriaMap);
     }
 

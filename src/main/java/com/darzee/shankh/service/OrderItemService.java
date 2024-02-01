@@ -9,16 +9,18 @@ import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.FileReferenceRepo;
-import com.darzee.shankh.repo.ObjectFilesRepo;
-import com.darzee.shankh.repo.OrderItemRepo;
-import com.darzee.shankh.repo.StitchOptionsRepo;
+import com.darzee.shankh.repo.*;
+import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
+import com.darzee.shankh.response.GetOrderItemResponse;
 import com.darzee.shankh.response.OrderItemDetails;
 import com.darzee.shankh.utils.CommonUtils;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -58,6 +60,9 @@ public class OrderItemService {
     private FileReferenceRepo fileReferenceRepo;
 
     @Autowired
+    private FilterOrderService filterOrderService;
+
+    @Autowired
     private AmazonClient s3Client;
     @Autowired
     private DaoEntityMapper mapper;
@@ -65,6 +70,8 @@ public class OrderItemService {
     private MeasurementService measurementService;
     @Autowired
     private ObjectFilesRepo objectFilesRepo;
+    @Autowired
+    private OrderRepo orderRepo;
 
     @Transactional
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
@@ -191,6 +198,23 @@ public class OrderItemService {
         return getOrderItemDetails(orderItemDAO);
     }
 
+    public ResponseEntity<GetOrderItemResponse> getOrderItemDetails(Long boutiqueId, Long orderId, String orderItemStatusList,
+                                                                    Boolean priorityOrdersOnly, String sortKey,
+                                                                    Integer countPerPage, Integer pageCount) {
+        validateGetOrderItemRequest(boutiqueId, orderId);
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList,
+                priorityOrdersOnly, null, null, null, orderId);
+        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, sortKey);
+        Specification<OrderItem> orderItemSpecification = OrderItemSpecificationClause.getSpecificationBasedOnFilters(filterMap);
+        Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingCriteriaMap);
+        List<OrderItem> orderItems = orderItemRepo.findAll(orderItemSpecification, pagingCriteria).getContent();
+        List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems, new CycleAvoidingMappingContext());
+        List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream()
+                .map(orderItem -> new OrderItemDetails(orderItem)).collect(Collectors.toList());
+        GetOrderItemResponse response = new GetOrderItemResponse(orderItemDetails);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     public OrderItemDetails getOrderItemDetails(OrderItemDAO orderItem) {
         OutfitType outfitType = orderItem.getOutfitType();
         String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
@@ -214,6 +238,12 @@ public class OrderItemService {
             return s3Client.generateShortLivedUrls(clothImageFileNames);
         }
         return new ArrayList<>();
+    }
+
+    private void validateGetOrderItemRequest(Long boutiqueId, Long orderId) {
+        if(boutiqueId == null && orderId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either Order ID or Boutique ID is mandatory");
+        };
     }
 
 }

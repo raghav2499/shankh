@@ -105,7 +105,7 @@ public class CustomerService {
             Optional<Customer> existingCustomer = customerRepo.findByBoutiqueIdAndPhoneNumber(optionalBoutique.get().getId(), phoneNumber);
             if (existingCustomer.isPresent()) {
                 CustomerDAO customerDAO = mapper.customerObjectToDao(existingCustomer.get(), new CycleAvoidingMappingContext());
-                String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+                String customerName = customerDAO.constructName();
                 String gender = customerDAO.getGender() != null ? customerDAO.getGender().getString() : null;
                 response = new CreateCustomerResponse(customerName, customerDAO.getPhoneNumber(), "",
                         customerDAO.getId(), gender, "Customer already registered");
@@ -130,7 +130,7 @@ public class CustomerService {
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
 
-            String customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+            String customerName = customerDAO.constructName();
             String gender = customerDAO.getGender() != null ? customerDAO.getGender().getString() : null;
             response = new CreateCustomerResponse(customerName, customerDAO.getPhoneNumber(), "",
                     customerDAO.getId(), gender, "Customer created successfully");
@@ -181,7 +181,7 @@ public class CustomerService {
             customer = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customer,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
-            String customerName = CommonUtils.constructName(customer.getFirstName(), customer.getLastName());
+            String customerName = customer.constructName();
             String gender = customer.getGender() != null ? customer.getGender().getString() : null;
             CreateCustomerResponse response = new CreateCustomerResponse(customerName, customer.getPhoneNumber(),
                     getCustomerProfilePicLink(customerId), customer.getId(), gender,

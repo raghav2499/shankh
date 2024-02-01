@@ -32,6 +32,10 @@ public class OrderItemDetails {
     private List<String> clothImageRefIds;
     private List<String> clothImagesLink;
     private String outfitTypeImageLink;
+    private Long orderId;
+    private String customerName;
+    private String status;
+
     public OrderItemDetails(OrderItemDAO orderItem, String outfitTypeImgLink) {
         OutfitType outfitType = orderItem.getOutfitType();
         this.isPriorityOrder = Optional.ofNullable(orderItem.getIsPriorityOrder()).orElse(Boolean.FALSE);
@@ -42,6 +46,17 @@ public class OrderItemDetails {
         this.outfitTypeIndex = outfitType.getOrdinal();
         this.outfitTypeImageLink = outfitTypeImgLink;
         this.pieces = outfitType.getPieces();
+    }
+
+    public OrderItemDetails(OrderItemDAO orderItem) {
+        this.orderId = orderItem.getOrder().getId();
+        this.customerName = orderItem.getOrder().getCustomer().constructName();
+        this.type = orderItem.getOrderType().getDisplayName();
+        this.isPriorityOrder = orderItem.getIsPriorityOrder();
+        this.status = orderItem.getOrderItemStatus().getDisplayString();
+        this.outfitType = orderItem.getOutfitType().getDisplayString();
+        this.trialDate = (orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null);
+        this.deliveryDate = orderItem.getDeliveryDate().toString();
     }
 
     public OrderItemDetails(List<String> clothImagesReferenceIds, List<String> clothImageUrlLinks,

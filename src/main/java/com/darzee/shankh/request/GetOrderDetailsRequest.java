@@ -18,10 +18,12 @@ import static com.darzee.shankh.enums.OrderItemSort.TRIAL_DATE;
 
 public class GetOrderDetailsRequest {
 
-    public static Map<String, Object> getPagingCriteria(Integer countPerPage, Integer pageCount) {
+    public static Map<String, Object> getPagingCriteria(Integer countPerPage, Integer pageCount, String sortKey) {
         Map<String, Object> finalParamsMap = new HashMap<>();
-        pageCount = pageCount - 1;//pageCount is 0 indexed
-//        setSortingCriteria(finalParamsMap, sortKey);
+        pageCount = pageCount - 1; //pageCount is 0 indexed
+        if (sortKey != null) {
+            setSortingCriteria(finalParamsMap, sortKey);
+        }
         setPagingCriteria(finalParamsMap, countPerPage, pageCount);
         return finalParamsMap;
     }
@@ -34,7 +36,7 @@ public class GetOrderDetailsRequest {
      * @return
      */
     public static Map<String, Object> getFilterMap(Long boutiqueId, String statuses, Boolean priorityOrdersOnly,
-                                                   Long customerId, String deliveryDateFrom, String deliveryDateTill) {
+                                                   Long customerId, String deliveryDateFrom, String deliveryDateTill, Long orderId) {
         Map<String, Object> filterMap = new HashMap<>();
         if (boutiqueId != null) {
             filterMap.put(BOUTIQUE_ID.getFilterName(), boutiqueId);
@@ -60,6 +62,9 @@ public class GetOrderDetailsRequest {
         }
         if (deliveryDateTill != null) {
             filterMap.put(DELIVERY_DATE_TILL.getFilterName(), LocalDateTime.parse(deliveryDateTill));
+        }
+        if(orderId != null) {
+            filterMap.put(ORDER_ID.getFilterName(), orderId);
         }
         return filterMap;
     }
