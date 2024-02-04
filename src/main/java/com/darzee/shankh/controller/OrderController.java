@@ -1,6 +1,5 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.response.GetOrderResponse;
@@ -15,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Map;
 
 
 @RestController
@@ -38,18 +36,18 @@ public class OrderController {
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<GetOrderResponse> getOrder(@RequestParam(name = "boutique_id") Long boutiqueId,
-                                                     @RequestParam(name = "order_item_status_list") String orderItemStatusList,
+                                                     @RequestParam(name = "order_item_status_list", required = false) String orderItemStatusList,
                                                      @RequestParam(name = "customer_id", required = false) Long customerId,
                                                      @RequestParam(name = "delivery_date_from", required = false) String deliveryDateFrom,
                                                      @RequestParam(name = "delivery_date_till", required = false) String deliveryDateTill,
                                                      @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
+                                                     @RequestParam(name = "payment_due", required = false) Boolean paymentDue,
+                                                     @RequestParam(name = "order_status_list", required = false) String orderStatusList,
 //                                                     @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
                                                      @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                      @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
-        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList, priorityOrdersOnly,
-                customerId, deliveryDateFrom, deliveryDateTill, null);
-        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, null);
-        return orderService.getOrder(filterMap, pagingCriteriaMap);
+        return orderService.getOrder(boutiqueId, orderItemStatusList, orderStatusList,
+                priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill, paymentDue, countPerPage, pageCount);
     }
 
 
@@ -66,7 +64,7 @@ public class OrderController {
 //        return orderService.updateOrder(orderId, request);
 //    }
 
-    @PostMapping(value = "/{id}/recieve_payment" , produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/recieve_payment", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity recievePayment(@PathVariable("id") Long orderId,
                                          @Validated @RequestBody RecievePaymentRequest request) {

@@ -9,7 +9,7 @@ import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.MeasurementRevisions;
-import com.darzee.shankh.entity.Measurements;
+import com.darzee.shankh.entity.OrderItem;
 import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
@@ -65,33 +65,44 @@ public class MeasurementService {
     @Autowired
     private AmazonClient s3Client;
 
-    public ResponseEntity getMeasurementDetails(Long customerId, Long orderItemId,
-                                                Integer outfitTypeIndex,
-                                                String scale,
-                                                Boolean nonEmptyValuesOnly) throws Exception {
+    public ResponseEntity getMeasurementDetailsResponse(Long customerId, Long orderItemId,
+                                                        Integer outfitTypeIndex,
+                                                        String scale,
+                                                        Boolean nonEmptyValuesOnly) throws Exception {
+        OverallMeasurementDetails measurementDetails = getMeasurementDetails(customerId, orderItemId,
+                outfitTypeIndex, scale, nonEmptyValuesOnly);
+        return new ResponseEntity(measurementDetails, HttpStatus.OK);
+    }
+
+    public OverallMeasurementDetails getMeasurementDetails(Long customerId, Long orderItemId,
+                                                           Integer outfitTypeIndex,
+                                                           String scale,
+                                                           Boolean nonEmptyValuesOnly) throws Exception {
         validateGetMeasurementRequestParams(customerId, orderItemId, outfitTypeIndex, scale);
 
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-        Optional<Customer> customer = customerRepo.findById(customerId);
-        Optional<Measurements> measurements = measurementsRepo.findOneByCustomerIdAndOutfitType(customerId, outfitType);
-        OverallMeasurementDetails overallMeasurementDetails = null;
-        if (customer.isPresent()) {
-            boolean mandatoryParamsSet = measurements.isPresent() ? true : false;
-            MeasurementsDAO measurementsDAO = measurements.isPresent()
-                    ? mapper.measurementsToMeasurementDAO(measurements.get(), new CycleAvoidingMappingContext())
-                    : new MeasurementsDAO();
-            MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
-            overallMeasurementDetails = outfitTypeService.setMeasurementDetails(measurementsDAO,
-                    measurementScale,
-                    nonEmptyValuesOnly);
-            overallMeasurementDetails.setMessage(getMeasurementDetailsMessage(mandatoryParamsSet));
-            overallMeasurementDetails.setMeasurementUpdatedAt(measurementsDAO.getUpdatedAt());
-            return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);
+        MeasurementRevisions measurementRevision = null;
+        if (orderItemId != null) {
+            Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
+            if (orderItem.isPresent()) {
+                measurementRevision = orderItem.get().getMeasurementRevision();
+            }
+        } else if (measurementRevision == null) {
+            measurementRevision = measurementRevisionsRepo.findByCustomerIdAndOutfitTypeOrderByIdDesc(customerId, outfitType);
         }
-
-        overallMeasurementDetails = new OverallMeasurementDetails("customer_id is invalid");
-        return new ResponseEntity(overallMeasurementDetails, HttpStatus.OK);
+        MeasurementRevisionsDAO revisionsDAO = new MeasurementRevisionsDAO();
+        if (measurementRevision != null) {
+            revisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(measurementRevision);
+        }
+        OverallMeasurementDetails overallMeasurementDetails = null;
+        MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
+        overallMeasurementDetails = outfitTypeService.setMeasurementDetails(revisionsDAO,
+                measurementScale,
+                nonEmptyValuesOnly);
+        overallMeasurementDetails.setMessage(getMeasurementDetailsMessage(revisionsDAO));
+        overallMeasurementDetails.setMeasurementUpdatedAt(revisionsDAO.getCreatedAt());
+        return overallMeasurementDetails;
     }
 
     public ResponseEntity saveMeasurementDetails(MeasurementDetails measurementDetails) throws Exception {
@@ -139,7 +150,7 @@ public class MeasurementService {
         List<MeasurementRevisionData> data = new ArrayList<>(measurementRevisions.size());
         for (MeasurementRevisionsDAO revision : measurementRevisions) {
             MeasurementRevisionData revisionData = null;
-            if(!revision.getMeasurementValue().isEmpty()) {
+            if (!revision.getMeasurementValue().isEmpty()) {
                 revisionData = new MeasurementRevisionData(revision);
             } else {
                 String referenceId = objectFilesService.getMeasurementRevisionReferenceId(revision.getId());
@@ -162,8 +173,8 @@ public class MeasurementService {
         return measurementRevisionsDAO;
     }
 
-    private String getMeasurementDetailsMessage(boolean mandatoryParamsSet) {
-        String message = mandatoryParamsSet
+    private String getMeasurementDetailsMessage(MeasurementRevisionsDAO revisionsDAO) {
+        String message = (revisionsDAO != null)
                 ? "Measurement details fetched sucessfully"
                 : "Measurement details not found";
         return message;
@@ -171,7 +182,7 @@ public class MeasurementService {
 
     private void validateGetMeasurementRequestParams(Long customerId, Long orderItemId,
                                                      Integer outfitTypeIndex, String scale) {
-        if(orderItemId == null && (customerId == null || outfitTypeIndex == null)) {
+        if (orderItemId == null && (customerId == null || outfitTypeIndex == null)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either send order item id or (outfit type and customer id)");
         }
         if (outfitTypeIndex != null && !OutfitType.getOutfitOrdinalEnumMap().containsKey(outfitTypeIndex)) {

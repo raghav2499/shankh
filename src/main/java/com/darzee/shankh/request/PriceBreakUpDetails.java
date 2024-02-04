@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PriceBreakUpDetails {
-
     private Long id;
     private String component;
     private Double value;

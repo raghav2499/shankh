@@ -67,8 +67,8 @@ public class ObjectFilesService {
     }
 
     @Nullable
-    public List<String> getClothReferenceIds(Long orderId) {
-        List<ObjectFiles> clothImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(orderId,
+    public List<String> getClothReferenceIds(Long orderItemId) {
+        List<ObjectFiles> clothImages = repo.findAllByEntityIdAndEntityTypeAndIsValid(orderItemId,
                 FileEntityType.ORDER_ITEM.getEntityType(),
                 Boolean.TRUE);
         if (!Collections.isEmpty(clothImages)) {
@@ -78,6 +78,22 @@ public class ObjectFilesService {
                     .map(clothImage -> clothImage.getReferenceId())
                     .collect(Collectors.toList());
             return clothImagesReferenceIds;
+        }
+        return null;
+    }
+
+    @Nullable
+    public List<String> getAudioReferenceIds(Long orderItemId) {
+        List<ObjectFiles> audioFiles = repo.findAllByEntityIdAndEntityTypeAndIsValid(orderItemId,
+                FileEntityType.AUDIO.getEntityType(),
+                Boolean.TRUE);
+        if (!Collections.isEmpty(audioFiles)) {
+            List<ObjectFilesDAO> audioFilesDAO = CommonUtils.mapList(audioFiles,
+                    mapper::objectImagesToObjectImagesDAO);
+            List<String> audioFileReferenceIds = audioFilesDAO.stream()
+                    .map(audio -> audio.getReferenceId())
+                    .collect(Collectors.toList());
+            return audioFileReferenceIds;
         }
         return null;
     }

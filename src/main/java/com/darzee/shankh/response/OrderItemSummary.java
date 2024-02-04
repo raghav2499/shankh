@@ -8,12 +8,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderItemSummary {
+
+    private Long id;
     private String outfitType;
     private String trialDate;
     private String deliveryDate;
@@ -21,12 +26,16 @@ public class OrderItemSummary {
     private String outfitAlias;
 
     private Integer quantity;
+    private List<PriceBreakupSummary> priceBreakup;
 
     public OrderItemSummary(OrderItemDAO orderItem) {
+        this.id = orderItem.getId();
         this.deliveryDate = orderItem.getDeliveryDate().toString();
         this.outfitType = orderItem.getOutfitType().getDisplayString();
         this.trialDate = orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null;
         this.quantity = orderItem.getQuantity();
         this.outfitAlias = orderItem.getOutfitAlias();
+        this.priceBreakup = orderItem.getPriceBreakup().stream().map(pb -> new PriceBreakupSummary(pb))
+                .collect(Collectors.toList());
     }
 }

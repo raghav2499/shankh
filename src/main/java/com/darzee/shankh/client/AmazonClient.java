@@ -99,6 +99,11 @@ public class AmazonClient {
         return generateShortLivedUrl(portfolioBucketName, fileName);
     }
 
+    public String generateShortLivedUrlForAudio(String fileName) {
+        String shortLivedUrl = generateShortLivedUrl(audioBucketName, fileName);
+        return shortLivedUrl;
+    }
+
     public List<String> generateShortLivedUrls(List<String> fileNames) {
         List<String> urlList = new ArrayList<>(fileNames.size());
         for (String fileName : fileNames) {

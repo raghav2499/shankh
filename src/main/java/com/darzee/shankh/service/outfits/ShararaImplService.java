@@ -173,17 +173,16 @@ public class ShararaImplService implements OutfitTypeService {
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO,
-                                                           MeasurementScale scale, Boolean nonEmptyValuesOnly) {
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementRevisionsDAO revisionsDAO, MeasurementScale scale, Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         List<InnerMeasurementDetails> innerMeasurementDetails = new ArrayList<>();
-        innerMeasurementDetails.add(setMeasurementDetailsInObjectTop(measurementsDAO, scale, nonEmptyValuesOnly));
-        innerMeasurementDetails.add(setMeasurementDetailsInObjectBottom(measurementsDAO, scale, nonEmptyValuesOnly));
+        innerMeasurementDetails.add(setMeasurementDetailsInObjectTop(revisionsDAO, scale, nonEmptyValuesOnly));
+        innerMeasurementDetails.add(setMeasurementDetailsInObjectBottom(revisionsDAO, scale, nonEmptyValuesOnly));
         overallMeasurementDetails.setInnerMeasurementDetails(innerMeasurementDetails);
         return overallMeasurementDetails;
     }
 
-    private InnerMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementsDAO measurementsDAO,
+    private InnerMeasurementDetails setMeasurementDetailsInObjectTop(MeasurementRevisionsDAO revisionsDAO,
                                                                      MeasurementScale scale,
                                                                      Boolean nonEmptyValuesOnly) {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
@@ -191,35 +190,35 @@ public class ShararaImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
 
         measurementDetailsResponseList.add(
-                addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
+                addLength(revisionsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addUpperChest(measurementsDAO.getMeasurement(UPPER_CHEST_MEASUREMENT_KEY, dividingFactor)));
+                addUpperChest(revisionsDAO.getMeasurement(UPPER_CHEST_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addBust(measurementsDAO.getMeasurement(BUST_MEASUREMENT_KEY, dividingFactor)));
+                addBust(revisionsDAO.getMeasurement(BUST_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addBelowBust(measurementsDAO.getMeasurement(BELOW_BUST_MEASUREMENT_KEY, dividingFactor)));
+                addBelowBust(revisionsDAO.getMeasurement(BELOW_BUST_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
+                addWaist(revisionsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addHipCircum(measurementsDAO.getMeasurement(HIP_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
+                addHipCircum(revisionsDAO.getMeasurement(HIP_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addShoulder(measurementsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
+                addShoulder(revisionsDAO.getMeasurement(SHOULDER_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addArmHole(measurementsDAO.getMeasurement(ARM_HOLE_MEASUREMENT_KEY, dividingFactor)));
+                addArmHole(revisionsDAO.getMeasurement(ARM_HOLE_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addBicep(measurementsDAO.getMeasurement(BICEP_MEASUREMENT_KEY, dividingFactor)));
+                addBicep(revisionsDAO.getMeasurement(BICEP_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addSleeveLength(measurementsDAO.getMeasurement(SLEEVE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+                addSleeveLength(revisionsDAO.getMeasurement(SLEEVE_LENGTH_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addSleeveCircumference(measurementsDAO.getMeasurement(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY, dividingFactor)));
+                addSleeveCircumference(revisionsDAO.getMeasurement(SLEEVE_CIRCUMFERENCE_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addCrossFront(measurementsDAO.getMeasurement(CROSS_FRONT_MEASUREMENT_KEY, dividingFactor)));
+                addCrossFront(revisionsDAO.getMeasurement(CROSS_FRONT_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addCrossBack(measurementsDAO.getMeasurement(CROSS_BACK_MEASUREMENT_KEY, dividingFactor)));
+                addCrossBack(revisionsDAO.getMeasurement(CROSS_BACK_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addFrontNeckDepth(measurementsDAO.getMeasurement(FRONT_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
+                addFrontNeckDepth(revisionsDAO.getMeasurement(FRONT_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addBackNeckDepth(measurementsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
+                addBackNeckDepth(revisionsDAO.getMeasurement(BACK_NECK_DEPTH_MEASUREMENT_KEY, dividingFactor)));
 
         if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
             measurementDetailsResponseList = measurementDetailsResponseList
@@ -234,7 +233,7 @@ public class ShararaImplService implements OutfitTypeService {
         return innerMeasurementDetails;
     }
 
-    private InnerMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementsDAO measurementsDAO,
+    private InnerMeasurementDetails setMeasurementDetailsInObjectBottom(MeasurementRevisionsDAO revisionsDAO,
                                                                         MeasurementScale scale,
                                                                         Boolean nonEmptyValuesOnly) {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
@@ -242,23 +241,23 @@ public class ShararaImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
 
         measurementDetailsResponseList.add(
-                addSalwarLength(measurementsDAO.getMeasurement(SALWAR_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+                addSalwarLength(revisionsDAO.getMeasurement(SALWAR_LENGTH_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addBottomWaist(measurementsDAO.getMeasurement(BOTTOM_WAIST_MEASUREMENT_KEY, dividingFactor)));
+                addBottomWaist(revisionsDAO.getMeasurement(BOTTOM_WAIST_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addThighCircum(measurementsDAO.getMeasurement(THIGH_MEASUREMENT_KEY, dividingFactor)));
+                addThighCircum(revisionsDAO.getMeasurement(THIGH_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addKnee(measurementsDAO.getMeasurement(KNEE_MEASUREMENT_KEY, dividingFactor)));
+                addKnee(revisionsDAO.getMeasurement(KNEE_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addCalf(measurementsDAO.getMeasurement(CALF_MEASUREMENT_KEY, dividingFactor)));
+                addCalf(revisionsDAO.getMeasurement(CALF_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addMohri(measurementsDAO.getMeasurement(MOHRI_MEASUREMENT_KEY, dividingFactor)));
+                addMohri(revisionsDAO.getMeasurement(MOHRI_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addCrotch(measurementsDAO.getMeasurement(CROTCH_MEASUREMENT_KEY, dividingFactor)));
+                addCrotch(revisionsDAO.getMeasurement(CROTCH_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addNikkerLength(measurementsDAO.getMeasurement(NIKKER_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+                addNikkerLength(revisionsDAO.getMeasurement(NIKKER_LENGTH_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addShararaCircum(measurementsDAO.getMeasurement(SHARARA_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
+                addShararaCircum(revisionsDAO.getMeasurement(SHARARA_CIRCUM_MEASUREMENT_KEY, dividingFactor)));
 
         if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
             measurementDetailsResponseList = measurementDetailsResponseList

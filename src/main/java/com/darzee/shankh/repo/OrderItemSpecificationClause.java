@@ -58,7 +58,7 @@ public class OrderItemSpecificationClause {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid filter found in request");
         }
         switch (filter) {
-            case STATUS:
+            case ITEM_STATUS:
                 return findOrderItemByStatus((List<Integer>) value);
             case BOUTIQUE_ID:
                 return findOrderItemByBoutiqueId((Long) value);

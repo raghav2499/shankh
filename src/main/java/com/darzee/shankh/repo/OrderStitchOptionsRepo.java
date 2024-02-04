@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface OrderStitchOptionsRepo extends JpaRepository<OrderStitchOptions, Long> {
     List<OrderStitchOptions> findAllByIdIn(List<Long> ids);
+    List<OrderStitchOptions> findAllByOrderItemIdIn(List<Long> orderItemIds);
+
+    List<OrderStitchOptions> findAllByOrderItemId(Long orderItemId);
 }

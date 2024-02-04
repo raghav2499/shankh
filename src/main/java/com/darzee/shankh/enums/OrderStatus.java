@@ -3,6 +3,9 @@ package com.darzee.shankh.enums;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum OrderStatus {
 
@@ -28,5 +31,17 @@ public enum OrderStatus {
 
     public String getDisplayString() {
         return displayString;
+    }
+
+    public Integer getOrdinal() {
+        return ordinal;
+    }
+
+    public static Map<Integer, OrderStatus> getOrderStatusEnumOrdinalMap() {
+        Map<Integer, OrderStatus> orderStatusEnumOrdinalMap = new HashMap<>();
+        for(OrderStatus status : OrderStatus.values()) {
+            orderStatusEnumOrdinalMap.put(status.getOrdinal(), status);
+        }
+        return orderStatusEnumOrdinalMap;
     }
 }

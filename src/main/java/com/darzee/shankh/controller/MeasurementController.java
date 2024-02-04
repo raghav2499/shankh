@@ -25,7 +25,7 @@ public class MeasurementController {
                                                 @RequestParam(value = "non_empty_values_only", required = false)
                                                 Boolean nonEmptyValuesOnly)
             throws Exception {
-        return measurementService.getMeasurementDetails(customerId, orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
+        return measurementService.getMeasurementDetailsResponse(customerId, orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
     }
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)

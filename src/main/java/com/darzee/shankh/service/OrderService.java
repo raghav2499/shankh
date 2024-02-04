@@ -11,6 +11,7 @@ import com.darzee.shankh.enums.PaymentMode;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
+import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.PriceBreakUpDetails;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
@@ -177,9 +178,18 @@ public class OrderService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid customer id or boutique id");
     }
 
-    public ResponseEntity<GetOrderResponse> getOrder(Map<String, Object> filterMap, Map<String, Object> pagingSortingMap) {
+    public ResponseEntity<GetOrderResponse> getOrder(Long boutiqueId, String orderItemStatusList,
+                                                     String orderStatusList,
+                                                     Boolean priorityOrdersOnly, Long customerId,
+                                                     String deliveryDateFrom, String deliveryDateTill,
+                                                     Boolean paymentDue, Integer countPerPage, Integer pageCount) {
+        validateGetOrderRequest(orderItemStatusList, orderStatusList);
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList,
+                orderStatusList, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill,
+                null, paymentDue);
+        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, null);
         Specification<Order> orderSpecification = OrderSpecificationClause.getSpecificationBasedOnFilters(filterMap);
-        Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingSortingMap);
+        Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingCriteriaMap);
         List<Order> orderDetails = orderRepo.findAll(orderSpecification, pagingCriteria).getContent();
         Long totalRecordsCount = orderRepo.count(orderSpecification);
         List<OrderDAO> orderDAOList = mapper.orderObjectListToDAOList(orderDetails, new CycleAvoidingMappingContext());
@@ -197,10 +207,10 @@ public class OrderService {
             OrderAmountDAO orderAmount = order.getOrderAmount();
             CustomerDAO customer = order.getCustomer();
             List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
-            for (OrderItemDAO orderItem : order.getNonDeletedItems()) {
-                OrderItemDetails orderItemDetails = orderItemService.getOrderItemDetails(orderItem);
-                orderItemDetailsList.add(orderItemDetails);
-            }
+//            for (OrderItemDAO orderItem : order.getNonDeletedItems()) {
+//                OrderItemDetails orderItemDetails = orderItemService.getOrderItemDetails(orderItem);
+//                orderItemDetailsList.add(orderItemDetails);
+//            }
             String message = "Details fetched succesfully";
             OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount,
                     orderItemDetailsList, message);
@@ -610,6 +620,12 @@ public class OrderService {
         if (!itemsPriceBreakupSum.equals(totalOrderAmount)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Either price break up or total order amount is incorrect");
+        }
+    }
+
+    private void validateGetOrderRequest(String orderStatusList, String orderItemStatusList) {
+        if(orderStatusList == null && orderItemStatusList == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either order status or item status is necessary to get orders");
         }
     }
 }

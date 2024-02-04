@@ -13,5 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadMultipleFileResponse {
-    private List<UploadFileResponse> response;
+    private List<FileDetail> response;
 }

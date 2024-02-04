@@ -93,8 +93,7 @@ public class PantImplService implements OutfitTypeService {
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO,
-                                                           MeasurementScale scale,
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementRevisionsDAO revisionsDAO, MeasurementScale scale,
                                                            Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
@@ -102,23 +101,23 @@ public class PantImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
 
         measurementDetailsResponseList.add(
-                addWaist(measurementsDAO.getMeasurement(BOTTOM_WAIST_MEASUREMENT_KEY, dividingFactor)));
+                addWaist(revisionsDAO.getMeasurement(BOTTOM_WAIST_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addSeat(measurementsDAO.getMeasurement(BOTTOM_SEAT_MEASUREMENT_KEY, dividingFactor)));
+                addSeat(revisionsDAO.getMeasurement(BOTTOM_SEAT_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addThigh(measurementsDAO.getMeasurement(THIGH_MEASUREMENT_KEY, dividingFactor)));
+                addThigh(revisionsDAO.getMeasurement(THIGH_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addCalf(measurementsDAO.getMeasurement(CALF_MEASUREMENT_KEY, dividingFactor)));
+                addCalf(revisionsDAO.getMeasurement(CALF_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addBottom(measurementsDAO.getMeasurement(BOTTOM_MEASUREMENT_KEY, dividingFactor)));
+                addBottom(revisionsDAO.getMeasurement(BOTTOM_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addPantLength(measurementsDAO.getMeasurement(PANT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+                addPantLength(revisionsDAO.getMeasurement(PANT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addFly(measurementsDAO.getMeasurement(FLY_MEASUREMENT_KEY, dividingFactor)));
+                addFly(revisionsDAO.getMeasurement(FLY_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addInSeam(measurementsDAO.getMeasurement(IN_SEAM_MEASUREMENT_KEY, dividingFactor)));
+                addInSeam(revisionsDAO.getMeasurement(IN_SEAM_MEASUREMENT_KEY, dividingFactor)));
         measurementDetailsResponseList.add(
-                addCrotch(measurementsDAO.getMeasurement(CROTCH_MEASUREMENT_KEY, dividingFactor)));
+                addCrotch(revisionsDAO.getMeasurement(CROTCH_MEASUREMENT_KEY, dividingFactor)));
 
         if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
             measurementDetailsResponseList = measurementDetailsResponseList

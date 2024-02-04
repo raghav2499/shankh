@@ -1,9 +1,6 @@
 package com.darzee.shankh.repo;
 
-import com.darzee.shankh.entity.Boutique;
-import com.darzee.shankh.entity.Customer;
-import com.darzee.shankh.entity.Order;
-import com.darzee.shankh.entity.OrderItem;
+import com.darzee.shankh.entity.*;
 import com.darzee.shankh.enums.OrderFilter;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -18,11 +15,15 @@ import java.util.Map;
 
 public class OrderSpecificationClause {
 
-    public static Specification<Order> findOrderByStatuses(List<Integer> statusList) {
+    public static Specification<Order> findOrderByItemStatuses(List<Integer> statusList) {
         return (root, cq, cb) -> {
             Join<Order, OrderItem> orderItem = root.join("orderItems");
             return orderItem.get("orderItemStatus").in(statusList);
         };
+    }
+
+    public static Specification<Order> findOrderByOrderStatuses(List<Integer> statusList) {
+        return (root, cq, cb) -> root.get("orderStatus").in(statusList);
     }
 
     public static Specification<Order> findOrderByBoutiqueId(Long boutiqueId) {
@@ -60,6 +61,13 @@ public class OrderSpecificationClause {
         };
     }
 
+    public static Specification<Order> findOrdersWithPaymentDue() {
+        return (root, cq, cb) -> {
+            Join<Order, OrderAmount> orderAmount = root.join("orderAmount");
+            return cb.lessThan(orderAmount.get("amountRecieved"), orderAmount.get("totalAmount"));
+        };
+    }
+
     public static Specification<Order> findNonDeletedOrders() {
         return (root, cq, cb) -> cb.equal(root.get("isDeleted"), false);
     }
@@ -90,8 +98,10 @@ public class OrderSpecificationClause {
         }
 
         switch (filter) {
-            case STATUS:
-                return findOrderByStatuses((List<Integer>) value);
+            case ITEM_STATUS:
+                return findOrderByItemStatuses((List<Integer>) value);
+            case ORDER_STATUS:
+                return findOrderByOrderStatuses((List<Integer>) value);
             case BOUTIQUE_ID:
                 return findOrderByBoutiqueId((Long) value);
             case PRIORITY_ORDERS_ONLY:
@@ -102,6 +112,8 @@ public class OrderSpecificationClause {
                 return findOrdersByDeliveryDateFrom((LocalDateTime) value);
             case DELIVERY_DATE_TILL:
                 return findOrdersByDeliveryDateTill((LocalDateTime) value);
+            case PAYMENT_DUE:
+                return findOrdersWithPaymentDue();
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We've not started grouping on " + filter);
         }

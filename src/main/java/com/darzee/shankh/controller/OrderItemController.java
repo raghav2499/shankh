@@ -49,7 +49,7 @@ public class OrderItemController {
 
     @GetMapping(value = "/order_item/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity getOrderItem(@PathVariable("id") Long orderItemId) {
+    public ResponseEntity getOrderItem(@PathVariable("id") Long orderItemId) throws Exception {
         return new ResponseEntity<>(orderItemService.getOrderItemDetails(orderItemId), HttpStatus.OK);
     }
 
@@ -75,5 +75,11 @@ public class OrderItemController {
                                                               @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
         return orderItemService.getOrderItemDetails(boutiqueId, orderId, orderItemStatusList,
                 priorityOrdersOnly, sortKey, countPerPage, pageCount, deliveryDateFrom, deliveryDateTill);
+    }
+
+    @GetMapping(value = "/order_item/{id}/stitch_option", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity getOrderStitchOption(@PathVariable("id") Long orderItemId) {
+        return stitchOptionService.getOrderItemStitchOptionsResponse(orderItemId);
     }
 }

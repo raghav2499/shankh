@@ -12,8 +12,7 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
-import com.darzee.shankh.response.GetOrderItemResponse;
-import com.darzee.shankh.response.OrderItemDetails;
+import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.CommonUtils;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -193,7 +192,7 @@ public class OrderItemService {
         return orderItem;
     }
 
-    public OrderItemDetails getOrderItemDetails(Long orderItemId) {
+    public OrderItemDetails getOrderItemDetails(Long orderItemId) throws Exception {
         Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
         if (!orderItem.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect order item id");
@@ -207,26 +206,34 @@ public class OrderItemService {
                                                                     Integer countPerPage, Integer pageCount, String deliveryDateFrom,
                                                                     String deliveryDateTill) {
         validateGetOrderItemRequest(boutiqueId, orderId);
-        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList,
-                priorityOrdersOnly, null, deliveryDateFrom, deliveryDateTill, orderId);
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList, null,
+                priorityOrdersOnly, null, deliveryDateFrom, deliveryDateTill, orderId, null);
         Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, sortKey);
         Specification<OrderItem> orderItemSpecification = OrderItemSpecificationClause.getSpecificationBasedOnFilters(filterMap);
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingCriteriaMap);
         List<OrderItem> orderItems = orderItemRepo.findAll(orderItemSpecification, pagingCriteria).getContent();
         List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems, new CycleAvoidingMappingContext());
         List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream()
-                .map(orderItem -> new OrderItemDetails(orderItem)).collect(Collectors.toList());
+                .map(orderItem ->
+                        new OrderItemDetails(orderItem, outfitImageLinkService.getOutfitImageLink(orderItem.getOutfitType())))
+                .collect(Collectors.toList());
         GetOrderItemResponse response = new GetOrderItemResponse(orderItemDetails);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public OrderItemDetails getOrderItemDetails(OrderItemDAO orderItem) {
+    public OrderItemDetails getOrderItemDetails(OrderItemDAO orderItem) throws Exception {
         OutfitType outfitType = orderItem.getOutfitType();
         String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
         List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(orderItem.getId());
-        List<String> clothImageUrlLinks = getClothProfilePicLink(clothImagesReferenceIds);
-        OrderItemDetails orderItemDetails = new OrderItemDetails(clothImagesReferenceIds,
-                clothImageUrlLinks, outfitImageLink, orderItem);
+        List<FileDetail> clothImageFileDetails = getClothImageDetails(clothImagesReferenceIds);
+        List<String> audioReferenceIds = objectFilesService.getAudioReferenceIds(orderItem.getId());
+        List<FileDetail> audioFileDetails = getAudioDetails(audioReferenceIds);
+        Long customerId = orderItem.getOrder().getCustomer().getId();
+        OverallMeasurementDetails overallMeasurementDetails = measurementService.getMeasurementDetails(customerId, orderItem.getId(),
+                outfitType.getOrdinal(), null, true);
+        Map<String, List<OrderStitchOptionDetail>> orderItemStitchOptions = stitchOptionService.getOrderItemStitchOptions(orderItem.getId());
+        OrderItemDetails orderItemDetails = new OrderItemDetails(clothImageFileDetails, audioFileDetails,
+                overallMeasurementDetails, orderItemStitchOptions, outfitImageLink, orderItem);
         return orderItemDetails;
     }
 
@@ -243,6 +250,36 @@ public class OrderItemService {
             return s3Client.generateShortLivedUrls(clothImageFileNames);
         }
         return new ArrayList<>();
+    }
+
+    private List<FileDetail> getClothImageDetails(List<String> clothImageRefIds) {
+        List<FileDetail> fileDetails = new ArrayList<>();
+        if (Collections.isEmpty(clothImageRefIds)) {
+            return fileDetails;
+        }
+
+        for (String clothImageRefId : clothImageRefIds) {
+            ImageReferenceDAO clothImageReferences = mapper.imageReferenceToImageReferenceDAO(fileReferenceRepo.findByReferenceId(clothImageRefId).get());
+            String url = s3Client.generateShortLivedUrl(clothImageReferences.getImageName());
+            FileDetail fileDetail = new FileDetail(clothImageRefId, url);
+            fileDetails.add(fileDetail);
+        }
+        return fileDetails;
+    }
+
+    private List<FileDetail> getAudioDetails(List<String> audioFileRefIds) {
+        List<FileDetail> fileDetails = new ArrayList<>();
+        if (Collections.isEmpty(audioFileRefIds)) {
+            return fileDetails;
+        }
+
+        for (String audioFileRefId : audioFileRefIds) {
+            ImageReferenceDAO audioFileReference = mapper.imageReferenceToImageReferenceDAO(fileReferenceRepo.findByReferenceId(audioFileRefId).get());
+            String url = s3Client.generateShortLivedUrl(audioFileReference.getImageName());
+            FileDetail fileDetail = new FileDetail(audioFileRefId, url);
+            fileDetails.add(fileDetail);
+        }
+        return fileDetails;
     }
 
     private void validateGetOrderItemRequest(Long boutiqueId, Long orderId) {

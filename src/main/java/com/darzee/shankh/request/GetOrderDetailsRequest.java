@@ -1,6 +1,7 @@
 package com.darzee.shankh.request;
 
 import com.darzee.shankh.enums.OrderItemStatus;
+import com.darzee.shankh.enums.OrderStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,21 +36,33 @@ public class GetOrderDetailsRequest {
      *
      * @return
      */
-    public static Map<String, Object> getFilterMap(Long boutiqueId, String statuses, Boolean priorityOrdersOnly,
-                                                   Long customerId, String deliveryDateFrom, String deliveryDateTill, Long orderId) {
+    public static Map<String, Object> getFilterMap(Long boutiqueId, String itemStatuses, String orderStatusList,
+                                                   Boolean priorityOrdersOnly, Long customerId,
+                                                   String deliveryDateFrom, String deliveryDateTill,
+                                                   Long orderId, Boolean paymentDue) {
         Map<String, Object> filterMap = new HashMap<>();
         if (boutiqueId != null) {
             filterMap.put(BOUTIQUE_ID.getFilterName(), boutiqueId);
         }
-        if (statuses != null) {
-            List<Integer> statusList = Arrays.asList(statuses.trim()
+        if (itemStatuses != null) {
+            List<Integer> statusList = Arrays.asList(itemStatuses.trim()
                             .split(","))
                     .stream()
                     .map(Integer::parseInt)
                     .map(requestOrdinal -> OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(requestOrdinal))
                     .map(orderItemStatus -> orderItemStatus.ordinal())
                     .collect(Collectors.toList());
-            filterMap.put(STATUS.getFilterName(), statusList);
+            filterMap.put(ITEM_STATUS.getFilterName(), statusList);
+        }
+        if (orderStatusList != null) {
+            List<Integer> statusList = Arrays.asList(orderStatusList.trim()
+                            .split(","))
+                    .stream()
+                    .map(Integer::parseInt)
+                    .map(requestOrdinal -> OrderStatus.getOrderStatusEnumOrdinalMap().get(requestOrdinal))
+                    .map(orderStatus -> orderStatus.ordinal())
+                    .collect(Collectors.toList());
+            filterMap.put(ORDER_STATUS.getFilterName(), statusList);
         }
         if (priorityOrdersOnly != null) {
             filterMap.put(PRIORITY_ORDERS_ONLY.getFilterName(), priorityOrdersOnly);
@@ -63,8 +76,11 @@ public class GetOrderDetailsRequest {
         if (deliveryDateTill != null) {
             filterMap.put(DELIVERY_DATE_TILL.getFilterName(), LocalDateTime.parse(deliveryDateTill));
         }
-        if(orderId != null) {
+        if (orderId != null) {
             filterMap.put(ORDER_ID.getFilterName(), orderId);
+        }
+        if (Boolean.TRUE.equals(paymentDue)) {
+            filterMap.put(PAYMENT_DUE.getFilterName(), Boolean.TRUE);
         }
         return filterMap;
     }
