@@ -16,14 +16,11 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderStitchOptionResponse {
-
-    private Long id;
     private Long stitchOptionId;
     private Long orderStitchOptionId;
     private List<String> values;
 
     public OrderStitchOptionResponse(OrderStitchOptionDAO orderStitchOption) {
-        this.id = orderStitchOption.getId();
         this.orderStitchOptionId = orderStitchOption.getId();
         this.stitchOptionId = orderStitchOption.getStitchOptionId();
         this.values = orderStitchOption.getValues();

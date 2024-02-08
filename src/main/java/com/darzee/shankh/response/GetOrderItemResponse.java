@@ -10,10 +10,12 @@ import java.util.List;
 @NoArgsConstructor
 public class GetOrderItemResponse {
     private String message;
+    private Long totalCount;
     private List<OrderItemDetails> data;
 
-    public GetOrderItemResponse(List<OrderItemDetails> data) {
+    public GetOrderItemResponse(List<OrderItemDetails> data, Long totalCount) {
         this.message = CollectionUtils.isEmpty(data) ? "No data foud for these filters" : "Data fetched successfully";
+        this.totalCount = totalCount;
         this.data = data;
     }
 }

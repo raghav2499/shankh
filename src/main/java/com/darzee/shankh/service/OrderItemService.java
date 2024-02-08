@@ -212,12 +212,13 @@ public class OrderItemService {
         Specification<OrderItem> orderItemSpecification = OrderItemSpecificationClause.getSpecificationBasedOnFilters(filterMap);
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingCriteriaMap);
         List<OrderItem> orderItems = orderItemRepo.findAll(orderItemSpecification, pagingCriteria).getContent();
+        Long totalCount = orderItemRepo.count(orderItemSpecification);
         List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems, new CycleAvoidingMappingContext());
         List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream()
                 .map(orderItem ->
                         new OrderItemDetails(orderItem, outfitImageLinkService.getOutfitImageLink(orderItem.getOutfitType())))
                 .collect(Collectors.toList());
-        GetOrderItemResponse response = new GetOrderItemResponse(orderItemDetails);
+        GetOrderItemResponse response = new GetOrderItemResponse(orderItemDetails, totalCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

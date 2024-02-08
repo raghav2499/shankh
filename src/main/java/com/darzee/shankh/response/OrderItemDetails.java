@@ -34,6 +34,7 @@ public class OrderItemDetails {
     private String type;
     private Integer pieces;
     private Integer itemQuantity;
+    private Double itemPrice;
     private List<FileDetail> clothImageFileDetails;
     private List<FileDetail> audioFileDetails;
 
@@ -54,6 +55,8 @@ public class OrderItemDetails {
         this.outfitTypeImageLink = outfitTypeImgLink;
         this.pieces = outfitType.getPieces();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
+        this.customerName = orderItem.getOrder().getCustomer().constructName();
+        this.orderId = orderItem.getOrder().getId();
     }
 
     public OrderItemDetails(List<FileDetail> clothImageFileDetail, List<FileDetail> audioFileDetail,
@@ -77,5 +80,7 @@ public class OrderItemDetails {
         this.pieces = orderItem.getOutfitType().getPieces();
         this.measurementDetails = measurementDetails;
         this.orderItemStitchOptions = orderItemStitchOptions;
+        this.trialDate = orderItem.getTrialDate().toString();
+        this.itemPrice = orderItem.calculateItemPrice();
     }
 }

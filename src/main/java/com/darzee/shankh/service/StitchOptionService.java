@@ -51,7 +51,7 @@ public class StitchOptionService {
                     stitchDetail.getValues());
             orderStitchOptionDAOs.add(orderStitchOptionDAO);
         }
-        List<OrderStitchOptionDAO> orderStitchOptions = mapper.orderStitchOptionListToOrderStitchOptionDAOList(
+        orderStitchOptionDAOs = mapper.orderStitchOptionListToOrderStitchOptionDAOList(
                 orderStitchOptionsRepo.saveAll(mapper.orderStitchOptionDAOListToOrderStitchOptionList(orderStitchOptionDAOs)));
         return new StitchSummary(orderStitchOptionDAOs);
     }

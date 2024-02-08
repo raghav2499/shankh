@@ -122,4 +122,8 @@ public class OrderItemDAO {
         return true;
     }
 
+    public Double calculateItemPrice() {
+        return this.getPriceBreakup().stream().mapToDouble(pb -> pb.getValue() * pb.getQuantity()).sum();
+    }
+
 }
