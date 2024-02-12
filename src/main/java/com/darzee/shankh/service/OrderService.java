@@ -550,6 +550,10 @@ public class OrderService {
         return orderAmountDAO;
     }
 
+    public boolean checkIfBoutiqueIsActive(Long boutiqueId) {
+        return orderRepo.countByBoutiqueId(boutiqueId) > 0;
+    }
+
     private Double calculateTotalOrderAmount(List<OrderItemDAO> orderItems) {
         List<PriceBreakupDAO> priceBreakups = orderItems.stream().map(item -> item.getPriceBreakup())
                 .flatMap(List::stream).collect(Collectors.toList());

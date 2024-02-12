@@ -54,4 +54,6 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             @Param("endDate") LocalDate endDate);
 
     List<Order> findAllByCustomerId(Long customerId);
+
+    Integer countByBoutiqueId(Long boutiqueId);
 }
