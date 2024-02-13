@@ -46,6 +46,7 @@ public class OrderItemDetails {
 
     public OrderItemDetails(OrderItemDAO orderItem, String outfitTypeImgLink) {
         OutfitType outfitType = orderItem.getOutfitType();
+        this.id = orderItem.getId();
         this.isPriorityOrder = Optional.ofNullable(orderItem.getIsPriorityOrder()).orElse(Boolean.FALSE);
         this.outfitType = outfitType.getDisplayString();
         this.trialDate = (orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null);
