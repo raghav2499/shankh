@@ -58,6 +58,7 @@ public class OrderItemDetails {
         this.status = orderItem.getOrderItemStatus().getDisplayString();
         this.customerName = orderItem.getOrder().getCustomer().constructName();
         this.orderId = orderItem.getOrder().getId();
+        this.itemPrice = orderItem.calculateItemPrice();
     }
 
     public OrderItemDetails(List<FileDetail> clothImageFileDetail, List<FileDetail> audioFileDetail,
