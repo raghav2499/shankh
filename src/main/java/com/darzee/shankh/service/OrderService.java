@@ -5,6 +5,7 @@ import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.PaymentMode;
@@ -16,7 +17,8 @@ import com.darzee.shankh.request.PriceBreakUpDetails;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
-import com.darzee.shankh.request.innerObjects.*;
+import com.darzee.shankh.request.innerObjects.UpdateOrderAmountDetails;
+import com.darzee.shankh.request.innerObjects.UpdateOrderDetails;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.pdfutils.BillGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -27,17 +29,17 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.io.File;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 
 @Service
 public class OrderService {
@@ -154,7 +156,7 @@ public class OrderService {
         return orderDAO;
     }
 
-    @Transactional(REQUIRES_NEW)
+    @Transactional
     public OrderDAO createNewOrder(Long boutiqueId, Long customerId) {
         Optional<Customer> optionalCustomer = customerRepo.findById(customerId);
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(boutiqueId);
@@ -487,20 +489,20 @@ public class OrderService {
         return new OrderDetailResponse(orderDAO, orderItemOutfitLinkPairList, customerProfilePicLink);
     }
 
-    @Transactional(REQUIRES_NEW)
-    public OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO,
-                                            CustomerDAO customerDAO) {
-
-        String invoiceNo = generateOrderInvoiceNo();
-        OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
-        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
-                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-
-        List<OrderItemDetailRequest> orderItemDetails = orderDetails.getOrderItems();
-        List<OrderItemDAO> orderItems = orderItemService.createOrderItems(orderItemDetails, orderDAO);
-        orderDAO.setOrderItems(orderItems);
-        return orderDAO;
-    }
+//    @Transactional(REQUIRES_NEW)
+//    public OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO,
+//                                            CustomerDAO customerDAO) {
+//
+//        String invoiceNo = generateOrderInvoiceNo();
+//        OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
+//        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
+//                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+//
+//        List<OrderItemDetailRequest> orderItemDetails = orderDetails.getOrderItems();
+//        List<OrderItemDAO> orderItems = orderItemService.createOrderItems(orderItemDetails, orderDAO);
+//        orderDAO.setOrderItems(orderItems);
+//        return orderDAO;
+//    }
 
 
     @Transactional
@@ -548,6 +550,34 @@ public class OrderService {
             paymentService.recordPayment(deltaAmountRecieved, PaymentMode.CASH, Boolean.TRUE, orderDAO);
         }
         return orderAmountDAO;
+    }
+
+    //todo : move this logic to spring state machine
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+    public OrderDAO updateOrderPostItemUpdation(Long orderId) {
+        OrderDAO orderDAO = mapper.orderObjectToDao(orderRepo.findById(orderId).get(),
+                new CycleAvoidingMappingContext());
+        List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems();
+        boolean allItemsAccepted = orderItems.stream()
+                .map(item -> OrderItemStatus.ACCEPTED.equals(item.getOrderItemStatus()))
+                .collect(Collectors.toList()).size() == orderItems.size();
+        if (allItemsAccepted && !OrderStatus.ACCEPTED.equals(orderDAO.getOrderStatus())) {
+            orderDAO.setOrderStatus(OrderStatus.ACCEPTED);
+        }
+        boolean allItemsDelivered = orderItems.stream()
+                .map(item -> OrderItemStatus.DELIVERED.equals(item.getOrderItemStatus()))
+                .collect(Collectors.toList()).size() == orderItems.size();
+        if (allItemsDelivered && !OrderStatus.DELIVERED.equals(orderDAO.getOrderStatus())) {
+            orderDAO.setOrderStatus(OrderStatus.DELIVERED);
+        }
+        Double orderItemsPriceSum = orderItems.stream().mapToDouble(item -> item.calculateItemPrice()).sum();
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        if (!orderAmountDAO.getTotalAmount().equals(orderItemsPriceSum)) {
+            orderAmountDAO.setTotalAmount(orderItemsPriceSum);
+        }
+        orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
+        orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
+        return orderDAO;
     }
 
     public boolean checkIfBoutiqueIsActive(Long boutiqueId) {
@@ -628,7 +658,7 @@ public class OrderService {
     }
 
     private void validateGetOrderRequest(String orderStatusList, String orderItemStatusList) {
-        if(orderStatusList == null && orderItemStatusList == null) {
+        if (orderStatusList == null && orderItemStatusList == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either order status or item status is necessary to get orders");
         }
     }

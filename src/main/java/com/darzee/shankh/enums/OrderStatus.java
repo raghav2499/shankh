@@ -18,13 +18,13 @@ public enum OrderStatus {
     @JsonProperty("delivered")
     DELIVERED("delivered", 3, "Delivered");
 
-    private String orderItemStatus;
+    private String orderStatus;
 
     private Integer ordinal;
     private String displayString;
 
-    OrderStatus(String orderItemStatus, Integer ordinal, String displayString) {
-        this.orderItemStatus = orderItemStatus;
+    OrderStatus(String orderStatus, Integer ordinal, String displayString) {
+        this.orderStatus = orderStatus;
         this.ordinal = ordinal;
         this.displayString = displayString;
     }

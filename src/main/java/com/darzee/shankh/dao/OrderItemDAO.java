@@ -123,7 +123,7 @@ public class OrderItemDAO {
     }
 
     public Double calculateItemPrice() {
-        return this.getPriceBreakup().stream().mapToDouble(pb -> pb.getValue() * pb.getQuantity()).sum();
+        return this.priceBreakup.stream().mapToDouble(pb -> pb.getValue() * pb.getQuantity()).sum();
     }
 
 }

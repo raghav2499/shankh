@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
+import com.darzee.shankh.dao.PriceBreakupDAO;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
@@ -11,6 +12,7 @@ import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.OrderDetails;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.response.OrderSummary;
+import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,9 @@ public class OrderOrderItemCommonService {
 
     @Autowired
     private OrderItemService orderItemService;
+
+    @Autowired
+    private PriceBreakUpService priceBreakUpService;
 
     @Autowired
     private OrderRepo orderRepo;
@@ -95,7 +100,11 @@ public class OrderOrderItemCommonService {
 
     public OrderSummary updateOrderItem(Long orderItemId, OrderItemDetailRequest orderItemDetails) {
         OrderItemDAO updatedItem = orderItemService.updateOrderItem(orderItemId, orderItemDetails);
-        OrderDAO orderDAO = updatedItem.getOrder();
+        if (!Collections.isEmpty(orderItemDetails.getPriceBreakup())) {
+            List<PriceBreakupDAO> updatedPriceBreakup =
+                    priceBreakUpService.updatePriceBreakups(orderItemDetails.getPriceBreakup(), updatedItem);
+        }
+        OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId());
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         OrderSummary orderItemSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getOrderItems());

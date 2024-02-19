@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +18,6 @@ public class OrderItemDetailRequest {
     private LocalDateTime trialDate;
     private Integer itemStatus;
     private LocalDateTime deliveryDate;
-    @NotNull(message = "outfit_type cannot be null")
     private Integer outfitType;
     private String outfitAlias;
     private Boolean isDeleted;

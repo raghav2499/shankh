@@ -21,10 +21,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -128,7 +130,7 @@ public class OrderItemService {
         return orderItemList;
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
     public OrderItemDAO updateOrderItem(Long orderItemId, OrderItemDetailRequest updateItemDetail) {
         OrderItemDAO orderItem = null;
         Optional<OrderItem> orderItemOb = orderItemRepo.findById(orderItemId);
@@ -181,11 +183,6 @@ public class OrderItemService {
                     orderItemId);
             objectFilesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
                     FileEntityType.AUDIO.getEntityType(), orderItemId);
-        }
-        if (!Collections.isEmpty(updateItemDetail.getPriceBreakup())) {
-            List<PriceBreakupDAO> updatedPriceBreakup =
-                    priceBreakUpService.updatePriceBreakups(updateItemDetail.getPriceBreakup(), orderItem);
-            orderItem.setPriceBreakup(updatedPriceBreakup);
         }
         orderItem = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItem,
                 new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
