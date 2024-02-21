@@ -84,5 +84,6 @@ public class OrderItemDetails {
         this.orderItemStitchOptions = orderItemStitchOptions;
         this.trialDate = orderItem.getTrialDate().toString();
         this.itemPrice = orderItem.calculateItemPrice();
+        this.status = orderItem.getOrderItemStatus().getDisplayString();
     }
 }

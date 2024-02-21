@@ -3,8 +3,8 @@ package com.darzee.shankh.enums;
 import java.util.Arrays;
 
 public enum OrderFilter {
-    ORDER_STATUS("order_status"),
-    ITEM_STATUS("item_status"),
+    ORDER_STATUS("orderStatus"),
+    ITEM_STATUS("orderItemStatus"),
     BOUTIQUE_ID("boutiqueId"),
     PRIORITY_ORDERS_ONLY("priorityOrdersOnly"),
 
@@ -14,9 +14,9 @@ public enum OrderFilter {
 
     DELIVERY_DATE_TILL("deliveryDateTill"),
 
-    ORDER_ID("order_id"),
+    ORDER_ID("orderId"),
 
-    PAYMENT_DUE("payment_due");
+    PAYMENT_DUE("paymentDue");
 
     OrderFilter(String filterName) {
         this.filterName = filterName;

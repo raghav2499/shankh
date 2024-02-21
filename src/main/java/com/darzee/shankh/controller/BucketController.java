@@ -43,7 +43,7 @@ public class BucketController {
     //for audio/images file upload endpoint
     @PostMapping("/upload_multiple_files")
     public ResponseEntity<UploadMultipleFileResponse> uploadMultipleFiles(@RequestPart(value = "file") List<MultipartFile> files,
-                                          @RequestParam(value = "file_type", required = false) String uploadFileType)
+                                                                          @RequestParam(value = "file_type", required = false) String uploadFileType)
             throws Exception {
         return bucketService.uploadMultipleFiles(files, uploadFileType);
     }

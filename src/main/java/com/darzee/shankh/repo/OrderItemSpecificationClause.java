@@ -50,7 +50,9 @@ public class OrderItemSpecificationClause {
 
 
     public static Specification<OrderItem> findNonDeletedOrderItems() {
-        return (root, cq, cb) -> cb.notEqual(root.get("isDeleted"), true);
+        return (root, cq, cb) -> cb.or(
+                cb.notEqual(root.get("isDeleted"), true),
+                cb.isNull(root.get("isDeleted")));
     }
     private static Specification<OrderItem> getAppropriatePredicate(String key, Object value) {
         OrderFilter filter = OrderFilter.getFilter(key);
