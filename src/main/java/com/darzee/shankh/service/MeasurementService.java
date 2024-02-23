@@ -121,16 +121,8 @@ public class MeasurementService {
             OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
             MeasurementsDAO measurementsDAO = customerMeasurementService.getCustomerMeasurements(customerDAO.getId(), outfitType);
             MeasurementRevisionsDAO revision = null;
-            if (!StringUtils.isNullOrEmpty(measurementDetails.getReferenceId())) {
-                String referenceId = measurementDetails.getReferenceId();
-                revision = outfitTypeService.addMeasurementRevision(measurementRequest, customerDAO.getId(),
-                        outfitType, measurementDetails.getScale());
-                objectFilesService.saveObjectImages(Arrays.asList(referenceId),
-                        FileEntityType.MEASUREMENT_REVISION.getEntityType(), revision.getId());
-            } else {
-                revision = outfitTypeService.addMeasurementRevision(measurementRequest, customerDAO.getId(),
-                        outfitType, measurementDetails.getScale());
-            }
+            revision = outfitTypeService.addMeasurementRevision(measurementRequest, customerDAO.getId(),
+                    outfitType, measurementDetails.getScale());
             revision = mapper.measurementRevisionsToMeasurementRevisionDAO(
                     measurementRevisionsRepo.save(mapper.measurementRevisionsDAOToMeasurementRevision(revision)));
             measurementsDAO.setMeasurementRevision(revision);
@@ -139,6 +131,10 @@ public class MeasurementService {
             measurementsDAO = mapper.measurementsToMeasurementDAO(
                     measurementsRepo.save(mapper.measurementsDAOToMeasurement(measurementsDAO,
                             new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+            if (!StringUtils.isNullOrEmpty(measurementDetails.getReferenceId())) {
+                objectFilesService.saveObjectImages(Arrays.asList(measurementDetails.getReferenceId()),
+                        FileEntityType.MEASUREMENT_REVISION.getEntityType(), revision.getId());
+            }
             return measurementsDAO;
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer id is invalid");
