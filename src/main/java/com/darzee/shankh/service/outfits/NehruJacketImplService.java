@@ -9,7 +9,7 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.MeasurementsRepo;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
-import com.darzee.shankh.service.MeasurementService;
+import com.darzee.shankh.service.MeasurementRevisionService;
 import com.darzee.shankh.service.OutfitImageLinkService;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +35,7 @@ public class NehruJacketImplService implements OutfitTypeService {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private MeasurementService measurementService;
+    private MeasurementRevisionService measurementRevisionService;
 
     @Autowired
     private OutfitImageLinkService outfitImageLinkService;
@@ -93,7 +93,7 @@ public class NehruJacketImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         String measurementImageLink = null;
         if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())) {
-            measurementImageLink = measurementService.getMeasurementRevisionImageLink(revisionsDAO.getId());
+            measurementImageLink = measurementRevisionService.getMeasurementRevisionImageLink(revisionsDAO.getId());
         } else {
             measurementDetailsResponseList.add(
                     addLength(revisionsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));

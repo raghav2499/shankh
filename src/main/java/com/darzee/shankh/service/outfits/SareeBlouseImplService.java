@@ -8,7 +8,7 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
-import com.darzee.shankh.service.MeasurementService;
+import com.darzee.shankh.service.MeasurementRevisionService;
 import com.darzee.shankh.service.OutfitImageLinkService;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +34,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private MeasurementService measurementService;
+    private MeasurementRevisionService measurementRevisionService;
 
     @Autowired
     private OutfitImageLinkService outfitImageLinkService;
@@ -153,7 +153,7 @@ public class SareeBlouseImplService implements OutfitTypeService {
 
         String measurementImageLink = null;
         if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())) {
-            measurementImageLink = measurementService.getMeasurementRevisionImageLink(revisionsDAO.getId());
+            measurementImageLink = measurementRevisionService.getMeasurementRevisionImageLink(revisionsDAO.getId());
         } else {
             measurementDetailsResponseList.add(
                     addBlouseLength(revisionsDAO.getMeasurement(BLOUSE_LENGTH_MEASUREMENT_KEY, dividingFactor)));

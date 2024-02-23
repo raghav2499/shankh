@@ -3,11 +3,9 @@ package com.darzee.shankh.service;
 import com.amazonaws.util.StringUtils;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.CustomerDAO;
-import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.dao.MeasurementRevisionsDAO;
 import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.entity.Customer;
-import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.MeasurementRevisions;
 import com.darzee.shankh.entity.OrderItem;
 import com.darzee.shankh.enums.FileEntityType;
@@ -53,6 +51,9 @@ public class MeasurementService {
 
     @Autowired
     private FileReferenceRepo fileReferenceRepo;
+
+    @Autowired
+    private MeasurementRevisionService measurementRevisionService;
 
     @Autowired
     private MeasurementRevisionsRepo measurementRevisionsRepo;
@@ -154,7 +155,7 @@ public class MeasurementService {
                 revisionData = new MeasurementRevisionData(revision);
             } else {
                 String referenceId = objectFilesService.getMeasurementRevisionReferenceId(revision.getId());
-                String measurementRevImageUrl = getMeasurementRevisionImageLink(referenceId);
+                String measurementRevImageUrl = measurementRevisionService.getMeasurementRevisionImageLink(referenceId);
                 MeasurementRevisionImageDetail measurementRevisionImageDetail = new MeasurementRevisionImageDetail(referenceId, measurementRevImageUrl);
                 revisionData = new MeasurementRevisionData(revision, referenceId, measurementRevImageUrl);
             }
@@ -200,18 +201,5 @@ public class MeasurementService {
         return response;
     }
 
-    public String getMeasurementRevisionImageLink(Long revisionId) {
-        String referenceId = objectFilesService.getMeasurementRevisionReferenceId(revisionId);
-        return getMeasurementRevisionImageLink(referenceId);
-    }
 
-    private String getMeasurementRevisionImageLink(String measurementRevisionReferenceId) {
-        Optional<ImageReference> measurementRevisionRef = fileReferenceRepo.findByReferenceId(measurementRevisionReferenceId);
-        if (measurementRevisionRef.isPresent()) {
-            ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(measurementRevisionRef.get());
-            String measurementRevRefFileName = imageReferenceDAO.getImageName();
-            return s3Client.generateShortLivedUrlForMeasurementRevision(measurementRevRefFileName);
-        }
-        return null;
-    }
 }
