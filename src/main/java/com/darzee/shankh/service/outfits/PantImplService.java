@@ -8,12 +8,14 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.MeasurementService;
 import com.darzee.shankh.service.OutfitImageLinkService;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,6 +32,9 @@ public class PantImplService implements OutfitTypeService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private MeasurementService measurementService;
 
     @Autowired
     private OutfitImageLinkService outfitImageLinkService;
@@ -99,37 +104,42 @@ public class PantImplService implements OutfitTypeService {
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
+        String measurementImageLink = null;
+        if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())) {
+            measurementImageLink = measurementService.getMeasurementRevisionImageLink(revisionsDAO.getId());
+        } else {
+            measurementDetailsResponseList.add(
+                    addWaist(revisionsDAO.getMeasurement(BOTTOM_WAIST_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addSeat(revisionsDAO.getMeasurement(BOTTOM_SEAT_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addThigh(revisionsDAO.getMeasurement(THIGH_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addCalf(revisionsDAO.getMeasurement(CALF_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addBottom(revisionsDAO.getMeasurement(BOTTOM_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addPantLength(revisionsDAO.getMeasurement(PANT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addFly(revisionsDAO.getMeasurement(FLY_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addInSeam(revisionsDAO.getMeasurement(IN_SEAM_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addCrotch(revisionsDAO.getMeasurement(CROTCH_MEASUREMENT_KEY, dividingFactor)));
 
-        measurementDetailsResponseList.add(
-                addWaist(revisionsDAO.getMeasurement(BOTTOM_WAIST_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addSeat(revisionsDAO.getMeasurement(BOTTOM_SEAT_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addThigh(revisionsDAO.getMeasurement(THIGH_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addCalf(revisionsDAO.getMeasurement(CALF_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addBottom(revisionsDAO.getMeasurement(BOTTOM_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addPantLength(revisionsDAO.getMeasurement(PANT_LENGTH_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addFly(revisionsDAO.getMeasurement(FLY_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addInSeam(revisionsDAO.getMeasurement(IN_SEAM_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addCrotch(revisionsDAO.getMeasurement(CROTCH_MEASUREMENT_KEY, dividingFactor)));
-
-        if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
-            measurementDetailsResponseList = measurementDetailsResponseList
-                    .stream()
-                    .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
-                    .collect(Collectors.toList());
+            if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
+                measurementDetailsResponseList = measurementDetailsResponseList
+                        .stream()
+                        .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
+                        .collect(Collectors.toList());
+            }
         }
 
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(PANTS_OUTFIT_IMAGE_LINK);
         innerMeasurementDetails.setOutfitTypeHeading(PANTS_OUTFIT_TYPE_HEADING);
         overallMeasurementDetails.setInnerMeasurementDetails(Arrays.asList(innerMeasurementDetails));
+        overallMeasurementDetails.setMeasurementImageLink(measurementImageLink);
         return overallMeasurementDetails;
     }
 

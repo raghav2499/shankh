@@ -19,11 +19,12 @@ import static com.darzee.shankh.enums.OrderItemSort.TRIAL_DATE;
 
 public class GetOrderDetailsRequest {
 
-    public static Map<String, Object> getPagingCriteria(Integer countPerPage, Integer pageCount, String sortKey) {
+    public static Map<String, Object> getPagingCriteria(Integer countPerPage, Integer pageCount, String sortKey,
+                                                        String sortOrder) {
         Map<String, Object> finalParamsMap = new HashMap<>();
         pageCount = pageCount - 1; //pageCount is 0 indexed
         if (sortKey != null) {
-            setSortingCriteria(finalParamsMap, sortKey);
+            setSortingCriteria(finalParamsMap, sortKey, sortOrder);
         }
         setPagingCriteria(finalParamsMap, countPerPage, pageCount);
         return finalParamsMap;
@@ -85,8 +86,10 @@ public class GetOrderDetailsRequest {
         return filterMap;
     }
 
-    private static void setSortingCriteria(Map<String, Object> paramsMap, String requestSortKey) {
+    private static void setSortingCriteria(Map<String, Object> paramsMap, String requestSortKey, String sortOrder) {
         String parasmMapSortKey = PARAMS_MAP_SORT_KEY;
+        String paramsMapSortOrder = PARAMS_MAP_SORT_ORDER;
+
         String paramsSortValue = "";
         switch (requestSortKey) {
             case "trial_date":
@@ -99,6 +102,7 @@ public class GetOrderDetailsRequest {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorting is not supported for " + requestSortKey);
         }
         paramsMap.put(parasmMapSortKey, paramsSortValue);
+        paramsMap.put(paramsMapSortOrder, sortOrder);
     }
 
     private static void setPagingCriteria(Map<String, Object> paramsMap, Integer countPerPage, Integer pageCount) {

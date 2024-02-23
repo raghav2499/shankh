@@ -21,6 +21,7 @@ public class Constants {
 
     public static final LocalDate REPORTING_START_DATE = LocalDate.of(2023, 5, 1);
     public static final String PARAMS_MAP_SORT_KEY = "sort_on";
+    public static final String PARAMS_MAP_SORT_ORDER = "order";
     public static final String PARAMS_MAP_COUNT_PER_PAGE_KEY = "count_per_page";
     public static final String PARAMS_MAP_PAGE_COUNT_KEY = "page_count";
 

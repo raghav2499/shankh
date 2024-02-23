@@ -71,10 +71,11 @@ public class OrderItemController {
                                                               @RequestParam(name = "delivery_date_from", required = false) String deliveryDateFrom,
                                                               @RequestParam(name = "delivery_date_till", required = false) String deliveryDateTill,
                                                               @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
+                                                              @RequestParam(name = "sort_order", required = false, defaultValue = "desc") String sortOrder,
                                                               @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                               @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
         return orderItemService.getOrderItemDetails(boutiqueId, orderId, orderItemStatusList,
-                priorityOrdersOnly, sortKey, countPerPage, pageCount, deliveryDateFrom, deliveryDateTill);
+                priorityOrdersOnly, sortKey, sortOrder, countPerPage, pageCount, deliveryDateFrom, deliveryDateTill);
     }
 
     @GetMapping(value = "/order_item/{id}/stitch_option", produces = MediaType.APPLICATION_JSON_VALUE)

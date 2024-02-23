@@ -200,6 +200,11 @@ public class MeasurementService {
         return response;
     }
 
+    public String getMeasurementRevisionImageLink(Long revisionId) {
+        String referenceId = objectFilesService.getMeasurementRevisionReferenceId(revisionId);
+        return getMeasurementRevisionImageLink(referenceId);
+    }
+
     private String getMeasurementRevisionImageLink(String measurementRevisionReferenceId) {
         Optional<ImageReference> measurementRevisionRef = fileReferenceRepo.findByReferenceId(measurementRevisionReferenceId);
         if (measurementRevisionRef.isPresent()) {

@@ -20,6 +20,7 @@ public class OverallMeasurementDetails {
 
     private String message;
     private List<InnerMeasurementDetails> innerMeasurementDetails = new ArrayList<>();
+    private String measurementImageLink;
     private LocalDateTime measurementUpdatedAt;
 
 
