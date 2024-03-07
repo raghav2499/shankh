@@ -3,6 +3,7 @@ package com.darzee.shankh.dao;
 import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.response.FileDetail;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -48,6 +49,10 @@ public class OrderItemDAO {
     private MeasurementRevisionsDAO measurementRevision;
 
     private List<PriceBreakupDAO> priceBreakup;
+
+    private List<FileDetail> clothImageDetails;
+
+    private List<FileDetail> audioFileDetails;
 
     private LocalDateTime createdAt;
 

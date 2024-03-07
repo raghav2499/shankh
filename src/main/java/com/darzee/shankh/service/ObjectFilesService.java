@@ -163,7 +163,7 @@ public class ObjectFilesService {
         }
     }
 
-    public void saveObjectImages(List<String> imageReferences, String entityType, Long entityId) {
+    public void saveObjectFiles(List<String> imageReferences, String entityType, Long entityId) {
         List<ObjectFilesDAO> objectImagesDAOList = imageReferences
                 .stream()
                 .filter(imageReference -> Boolean.FALSE.equals(StringUtils.isEmpty(imageReference)))
@@ -172,7 +172,7 @@ public class ObjectFilesService {
         repo.saveAll(CommonUtils.mapList(objectImagesDAOList, mapper::objectImageDAOToObjectImage));
     }
 
-    public void saveObjectImages(Map<String, Long> refEntityIdMap, String entityType) {
+    public void saveObjectFiles(Map<String, Long> refEntityIdMap, String entityType) {
         List<ObjectFilesDAO> objectImages = refEntityIdMap.entrySet().stream()
                 .map(refEntityIdValue -> new ObjectFilesDAO(refEntityIdValue.getKey(),
                         entityType, refEntityIdValue.getValue()))

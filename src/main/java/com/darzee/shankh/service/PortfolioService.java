@@ -115,7 +115,7 @@ public class PortfolioService {
                 new CycleAvoidingMappingContext());
 
         if (!StringUtils.isEmpty(request.getCoverImageReference())) {
-            objectFilesService.saveObjectImages(Collections.singletonList(request.getCoverImageReference()),
+            objectFilesService.saveObjectFiles(Collections.singletonList(request.getCoverImageReference()),
                     FileEntityType.PORTFOLIO_COVER.getEntityType(),
                     portfolio.getId());
         }
@@ -210,7 +210,7 @@ public class PortfolioService {
         if (!StringUtils.isEmpty(request.getCoverImageReference())) {
             objectFilesService.invalidateExistingReferenceIds(FileEntityType.PORTFOLIO_COVER.getEntityType(),
                     portfolioDAO.getId());
-            objectFilesService.saveObjectImages(Arrays.asList(request.getCoverImageReference()),
+            objectFilesService.saveObjectFiles(Arrays.asList(request.getCoverImageReference()),
                     FileEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
         }
     }
@@ -236,7 +236,7 @@ public class PortfolioService {
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         if (!CollectionUtils.isEmpty(portfolioOutfitReferenceIds)) {
-            objectFilesService.saveObjectImages(portfolioOutfitReferenceIds,
+            objectFilesService.saveObjectFiles(portfolioOutfitReferenceIds,
                     FileEntityType.PORTFOLIO_OUTFIT.getEntityType(),
                     portfolioOutfit.getId());
         }
@@ -301,7 +301,7 @@ public class PortfolioService {
         if (!CollectionUtils.isEmpty(portfolioOutfitReferenceIds)) {
             List<String> existingReferenceIds = objectFilesService.getPortfolioOutfitsReferenceIds(updatePortfolioOutfit.getId());
             if (CollectionUtils.isEmpty(existingReferenceIds)) {
-                objectFilesService.saveObjectImages(portfolioOutfitReferenceIds, FileEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
+                objectFilesService.saveObjectFiles(portfolioOutfitReferenceIds, FileEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
             }
             List<String> removedReferenceIds = new ArrayList<>(existingReferenceIds);
             removedReferenceIds.removeAll(portfolioOutfitReferenceIds);
@@ -311,7 +311,7 @@ public class PortfolioService {
 
             objectFilesService.invalidateExistingReferenceIds(removedReferenceIds);
             if (!CollectionUtils.isEmpty(updatedReferenceIds)) {
-                objectFilesService.saveObjectImages(updatedReferenceIds, FileEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
+                objectFilesService.saveObjectFiles(updatedReferenceIds, FileEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
             }
         }
     }

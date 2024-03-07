@@ -78,7 +78,6 @@ public class OrderItemService {
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
         Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
         Map<String, Long> audioRefOrderItemIdMap = new HashMap<>();
-        List<PriceBreakupDAO> priceBreakUpList = new ArrayList<>();
         List<OrderItemDAO> orderItemList = Optional.ofNullable(order.getNonDeletedItems()).orElse(new ArrayList<>());
         for (OrderItemDetailRequest itemDetail : orderItemDetails) {
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
@@ -100,31 +99,32 @@ public class OrderItemService {
                     new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
             List<PriceBreakupDAO> priceBreakupDAOList =
                     priceBreakUpService.generatePriceBreakupList(itemDetail.getPriceBreakup(), orderItemDAO);
-            priceBreakUpList.addAll(priceBreakupDAOList);
             if (!CollectionUtils.isEmpty(itemDetail.getClothImageReferenceIds())) {
                 for (String imageRef : itemDetail.getClothImageReferenceIds()) {
                     clothRefOrderItemIdMap.put(imageRef, orderItemDAO.getId());
                 }
+                List<FileDetail> clothImageFileDetails = getClothImageDetails(itemDetail.getClothImageReferenceIds());
+                orderItemDAO.setClothImageDetails(clothImageFileDetails);
             }
             if (!CollectionUtils.isEmpty(itemDetail.getAudioReferenceIds())) {
                 for (String audioRef : itemDetail.getAudioReferenceIds()) {
                     audioRefOrderItemIdMap.put(audioRef, orderItemDAO.getId());
                 }
+                List<FileDetail> audioFileDetails = getAudioDetails(itemDetail.getAudioReferenceIds());
+                orderItemDAO.setAudioFileDetails(audioFileDetails);
             }
             if (!CollectionUtils.isEmpty(itemDetail.getStitchOptionReferences())) {
                 stitchOptionService.addOrderItemId(itemDetail.getStitchOptionReferences(), orderItemDAO.getId());
             }
-            orderItemDAO.setPriceBreakup(priceBreakUpList);
+            priceBreakupDAOList = priceBreakUpService.savePriceBreakUp(priceBreakupDAOList);
+            orderItemDAO.setPriceBreakup(priceBreakupDAOList);
             orderItemList.add(orderItemDAO);
         }
-        if (!CollectionUtils.isEmpty(priceBreakUpList)) {
-            priceBreakUpService.savePriceBreakUp(priceBreakUpList);
-        }
         if (!CollectionUtils.isEmpty(clothRefOrderItemIdMap)) {
-            objectFilesService.saveObjectImages(clothRefOrderItemIdMap, FileEntityType.ORDER_ITEM.getEntityType());
+            objectFilesService.saveObjectFiles(clothRefOrderItemIdMap, FileEntityType.ORDER_ITEM.getEntityType());
         }
         if (!CollectionUtils.isEmpty(audioRefOrderItemIdMap)) {
-            objectFilesService.saveObjectImages(audioRefOrderItemIdMap, FileEntityType.AUDIO.getEntityType());
+            objectFilesService.saveObjectFiles(audioRefOrderItemIdMap, FileEntityType.AUDIO.getEntityType());
         }
         order.setOrderItems(orderItemList);
         return orderItemList;
@@ -175,13 +175,13 @@ public class OrderItemService {
         if (!Collections.isEmpty(updateItemDetail.getClothImageReferenceIds())) {
             objectFilesService.invalidateExistingReferenceIds(FileEntityType.ORDER_ITEM.getEntityType(),
                     orderItemId);
-            objectFilesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
+            objectFilesService.saveObjectFiles(updateItemDetail.getClothImageReferenceIds(),
                     FileEntityType.ORDER_ITEM.getEntityType(), orderItemId);
         }
         if (!Collections.isEmpty(updateItemDetail.getAudioReferenceIds())) {
             objectFilesService.invalidateExistingReferenceIds(FileEntityType.AUDIO.getEntityType(),
                     orderItemId);
-            objectFilesService.saveObjectImages(updateItemDetail.getClothImageReferenceIds(),
+            objectFilesService.saveObjectFiles(updateItemDetail.getClothImageReferenceIds(),
                     FileEntityType.AUDIO.getEntityType(), orderItemId);
         }
         orderItem = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItem,

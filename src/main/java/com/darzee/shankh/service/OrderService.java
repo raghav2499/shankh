@@ -641,13 +641,13 @@ public class OrderService {
         }
     }
 
-    private List<OrderItemSummary> generateOrderItemSummaries(List<OrderItemDAO> orderItemDAOList) {
-        List<OrderItemSummary> orderItemSummaryList = new ArrayList<>();
-        for (OrderItemDAO item : orderItemDAOList) {
-            orderItemSummaryList.add(new OrderItemSummary(item));
-        }
-        return orderItemSummaryList;
-    }
+//    private List<OrderItemSummary> generateOrderItemSummaries(List<OrderItemDAO> orderItemDAOList) {
+//        List<OrderItemSummary> orderItemSummaryList = new ArrayList<>();
+//        for (OrderItemDAO item : orderItemDAOList) {
+//            orderItemSummaryList.add(new OrderItemSummary(item));
+//        }
+//        return orderItemSummaryList;
+//    }
 
     private void postUpdateOrderValidation(Double totalOrderAmount, List<PriceBreakupDAO> allItemsPriceBreakup) {
         Double itemsPriceBreakupSum = allItemsPriceBreakup.stream().mapToDouble(PriceBreakupDAO::getValue).sum();

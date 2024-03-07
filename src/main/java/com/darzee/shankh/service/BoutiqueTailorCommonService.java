@@ -66,7 +66,7 @@ public class BoutiqueTailorCommonService {
 
     public void saveTailorImageReference(String imageReference, Long tailorId) {
         objectFilesService.invalidateExistingReferenceIds(FileEntityType.TAILOR.getEntityType(), tailorId);
-        objectFilesService.saveObjectImages(Arrays.asList(imageReference),
+        objectFilesService.saveObjectFiles(Arrays.asList(imageReference),
                 FileEntityType.TAILOR.getEntityType(),
                 tailorId);
     }
@@ -78,7 +78,7 @@ public class BoutiqueTailorCommonService {
 
     private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
         objectFilesService.invalidateExistingReferenceIds(FileEntityType.BOUTIQUE.getEntityType(), boutique.getId());
-        objectFilesService.saveObjectImages(imageReferences,
+        objectFilesService.saveObjectFiles(imageReferences,
                 FileEntityType.BOUTIQUE.getEntityType(),
                 boutique.getId());
     }

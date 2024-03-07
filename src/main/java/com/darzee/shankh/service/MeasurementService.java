@@ -132,7 +132,7 @@ public class MeasurementService {
                     measurementsRepo.save(mapper.measurementsDAOToMeasurement(measurementsDAO,
                             new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
             if (!StringUtils.isNullOrEmpty(measurementDetails.getReferenceId())) {
-                objectFilesService.saveObjectImages(Arrays.asList(measurementDetails.getReferenceId()),
+                objectFilesService.saveObjectFiles(Arrays.asList(measurementDetails.getReferenceId()),
                         FileEntityType.MEASUREMENT_REVISION.getEntityType(), revision.getId());
             }
             return measurementsDAO;

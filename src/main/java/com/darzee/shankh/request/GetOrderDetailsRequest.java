@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.darzee.shankh.constants.Constants.*;
@@ -53,6 +50,9 @@ public class GetOrderDetailsRequest {
                     .map(requestOrdinal -> OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(requestOrdinal))
                     .map(orderItemStatus -> orderItemStatus.ordinal())
                     .collect(Collectors.toList());
+            filterMap.put(ITEM_STATUS.getFilterName(), statusList);
+        } else {
+            List<Integer> statusList = new ArrayList<>(OrderItemStatus.getOrderItemTypeEnumOrdinalMap().keySet());
             filterMap.put(ITEM_STATUS.getFilterName(), statusList);
         }
         if (orderStatusList != null) {

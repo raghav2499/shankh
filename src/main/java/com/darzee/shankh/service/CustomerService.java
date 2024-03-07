@@ -252,7 +252,7 @@ public class CustomerService {
 
     private void saveCustomerImages(CustomerDAO customerDAO, String imageReferenceId) {
         objectFilesService.invalidateExistingReferenceIds(FileEntityType.CUSTOMER.getEntityType(), customerDAO.getId());
-        objectFilesService.saveObjectImages(Arrays.asList(imageReferenceId),
+        objectFilesService.saveObjectFiles(Arrays.asList(imageReferenceId),
                 FileEntityType.CUSTOMER.getEntityType(),
                 customerDAO.getId());
     }

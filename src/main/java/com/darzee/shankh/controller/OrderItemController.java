@@ -66,7 +66,7 @@ public class OrderItemController {
     @CrossOrigin
     public ResponseEntity<GetOrderItemResponse> getOrderItems(@RequestParam(name = "boutique_id", required = false) Long boutiqueId,
                                                               @RequestParam(name = "order_id", required = false) Long orderId,
-                                                              @RequestParam(name = "order_item_status_list") String orderItemStatusList,
+                                                              @RequestParam(name = "order_item_status_list",required = false) String orderItemStatusList,
                                                               @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
                                                               @RequestParam(name = "delivery_date_from", required = false) String deliveryDateFrom,
                                                               @RequestParam(name = "delivery_date_till", required = false) String deliveryDateTill,

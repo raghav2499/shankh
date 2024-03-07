@@ -121,7 +121,7 @@ public class BoutiqueService {
 
     private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
         objectFilesService.invalidateExistingReferenceIds(FileEntityType.BOUTIQUE.getEntityType(), boutique.getId());
-        objectFilesService.saveObjectImages(imageReferences,
+        objectFilesService.saveObjectFiles(imageReferences,
                 FileEntityType.BOUTIQUE.getEntityType(),
                 boutique.getId());
     }

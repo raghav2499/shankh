@@ -29,11 +29,12 @@ public class PriceBreakUpService {
     @Autowired
     private PriceBreakUpRepo priceBreakUpRepo;
 
-    public void savePriceBreakUp(List<PriceBreakupDAO> priceBreakupDAOList) {
+    public List<PriceBreakupDAO> savePriceBreakUp(List<PriceBreakupDAO> priceBreakupDAOList) {
         priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(
                 priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
+        return priceBreakupDAOList;
 
     }
 

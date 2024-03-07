@@ -26,6 +26,9 @@ public class OrderItemSummary {
     private String outfitAlias;
 
     private Integer quantity;
+
+    private List<FileDetail> clothImages;
+    private List<FileDetail> audio;
     private List<PriceBreakupSummary> priceBreakup;
 
     public OrderItemSummary(OrderItemDAO orderItem) {
