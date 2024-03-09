@@ -43,6 +43,7 @@ public class OrderItemDetails {
     private Long orderId;
     private String customerName;
     private String status;
+    private String outfitAlias;
 
     public OrderItemDetails(OrderItemDAO orderItem, String outfitTypeImgLink) {
         OutfitType outfitType = orderItem.getOutfitType();
@@ -59,6 +60,7 @@ public class OrderItemDetails {
         this.customerName = orderItem.getOrder().getCustomer().constructName();
         this.orderId = orderItem.getOrder().getId();
         this.itemPrice = orderItem.calculateItemPrice();
+        this.outfitAlias = orderItem.getOutfitAlias();
     }
 
     public OrderItemDetails(List<FileDetail> clothImageFileDetail, List<FileDetail> audioFileDetail,
@@ -85,5 +87,6 @@ public class OrderItemDetails {
         this.trialDate = orderItem.getTrialDate().toString();
         this.itemPrice = orderItem.calculateItemPrice();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
+        this.outfitAlias = orderItem.getOutfitAlias();
     }
 }
