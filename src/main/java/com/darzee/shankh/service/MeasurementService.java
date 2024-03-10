@@ -89,7 +89,8 @@ public class MeasurementService {
             if (orderItem.isPresent()) {
                 measurementRevision = orderItem.get().getMeasurementRevision();
             }
-        } else if (measurementRevision == null) {
+        }
+        if (measurementRevision == null) {
             measurementRevision = measurementRevisionsRepo.findTopByCustomerIdAndOutfitTypeOrderByIdDesc(customerId,
                     outfitType);
         }

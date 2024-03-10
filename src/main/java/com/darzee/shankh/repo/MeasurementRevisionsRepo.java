@@ -9,8 +9,6 @@ import java.util.List;
 public interface MeasurementRevisionsRepo extends JpaRepository<MeasurementRevisions, Long> {
 
     List<MeasurementRevisions> findAllByCustomerIdAndOutfitType(Long customerId, OutfitType outfitType);
-    MeasurementRevisions findByCustomerIdAndOutfitTypeOrderByIdDesc(Long customerId, OutfitType outfitType);
-
     MeasurementRevisions findTopByCustomerIdAndOutfitTypeOrderByIdDesc(Long customerId, OutfitType outfitType);
 
 }
