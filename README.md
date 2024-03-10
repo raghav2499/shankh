@@ -9,7 +9,7 @@ Run in development mode in Intellij idea etc by adding the following line
 mvn clean package
 
 #### Run
-java  -jar target/shankh-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev=dev
+java  -jar target/shankh-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev
 
 #### Documentation
 Api documentation can be found at : [TBA] 
