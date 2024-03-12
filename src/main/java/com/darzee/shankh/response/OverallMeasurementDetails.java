@@ -22,6 +22,7 @@ public class OverallMeasurementDetails {
     private List<InnerMeasurementDetails> innerMeasurementDetails = new ArrayList<>();
     private String measurementImageLink;
     private LocalDateTime measurementUpdatedAt;
+    private Long measurementRevisionId;
 
 
     public OverallMeasurementDetails(String message) {

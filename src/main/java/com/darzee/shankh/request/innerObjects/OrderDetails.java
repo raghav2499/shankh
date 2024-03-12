@@ -1,5 +1,6 @@
 package com.darzee.shankh.request.innerObjects;
 
+import com.darzee.shankh.request.OrderCreationRequest;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
@@ -11,9 +12,10 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderDetails {
 
-    @NotNull(message = "customer_id cannot be null")
+
+    @NotNull(message = "customer_id cannot be null", groups = {OrderCreationRequest.CreateOrder.class})
     private Long customerId;
-    @NotNull(message = "boutique_id cannot be null")
+    @NotNull(message = "boutique_id cannot be null", groups = {OrderCreationRequest.CreateOrder.class})
     private Long boutiqueId;
     private Long orderId;
     private List<OrderItemDetailRequest> orderItems;

@@ -23,6 +23,9 @@ public class PriceBreakupDAO {
         this.orderItem = orderItem;
     }
 
+    public Double getTotalBreakUpValue() {
+        return this.getValue() * this.getQuantity();
+    }
     public boolean isComponentStringUpdated(String value) {
         return value != null && !this.component.equals(value);
     }

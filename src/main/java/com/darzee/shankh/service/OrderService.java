@@ -12,10 +12,7 @@ import com.darzee.shankh.enums.PaymentMode;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
-import com.darzee.shankh.request.GetOrderDetailsRequest;
-import com.darzee.shankh.request.PriceBreakUpDetails;
-import com.darzee.shankh.request.RecievePaymentRequest;
-import com.darzee.shankh.request.UpdateOrderRequest;
+import com.darzee.shankh.request.*;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.UpdateOrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.UpdateOrderDetails;
@@ -209,10 +206,6 @@ public class OrderService {
             OrderAmountDAO orderAmount = order.getOrderAmount();
             CustomerDAO customer = order.getCustomer();
             List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
-//            for (OrderItemDAO orderItem : order.getNonDeletedItems()) {
-//                OrderItemDetails orderItemDetails = orderItemService.getOrderItemDetails(orderItem);
-//                orderItemDetailsList.add(orderItemDetails);
-//            }
             String message = "Details fetched succesfully";
             OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount,
                     orderItemDetailsList, message);
@@ -255,8 +248,14 @@ public class OrderService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
     }
 
+    public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long orderId, OrderCreationRequest request) {
+        OrderSummary orderSummary = confirmOrder(orderId, request);
+        generateInvoiceV2(orderId);
+        return new ResponseEntity<>(orderSummary, HttpStatus.OK);
+    }
+
     @Transactional
-    public ResponseEntity<OrderSummary> confirmOrder(Long orderId) {
+    public OrderSummary confirmOrder(Long orderId, OrderCreationRequest request) {
         Optional<Order> order = orderRepo.findById(orderId);
         if (!order.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order with ID " + orderId + " doesn't exist");
@@ -269,7 +268,8 @@ public class OrderService {
         }
         orderItemService.validateMandatoryOrderItemFields(orderDAO.getOrderItems());
         Double priceBreakupSum = orderDAO.getPriceBreakupSum();
-        Double totalOrderAmount = orderDAO.getOrderAmount().getTotalAmount();
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        Double totalOrderAmount = orderAmountDAO.getTotalAmount();
         if (!priceBreakupSum.equals(totalOrderAmount)) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Items' Price Breakups are not summing up to total amount. " +
@@ -277,11 +277,18 @@ public class OrderService {
                             + priceBreakupSum);
         }
         orderDAO.setOrderStatus(OrderStatus.ACCEPTED);
-        orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
+        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
+                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         orderItemService.acceptOrderItems(orderDAO.getNonDeletedItems());
+        if (request.getOrderDetails().getOrderAmountDetails().getAdvanceOrderAmount() != null) {
+            Double advanceAmount = request.getOrderDetails().getOrderAmountDetails().getAdvanceOrderAmount();
+            orderAmountDAO.setAmountRecieved(advanceAmount);
+            orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
+            paymentService.recordPayment(advanceAmount, PaymentMode.CASH, Boolean.TRUE, orderDAO);
+        }
         OrderSummary summary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(), totalOrderAmount,
                 orderDAO.getOrderAmount().getAmountRecieved(), orderDAO.getNonDeletedItems());
-        return new ResponseEntity<>(summary, HttpStatus.OK);
+        return summary;
     }
 
     public SalesDashboard getWeekWiseSales(Long boutiqueId, int month, int year) {
@@ -388,6 +395,23 @@ public class OrderService {
                     orderDAO,
                     orderAmountDAO,
                     boutique);
+            String fileUploadUrl = bucketService.uploadInvoice(bill, orderId);
+            bill.delete();
+            return fileUploadUrl;
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order id");
+    }
+
+    public String generateInvoiceV2(Long orderId) {
+        Optional<Order> order = orderRepo.findById(orderId);
+        if (order.isPresent()) {
+            OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
+            CustomerDAO customerDAO = orderDAO.getCustomer();
+            String customerName = customerDAO.constructName();
+            BoutiqueDAO boutique = orderDAO.getBoutique();
+            TailorDAO tailorDAO = boutique.getAdminTailor();
+            File bill = billGenerator.generateBillV2(boutique, customerName,
+                    tailorDAO.getPhoneNumber(), orderDAO);
             String fileUploadUrl = bucketService.uploadInvoice(bill, orderId);
             bill.delete();
             return fileUploadUrl;

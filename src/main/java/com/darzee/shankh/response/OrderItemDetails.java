@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -44,6 +45,7 @@ public class OrderItemDetails {
     private String customerName;
     private String status;
     private String outfitAlias;
+    private List<PriceBreakupSummary> priceBreakupSummaryList;
 
     public OrderItemDetails(OrderItemDAO orderItem, String outfitTypeImgLink) {
         OutfitType outfitType = orderItem.getOutfitType();
@@ -88,5 +90,7 @@ public class OrderItemDetails {
         this.itemPrice = orderItem.calculateItemPrice();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
         this.outfitAlias = orderItem.getOutfitAlias();
+        this.priceBreakupSummaryList = orderItem.getPriceBreakup().stream()
+                .map(priceBreakup -> new PriceBreakupSummary(priceBreakup)).collect(Collectors.toList());
     }
 }

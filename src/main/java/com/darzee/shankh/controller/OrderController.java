@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-
 
 @RestController
 @RequestMapping(value = "/order")
@@ -28,7 +26,7 @@ public class OrderController {
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<OrderSummary> createOrder(@Valid @RequestBody OrderCreationRequest request) throws Exception {
+    public ResponseEntity<OrderSummary> createOrder(@Validated(OrderCreationRequest.CreateOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
         OrderSummary response = orderOrderItemCommonService.createOrder(request);
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
@@ -79,7 +77,8 @@ public class OrderController {
 
     @PostMapping(value = "/{id}/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity confirmOrder(@PathVariable("id") Long orderId) {
-        return orderService.confirmOrder(orderId);
+    public ResponseEntity confirmOrder(@PathVariable("id") Long orderId,
+                                       @Validated(OrderCreationRequest.ConfirmOrder.class) @RequestBody OrderCreationRequest request) {
+        return orderService.confirmOrderAndGenerateInvoice(orderId, request);
     }
 }

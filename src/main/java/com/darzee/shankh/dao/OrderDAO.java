@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,8 @@ public class OrderDAO {
     private Boolean isDeleted = Boolean.FALSE;
     private BoutiqueDAO boutique;
     private OrderAmountDAO orderAmount;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private CustomerDAO customer;
     private List<OrderItemDAO> orderItems;
 //    private List<PaymentDAO> payment;
@@ -72,5 +75,4 @@ public class OrderDAO {
                 .mapToDouble(pb -> pb.getValue()).sum();
         return priceBreakupSum;
     }
-
 }

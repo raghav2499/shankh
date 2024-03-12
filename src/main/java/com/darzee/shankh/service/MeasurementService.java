@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -72,6 +73,7 @@ public class MeasurementService {
                                                         Boolean nonEmptyValuesOnly) throws Exception {
         OverallMeasurementDetails measurementDetails = getMeasurementDetails(customerId, orderItemId,
                 outfitTypeIndex, scale, nonEmptyValuesOnly);
+        measurementDetails.setMessage(getMeasurementDetailsMessage(measurementDetails));
         return new ResponseEntity(measurementDetails, HttpStatus.OK);
     }
 
@@ -103,8 +105,8 @@ public class MeasurementService {
         overallMeasurementDetails = outfitTypeService.setMeasurementDetails(revisionsDAO,
                 measurementScale,
                 nonEmptyValuesOnly);
-        overallMeasurementDetails.setMessage(getMeasurementDetailsMessage(revisionsDAO));
         overallMeasurementDetails.setMeasurementUpdatedAt(revisionsDAO.getCreatedAt());
+        overallMeasurementDetails.setMeasurementRevisionId(revisionsDAO.getId());
         return overallMeasurementDetails;
     }
 
@@ -172,8 +174,8 @@ public class MeasurementService {
         return measurementRevisionsDAO;
     }
 
-    private String getMeasurementDetailsMessage(MeasurementRevisionsDAO revisionsDAO) {
-        String message = (revisionsDAO != null)
+    private String getMeasurementDetailsMessage(OverallMeasurementDetails measurementDetails) {
+        String message = (!CollectionUtils.isEmpty(measurementDetails.getInnerMeasurementDetails()))
                 ? "Measurement details fetched sucessfully"
                 : "Measurement details not found";
         return message;

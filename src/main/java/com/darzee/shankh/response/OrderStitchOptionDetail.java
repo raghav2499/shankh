@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderStitchOptionDetail {
     public Long orderStitchOptionId;
+    public Long stitchOptionId;
     public String type;
     public String label;
     public String outfitSide;
@@ -21,6 +22,7 @@ public class OrderStitchOptionDetail {
 
     public OrderStitchOptionDetail(OrderStitchOptionDAO orderStitchOptionDAO, StitchOptionsDAO stitchOptionsDAO) {
         this.orderStitchOptionId = orderStitchOptionDAO.getId();
+        this.stitchOptionId = orderStitchOptionDAO.getStitchOptionId();
         this.type = stitchOptionsDAO.getType().getName();
         this.label = stitchOptionsDAO.getKey();
         this.outfitSide = stitchOptionsDAO.getOutfitSide().getView();
