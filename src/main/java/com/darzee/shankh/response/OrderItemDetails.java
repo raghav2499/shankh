@@ -63,6 +63,9 @@ public class OrderItemDetails {
         this.orderId = orderItem.getOrder().getId();
         this.itemPrice = orderItem.calculateItemPrice();
         this.outfitAlias = orderItem.getOutfitAlias();
+        this.deliveryDate = orderItem.getDeliveryDate().toString();
+        this.priceBreakupSummaryList = orderItem.getPriceBreakup().stream()
+                .map(priceBreakup -> new PriceBreakupSummary(priceBreakup)).collect(Collectors.toList());
     }
 
     public OrderItemDetails(List<FileDetail> clothImageFileDetail, List<FileDetail> audioFileDetail,
