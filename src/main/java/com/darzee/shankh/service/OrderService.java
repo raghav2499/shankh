@@ -280,8 +280,8 @@ public class OrderService {
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
                 new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         orderItemService.acceptOrderItems(orderDAO.getNonDeletedItems());
-        if (request.getOrderDetails().getOrderAmountDetails().getAdvanceOrderAmount() != null) {
-            Double advanceAmount = request.getOrderDetails().getOrderAmountDetails().getAdvanceOrderAmount();
+        if (request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived() != null) {
+            Double advanceAmount = request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived();
             orderAmountDAO.setAmountRecieved(advanceAmount);
             orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
             paymentService.recordPayment(advanceAmount, PaymentMode.CASH, Boolean.TRUE, orderDAO);
@@ -551,8 +551,8 @@ public class OrderService {
     @Transactional
     public OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
         Double amountRecieved = 0d;
-        if (orderAmountDetails != null && orderAmountDetails.getAdvanceOrderAmount() != null) {
-            amountRecieved = orderAmountDetails.getAdvanceOrderAmount();
+        if (orderAmountDetails != null && orderAmountDetails.getAdvanceReceived() != null) {
+            amountRecieved = orderAmountDetails.getAdvanceReceived();
         }
         Double totalOrderAmount = calculateTotalOrderAmount(orderDAO.getNonDeletedItems());
 
