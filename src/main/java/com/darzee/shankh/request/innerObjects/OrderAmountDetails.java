@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderAmountDetails {
-    private Double totalOrderAmount;
-    private Double advanceOrderAmount;
-    private Double dueBalance;
+    private Double totalAmount;
+    private Double advanceReceived;
+    private Double balanceDue;
 }

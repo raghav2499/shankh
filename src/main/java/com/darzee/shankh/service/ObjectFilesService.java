@@ -129,6 +129,9 @@ public class ObjectFilesService {
 
     @Nullable
     public String getMeasurementRevisionReferenceId(Long measurementRevisionId) {
+        if(measurementRevisionId == null) {
+            return null;
+        }
         Optional<ObjectFiles> measurementRevImage = repo.findByEntityIdAndEntityTypeAndIsValid(measurementRevisionId,
                 FileEntityType.MEASUREMENT_REVISION.getEntityType(),
                 Boolean.TRUE);
