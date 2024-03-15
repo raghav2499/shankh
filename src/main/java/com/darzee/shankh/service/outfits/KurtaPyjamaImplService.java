@@ -137,7 +137,8 @@ public class KurtaPyjamaImplService implements OutfitTypeService {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         List<InnerMeasurementDetails> innerMeasurementDetails = new ArrayList<>();
         String measurementImageLink = null;
-        if(CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())) {
+        if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())
+                && measurementRevisionService.measurementRevisionImageExists(revisionsDAO.getId())) {
             measurementImageLink = measurementRevisionService.getMeasurementRevisionImageLink(revisionsDAO.getId());
         } else {
             innerMeasurementDetails.add(setMeasurementDetailsInObjectTop(revisionsDAO, scale, nonEmptyValuesOnly));

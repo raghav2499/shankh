@@ -30,6 +30,11 @@ public class MeasurementRevisionService {
         return getMeasurementRevisionImageLink(referenceId);
     }
 
+    public boolean measurementRevisionImageExists(Long revisionId) {
+        return revisionId != null
+                && objectFilesService.getMeasurementRevisionReferenceId(revisionId) != null;
+    }
+
     public String getMeasurementRevisionImageLink(String measurementRevisionReferenceId) {
         Optional<ImageReference> measurementRevisionRef = fileReferenceRepo.findByReferenceId(measurementRevisionReferenceId);
         if (measurementRevisionRef.isPresent()) {

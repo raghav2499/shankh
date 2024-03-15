@@ -89,7 +89,7 @@ public class OrderItemDetails {
         this.pieces = orderItem.getOutfitType().getPieces();
         this.measurementDetails = measurementDetails;
         this.orderItemStitchOptions = orderItemStitchOptions;
-        this.trialDate = orderItem.getTrialDate().toString();
+        this.trialDate = (orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null);
         this.itemPrice = orderItem.calculateItemPrice();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
         this.outfitAlias = orderItem.getOutfitAlias();

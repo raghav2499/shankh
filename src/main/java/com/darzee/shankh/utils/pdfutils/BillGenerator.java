@@ -14,8 +14,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -103,7 +105,7 @@ public class BillGenerator {
             context.setVariable("totalAmount", orderAmount.getTotalAmount());
             context.setVariable("amountPaid", orderAmount.getAmountRecieved());
             context.setVariable("balanceDue", orderAmount.getTotalAmount() - orderAmount.getAmountRecieved());
-
+            context.setVariable("orderUpdationDate", Date.from(order.getUpdatedAt().toInstant(ZoneOffset.UTC)));
             // Process the HTML template with the Thymeleaf template engine
             String processedHtml = templateEngine.process("bill_template_v2", context);
 

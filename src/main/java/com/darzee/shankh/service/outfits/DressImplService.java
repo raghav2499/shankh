@@ -143,7 +143,8 @@ public class DressImplService implements OutfitTypeService {
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         String measurementRevisionImgLink = null;
 
-        if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())) {
+        if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())
+                && measurementRevisionService.measurementRevisionImageExists(revisionsDAO.getId())) {
             measurementRevisionImgLink = measurementRevisionService.getMeasurementRevisionImageLink(revisionsDAO.getId());
         } else {
             measurementDetailsResponseList.add(

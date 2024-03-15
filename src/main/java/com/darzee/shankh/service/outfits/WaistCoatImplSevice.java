@@ -81,7 +81,8 @@ public class WaistCoatImplSevice implements OutfitTypeService {
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         String measurementImageLink = null;
-        if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())) {
+        if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())
+                && measurementRevisionService.measurementRevisionImageExists(revisionsDAO.getId())) {
             measurementImageLink = measurementRevisionService.getMeasurementRevisionImageLink(revisionsDAO.getId());
         } else {
             measurementDetailsResponseList.add(
