@@ -3,8 +3,6 @@ package com.darzee.shankh.entity;
 import com.darzee.shankh.enums.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -33,11 +31,11 @@ public class Order {
     private Boolean isDeleted;
 
     @Column(name = "created_at")
-    @CreationTimestamp
+//    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    @UpdateTimestamp
+//    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @ManyToOne

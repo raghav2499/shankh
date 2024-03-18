@@ -117,7 +117,7 @@ public class OrderService {
 //        OrderDetails orderDetails = request.getOrderDetails();
 //        OrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
 //        List<PriceBreakUpDetails> allItemsPriceBreakUpDetails = orderDetails.getOrderItems()
-//                .stream().map(orderItem -> orderItem.getPriceBreakup()).flatMap(List::stream)
+//                .stream().map(orderItem -> orderItem.getActivePriceBreakUpList()).flatMap(List::stream)
 //                .collect(Collectors.toList());
 //        validatePriceBreakup(allItemsPriceBreakUpDetails, orderAmountDetails.getTotalOrderAmount());
 //
@@ -162,12 +162,11 @@ public class OrderService {
                     new CycleAvoidingMappingContext());
             CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(),
                     new CycleAvoidingMappingContext());
-            OrderDAO orderDAO = setOrderSpecificDetails(boutiqueDAO, customerDAO);
             OrderAmountDAO orderAmountDAO = new OrderAmountDAO();
-            orderAmountDAO.setOrder(orderDAO);
             orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(
                             mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
+            OrderDAO orderDAO = setOrderSpecificDetails(boutiqueDAO, customerDAO);
             orderDAO.setOrderAmount(orderAmountDAO);
             orderDAO = mapper.orderObjectToDao(
                     orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())),
@@ -226,7 +225,7 @@ public class OrderService {
         Optional<Order> optionalOrder = orderRepo.findById(orderId);
         if (optionalOrder.isPresent()) {
             OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
-            OrderAmountDAO orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.findByOrderId(order.getId()), new CycleAvoidingMappingContext());
+            OrderAmountDAO orderAmountDAO = order.getOrderAmount();
             UpdateOrderDetails orderDetails = request.getOrderDetails();
             UpdateOrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
             if (orderDetails != null) {
@@ -529,13 +528,10 @@ public class OrderService {
 //    }
 
 
-    @Transactional
     private OrderDAO setOrderSpecificDetails(BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
 
         String invoiceNo = generateOrderInvoiceNo();
         OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
-        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
-                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return orderDAO;
     }
 
@@ -609,7 +605,7 @@ public class OrderService {
     }
 
     private Double calculateTotalOrderAmount(List<OrderItemDAO> orderItems) {
-        List<PriceBreakupDAO> priceBreakups = orderItems.stream().map(item -> item.getPriceBreakup())
+        List<PriceBreakupDAO> priceBreakups = orderItems.stream().map(item -> item.getActivePriceBreakUpList())
                 .flatMap(List::stream).collect(Collectors.toList());
         Double totalAmount = 0d;
         if (!CollectionUtils.isEmpty(priceBreakups)) {
