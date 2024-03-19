@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <title>Order Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .main-div-header {
+            margin-bottom: 20px;
+            overflow: hidden;
+            /* Clear float */
+        }
+
+        .main-div-header h1 {
+            margin-top: 2rem;
+            color: #525252;
+            float: left;
+        }
+
+        .main-div-header .right {
+            float: right;
+        }
+
+        .main-div-content {
+            margin-bottom: 20px;
+            overflow: hidden;
+            /* Clear float */
+        }
+
+        .main-div-content-left {
+            width: 40%;
+            /* Adjusted width */
+            float: left;
+
+        }
+
+        .main-div-content-right {
+            width: 60%;
+            /* Adjusted width */
+            float: left;
+
+        }
+
+        .order-summary {
+            background-color: #eef2ff;
+            padding: 20px;
+        }
+
+        .order-summary h5 {
+            margin-top: 0;
+        }
+
+        .gray-background {
+            background-color: #f1f1f1;
+            padding: 20px;
+
+        }
+
+        .invoice-details {
+            color: #525252
+        }
+
+        .black {
+            color: black
+        }
+
+        table th {
+            font-size: 12px;
+        }
+
+        table tr {
+            font-size: 14px;
+        }
+
+        .total,
+        .total1,
+        .balanceDue {
+            background-color: #eef2ff;
+            margin-top: 5px;
+            padding: 1px;
+            position: relative;
+        }
+
+        #main-para {
+            position: absolute;
+            top: 70px;
+            /* Adjust top position as needed */
+            right: calc(100% - 50px);
+            /* Position from the right edge of the container */
+        }
+
+        #main-heading {
+            margin-top: 20px;
+            color: #525252;
+            float: left;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="main-div-header">
+            <div class="left">
+                <h1 id="main-heading">Invoice</h1>
+                <p class="invoice-details" id="main-para">Business Name:</p>
+            </div>
+            <div class="right">
+                <p class="invoice-details">Invoice Date: <span class="black">March 17, 2024</span></p>
+                <p class="invoice-details">Invoice Number: <span class="black">INV12345</span></p>
+            </div>
+        </div>
+        <hr>
+        </hr>
+        <div class="main-div-content">
+            <div class="main-div-content-left">
+                <div class="customer-details">
+                    <h2>Customer Details</h2>
+                    <p class="invoice-details">Customer Name: <span class="black">John Doe</span></p>
+                    <p class="invoice-details">Order Number: <span class="black">123456</span></p>
+                    <p class="invoice-details">Order Received Date: <span class="black">March 15, 2024</span></p>
+                    <p class="invoice-details">Order Received Time: <span class="black">10:00 AM</span></p>
+                </div>
+            </div>
+            <div class="main-div-content-right">
+                <div class="order-summary">
+                    <h5>Order Summary</h5>
+                    <table border="1">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Price</th>
+                                <th>Price Breakup</th>
+                                <th>Expected Delivery Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>OutfitOutfitOutfit</td>
+                                <td>$50</td>
+                                <td>Component 1 x 1 = $20<br />Component 2 x 2 = $30</td>
+                                <td>March 20, 2024</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="total">
+                    <p class="invoice-details">Total: <span class="black" style="float:right">$50</span></p>
+                </div>
+                <div class="total1">
+                    <p class="invoice-details">Advance (if any): <span class="black" style="float:right">$20</span></p>
+                </div>
+                <div class="balanceDue">
+                    <p class="invoice-details">Balance Due: <span id="balanceDue" class="black"
+                            style="float:right">$30</span></p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        </hr>
+        <div class="gray-background">
+            <h2 class="invoice-details">Thank you for your business</h2>
+            <p>Terms and conditions</p>
+            <ul>
+                <li class="black">Once confirmed, any advance amount paid towards the order cannot be refunded.</li>
+                <li class="black">Goods once sold will not be taken back.</li>
+                <li class="black">We do not give a guarantee of colors. We advise dry cleaning only.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>

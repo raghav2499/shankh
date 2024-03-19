@@ -35,7 +35,7 @@ public class BillGenerator {
     private void configureTemplateResolver() {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setPrefix("templates/");
-        templateResolver.setSuffix(".ftl");
+        templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode("HTML");
         templateResolver.setCharacterEncoding("UTF-8");
         Set<String> resolvablePatterns = new HashSet<>();
