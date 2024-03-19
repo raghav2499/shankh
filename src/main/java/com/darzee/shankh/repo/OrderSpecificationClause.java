@@ -100,8 +100,6 @@ public class OrderSpecificationClause {
         }
 
         switch (filter) {
-            case ITEM_STATUS:
-                return findOrderByItemStatuses((List<Integer>) value);
             case ORDER_STATUS:
                 return findOrderByOrderStatuses((List<Integer>) value);
             case BOUTIQUE_ID:

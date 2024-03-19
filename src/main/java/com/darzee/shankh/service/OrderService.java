@@ -182,7 +182,7 @@ public class OrderService {
                                                      String deliveryDateFrom, String deliveryDateTill,
                                                      Boolean paymentDue, Integer countPerPage, Integer pageCount) {
         validateGetOrderRequest(orderItemStatusList, orderStatusList);
-        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList,
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, null,
                 orderStatusList, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill,
                 null, paymentDue);
         String defaultOrderSortKey = "created_at";
@@ -194,8 +194,18 @@ public class OrderService {
         List<Order> orderDetails = orderRepo.findAll(orderSpecification, pagingCriteria).getContent();
         Long totalRecordsCount = orderRepo.count(orderSpecification);
         List<OrderDAO> orderDAOList = mapper.orderObjectListToDAOList(orderDetails, new CycleAvoidingMappingContext());
+        List<OrderItemStatus> orderItemStatuses = Arrays.asList(OrderItemStatus.values());
+        if (orderItemStatusList != null) {
+            List<Integer> eligibleStatuses = Arrays.stream(orderItemStatusList.split(","))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+            orderItemStatuses = orderItemStatuses.stream()
+                    .filter(orderItemStatus -> eligibleStatuses.contains(orderItemStatus.getOrdinal()))
+                    .collect(Collectors.toList());
+        }
+        List<OrderItemStatus> finalOrderItemStatuses = orderItemStatuses;
         List<OrderDetailResponse> orderDetailsList = orderDAOList.stream()
-                .map(order -> getOrderDetails(order))
+                .map(order -> getOrderDetails(order, finalOrderItemStatuses))
                 .collect(Collectors.toList());
         GetOrderResponse response = new GetOrderResponse(orderDetailsList, totalRecordsCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -504,10 +514,13 @@ public class OrderService {
         return totalAmountPaid;
     }
 
-    private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
+    private OrderDetailResponse getOrderDetails(OrderDAO orderDAO, List<OrderItemStatus> eligibleStatuses) {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
         List<Pair<OrderItemDAO, String>> orderItemOutfitLinkPairList = new ArrayList<>();
-        for (OrderItemDAO orderItem : orderDAO.getNonDeletedItems()) {
+        List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems().stream()
+                .filter(item -> eligibleStatuses.contains(item.getOrderItemStatus()))
+                .collect(Collectors.toList());
+        for (OrderItemDAO orderItem : orderItems) {
             String outfitImgLink = outfitImageLinkService.getOutfitImageLink(orderItem.getOutfitType());
             orderItemOutfitLinkPairList.add(Pair.of(orderItem, outfitImgLink));
         }
