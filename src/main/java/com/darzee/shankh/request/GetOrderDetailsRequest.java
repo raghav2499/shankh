@@ -11,8 +11,7 @@ import java.util.stream.Collectors;
 
 import static com.darzee.shankh.constants.Constants.*;
 import static com.darzee.shankh.enums.OrderFilter.*;
-import static com.darzee.shankh.enums.OrderItemSort.DELIVERY_DATE;
-import static com.darzee.shankh.enums.OrderItemSort.TRIAL_DATE;
+import static com.darzee.shankh.enums.OrderItemSort.*;
 
 public class GetOrderDetailsRequest {
 
@@ -50,9 +49,6 @@ public class GetOrderDetailsRequest {
                     .map(requestOrdinal -> OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(requestOrdinal))
                     .map(orderItemStatus -> orderItemStatus.ordinal())
                     .collect(Collectors.toList());
-            filterMap.put(ITEM_STATUS.getFilterName(), statusList);
-        } else {
-            List<Integer> statusList = new ArrayList<>(OrderItemStatus.getOrderItemTypeEnumOrdinalMap().keySet());
             filterMap.put(ITEM_STATUS.getFilterName(), statusList);
         }
         if (orderStatusList != null) {
@@ -97,6 +93,9 @@ public class GetOrderDetailsRequest {
                 break;
             case "delivery_date":
                 paramsSortValue = DELIVERY_DATE.getOrderSortString();
+                break;
+            case "created_at":
+                paramsSortValue = CREATED_AT.getOrderSortString();
                 break;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorting is not supported for " + requestSortKey);

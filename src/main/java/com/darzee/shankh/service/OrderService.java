@@ -185,7 +185,10 @@ public class OrderService {
         Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList,
                 orderStatusList, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill,
                 null, paymentDue);
-        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, null, null);
+        String defaultOrderSortKey = "created_at";
+        String defaultOrderSortOrder = "desc";
+        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount,
+                defaultOrderSortKey, defaultOrderSortOrder);
         Specification<Order> orderSpecification = OrderSpecificationClause.getSpecificationBasedOnFilters(filterMap);
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingCriteriaMap);
         List<Order> orderDetails = orderRepo.findAll(orderSpecification, pagingCriteria).getContent();
