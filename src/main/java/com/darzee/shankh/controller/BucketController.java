@@ -48,7 +48,7 @@ public class BucketController {
     @GetMapping(value = "/file/link", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity getFileLink(@RequestParam("entity_id") Long entityId,
-                                     @RequestParam("entity_type") String entityType) {
+                                      @RequestParam("entity_type") String entityType) {
         return bucketService.getFileLinkResponse(entityType, entityId);
     }
 }

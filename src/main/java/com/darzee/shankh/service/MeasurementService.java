@@ -150,7 +150,7 @@ public class MeasurementService {
                                                                                    String scale) {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitOrdinal);
         MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
+        Double dividingFactor = MeasurementScale.INCH.equals(measurementScale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         List<MeasurementRevisionsDAO> measurementRevisions = mapper.measurementRevisionsListToDAOList(
                 measurementRevisionsRepo.findAllByCustomerIdAndOutfitType(customerId, outfitType));
         List<MeasurementRevisionData> data = new ArrayList<>(measurementRevisions.size());
