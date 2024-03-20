@@ -25,22 +25,6 @@ public class BucketController {
     @Autowired
     private SampleImageService sampleImageService;
 
-//    @PostMapping("/uploadFile")
-//    @CrossOrigin
-//    public UploadFileResponse uploadFile(@RequestPart(value = "file") MultipartFile file,
-//                                          @RequestPart(value = "file_type", required = false) String uploadFileType)
-//            throws Exception {
-//        return bucketService.uploadSingleImage(file, uploadFileType);
-//    }
-
-//    @PostMapping("/upload_multiple")
-//    @CrossOrigin
-//    public ResponseEntity<UploadMultipleFileResponse> uploadMultiple(@RequestPart(value = "files") List<MultipartFile> files,
-//                                                                     @RequestPart(value = "file_type", required = false) String uploadFileType)
-//            throws Exception {
-//        return bucketService.uploadMultipleImages(files, uploadFileType);
-//    }
-
     //for audio/images file upload endpoint
     @PostMapping("/upload_multiple_files")
     public ResponseEntity<UploadMultipleFileResponse> uploadMultipleFiles(@RequestPart(value = "file") List<MultipartFile> files,
@@ -63,8 +47,8 @@ public class BucketController {
 
     @GetMapping(value = "/file/link", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity getInvoice(@PathVariable("entity_id") Long entityId,
-                                     @PathVariable("entity_type") String entityType) {
+    public ResponseEntity getFileLink(@RequestParam("entity_id") Long entityId,
+                                     @RequestParam("entity_type") String entityType) {
         return bucketService.getFileLinkResponse(entityType, entityId);
     }
 }
