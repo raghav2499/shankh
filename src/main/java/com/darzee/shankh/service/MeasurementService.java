@@ -2,6 +2,7 @@ package com.darzee.shankh.service;
 
 import com.amazonaws.util.StringUtils;
 import com.darzee.shankh.client.AmazonClient;
+import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.CustomerDAO;
 import com.darzee.shankh.dao.MeasurementRevisionsDAO;
 import com.darzee.shankh.dao.MeasurementsDAO;
@@ -148,13 +149,15 @@ public class MeasurementService {
                                                                                    Integer outfitOrdinal,
                                                                                    String scale) {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitOrdinal);
+        MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
+        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         List<MeasurementRevisionsDAO> measurementRevisions = mapper.measurementRevisionsListToDAOList(
                 measurementRevisionsRepo.findAllByCustomerIdAndOutfitType(customerId, outfitType));
         List<MeasurementRevisionData> data = new ArrayList<>(measurementRevisions.size());
         for (MeasurementRevisionsDAO revision : measurementRevisions) {
             MeasurementRevisionData revisionData = null;
             if (!revision.getMeasurementValue().isEmpty()) {
-                revisionData = new MeasurementRevisionData(revision);
+                revisionData = new MeasurementRevisionData(revision, dividingFactor);
             } else {
                 String referenceId = objectFilesService.getMeasurementRevisionReferenceId(revision.getId());
                 String measurementRevImageUrl = measurementRevisionService.getMeasurementRevisionImageLink(referenceId);

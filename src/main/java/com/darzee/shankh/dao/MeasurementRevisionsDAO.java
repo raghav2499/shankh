@@ -35,4 +35,11 @@ public class MeasurementRevisionsDAO {
         return "";
     }
 
+    public Map<String, Double> getMeasurementValue(Double dividingFactor) {
+        for(String key: measurementValue.keySet()) {
+           Double val  = measurementValue.get(key)/dividingFactor;
+           measurementValue.put(key, val);
+        }
+        return measurementValue;
+    }
 }
