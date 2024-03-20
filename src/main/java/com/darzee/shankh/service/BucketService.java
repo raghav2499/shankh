@@ -10,6 +10,7 @@ import com.darzee.shankh.repo.FileReferenceRepo;
 import com.darzee.shankh.request.DownloadImageRequest;
 import com.darzee.shankh.response.DownloadImageResponse;
 import com.darzee.shankh.response.FileDetail;
+import com.darzee.shankh.response.GetFileResponse;
 import com.darzee.shankh.response.UploadMultipleFileResponse;
 import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.s3utils.FileUtil;
@@ -44,6 +45,9 @@ public class BucketService {
 
     @Value("invoice/")
     private String invoiceDirectory;
+
+    @Value("items/")
+    private String itemDetailsDirectory;
 
     public FileDetail uploadSingleImage(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
         try {
@@ -127,13 +131,18 @@ public class BucketService {
     }
 
     public String uploadInvoice(File file, Long orderId) {
-        String fileName = "bill" + orderId;
+        String fileName = String.valueOf(orderId);
         ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, invoiceDirectory + fileName);
         return fileUploadResult.getValue();
     }
 
     public String getInvoiceShortLivedLink(Long orderId) {
-        String fileLocation = invoiceDirectory + "bill" + orderId;
+        String fileLocation = invoiceDirectory + orderId;
+        return client.generateShortLivedUrl(fileLocation);
+    }
+
+    public String getItemDetailsShortLivedLink(Long orderItemId) {
+        String fileLocation = itemDetailsDirectory + orderItemId;
         return client.generateShortLivedUrl(fileLocation);
     }
 
@@ -182,6 +191,25 @@ public class BucketService {
             return fileUploadResult;
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception " + e.getMessage(), e);
+        }
+    }
+
+
+    public ResponseEntity<GetFileResponse> getFileLinkResponse(String entityType, Long entityId) {
+        String link = getFileLink(entityType, entityId);
+        GetFileResponse response = new GetFileResponse(link);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    private String getFileLink(String entityType, Long entityId) {
+        switch(entityType) {
+            case "invoice":
+                return getInvoiceShortLivedLink(entityId);
+            case "item_details":
+                return getItemDetailsShortLivedLink(entityId);
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This entity_type is not supported");
         }
     }
 }

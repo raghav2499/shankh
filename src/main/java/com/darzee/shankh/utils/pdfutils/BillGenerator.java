@@ -70,7 +70,7 @@ public class BillGenerator {
             renderer.setDocumentFromString(processedHtml);
             renderer.layout();
 
-            File outputFile = File.createTempFile("bill", ".pdf");
+            File outputFile = File.createTempFile("", ".pdf");
             try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
                 renderer.createPDF(outputStream);
             }
@@ -114,7 +114,7 @@ public class BillGenerator {
             renderer.setDocumentFromString(processedHtml);
             renderer.layout();
 
-            File outputFile = File.createTempFile("bill", ".pdf");
+            File outputFile = File.createTempFile("", ".pdf");
             try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
                 renderer.createPDF(outputStream);
             }

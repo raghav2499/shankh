@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetInvoiceResponse {
+public class GetFileResponse {
 
     private String link;
 }

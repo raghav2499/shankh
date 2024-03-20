@@ -229,7 +229,7 @@ public class OrderService {
     public ResponseEntity getOrderInvoiceLink(Long orderId) {
         String link = bucketService.getInvoiceShortLivedLink(orderId);
         link = link.trim();
-        GetInvoiceResponse response = new GetInvoiceResponse(link);
+        GetFileResponse response = new GetFileResponse(link);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

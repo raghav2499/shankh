@@ -150,7 +150,7 @@
                         </thead>
                         <tbody>
                             <tr th:each="item : ${orderItems}">
-                                <td th:text="${item.outfitType}"></td>
+                                <td th:text="${item.outfitType.getDisplayString()}"></td>
                                 <td th:text="${item.calculateItemPrice()}"></td>
                                 <td>
                                     <ul>

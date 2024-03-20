@@ -7,6 +7,7 @@ import com.darzee.shankh.response.UploadMultipleFileResponse;
 import com.darzee.shankh.service.BucketService;
 import com.darzee.shankh.service.SampleImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,5 +59,12 @@ public class BucketController {
     @CrossOrigin
     public ResponseEntity<GetSampleImageResponse> getSampleCoverImages(@RequestParam(value = "type") String type) {
         return sampleImageService.getSampleImages(type);
+    }
+
+    @GetMapping(value = "/file/link", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity getInvoice(@PathVariable("entity_id") Long entityId,
+                                     @PathVariable("entity_type") String entityType) {
+        return bucketService.getFileLinkResponse(entityType, entityId);
     }
 }
