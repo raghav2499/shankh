@@ -38,7 +38,7 @@ public class OrderItemSummary {
         this.trialDate = orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null;
         this.quantity = orderItem.getQuantity();
         this.outfitAlias = orderItem.getOutfitAlias();
-        this.priceBreakup = orderItem.getPriceBreakup().stream().map(pb -> new PriceBreakupSummary(pb))
+        this.priceBreakup = orderItem.getActivePriceBreakUpList().stream().map(pb -> new PriceBreakupSummary(pb))
                 .collect(Collectors.toList());
     }
 }

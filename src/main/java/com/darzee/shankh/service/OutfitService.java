@@ -2,6 +2,7 @@ package com.darzee.shankh.service;
 
 import com.darzee.shankh.enums.Gender;
 import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.repo.StitchOptionsRepo;
 import com.darzee.shankh.response.OutfitDetails;
 import com.darzee.shankh.response.PortfolioSubOutfit;
 import com.darzee.shankh.response.SubOutfitTypeDetailResponse;
@@ -22,12 +23,18 @@ public class OutfitService {
     @Autowired
     private OutfitTypeObjectService outfitTypeObjectService;
 
+    @Autowired
+    private StitchOptionsRepo stitchOptionsRepo;
+
     public ResponseEntity getOutfitDetails(String gender) throws Exception {
         List<OutfitType> outfitTypes = getOutfitTypes(gender);
         List<OutfitDetails> outfitDetailsList = new ArrayList<>(outfitTypes.size());
         for (OutfitType outfitType : outfitTypes) {
             OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-            outfitDetailsList.add(outfitTypeService.getOutfitDetails());
+            OutfitDetails outfitDetails = outfitTypeService.getOutfitDetails();
+            boolean stitchOptionsExist = (stitchOptionsRepo.countByOutfitTypeAndIsValid(outfitType, Boolean.TRUE) > 0);
+            outfitDetails.setStitchOptionsExist(stitchOptionsExist);
+            outfitDetailsList.add(outfitDetails);
         }
         return new ResponseEntity(outfitDetailsList, HttpStatus.OK);
     }

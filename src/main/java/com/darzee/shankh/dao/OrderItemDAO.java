@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -129,6 +130,12 @@ public class OrderItemDAO {
 
     public Double calculateItemPrice() {
         return this.priceBreakup.stream().mapToDouble(pb -> pb.getValue() * pb.getQuantity()).sum();
+    }
+    
+    public List<PriceBreakupDAO> getActivePriceBreakUpList() {
+        return this.getPriceBreakup().stream()
+                .filter(pb -> !Boolean.TRUE.equals(pb.getIsDeleted()))
+                .collect(Collectors.toList());
     }
 
 }

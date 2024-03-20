@@ -26,6 +26,9 @@ public class PriceBreakup {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @ManyToOne
     @JoinColumn(name = "order_item_id")
     private OrderItem orderItem;

@@ -7,7 +7,8 @@ public enum OrderItemSort {
 
     TRIAL_DATE("trialDate"),
 
-    DELIVERY_DATE("deliveryDate");
+    DELIVERY_DATE("deliveryDate"),
+    CREATED_AT("createdAt");
 
     private String orderItemSortString;
 

@@ -71,8 +71,8 @@ public class OrderDAO {
             return priceBreakupSum;
         }
         priceBreakupSum = getNonDeletedItems().stream()
-                .map(item -> item.getPriceBreakup()).flatMap(List::stream)
-                .mapToDouble(pb -> pb.getValue()).sum();
+                .map(item -> item.getActivePriceBreakUpList()).flatMap(List::stream)
+                .mapToDouble(pb -> (pb.getValue() * pb.getQuantity())).sum();
         return priceBreakupSum;
     }
 }

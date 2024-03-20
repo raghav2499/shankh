@@ -13,11 +13,4 @@ public class OrderAmountDAO {
     private Long id;
     private Double totalAmount = 0d;
     private Double amountRecieved = 0d;
-    private OrderDAO order;
-
-    public OrderAmountDAO(Double totalAmount, Double amountRecieved, OrderDAO orderDAO) {
-        this.totalAmount = totalAmount;
-        this.amountRecieved = amountRecieved;
-        this.order = orderDAO;
-    }
 }

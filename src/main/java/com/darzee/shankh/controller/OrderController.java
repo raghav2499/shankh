@@ -40,8 +40,8 @@ public class OrderController {
                                                      @RequestParam(name = "delivery_date_till", required = false) String deliveryDateTill,
                                                      @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
                                                      @RequestParam(name = "payment_due", required = false) Boolean paymentDue,
-                                                     @RequestParam(name = "order_status_list", required = false) String orderStatusList,
-//                                                     @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
+                                                     @RequestParam(name = "order_status_list", required = false, defaultValue = "1,2,3") String orderStatusList,
+//                                                     @RequestParam(name = "sort_key", required = false, defaultValue = "delivery_date") String sortKey,
                                                      @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                      @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
         return orderService.getOrder(boutiqueId, orderItemStatusList, orderStatusList,

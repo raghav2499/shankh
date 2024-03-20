@@ -117,7 +117,7 @@ public class OrderService {
 //        OrderDetails orderDetails = request.getOrderDetails();
 //        OrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
 //        List<PriceBreakUpDetails> allItemsPriceBreakUpDetails = orderDetails.getOrderItems()
-//                .stream().map(orderItem -> orderItem.getPriceBreakup()).flatMap(List::stream)
+//                .stream().map(orderItem -> orderItem.getActivePriceBreakUpList()).flatMap(List::stream)
 //                .collect(Collectors.toList());
 //        validatePriceBreakup(allItemsPriceBreakUpDetails, orderAmountDetails.getTotalOrderAmount());
 //
@@ -162,12 +162,11 @@ public class OrderService {
                     new CycleAvoidingMappingContext());
             CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(),
                     new CycleAvoidingMappingContext());
-            OrderDAO orderDAO = setOrderSpecificDetails(boutiqueDAO, customerDAO);
             OrderAmountDAO orderAmountDAO = new OrderAmountDAO();
-            orderAmountDAO.setOrder(orderDAO);
             orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(
                             mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
+            OrderDAO orderDAO = setOrderSpecificDetails(boutiqueDAO, customerDAO);
             orderDAO.setOrderAmount(orderAmountDAO);
             orderDAO = mapper.orderObjectToDao(
                     orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())),
@@ -183,17 +182,30 @@ public class OrderService {
                                                      String deliveryDateFrom, String deliveryDateTill,
                                                      Boolean paymentDue, Integer countPerPage, Integer pageCount) {
         validateGetOrderRequest(orderItemStatusList, orderStatusList);
-        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList,
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, null,
                 orderStatusList, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill,
                 null, paymentDue);
-        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, null, null);
+        String defaultOrderSortKey = "created_at";
+        String defaultOrderSortOrder = "desc";
+        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount,
+                defaultOrderSortKey, defaultOrderSortOrder);
         Specification<Order> orderSpecification = OrderSpecificationClause.getSpecificationBasedOnFilters(filterMap);
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingCriteriaMap);
         List<Order> orderDetails = orderRepo.findAll(orderSpecification, pagingCriteria).getContent();
         Long totalRecordsCount = orderRepo.count(orderSpecification);
         List<OrderDAO> orderDAOList = mapper.orderObjectListToDAOList(orderDetails, new CycleAvoidingMappingContext());
+        List<OrderItemStatus> orderItemStatuses = Arrays.asList(OrderItemStatus.values());
+        if (orderItemStatusList != null) {
+            List<Integer> eligibleStatuses = Arrays.stream(orderItemStatusList.split(","))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+            orderItemStatuses = orderItemStatuses.stream()
+                    .filter(orderItemStatus -> eligibleStatuses.contains(orderItemStatus.getOrdinal()))
+                    .collect(Collectors.toList());
+        }
+        List<OrderItemStatus> finalOrderItemStatuses = orderItemStatuses;
         List<OrderDetailResponse> orderDetailsList = orderDAOList.stream()
-                .map(order -> getOrderDetails(order))
+                .map(order -> getOrderDetails(order, finalOrderItemStatuses))
                 .collect(Collectors.toList());
         GetOrderResponse response = new GetOrderResponse(orderDetailsList, totalRecordsCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -226,7 +238,7 @@ public class OrderService {
         Optional<Order> optionalOrder = orderRepo.findById(orderId);
         if (optionalOrder.isPresent()) {
             OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
-            OrderAmountDAO orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.findByOrderId(order.getId()), new CycleAvoidingMappingContext());
+            OrderAmountDAO orderAmountDAO = order.getOrderAmount();
             UpdateOrderDetails orderDetails = request.getOrderDetails();
             UpdateOrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
             if (orderDetails != null) {
@@ -502,10 +514,13 @@ public class OrderService {
         return totalAmountPaid;
     }
 
-    private OrderDetailResponse getOrderDetails(OrderDAO orderDAO) {
+    private OrderDetailResponse getOrderDetails(OrderDAO orderDAO, List<OrderItemStatus> eligibleStatuses) {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
         List<Pair<OrderItemDAO, String>> orderItemOutfitLinkPairList = new ArrayList<>();
-        for (OrderItemDAO orderItem : orderDAO.getNonDeletedItems()) {
+        List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems().stream()
+                .filter(item -> eligibleStatuses.contains(item.getOrderItemStatus()))
+                .collect(Collectors.toList());
+        for (OrderItemDAO orderItem : orderItems) {
             String outfitImgLink = outfitImageLinkService.getOutfitImageLink(orderItem.getOutfitType());
             orderItemOutfitLinkPairList.add(Pair.of(orderItem, outfitImgLink));
         }
@@ -529,13 +544,10 @@ public class OrderService {
 //    }
 
 
-    @Transactional
     private OrderDAO setOrderSpecificDetails(BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
 
         String invoiceNo = generateOrderInvoiceNo();
         OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
-        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
-                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return orderDAO;
     }
 
@@ -609,7 +621,7 @@ public class OrderService {
     }
 
     private Double calculateTotalOrderAmount(List<OrderItemDAO> orderItems) {
-        List<PriceBreakupDAO> priceBreakups = orderItems.stream().map(item -> item.getPriceBreakup())
+        List<PriceBreakupDAO> priceBreakups = orderItems.stream().map(item -> item.getActivePriceBreakUpList())
                 .flatMap(List::stream).collect(Collectors.toList());
         Double totalAmount = 0d;
         if (!CollectionUtils.isEmpty(priceBreakups)) {

@@ -37,7 +37,8 @@ public class MeasurementController {
     @GetMapping(value = "/revisions", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity getMeasurementRevisions(@RequestParam("customer_id") Long customerId,
-                                                  @RequestParam("outfit_type") Integer outfitTypeIndex) {
-        return measurementService.getMeasurementRevisions(customerId, outfitTypeIndex);
+                                                  @RequestParam("outfit_type") Integer outfitTypeIndex,
+                                                  @RequestParam(value = "scale", defaultValue = "inch") String scale) {
+        return measurementService.getMeasurementRevisions(customerId, outfitTypeIndex, scale);
     }
 }

@@ -87,7 +87,7 @@ public class BoutiqueLedgerService {
                 ledgerDAO.setMonthlyClosedOrders(ledgerDAO.getMonthlyClosedOrders() - 1);
                 ledgerDAO.setTotalClosedOrders(ledgerDAO.getTotalClosedOrders() - 1);
             }
-            Double itemPrice = orderItemDAO.getPriceBreakup().stream()
+            Double itemPrice = orderItemDAO.getActivePriceBreakUpList().stream()
                     .mapToDouble(pb ->
                             Optional.ofNullable(pb.getQuantity()).orElse(0) * Optional.ofNullable(pb.getValue()).orElse(0d))
                     .sum();

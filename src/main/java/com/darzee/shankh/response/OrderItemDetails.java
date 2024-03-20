@@ -64,7 +64,7 @@ public class OrderItemDetails {
         this.itemPrice = orderItem.calculateItemPrice();
         this.outfitAlias = orderItem.getOutfitAlias();
         this.deliveryDate = orderItem.getDeliveryDate().toString();
-        this.priceBreakupSummaryList = orderItem.getPriceBreakup().stream()
+        this.priceBreakupSummaryList = orderItem.getActivePriceBreakUpList().stream()
                 .map(priceBreakup -> new PriceBreakupSummary(priceBreakup)).collect(Collectors.toList());
     }
 
@@ -93,7 +93,7 @@ public class OrderItemDetails {
         this.itemPrice = orderItem.calculateItemPrice();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
         this.outfitAlias = orderItem.getOutfitAlias();
-        this.priceBreakupSummaryList = orderItem.getPriceBreakup().stream()
+        this.priceBreakupSummaryList = orderItem.getActivePriceBreakUpList().stream()
                 .map(priceBreakup -> new PriceBreakupSummary(priceBreakup)).collect(Collectors.toList());
     }
 }

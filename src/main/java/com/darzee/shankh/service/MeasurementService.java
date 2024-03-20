@@ -144,7 +144,9 @@ public class MeasurementService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer id is invalid");
     }
 
-    public ResponseEntity<GetMeasurementRevisionsResponse> getMeasurementRevisions(Long customerId, Integer outfitOrdinal) {
+    public ResponseEntity<GetMeasurementRevisionsResponse> getMeasurementRevisions(Long customerId,
+                                                                                   Integer outfitOrdinal,
+                                                                                   String scale) {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitOrdinal);
         List<MeasurementRevisionsDAO> measurementRevisions = mapper.measurementRevisionsListToDAOList(
                 measurementRevisionsRepo.findAllByCustomerIdAndOutfitType(customerId, outfitType));

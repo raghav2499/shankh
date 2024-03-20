@@ -20,6 +20,8 @@ public class MeasurementRevisionData {
     private Map<String, Double> measurementValue;
 
     private MeasurementRevisionImageDetail imageDetail;
+
+    private Long revisionId;
     private LocalDateTime createdAt;
 
     public MeasurementRevisionData(MeasurementRevisionsDAO measurementRevisions) {
@@ -27,6 +29,7 @@ public class MeasurementRevisionData {
         this.outfitType = measurementRevisions.getOutfitType().getOrdinal();
         this.measurementValue = measurementRevisions.getMeasurementValue();
         this.createdAt = measurementRevisions.getCreatedAt();
+        this.revisionId = measurementRevisions.getId();
     }
 
     public MeasurementRevisionData(MeasurementRevisionsDAO measurementRevisions,
@@ -35,5 +38,6 @@ public class MeasurementRevisionData {
         this.outfitType = measurementRevisions.getOutfitType().getOrdinal();
         this.imageDetail = new MeasurementRevisionImageDetail(imageReferenceId, imageUrl);
         this.createdAt = measurementRevisions.getCreatedAt();
+        this.revisionId = measurementRevisions.getId();
     }
 }
