@@ -205,8 +205,4 @@ public class MeasurementService {
                 customerId, measurementDAO.getId(), measurementDAO.getMeasurementRevision().getId());
         return response;
     }
-
-
 }
-
-
