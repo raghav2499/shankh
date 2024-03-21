@@ -140,7 +140,7 @@ public class OrderItemService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item ID is invalid");
         }
         if (orderItem.isStatusUpdated(updateItemDetail.getItemStatus())) {
-            OrderItemStatus status = OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(updateItemDetail.getItemStatus());
+            OrderItemStatus status = OrderItemStatus.getOrderItemStatusEnumOrdinalMap().get(updateItemDetail.getItemStatus());
             OrderItemStatus initialState = orderItem.getOrderItemStatus();
             orderItemStateMachineService.isTransitionAllowed(initialState, status);
             orderItem.setOrderItemStatus(status);

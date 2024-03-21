@@ -48,7 +48,7 @@ public enum OrderItemStatus {
         return this.displayString;
     }
 
-    public static Map<Integer, OrderItemStatus> getOrderItemTypeEnumOrdinalMap() {
+    public static Map<Integer, OrderItemStatus> getOrderItemStatusEnumOrdinalMap() {
         Map<Integer, OrderItemStatus> orderItemOrdinalEnumMap = new HashMap<>();
         for(OrderItemStatus status : OrderItemStatus.values()) {
             orderItemOrdinalEnumMap.put(status.getOrdinal(), status);

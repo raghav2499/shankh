@@ -106,8 +106,9 @@ public class OrderOrderItemCommonService {
         }
         OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId());
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        orderService.generateInvoiceV2(orderDAO.getId());
         OrderSummary orderItemSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
-                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getOrderItems());
+                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         return orderItemSummary;
     }
 

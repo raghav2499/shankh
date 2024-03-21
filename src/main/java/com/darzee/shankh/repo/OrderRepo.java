@@ -14,10 +14,13 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
     @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, DATE_TRUNC('week', ord.created_at) AS week " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.id = ord_amt.order_id " +
+            "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +
             "WHERE ord.boutique_id = :boutiqueId " +
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +
             "AND ord.is_deleted != true " +
+            "AND ord.status != 0 " +
+            "AND ord_ite.status != 6 " +
             "GROUP BY DATE_TRUNC('week', ord.created_at) ORDER BY DATE_TRUNC('week', ord.created_at)", nativeQuery = true)
     List<Object[]> getTotalAmountByWeek(
             @Param("boutiqueId") Long boutiqueId,
@@ -28,11 +31,15 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
     @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, ord.order_type AS orderType " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.id = ord_amt.order_id " +
+            "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +
             "WHERE ord.boutique_id = :boutiqueId " +
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +
             "AND ord.is_deleted != true " +
-            "GROUP BY ord.order_type", nativeQuery = true)
+            "AND ord_ite.is_deleted != true " +
+            "AND ord.status != 0 " +
+            "AND ord_ite.status != 6 " +
+            "GROUP BY ord_ite.order_type", nativeQuery = true)
     List<Object[]> getTotalAmountByOrderType(
             @Param("boutiqueId") Long boutiqueId,
             @Param("startDate") LocalDate startDate,
@@ -45,6 +52,9 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +
             "AND ord.is_deleted != true " +
+            "AND ord_ite.is_deleted != true " +
+            "AND ord.status != 0 " +
+            "AND ord_ite.status != 6 " +
             "GROUP BY ord.customer_id " +
             "ORDER BY totalAmount DESC " +
             "LIMIT 2", nativeQuery = true)

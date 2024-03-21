@@ -233,32 +233,32 @@ public class OrderService {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @Transactional
-    public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {
-        Optional<Order> optionalOrder = orderRepo.findById(orderId);
-        if (optionalOrder.isPresent()) {
-            OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
-            OrderAmountDAO orderAmountDAO = order.getOrderAmount();
-            UpdateOrderDetails orderDetails = request.getOrderDetails();
-            UpdateOrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
-            if (orderDetails != null) {
-                order = updateOrderDetails(orderDetails, order);
-            }
-            if (orderAmountDetails != null) {
-                orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order,
-                        order.getBoutique().getId());
-            }
-            List<PriceBreakupDAO> priceBreakupDAOList = order.getNonDeletedItems().stream()
-                    .map(OrderItemDAO::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
-            postUpdateOrderValidation(orderAmountDAO.getTotalAmount(), priceBreakupDAOList);
-            OrderSummary orderSummary = new OrderSummary(order.getId(), order.getInvoiceNo(),
-                    orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
-                    order.getNonDeletedItems());
-            CreateOrderResponse response = new CreateOrderResponse("Order updated successfully", orderSummary);
-            return new ResponseEntity(response, HttpStatus.OK);
-        }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
-    }
+//    @Transactional
+//    public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {
+//        Optional<Order> optionalOrder = orderRepo.findById(orderId);
+//        if (optionalOrder.isPresent()) {
+//            OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
+//            OrderAmountDAO orderAmountDAO = order.getOrderAmount();
+//            UpdateOrderDetails orderDetails = request.getOrderDetails();
+//            UpdateOrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
+//            if (orderDetails != null) {
+//                order = updateOrderDetails(orderDetails, order);
+//            }
+//            if (orderAmountDetails != null) {
+//                orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order,
+//                        order.getBoutique().getId());
+//            }
+//            List<PriceBreakupDAO> priceBreakupDAOList = order.getNonDeletedItems().stream()
+//                    .map(OrderItemDAO::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
+//            postUpdateOrderValidation(orderAmountDAO.getTotalAmount(), priceBreakupDAOList);
+//            OrderSummary orderSummary = new OrderSummary(order.getId(), order.getInvoiceNo(),
+//                    orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
+//                    order.getNonDeletedItems());
+//            CreateOrderResponse response = new CreateOrderResponse("Order updated successfully", orderSummary);
+//            return new ResponseEntity(response, HttpStatus.OK);
+//        }
+//        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
+//    }
 
     public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long orderId, OrderCreationRequest request) {
         OrderSummary orderSummary = confirmOrder(orderId, request);
@@ -321,6 +321,9 @@ public class OrderService {
         Map<OrderType, Double> orderTypeAmountMap = new HashMap<>(OrderType.values().length);
         for (Object[] orderTypeSales : orderTypeWiseSalesData) {
             Integer orderTypeDbOrdinal = (Integer) orderTypeSales[1];
+            if (orderTypeDbOrdinal == null) {
+                continue;
+            }
             OrderType orderType = OrderType.values()[orderTypeDbOrdinal];
             orderTypeAmountMap.put(orderType, (Double) orderTypeSales[0]);
         }
@@ -433,22 +436,6 @@ public class OrderService {
 
     @Transactional
     private OrderDAO updateOrderDetails(UpdateOrderDetails orderDetails, OrderDAO order) {
-//        if (order.isOrderStatusUpdated(orderDetails.getStatus())) {
-//            Integer targetStatusOrdinal = orderDetails.getStatus();
-//            OrderStatus initialStatus = order.getOrderStatus();
-//            OrderStatus targetStatus = OrderStatus.getOrderTypeEnumOrdinalMap().get(targetStatusOrdinal);
-//            if (targetStatus == null) {
-//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status " + targetStatusOrdinal + " is not valid status");
-//            }
-//            if (orderStateMachineService.isTransitionAllowed(order.getOrderStatus(), targetStatus)) {
-//                order.setOrderStatus(targetStatus);
-//                updateLedgerIfApplicable(order, initialStatus);
-//            } else {
-//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "State transition from "
-//                        + order.getOrderStatus() + " to " + targetStatus + " is not allowed");
-//            }
-//        }
-
         if (Boolean.TRUE.equals(orderDetails.getDeleteOrder())) {
             order.setIsDeleted(Boolean.TRUE);
             resetOrderAmountForDeletedOrders(order, order.getOrderStatus());
@@ -528,21 +515,6 @@ public class OrderService {
         return new OrderDetailResponse(orderDAO, orderItemOutfitLinkPairList, customerProfilePicLink);
     }
 
-//    @Transactional(REQUIRES_NEW)
-//    public OrderDAO setOrderSpecificDetails(OrderDetails orderDetails, BoutiqueDAO boutiqueDAO,
-//                                            CustomerDAO customerDAO) {
-//
-//        String invoiceNo = generateOrderInvoiceNo();
-//        OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
-//        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
-//                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-//
-//        List<OrderItemDetailRequest> orderItemDetails = orderDetails.getOrderItems();
-//        List<OrderItemDAO> orderItems = orderItemService.createOrderItems(orderItemDetails, orderDAO);
-//        orderDAO.setOrderItems(orderItems);
-//        return orderDAO;
-//    }
-
 
     private OrderDAO setOrderSpecificDetails(BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
 
@@ -595,24 +567,30 @@ public class OrderService {
                 new CycleAvoidingMappingContext());
         List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems();
         boolean allItemsAccepted = orderItems.stream()
-                .map(item -> OrderItemStatus.ACCEPTED.equals(item.getOrderItemStatus()))
+                .filter(item -> OrderItemStatus.ACCEPTED.equals(item.getOrderItemStatus()))
                 .collect(Collectors.toList()).size() == orderItems.size();
         if (allItemsAccepted && !OrderStatus.ACCEPTED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.ACCEPTED);
         }
         boolean allItemsDelivered = orderItems.stream()
-                .map(item -> OrderItemStatus.DELIVERED.equals(item.getOrderItemStatus()))
+                .filter(item -> OrderItemStatus.DELIVERED.equals(item.getOrderItemStatus()))
                 .collect(Collectors.toList()).size() == orderItems.size();
         if (allItemsDelivered && !OrderStatus.DELIVERED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.DELIVERED);
         }
         Double orderItemsPriceSum = orderItems.stream().mapToDouble(item -> item.calculateItemPrice()).sum();
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        Double orderAmountDelta = 0d;
         if (!orderAmountDAO.getTotalAmount().equals(orderItemsPriceSum)) {
+            orderAmountDelta = orderItemsPriceSum - orderAmountDAO.getTotalAmount();
             orderAmountDAO.setTotalAmount(orderItemsPriceSum);
         }
         orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
         orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
+        if (orderAmountDelta != 0) {
+            boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(orderAmountDelta, 0d,
+                    orderDAO.getBoutique().getId());
+        }
         return orderDAO;
     }
 

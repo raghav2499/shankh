@@ -156,7 +156,7 @@ public class MeasurementService {
         List<MeasurementRevisionData> data = new ArrayList<>(measurementRevisions.size());
         for (MeasurementRevisionsDAO revision : measurementRevisions) {
             MeasurementRevisionData revisionData = null;
-            if (!revision.getMeasurementValue().isEmpty()) {
+            if (!CollectionUtils.isEmpty(revision.getMeasurementValue())){
                 revisionData = new MeasurementRevisionData(revision, dividingFactor);
             } else {
                 String referenceId = objectFilesService.getMeasurementRevisionReferenceId(revision.getId());

@@ -18,9 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -87,13 +87,6 @@ public class BoutiqueLedgerService {
                 ledgerDAO.setMonthlyClosedOrders(ledgerDAO.getMonthlyClosedOrders() - 1);
                 ledgerDAO.setTotalClosedOrders(ledgerDAO.getTotalClosedOrders() - 1);
             }
-            Double itemPrice = orderItemDAO.getActivePriceBreakUpList().stream()
-                    .mapToDouble(pb ->
-                            Optional.ofNullable(pb.getQuantity()).orElse(0) * Optional.ofNullable(pb.getValue()).orElse(0d))
-                    .sum();
-            ledgerDAO.setMonthlyPendingAmount(ledgerDAO.getMonthlyPendingAmount() - itemPrice);
-            ledgerDAO.setTotalPendingAmount(ledgerDAO.getTotalPendingAmount() - itemPrice);
-
             repo.save(mapper.boutiqueLedgerDAOToObject(ledgerDAO, new CycleAvoidingMappingContext()));
             return ledgerDAO;
         }
