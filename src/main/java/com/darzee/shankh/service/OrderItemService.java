@@ -74,7 +74,7 @@ public class OrderItemService {
     @Autowired
     private OrderRepo orderRepo;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
         Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
         Map<String, Long> audioRefOrderItemIdMap = new HashMap<>();

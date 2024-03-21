@@ -15,13 +15,12 @@ import com.darzee.shankh.response.OrderSummary;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 
 @Service
 public class OrderOrderItemCommonService {
@@ -80,7 +79,7 @@ public class OrderOrderItemCommonService {
         return orderSummary;
     }
 
-    @Transactional(REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public OrderSummary createOrderItem(OrderCreationRequest orderCreationRequest) {
         OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
         OrderDAO orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(), orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
