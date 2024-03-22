@@ -9,11 +9,12 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            
         }
 
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
             box-sizing: border-box;
@@ -26,14 +27,11 @@
         }
 
         .main-div-header h1 {
-            margin-top: 2rem;
+            margin-top: 6px;
             color: #525252;
             float: left;
         }
-
-        .main-div-header .right {
-            float: right;
-        }
+    
 
         .main-div-content {
             margin-bottom: 20px;
@@ -71,11 +69,11 @@
         }
 
         .invoice-details {
-            color: #525252
+            color: #525252;
         }
 
         .black {
-            color: black
+            color: black;
         }
 
         table th {
@@ -93,33 +91,35 @@
             margin-top: 5px;
             padding: 1px;
             position: relative;
+            font-size: 14px;
         }
 
         #main-para {
             position: absolute;
-            top: 70px;
-            /* Adjust top position as needed */
-            right: calc(100% - 50px);
-            /* Position from the right edge of the container */
+            top: 60px;
+            left: 20px;
+        } 
+
+        .left-item {
+            margin-left: 20px;
         }
 
-        #main-heading {
-            margin-top: 18px;
-            color: #525252;
-            float: left;
-
+        .right-item {
+            margin-right: 20px;
         }
+
+      
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="main-div-header">
-            <div class="left">
+            <div class="left" style="float: left;">
                 <h1 id="main-heading">Invoice</h1>
                 <p class="invoice-details" id="main-para" th:text="${businessName}"></p>
             </div>
-            <div class="right">
+            <div class="right" style="float: right;">
                 <p class="invoice-details">Invoice Date: <span class="black" th:text="${orderUpdationDate}"></span></p>
                 <p class="invoice-details">Invoice Number: <span class="black" th:text="${invoiceNo}"></span></p>
             </div>
@@ -132,48 +132,54 @@
                     <h2>Customer Details</h2>
                     <p class="invoice-details">Customer Name: <span class="black" th:text="${customerName}"></span></p>
                     <p class="invoice-details">Order Number: <span class="black" th:text="${orderId}"></span></p>
-                    <p class="invoice-details">Order Received Date: <span class="black" th:text="${orderCreationDate}"></span></p>
-                    <p class="invoice-details">Order Received Time: <span class="black" th:text="${orderCreationTime}"></span></p>
+                    <p class="invoice-details">Order Received Date: <span class="black"
+                            th:text="${orderCreationDate}"></span></p>
+                    <p class="invoice-details">Order Received Time: <span class="black"
+                            th:text="${orderCreationTime}"></span></p>
                 </div>
             </div>
             <div class="main-div-content-right">
                 <div class="order-summary">
-                    <h5>Order Summary</h5>
-                    <table border="1">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Price</th>
-                                <th>Price Breakup</th>
-                                <th>Expected Delivery Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="item : ${orderItems}">
-                                <td th:text="${item.outfitType}"></td>
-                                <td th:text="${item.calculateItemPrice()}"></td>
-                                <td>
-                                    <ul>
-                                        <li th:each="pb : ${item.getPriceBreakup()}"
-                                            th:text="${pb.component + ' ' + pb.quantity + ' x ' + pb.value + ' = $' + pb.getTotalBreakUpValue()}">
-                                        </li>
-                                    </ul>
-                                </td>
-                                <td th:text="${item.deliveryDate}"></td>
-                            </tr>
+                    <h4>Order Summary</h4>
+                    <div th:each="item : ${orderItems}" class="order-summary-content">
+                        <h5 class="order-left" th:text="${item.outfitType.getDisplayString()}">
 
-                        </tbody>
-                    </table>
+                            <span class="order-right" style="float:right" th:text="${item.calculateItemPrice()}"></span>
+                        </h5>
+                        <p class="invoice-details" style="font-size: 14px;" th:each="pb : ${item.getPriceBreakup()}">
+                            Stiching Cost:
+                            <span class="order-right" style="float:right"
+                                th:text="${pb.component + ' ' + pb.quantity + ' x ' + pb.value + ' = $' + pb.getTotalBreakUpValue()}">
+                                2 * 250 = $500
+                            </span>
+                        </p>
+                        <p class="invoice-details" style="font-size: 14px;" th:each="pb : ${item.getPriceBreakup()}">
+                            Material Cost:
+                            <span class="order-right" style="float:right"
+                                th:text="${pb.component + ' ' + pb.quantity + ' x ' + pb.value + ' = $' + pb.getTotalBreakUpValue()}">
+                                2 * 250 = $500
+                            </span>
+                        </p>
+                        <p class="invoice-details" style="font-size: 14px;">
+                            Exp. Delivery Date:
+                            <span class="order-right" th:text="${item.deliveryDate}">
+                                20th Oct, 2023 at 5PM
+                            </span>
+                        </p>
+                    </div>
                 </div>
+
                 <div class="total">
-                    <p class="invoice-details">Total: <span class="black" style="float:right" th:text="${totalAmount}"></span></p>
+                    <p class="invoice-details left-item" style="font-size: 14px;">Total: <span class="black right-item"
+                            style="float:right;font-size: 14px;">$50</span></p>
                 </div>
                 <div class="total1">
-                    <p class="invoice-details">Advance (if any): <span class="black" style="float:right" th:text="${amountPaid}"></span></p>
+                    <p class="invoice-details left-item" style="font-size: 14px;">Advance (if any): <span class="black right-item"
+                            style="float:right; font-size: 14px;">$20</span></p>
                 </div>
                 <div class="balanceDue">
-                    <p class="invoice-details">Balance Due: <span id="balanceDue" class="black"
-                            style="float:right" th:text="${balanceDue}"></span></p>
+                    <p class="invoice-details left-item" style="font-size: 14px;">Balance Due: <span id="balanceDue" class="black right-item"
+                            style="float:right; font-size: 14px;">$30</span></p>
                 </div>
             </div>
         </div>
