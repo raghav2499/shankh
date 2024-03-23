@@ -1,2 +1,3 @@
-package com.darzee.shankh.repo;public class BoutiqueMeasurementParameterRepo {
+package com.darzee.shankh.repo;
+public class BoutiqueMeasurementRepo {
 }

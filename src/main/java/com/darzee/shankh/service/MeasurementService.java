@@ -15,7 +15,7 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
-import com.darzee.shankh.request.MeasurementDetails;
+import com.darzee.shankh.request.MeasurementDetailsRequest;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,13 +111,13 @@ public class MeasurementService {
         return overallMeasurementDetails;
     }
 
-    public ResponseEntity saveMeasurementDetails(MeasurementDetails measurementDetails) throws Exception {
+    public ResponseEntity saveMeasurementDetails(MeasurementDetailsRequest measurementDetails) throws Exception {
         MeasurementsDAO measurementsDAO = setMeasurementDetails(measurementDetails);
         CreateMeasurementResponse response = generateCreateMeasurementResponse(measurementsDAO, measurementDetails.getCustomerId());
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    public MeasurementsDAO setMeasurementDetails(MeasurementDetails measurementDetails) throws Exception {
+    public MeasurementsDAO setMeasurementDetails(MeasurementDetailsRequest measurementDetails) throws Exception {
         MeasurementRequest measurementRequest = measurementDetails.getMeasurements();
         Optional<Customer> optionalCustomer = customerRepo.findById(measurementDetails.getCustomerId());
         if (optionalCustomer.isPresent()) {

@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @SequenceGenerator(name = "b-measurement-param-seq", sequenceName = "b_measurement_param_seq", allocationSize = 1)
-public class BoutiqueMeasurementParameter {
+public class BoutiqueMeasurement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "b-measurement-param-seq")

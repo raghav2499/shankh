@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class BoutiqueMeasurementParameterDAO {
+public class BoutiqueMeasurementDAO {
     private Long id;
     private Long boutiqueId;
     private OutfitType outfitType;
