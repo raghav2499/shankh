@@ -103,6 +103,7 @@ public interface DaoEntityMapper {
 
     BoutiqueMeasurement boutiqueMeasurementDAOToObject(BoutiqueMeasurementDAO boutiqueMeasurementDAO);
 
+    MeasurementParamDAO measurementParamToDAO(MeasurementParam measurementParam);
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if (orderList == null) {
             return new ArrayList<>();
@@ -275,6 +276,18 @@ public interface DaoEntityMapper {
             paymentDAOs.add(paymentDAO);
         }
         return paymentDAOs;
+    }
+
+    default List<MeasurementParamDAO> measurementParamToDAOList(List<MeasurementParam> measurementParams) {
+        if(CollectionUtils.isEmpty(measurementParams)) {
+            return Collections.emptyList();
+        }
+        List<MeasurementParamDAO> measurementParamDAOS = new ArrayList<>();
+        for(MeasurementParam measurementParam : measurementParams) {
+            MeasurementParamDAO measurementParamDAO = measurementParamToDAO(measurementParam);
+            measurementParamDAOS.add(measurementParamDAO);
+        }
+        return measurementParamDAOS;
     }
 
 }

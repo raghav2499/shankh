@@ -247,10 +247,10 @@ public class MeasurementService {
             Map<OutfitSide, List<String>> boutiqueMeasurementParams = getBoutiqueMeasurementParams(boutiqueId, revisionsDAO.getOutfitType());
             List<String> eligibleMeasurementParams = boutiqueMeasurementParams.values().stream().flatMap(List::stream)
                     .collect(Collectors.toList());
-            List<MeasurementParam> measurementParamDetails = measurementParamRepo.findAllByNameIn(eligibleMeasurementParams);
+            List<MeasurementParamDAO> measurementParamDetails = mapper.measurementParamToDAOList(measurementParamRepo.findAllByNameIn(eligibleMeasurementParams));
 
-            Map<String, MeasurementParam> paramDetailMap = measurementParamDetails.stream()
-                    .collect(Collectors.toMap(MeasurementParam::getName,
+            Map<String, MeasurementParamDAO> paramDetailMap = measurementParamDetails.stream()
+                    .collect(Collectors.toMap(MeasurementParamDAO::getName,
                             measurementParam -> measurementParam));
             OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(revisionsDAO.getOutfitType());
             for (Map.Entry<OutfitSide, List<String>> outfitSideParamList : boutiqueMeasurementParams.entrySet()) {
@@ -310,13 +310,13 @@ public class MeasurementService {
     private List<MeasurementDetails> getMeasurementDetailsList(Map<String, Double> measurementValue,
                                                                Double dividingFactor,
                                                                List<String> params,
-                                                               Map<String, MeasurementParam> paramDetailMap,
+                                                               Map<String, MeasurementParamDAO> paramDetailMap,
                                                                Boolean nonEmptyValuesOnly) {
         List<MeasurementDetails> measurementDetailsList = new ArrayList<>();
         int idx = 0;
         for (String param : params) {
             String value = String.valueOf(measurementValue.get(param) / dividingFactor);
-            MeasurementParam measurementParam = getMeasurementParams(paramDetailMap, param);
+            MeasurementParamDAO measurementParam = getMeasurementParams(paramDetailMap, param);
             String imageLink = getMeasurementParamImageLink(measurementParam.getFileName());
             MeasurementDetails measurementDetails = new MeasurementDetails(imageLink,
                     measurementParam.getDisplayName(), value, String.valueOf(idx));
@@ -332,11 +332,11 @@ public class MeasurementService {
         return measurementDetailsList;
     }
 
-    private MeasurementParam getMeasurementParams(Map<String, MeasurementParam> paramDetailMap, String param) {
+    private MeasurementParamDAO getMeasurementParams(Map<String, MeasurementParamDAO> paramDetailMap, String param) {
         if (paramDetailMap.containsKey(param)) {
             return paramDetailMap.get(param);
         }
-        MeasurementParam measurementDetails = new MeasurementParam(param, param, "");
+        MeasurementParamDAO measurementDetails = new MeasurementParamDAO(param, param, "");
         return measurementDetails;
 
     }

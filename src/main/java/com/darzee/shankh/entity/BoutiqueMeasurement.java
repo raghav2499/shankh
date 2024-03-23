@@ -10,15 +10,15 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Table(name = "boutique_measurement")
+@Table(name = "boutique_measurement_param")
 @Entity
 @Getter
 @Setter
-@SequenceGenerator(name = "b-measurement-seq", sequenceName = "b_measurement_seq", allocationSize = 1)
+@SequenceGenerator(name = "b-measurement-param-seq", sequenceName = "b_measurement_param_seq", allocationSize = 1)
 public class BoutiqueMeasurement {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "b-measurement-seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "b-measurement-param-seq")
     @Column(name = "id", nullable = false)
     private Long id;
 

@@ -604,7 +604,9 @@ public class OrderService {
         Double totalAmount = 0d;
         if (!CollectionUtils.isEmpty(priceBreakups)) {
             for (PriceBreakupDAO priceBreakupDAO : priceBreakups) {
-                totalAmount += priceBreakupDAO.getValue() * priceBreakupDAO.getQuantity();
+                if (priceBreakupDAO.getValue() != null && priceBreakupDAO.getQuantity() != null) {
+                    totalAmount += priceBreakupDAO.getValue() * priceBreakupDAO.getQuantity();
+                }
             }
         }
         return totalAmount;
