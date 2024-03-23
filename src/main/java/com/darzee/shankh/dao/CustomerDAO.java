@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -20,7 +20,7 @@ public class CustomerDAO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private BoutiqueDAO boutique;
-    private List<OrderDAO> orders;
+//    private List<OrderDAO> orders;
 
     public CustomerDAO(Integer age, String phoneNumber, String firstName, String lastName, Gender gender, BoutiqueDAO boutiqueDAO) {
         this.age = age;
@@ -45,6 +45,10 @@ public class CustomerDAO {
 
     public boolean isAgeUpdated(Integer value) {
         return (value != null && !value.equals(this.age)) || (value == null && this.age != null);
+    }
+
+    public String constructName() {
+        return (Optional.ofNullable(this.firstName).orElse("") + " " + Optional.ofNullable(this.lastName).orElse("")).trim();
     }
 
 }

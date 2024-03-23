@@ -52,4 +52,8 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             @Param("boutiqueId") Long boutiqueId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    List<Order> findAllByCustomerId(Long customerId);
+
+    Integer countByBoutiqueId(Long boutiqueId);
 }

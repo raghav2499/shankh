@@ -36,10 +36,23 @@ public class AmazonClient {
     @Value("${amazonProperties.s3.secretKey}")
     private String secretKey;
 
+    @Value("${amazonProperties.s3.audioBucketName}")
+    private String audioBucketName;
+
+    @Value("measurement_revision/")
+    private String measurementRevisionDirectory;
+
     @PostConstruct
     private void initializeAmazon() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
         this.s3client = new AmazonS3Client(credentials);
+    }
+
+    public ImmutablePair<String, String> uploadMeasurementFile(File file, String fileName) {
+        s3client.putObject(new PutObjectRequest(privateBucketName, measurementRevisionDirectory + fileName, file));
+        String referenceId = UUID.randomUUID().toString();
+        String shortLivedUrl = generateShortLivedUrl(privateBucketName, measurementRevisionDirectory + fileName);
+        return new ImmutablePair(referenceId, shortLivedUrl);
     }
 
     public ImmutablePair<String, String> uploadFile(File file, String fileName) {
@@ -56,6 +69,14 @@ public class AmazonClient {
         return new ImmutablePair(referenceId, shortLivedUrl);
     }
 
+    //to upload audio to amazon s3 bucket
+    public ImmutablePair<String, String> uploadAudioFile(File file, String fileName) {
+        s3client.putObject(new PutObjectRequest(audioBucketName, fileName, file));
+        String referenceId = UUID.randomUUID().toString();
+        String shortLivedUrl = generateShortLivedUrl(audioBucketName, fileName);
+        return new ImmutablePair(referenceId, shortLivedUrl);
+    }
+
     public List<String> generateShortLivedUrlForPortfolio(List<String> fileNames) {
         List<String> urlList = new ArrayList<>(fileNames.size());
         for (String fileName : fileNames) {
@@ -65,12 +86,22 @@ public class AmazonClient {
         return urlList;
     }
 
+    public String generateShortLivedUrlForMeasurementRevision(String fileName) {
+        String shortLivedUrl = generateShortLivedUrl(privateBucketName, measurementRevisionDirectory + fileName);
+        return shortLivedUrl;
+    }
+
     public String generateShortLivedUrl(String fileName) {
         return generateShortLivedUrl(privateBucketName, fileName);
     }
 
     public String generateShortLivedUrlForPortfolio(String fileName) {
         return generateShortLivedUrl(portfolioBucketName, fileName);
+    }
+
+    public String generateShortLivedUrlForAudio(String fileName) {
+        String shortLivedUrl = generateShortLivedUrl(audioBucketName, fileName);
+        return shortLivedUrl;
     }
 
     public List<String> generateShortLivedUrls(List<String> fileNames) {

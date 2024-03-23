@@ -49,13 +49,13 @@ public class TailorService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private BoutiqueTailorService boutiqueTailorService;
+    private BoutiqueTailorCommonService boutiqueTailorService;
 
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private PortfolioService portfolioService;

@@ -4,17 +4,16 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@Valid
 public class UpdateOrderDetails {
 
-    private Boolean isPriorityOrder;
-
     private Integer status;
-
     private LocalDateTime trialDate;
 
     private LocalDateTime deliveryDate;
@@ -25,5 +24,6 @@ public class UpdateOrderDetails {
 
     private List<String> clothImageReferenceIds;
 
+    private List<String> audioReferenceIds;
     private Boolean deleteOrder;
 }

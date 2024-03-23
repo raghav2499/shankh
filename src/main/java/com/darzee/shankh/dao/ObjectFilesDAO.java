@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ObjectImagesDAO {
+public class ObjectFilesDAO {
     private Long id;
     private String referenceId;
     private Boolean isValid = Boolean.TRUE;
@@ -20,7 +20,7 @@ public class ObjectImagesDAO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public ObjectImagesDAO(String referenceId, String entityType, Long entityId) {
+    public ObjectFilesDAO(String referenceId, String entityType, Long entityId) {
         this.referenceId = referenceId;
         this.entityId = entityId;
         this.entityType = entityType;

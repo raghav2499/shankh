@@ -18,9 +18,11 @@ import java.util.List;
 public class GetOrderResponse {
     private String message;
     private List<OrderDetailResponse> data;
+    private Long totalRecordsCount;
 
-    public GetOrderResponse(List<OrderDetailResponse> data) {
+    public GetOrderResponse(List<OrderDetailResponse> data, Long totalRecordsCount) {
         this.message = (Collections.isEmpty(data)) ? "No data found for these filters" : "Data fetched successfully";
         this.data = data;
+        this.totalRecordsCount = totalRecordsCount;
     }
 }

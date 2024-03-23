@@ -1,7 +1,6 @@
 package com.darzee.shankh.response;
 
 import com.darzee.shankh.dao.CustomerDAO;
-import com.darzee.shankh.utils.CommonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -43,7 +42,7 @@ public class CustomerDetails {
 
     public CustomerDetails(CustomerDAO customerDAO, String customerProfilePicLink) {
         if(customerDAO != null) {
-            this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+            this.customerName = customerDAO.constructName();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.profilePicLink = customerProfilePicLink;
             this.age = customerDAO.getAge();
@@ -54,7 +53,7 @@ public class CustomerDetails {
 
     public CustomerDetails(CustomerDAO customerDAO, String referenceId, String customerProfilePicLink, Double revenue) {
         if(customerDAO != null) {
-            this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+            this.customerName = customerDAO.constructName();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.referenceId = referenceId;
             this.profilePicLink = customerProfilePicLink;
@@ -67,7 +66,7 @@ public class CustomerDetails {
 
     public CustomerDetails(CustomerDAO customerDAO) {
         if(customerDAO != null) {
-            this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+            this.customerName = customerDAO.constructName();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.customerId = customerDAO.getId();
             this.age = customerDAO.getAge();

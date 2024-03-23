@@ -66,8 +66,10 @@ public class DashboardService {
         List<TopCustomerData> topCustomerData = orderService.getTopCustomerData(boutiqueId, month, year);
         SalesDashboard weekwiseSalesSplit = orderService.getWeekWiseSales(boutiqueId, month, year);
         List<OrderTypeDashboardData> orderTypeSalesSplit = orderService.getOrderTypeWiseSales(boutiqueId, month, year);
+
         Integer activeSinceMonth = startMonth;
         Integer activeSinceYear = startYear;
+        Boolean isActive = orderService.checkIfBoutiqueIsActive(boutiqueId);
 
         String successMessage = "Reporting data fetched successfully";
         BoutiqueReportResponse response = new BoutiqueReportResponse(ledgerDashboardData,
@@ -77,6 +79,7 @@ public class DashboardService {
                 orderTypeSalesSplit,
                 activeSinceMonth,
                 activeSinceYear,
+                isActive,
                 successMessage);
         return new ResponseEntity(response, HttpStatus.OK);
     }

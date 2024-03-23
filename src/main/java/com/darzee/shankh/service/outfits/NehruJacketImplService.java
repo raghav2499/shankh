@@ -6,14 +6,17 @@ import com.darzee.shankh.dao.MeasurementsDAO;
 import com.darzee.shankh.enums.MeasurementScale;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
+import com.darzee.shankh.repo.MeasurementsRepo;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.MeasurementRevisionService;
 import com.darzee.shankh.service.OutfitImageLinkService;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,13 +35,22 @@ public class NehruJacketImplService implements OutfitTypeService {
     private ObjectMapper objectMapper;
 
     @Autowired
+    private MeasurementRevisionService measurementRevisionService;
+
+    @Autowired
     private OutfitImageLinkService outfitImageLinkService;
+    @Autowired
+    private MeasurementsRepo measurementsRepo;
 
     @Override
     public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId,
                                                           OutfitType outfitType, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        Map<String, Double> measurementValue = new HashMap<>();
+                Map<String, Double> measurementValue = new HashMap<>();
+        if (measurementDetails == null) {
+            MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitType, measurementValue);
+            return revisions;
+        }
 
         if (measurementValue == null) {
             measurementValue = new HashMap<>();
@@ -73,34 +85,39 @@ public class NehruJacketImplService implements OutfitTypeService {
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO,
-                                                           MeasurementScale scale,
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementRevisionsDAO revisionsDAO, MeasurementScale scale,
                                                            Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
-        MeasurementRevisionsDAO revision = measurementsDAO.getMeasurementRevision();
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
+        String measurementImageLink = null;
+        if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())
+                && measurementRevisionService.measurementRevisionImageExists(revisionsDAO.getId())) {
+            measurementImageLink = measurementRevisionService.getMeasurementRevisionImageLink(revisionsDAO.getId());
+        } else {
+            measurementDetailsResponseList.add(
+                    addLength(revisionsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addNeck(revisionsDAO.getMeasurement(NECK_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addChest(revisionsDAO.getMeasurement(CHEST_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addWaist(revisionsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
 
-        measurementDetailsResponseList.add(
-                addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addNeck(measurementsDAO.getMeasurement(NECK_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addChest(measurementsDAO.getMeasurement(CHEST_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
-
-        if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
-            measurementDetailsResponseList = measurementDetailsResponseList
-                    .stream()
-                    .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
-                    .collect(Collectors.toList());
+            if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
+                measurementDetailsResponseList = measurementDetailsResponseList
+                        .stream()
+                        .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
+                        .collect(Collectors.toList());
+            }
         }
+
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(NEHRU_JACKET_OUTFIT_IMAGE_LINK);
         innerMeasurementDetails.setOutfitTypeHeading(NEHRU_JACKET_OUTFIT_TYPE_HEADING);
         overallMeasurementDetails.setInnerMeasurementDetails(Arrays.asList(innerMeasurementDetails));
+        overallMeasurementDetails.setMeasurementImageLink(measurementImageLink);
         return overallMeasurementDetails;
     }
 

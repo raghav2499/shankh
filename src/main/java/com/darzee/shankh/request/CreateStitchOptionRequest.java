@@ -1,17 +1,13 @@
-package com.darzee.shankh.response;
-
+package com.darzee.shankh.request;
+import com.darzee.shankh.request.innerObjects.StitchDetails;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@AllArgsConstructor
-@NoArgsConstructor
-public class UploadMultipleImageResponse {
-    private List<UploadImageResponse> response;
+public class CreateStitchOptionRequest {
+    List<StitchDetails> stitchDetails;
 }

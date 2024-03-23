@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -26,7 +27,9 @@ public class FilterOrderService {
     public Sort sortIfNeeded(Map<String, Object> paramMap) {
         if (paramMap.get(PARAMS_MAP_SORT_KEY) != null) {
             String sortOnParam = (String) paramMap.get(PARAMS_MAP_SORT_KEY);
-            return Sort.by(sortOnParam);
+            String sortOrder = (String) paramMap.get(PARAMS_MAP_SORT_ORDER);
+            Direction sortDirection = (sortOrder == "desc") ? Direction.DESC : Direction.ASC;
+            return Sort.by(sortDirection, sortOnParam);
         }
         return null;
     }

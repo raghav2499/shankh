@@ -34,10 +34,4 @@ public class Boutique extends GenericEntity {
     @OneToOne
     @JoinColumn(name = "admin_tailor_id")
     private Tailor adminTailor;
-
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
-//    private List<Order> orders = new ArrayList<>();
-
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "boutique")
-//    private List<Customer> customers = new ArrayList<>();
 }

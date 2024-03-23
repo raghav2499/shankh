@@ -8,7 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Table(name = "customer")
 @Entity
@@ -49,14 +48,8 @@ public class Customer {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
-    private List<Order> orders;
-
     @ManyToOne
     @JoinColumn(name = "boutique_id")
     private Boutique boutique;
-
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
-//    private List<Measurements> measurements;
 
 }

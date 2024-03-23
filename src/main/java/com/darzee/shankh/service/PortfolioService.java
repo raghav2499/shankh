@@ -7,7 +7,7 @@ import com.darzee.shankh.entity.Portfolio;
 import com.darzee.shankh.entity.PortfolioOutfits;
 import com.darzee.shankh.entity.Tailor;
 import com.darzee.shankh.enums.ColorEnum;
-import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.enums.SocialMedia;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class PortfolioService {
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private BucketService bucketService;
@@ -60,7 +60,7 @@ public class PortfolioService {
     private PortfolioOutfitsRepo portfolioOutfitsRepo;
 
     @Autowired
-    private ImageReferenceRepo imageReferenceRepo;
+    private FileReferenceRepo fileReferenceRepo;
 
     @Autowired
     private AmazonClient s3Client;
@@ -115,8 +115,8 @@ public class PortfolioService {
                 new CycleAvoidingMappingContext());
 
         if (!StringUtils.isEmpty(request.getCoverImageReference())) {
-            objectImagesService.saveObjectImages(Collections.singletonList(request.getCoverImageReference()),
-                    ImageEntityType.PORTFOLIO_COVER.getEntityType(),
+            objectFilesService.saveObjectFiles(Collections.singletonList(request.getCoverImageReference()),
+                    FileEntityType.PORTFOLIO_COVER.getEntityType(),
                     portfolio.getId());
         }
         tailorDAO.setPortfolio(portfolio);
@@ -148,8 +148,8 @@ public class PortfolioService {
                     new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
             updateImageReference(request, portfolioDAO);
-            String tailorImageReference = objectImagesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
-            String portfolioCoverReference = objectImagesService.getProfileCoverReference(portfolioDAO.getId());
+            String tailorImageReference = objectFilesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
+            String portfolioCoverReference = objectFilesService.getProfileCoverReference(portfolioDAO.getId());
             String tailorImageReferenceUrl = null;
             String portfolioCoverImageUrl = null;
             if (tailorImageReference != null) {
@@ -208,10 +208,10 @@ public class PortfolioService {
 
     private void updateImageReference(UpdatePortfolioRequest request, PortfolioDAO portfolioDAO) {
         if (!StringUtils.isEmpty(request.getCoverImageReference())) {
-            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_COVER.getEntityType(),
+            objectFilesService.invalidateExistingReferenceIds(FileEntityType.PORTFOLIO_COVER.getEntityType(),
                     portfolioDAO.getId());
-            objectImagesService.saveObjectImages(Arrays.asList(request.getCoverImageReference()),
-                    ImageEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
+            objectFilesService.saveObjectFiles(Arrays.asList(request.getCoverImageReference()),
+                    FileEntityType.PORTFOLIO_COVER.getEntityType(), portfolioDAO.getId());
         }
     }
 
@@ -236,8 +236,8 @@ public class PortfolioService {
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         if (!CollectionUtils.isEmpty(portfolioOutfitReferenceIds)) {
-            objectImagesService.saveObjectImages(portfolioOutfitReferenceIds,
-                    ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(),
+            objectFilesService.saveObjectFiles(portfolioOutfitReferenceIds,
+                    FileEntityType.PORTFOLIO_OUTFIT.getEntityType(),
                     portfolioOutfit.getId());
         }
         String successMessage = "Portfolio outfit saved successfully";
@@ -299,9 +299,9 @@ public class PortfolioService {
     private void updatePortfolioOutfitImageReference(CreatePortfolioOutfitRequest request, PortfolioOutfitsDAO updatePortfolioOutfit) {
         List<String> portfolioOutfitReferenceIds = request.getReferenceIds();
         if (!CollectionUtils.isEmpty(portfolioOutfitReferenceIds)) {
-            List<String> existingReferenceIds = objectImagesService.getPortfolioOutfitsReferenceIds(updatePortfolioOutfit.getId());
+            List<String> existingReferenceIds = objectFilesService.getPortfolioOutfitsReferenceIds(updatePortfolioOutfit.getId());
             if (CollectionUtils.isEmpty(existingReferenceIds)) {
-                objectImagesService.saveObjectImages(portfolioOutfitReferenceIds, ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
+                objectFilesService.saveObjectFiles(portfolioOutfitReferenceIds, FileEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
             }
             List<String> removedReferenceIds = new ArrayList<>(existingReferenceIds);
             removedReferenceIds.removeAll(portfolioOutfitReferenceIds);
@@ -309,9 +309,9 @@ public class PortfolioService {
             List<String> updatedReferenceIds = new ArrayList<>(portfolioOutfitReferenceIds);
             updatedReferenceIds.removeAll(existingReferenceIds);
 
-            objectImagesService.invalidateExistingReferenceIds(removedReferenceIds);
+            objectFilesService.invalidateExistingReferenceIds(removedReferenceIds);
             if (!CollectionUtils.isEmpty(updatedReferenceIds)) {
-                objectImagesService.saveObjectImages(updatedReferenceIds, ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
+                objectFilesService.saveObjectFiles(updatedReferenceIds, FileEntityType.PORTFOLIO_OUTFIT.getEntityType(), updatePortfolioOutfit.getId());
             }
         }
     }
@@ -329,7 +329,7 @@ public class PortfolioService {
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
 
-            objectImagesService.invalidateExistingReferenceIds(ImageEntityType.PORTFOLIO_OUTFIT.getEntityType(),
+            objectFilesService.invalidateExistingReferenceIds(FileEntityType.PORTFOLIO_OUTFIT.getEntityType(),
                     portfolioOutfitId);
             response.setMessage("Portfolio outfit deleted!");
             response.setPortfolioOutfitId(portfolioOutfitId);
@@ -363,8 +363,8 @@ public class PortfolioService {
             }
             String tailorName = tailorRepo.findNameById(tailorId);
             String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
-            String tailorImageReferenceId = objectImagesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
-            String portfolioCoverReference = objectImagesService.getProfileCoverReference(portfolioDAO.getId());
+            String tailorImageReferenceId = objectFilesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
+            String portfolioCoverReference = objectFilesService.getProfileCoverReference(portfolioDAO.getId());
             String tailorImageReferenceUrl = null;
             String portfolioCoverImageUrl = null;
             if (tailorImageReferenceId != null) {
@@ -481,7 +481,7 @@ public class PortfolioService {
             return new ArrayList<>();
         }
         List<ImageReference> portfolioOutfitReferences =
-                imageReferenceRepo.findAllByReferenceIdIn(portfolioOutfitReferenceIds);
+                fileReferenceRepo.findAllByReferenceIdIn(portfolioOutfitReferenceIds);
         if (!CollectionUtils.isEmpty(portfolioOutfitReferences)) {
             List<ImageReferenceDAO> imageReferenceDAOs =
                     CommonUtils.mapList(portfolioOutfitReferences, mapper::imageReferenceToImageReferenceDAO);
@@ -550,7 +550,7 @@ public class PortfolioService {
             String subOutfitName = outfitTypeService.getSubOutfitName(portfolioOutfit.getSubOutfitType());
             PortfolioOutfitDetails outfitDetail = new PortfolioOutfitDetails(portfolioOutfit, subOutfitName);
             List<String> portfolioOutfitReferences =
-                    objectImagesService.getPortfolioOutfitsReferenceIds(portfolioOutfit.getId());
+                    objectFilesService.getPortfolioOutfitsReferenceIds(portfolioOutfit.getId());
             List<String> portfolioOutfitImageLinks = getPortfolioOutfitImageLinks(portfolioOutfitReferences);
             outfitDetail.setImageUrl(portfolioOutfitImageLinks);
             outfitDetail.setImageReferences(portfolioOutfitReferences);

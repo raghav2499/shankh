@@ -8,12 +8,14 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.MeasurementRevisionService;
 import com.darzee.shankh.service.OutfitImageLinkService;
 import com.darzee.shankh.service.OutfitTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,13 +33,21 @@ public class UnderSkirtImplService implements OutfitTypeService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private MeasurementRevisionService measurementRevisionService;
+
     @Autowired
     private OutfitImageLinkService outfitImageLinkService;
 
     @Override
     public MeasurementRevisionsDAO addMeasurementRevision(MeasurementRequest measurementDetails, Long customerId, OutfitType outfitType, MeasurementScale scale) {
         Double multiplyingFactor = MeasurementScale.INCH.equals(scale) ? Constants.INCH_TO_CM_MULTIPLYING_FACTOR : 1;
-        Map<String, Double> measurementValue = new HashMap<>();
+                Map<String, Double> measurementValue = new HashMap<>();
+        if (measurementDetails == null) {
+            MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitType, measurementValue);
+            return revisions;
+        }
 
         if (measurementDetails.getWaist() != null) {
             measurementValue.put(WAIST_MEASUREMENT_KEY, measurementDetails.getWaist() * multiplyingFactor);
@@ -62,29 +72,35 @@ public class UnderSkirtImplService implements OutfitTypeService {
     }
 
     @Override
-    public OverallMeasurementDetails setMeasurementDetails(MeasurementsDAO measurementsDAO,
-                                                           MeasurementScale scale,
+    public OverallMeasurementDetails setMeasurementDetails(MeasurementRevisionsDAO revisionsDAO, MeasurementScale scale,
                                                            Boolean nonEmptyValuesOnly) {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
         InnerMeasurementDetails innerMeasurementDetails = new InnerMeasurementDetails();
         List<MeasurementDetails> measurementDetailsResponseList = new ArrayList<>();
         Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
 
-        measurementDetailsResponseList.add(
-                addWaist(measurementsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
-        measurementDetailsResponseList.add(
-                addLength(measurementsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
+        String measurementImageLink = null;
+        if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())
+                && measurementRevisionService.measurementRevisionImageExists(revisionsDAO.getId())) {
+            measurementImageLink = measurementRevisionService.getMeasurementRevisionImageLink(revisionsDAO.getId());
+        } else {
+            measurementDetailsResponseList.add(
+                    addWaist(revisionsDAO.getMeasurement(WAIST_MEASUREMENT_KEY, dividingFactor)));
+            measurementDetailsResponseList.add(
+                    addLength(revisionsDAO.getMeasurement(LENGTH_MEASUREMENT_KEY, dividingFactor)));
 
-        if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
-            measurementDetailsResponseList = measurementDetailsResponseList
-                    .stream()
-                    .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
-                    .collect(Collectors.toList());
+            if (Boolean.TRUE.equals(nonEmptyValuesOnly)) {
+                measurementDetailsResponseList = measurementDetailsResponseList
+                        .stream()
+                        .filter(measurement -> StringUtils.isNotEmpty(measurement.getValue()))
+                        .collect(Collectors.toList());
+            }
         }
         innerMeasurementDetails.setMeasurementDetailsList(measurementDetailsResponseList);
         innerMeasurementDetails.setOutfitImageLink(UNDER_SKIRT_OUTFIT_IMAGE_LINK);
         innerMeasurementDetails.setOutfitTypeHeading(UNDER_SHIRT_OUTFIT_TYPE_HEADING);
         overallMeasurementDetails.setInnerMeasurementDetails(Arrays.asList(innerMeasurementDetails));
+        overallMeasurementDetails.setMeasurementImageLink(measurementImageLink);
         return overallMeasurementDetails;
     }
 

@@ -24,6 +24,8 @@ public class BoutiqueReportResponse {
     Integer activeSinceMonth;
     Integer activeSinceYear;
 
+    Boolean isActive;
+
     public BoutiqueReportResponse(LedgerDashboardData ledgerDashboardData,
                                   CustomerDashboard customerDashboard,
                                   List<TopCustomerData> topCustomerData,
@@ -31,6 +33,7 @@ public class BoutiqueReportResponse {
                                   List<OrderTypeDashboardData> orderTypeSalesSplit,
                                   Integer activeSinceMonth,
                                   Integer activeSinceYear,
+                                  Boolean isActive,
                                   String message) {
         this.ledgerDashboardData = ledgerDashboardData;
         this.customerDashboard = customerDashboard;
@@ -39,6 +42,7 @@ public class BoutiqueReportResponse {
         this.orderTypeSalesSplit = orderTypeSalesSplit;
         this.activeSinceMonth = activeSinceMonth;
         this.activeSinceYear = activeSinceYear;
+        this.isActive = isActive;
         this.message = message;
     }
 }
