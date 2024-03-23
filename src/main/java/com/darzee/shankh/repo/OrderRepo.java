@@ -48,6 +48,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
     @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, ord.customer_id AS customerId " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.id = ord_amt.order_id " +
+            "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +
             "WHERE ord.boutique_id = :boutiqueId " +
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +

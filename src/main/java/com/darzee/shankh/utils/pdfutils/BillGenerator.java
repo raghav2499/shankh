@@ -14,10 +14,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -98,14 +96,17 @@ public class BillGenerator {
             context.setVariable("customerName", customerName);
             context.setVariable("orderId", order.getId());
             context.setVariable("orderCreationDate", order.getCreatedAt().format(dateFormatter));
-            ZonedDateTime zonedDateTime = order.getCreatedAt().atZone(ZoneId.of("Asia/Kolkata"));
-            String formattedTime = zonedDateTime.format(timeFormatter);
-            context.setVariable("orderCreationTime", formattedTime);
+            ZonedDateTime creationZonedDateTime = order.getCreatedAt().atZone(ZoneId.of("Asia/Kolkata"));
+            ZonedDateTime updationZonedDateTime = order.getUpdatedAt() == null
+                    ? creationZonedDateTime
+                    : order.getUpdatedAt().atZone(ZoneId.of("Asia/Kolkata")) ;
+            String formattedCreationTime = creationZonedDateTime.format(timeFormatter);
+            context.setVariable("orderCreationTime", formattedCreationTime);
             context.setVariable("orderItems", order.getNonDeletedItems());
             context.setVariable("totalAmount", orderAmount.getTotalAmount());
             context.setVariable("amountPaid", orderAmount.getAmountRecieved());
             context.setVariable("balanceDue", orderAmount.getTotalAmount() - orderAmount.getAmountRecieved());
-            context.setVariable("orderUpdationDate", Date.from(order.getUpdatedAt().toInstant(ZoneOffset.UTC)));
+            context.setVariable("orderUpdationDate", updationZonedDateTime);
             // Process the HTML template with the Thymeleaf template engine
             String processedHtml = templateEngine.process("bill_template_v2", context);
 
