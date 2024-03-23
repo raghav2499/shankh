@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -21,6 +22,6 @@ public class MeasurementDetails {
     @NotNull(message = "outfit_type is mandatory for saving measurement")
     private Integer outfitType;
     private MeasurementScale scale;
-    private MeasurementRequest measurements;
+    private Map<String, Double> measurements;
     private String referenceId;
 }

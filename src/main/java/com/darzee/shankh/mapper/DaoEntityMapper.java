@@ -99,6 +99,10 @@ public interface DaoEntityMapper {
 
     PriceBreakupDAO priceBreakupToPriceBreakupDAO(PriceBreakup priceBreakup, @Context CycleAvoidingMappingContext context);
 
+    BoutiqueMeasurementDAO boutiqueMeasurementToDAO(BoutiqueMeasurement boutiqueMeasurement);
+
+    BoutiqueMeasurement boutiqueMeasurementDAOToObject(BoutiqueMeasurementDAO boutiqueMeasurementDAO);
+
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if (orderList == null) {
             return new ArrayList<>();

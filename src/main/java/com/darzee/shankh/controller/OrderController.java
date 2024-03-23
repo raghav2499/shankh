@@ -55,13 +55,6 @@ public class OrderController {
         return orderService.getOrderDetails(orderId);
     }
 
-//    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @CrossOrigin
-//    public ResponseEntity updateOrder(@PathVariable("id") Long orderId,
-//                                      @Valid @RequestBody UpdateOrderRequest request) {
-//        return orderService.updateOrder(orderId, request);
-//    }
-
     @PostMapping(value = "/{id}/recieve_payment", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity recievePayment(@PathVariable("id") Long orderId,

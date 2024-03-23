@@ -59,8 +59,6 @@ public class MeasurementKeys {
 
     public static final String ANKLE_MEASUREMENT_KEY = "ankle";
     public static final String KAMEEZ_LENGTH_MEASUREMENT_KEY = "kameez_length";
-
-    public static final String SALWAR_HIP_MEASUREMENT_KEY = "salwar_hip";
     public static final String SALWAR_LENGTH_MEASUREMENT_KEY = "salwar_length";
     public static final String ABOVE_HEAD_MEASUREMENT_KEY = "above_head";
     public static final String AROUND_SHOULDER_MEASUREMENT_KEY = "around_shoulder";
