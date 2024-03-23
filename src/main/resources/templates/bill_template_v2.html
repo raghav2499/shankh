@@ -107,6 +107,7 @@
         .right-item {
             margin-right: 20px;
         }
+       
 
       
     </style>
@@ -124,12 +125,11 @@
                 <p class="invoice-details">Invoice Number: <span class="black" th:text="${invoiceNo}"></span></p>
             </div>
         </div>
-        <hr>
+        <hr style="height: 1px; border: none; background-color: #000;">
         </hr>
         <div class="main-div-content">
             <div class="main-div-content-left">
                 <div class="customer-details">
-                    <h2>Customer Details</h2>
                     <p class="invoice-details">Customer Name: <span class="black" th:text="${customerName}"></span></p>
                     <p class="invoice-details">Order Number: <span class="black" th:text="${orderId}"></span></p>
                     <p class="invoice-details">Order Received Date: <span class="black"
@@ -149,20 +149,20 @@
                         <p class="invoice-details" style="font-size: 14px;" th:each="pb : ${item.getPriceBreakup()}">
                             Stiching Cost:
                             <span class="order-right" style="float:right"
-                                th:text="${pb.component + ' ' + pb.quantity + ' x ' + pb.value + ' = $' + pb.getTotalBreakUpValue()}">
+                                th:text="${pb.component + ' ' + pb.quantity + ' x ' + pb.value + ' =  ₹' + pb.getTotalBreakUpValue()}">
                                 2 * 250 = $500
                             </span>
                         </p>
                         <p class="invoice-details" style="font-size: 14px;" th:each="pb : ${item.getPriceBreakup()}">
                             Material Cost:
                             <span class="order-right" style="float:right"
-                                th:text="${pb.component + ' ' + pb.quantity + ' x ' + pb.value + ' = $' + pb.getTotalBreakUpValue()}">
+                                th:text="${pb.component + ' ' + pb.quantity + ' x ' + pb.value + ' =  ₹' + pb.getTotalBreakUpValue()}">
                                 2 * 250 = $500
                             </span>
                         </p>
-                        <p class="invoice-details" style="font-size: 14px;">
+                        <p class="invoice-details" style="font-size: 12px;">
                             Exp. Delivery Date:
-                            <span class="order-right" th:text="${item.deliveryDate}">
+                            <span class="order-right" th:text="${item.deliveryDate}" style="font-size: 12px;">
                                 20th Oct, 2023 at 5PM
                             </span>
                         </p>
@@ -179,11 +179,11 @@
                 </div>
                 <div class="balanceDue">
                     <p class="invoice-details left-item" style="font-size: 14px;">Balance Due: <span id="balanceDue" class="black right-item"
-                            style="float:right; font-size: 14px;">$30</span></p>
+                            style="float:right; font-size: 14px;color:red">$30</span></p>
                 </div>
             </div>
         </div>
-        <hr>
+        <hr style="height: 1px; border: none; background-color: #000;">
         </hr>
         <div class="gray-background">
             <h2 class="invoice-details">Thank you for your business</h2>
