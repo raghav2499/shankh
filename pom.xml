@@ -12,7 +12,7 @@
     <artifactId>shankh</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>shankh</name>
-    <description>Spring Boot Project</description>
+    <description>Darzee's Core Backend</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
@@ -133,6 +133,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
             <version>2.5.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>2.2.7.RELEASE</version>
         </dependency>
 
         <dependency>
