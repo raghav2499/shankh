@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <title>Item Details</title>
+
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 20px;
+            box-sizing: border-box;
+        }
+
+        .main-div-header {
+            margin-bottom: 20px;
+            overflow: hidden;
+            /* Clear float */
+        }
+
+        .main-div-header h1 {
+            margin-top: 6px;
+            color: #525252;
+            float: left;
+        }
+
+
+        .main-div-content {
+            margin-bottom: 20px;
+            overflow: hidden;
+            /* Clear float */
+        }
+
+        .main-div-content-left {
+            width: 45%;
+            /* Adjusted width */
+            float: left;
+
+        }
+
+        .main-div-content-right {
+            width: 55%;
+            /* Adjusted width */
+            float: left;
+
+        }
+
+        .order-summary {
+            background-color: #eef2ff;
+            padding: 20px;
+        }
+
+        .order-summary h5 {
+            margin-top: 0;
+        }
+
+        .gray-background {
+            background-color: #f1f1f1;
+            padding: 20px;
+
+        }
+
+        .invoice-details {
+            color: #525252;
+        }
+
+        .black {
+            color: black;
+        }
+
+
+
+        .total,
+        .total1,
+        .balanceDue {
+            background-color: #eef2ff;
+            margin-top: 5px;
+            padding: 1px;
+            position: relative;
+            font-size: 14px;
+        }
+
+        #main-para {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+        }
+
+
+
+        .invoice {
+            color: #525252;
+        }
+
+        .black {
+            color: black;
+        }
+
+        .btn-sm {
+            border-radius: 8px;
+        }
+
+
+        table {
+
+            width: 100% !important;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        table th {
+            font-size: 14px;
+            padding: 10px;
+            border: 1.5px solid #DEDEDF;
+            font-weight: 700;
+        }
+
+        .span-outer {
+            float: left;
+            font-weight: bold;
+            margin-top: 16px;
+            margin-left: 14px;
+        }
+
+        .span-inner {
+            float: right;
+            font-weight: bold;
+            margin-top: 16px;
+            margin-right: 14px;
+        }
+
+        table th img {
+            height: 54px;
+            width: 69px;
+            float: left;
+            box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.15);
+        }
+
+        .text-bg-primary {
+            width: 70px;
+            background-color: #007bff;
+            /* Primary color */
+            color: white;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            /* Text color */
+            padding: 5px 10px;
+            /* Adjust padding as needed */
+            border-radius: 10px;
+            /* Adjust border radius to make it more rounded */
+        }
+
+        .image-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+
+        .image-col {
+            flex: 0 0 20%;
+            /* 20% to fit 5 images in a row */
+            max-width: 20%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="main-div-header">
+            <div class="left" style="float: left;">
+                <h1 id="main-heading">Item Details</h1>
+                <p class="invoice-details" id="main-para" th:text="${businessName}">Item Details</p>
+            </div>
+            <div class="right" style="float: right;">
+                <p class="invoice-details">Order Number: <span class="black" th:text="${orderUpdationDate}"></span></p>
+                <p class="invoice-details">Finish By: <span class="black" th:text="${invoiceNo}"></span></p>
+            </div>
+        </div>
+        <hr style="height: 1px; border: none; background-color: #000;">
+        </hr>
+        <div class="main-div-content">
+            <th:block th:if="${#lists.size(rows) > 0}">
+                <div class="top">
+                    <button class="badge rounded-pill text-bg-primary">Pant</button>
+                    </button>
+                    <p class="invoice mt-4">Measurements</p>
+                    <p class="invoice mt-4">Top</p>
+                    <div class="clother_measurements_div"
+                        style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
+                        <div class="size-chart">
+                            <table>
+                                <thead>
+                                    <!-- Iterate over each row -->
+                                    <tr th:each="row : ${rows}">
+                                        <!-- Iterate over each column in the row -->
+                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
+                                            <img src="../B.Tech Degree.jpg" alt="No Image">
+                                            <div>
+                                                <!-- Access the outer and inner spans -->
+                                                <span class="span-outer" th:text="${column.outer}">Length</span>
+                                                <span class="span-inner" th:text="${column.inner}">10px</span>
+                                            </div>
+                                        </th>
+                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
+                                            <img src="../B.Tech Degree.jpg" alt="No Image">
+                                            <div>
+                                                <!-- Access the outer and inner spans -->
+                                                <span class="span-outer" th:text="${column.outer}">Length</span>
+                                                <span class="span-inner" th:text="${column.inner}">10px</span>
+                                            </div>
+                                        </th>
+                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
+                                            <img src="../B.Tech Degree.jpg" alt="No Image">
+                                            <div>
+                                                <!-- Access the outer and inner spans -->
+                                                <span class="span-outer" th:text="${column.outer}">Length</span>
+                                                <span class="span-inner" th:text="${column.inner}">10px</span>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+
+
+                        </div>
+                        <div class="stich_options" style="display: flex; flex-wrap: wrap;width: 100%;">
+                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
+                            <div style="width: 100%; height: 0; clear: both;"></div>
+                            <div class="small" style="margin-right: 50px;">Type: <span
+                                    style="font-weight: bold;">1</span>
+                            </div>
+                            <div class="small" style="margin-right: 50px;">Collar: <span
+                                    style="font-weight: bold;">1</span>
+                            </div>
+                            <div class="small" style="margin-right: 50px;">Pocket: <span
+                                    style="font-weight: bold;">1</span>
+                            </div>
+                            <div class="small" style="margin-right: 50px;">Lapels: <span
+                                    style="font-weight: bold;">1</span>
+                            </div>
+                            <div class="small" style="margin-right: 50px;">Vents: <span
+                                    style="font-weight: bold;">1</span>
+                            </div>
+                            <div class="small" style="margin-right: 50px;">Pocket Square: <span
+                                    style="font-weight: bold;">1</span></div>
+                        </div>
+                        <div style="width: 100%; height: 0; clear: both;"></div>
+                        <div class="mt-3 small" style="margin-top: 10px;margin-bottom: 20px;">Number Of Buttons: <span
+                                style="font-weight: bold;">1</span></div>
+                    </div>
+                </div>
+            </th:block>
+
+            <!--Bottom-->
+            <th:block th:if="${#lists.size(rows) > 0}">
+                <div class="bottom">
+
+
+                    <p class="invoice mt-4">Bottom</p>
+                    <div class="clother_measurements_div"
+                        style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
+                        <div class="size-chart">
+                            <table>
+                                <thead>
+                                    <!-- Iterate over each row -->
+                                    <tr th:each="row : ${rows}">
+                                        <!-- Iterate over each column in the row -->
+                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
+                                            <img src="../B.Tech Degree.jpg" alt="No Image">
+                                            <div>
+                                                <!-- Access the outer and inner spans -->
+                                                <span class="span-outer" th:text="${column.outer}">Length</span>
+                                                <span class="span-inner" th:text="${column.inner}">10px</span>
+                                            </div>
+                                        </th>
+                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
+                                            <img src="../B.Tech Degree.jpg" alt="No Image">
+                                            <div>
+                                                <!-- Access the outer and inner spans -->
+                                                <span class="span-outer" th:text="${column.outer}">Length</span>
+                                                <span class="span-inner" th:text="${column.inner}">10px</span>
+                                            </div>
+                                        </th>
+                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
+                                            <img src="../B.Tech Degree.jpg" alt="No Image">
+                                            <div>
+                                                <!-- Access the outer and inner spans -->
+                                                <span class="span-outer" th:text="${column.outer}">Length</span>
+                                                <span class="span-inner" th:text="${column.inner}">10px</span>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+
+
+                        </div>
+                        <div class="stich_options" style="display: flex; flex-wrap: wrap;width: 100%;">
+                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
+                            <div style="width: 100%; height: 0; clear: both;"></div>
+                            <div class="small" style="margin-right: 50px;">Type: <span
+                                    style="font-weight: bold;">1</span>
+                            </div>
+                            <div class="small" style="margin-right: 50px;">Collar: <span
+                                    style="font-weight: bold;">1</span>
+                            </div>
+                            <div class="small" style="margin-right: 50px;">Pocket: <span
+                                    style="font-weight: bold;">1</span>
+                            </div>
+                            <div class="small" style="margin-right: 50px;">Lapels: <span
+                                    style="font-weight: bold;">1</span>
+                            </div>
+                            <div class="small" style="margin-right: 50px;">Vents: <span
+                                    style="font-weight: bold;">1</span>
+                            </div>
+                            <div class="small" style="margin-right: 50px;">Pocket Square: <span
+                                    style="font-weight: bold;">1</span></div>
+                        </div>
+                        <div style="width: 100%; height: 0; clear: both;"></div>
+                        <div class="mt-3 small" style="margin-top: 10px;margin-bottom: 20px;">Number Of Buttons: <span
+                                style="font-weight: bold;">1</span></div>
+                    </div>
+                </div>
+
+            </th:block>
+
+
+
+
+
+        </div>
+
+        <div class="special-instructions">
+            <p class="invoice">Special Instructions</p>
+            <p class="black">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
+                ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa
+                qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+
+        <div class="Inspiration">
+            <p class="invoice">Inspiration</p>
+            <a href="http://www.google.com">google</a>
+        </div>
+
+
+
+        <div class="image_div">
+            <p class="invoice">Cloth Images</p>
+            <div class="image-row">
+                <!-- Iterate over each image -->
+                <div class="image-col" th:each="image, i : ${images}">
+                    <div class="card">
+                        <img th:src="@{'/path/to/images/' + ${imageUrl}}" width="100px" height="100px" class="card-img-top"
+                            alt="Image">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${'Image ' + (i.index + 1)}">Image</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-col" th:each="image, i : ${images}">
+                    <div class="card">
+                        <img th:src="@{'/path/to/images/' + ${imageUrl}}" width="100px" height="100px" class="card-img-top"
+                            alt="Image">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${'Image ' + (i.index + 1)}">Image</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-col" th:each="image, i : ${images}">
+                    <div class="card">
+                        <img th:src="@{'/path/to/images/' + ${imageUrl}}" width="100px" height="100px" class="card-img-top"
+                            alt="Image">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${'Image ' + (i.index + 1)}">Image</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+</body>
+
+</html>
