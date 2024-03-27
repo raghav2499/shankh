@@ -16,6 +16,10 @@ import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.MeasurementDetailsRequest;
+<<<<<<< HEAD
+=======
+import com.darzee.shankh.request.MeasurementRequest;
+>>>>>>> 2d1fbc72e1773ae191614b2dbc42e53af5ca550e
 import com.darzee.shankh.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -122,8 +126,14 @@ public class MeasurementService {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+<<<<<<< HEAD
     public MeasurementsDAO setMeasurementDetails(MeasurementDetailsRequest measurementRequest) throws Exception {
         Optional<Customer> optionalCustomer = customerRepo.findById(measurementRequest.getCustomerId());
+=======
+    public MeasurementsDAO setMeasurementDetails(MeasurementDetailsRequest measurementDetails) throws Exception {
+        MeasurementRequest measurementRequest = measurementDetails.getMeasurements();
+        Optional<Customer> optionalCustomer = customerRepo.findById(measurementDetails.getCustomerId());
+>>>>>>> 2d1fbc72e1773ae191614b2dbc42e53af5ca550e
         if (optionalCustomer.isPresent()) {
             CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(), new CycleAvoidingMappingContext());
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(measurementRequest.getOutfitType());

@@ -19,8 +19,8 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +
             "AND ord.is_deleted != true " +
-            "AND ord.status != 0 " +
-            "AND ord_ite.status != 6 " +
+            "AND ord.order_status != 0 " +
+            "AND ord_ite.order_item_status != 6 " +
             "GROUP BY DATE_TRUNC('week', ord.created_at) ORDER BY DATE_TRUNC('week', ord.created_at)", nativeQuery = true)
     List<Object[]> getTotalAmountByWeek(
             @Param("boutiqueId") Long boutiqueId,
@@ -37,8 +37,8 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             "AND ord.created_at < :endDate " +
             "AND ord.is_deleted != true " +
             "AND ord_ite.is_deleted != true " +
-            "AND ord.status != 0 " +
-            "AND ord_ite.status != 6 " +
+            "AND ord.order_status != 0 " +
+            "AND ord_ite.order_item_status != 6 " +
             "GROUP BY ord_ite.order_type", nativeQuery = true)
     List<Object[]> getTotalAmountByOrderType(
             @Param("boutiqueId") Long boutiqueId,
@@ -54,8 +54,8 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             "AND ord.created_at < :endDate " +
             "AND ord.is_deleted != true " +
             "AND ord_ite.is_deleted != true " +
-            "AND ord.status != 0 " +
-            "AND ord_ite.status != 6 " +
+            "AND ord.order_status != 0 " +
+            "AND ord_ite.order_item_status != 6 " +
             "GROUP BY ord.customer_id " +
             "ORDER BY totalAmount DESC " +
             "LIMIT 2", nativeQuery = true)
