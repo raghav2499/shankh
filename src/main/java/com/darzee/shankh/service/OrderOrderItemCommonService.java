@@ -72,7 +72,7 @@ public class OrderOrderItemCommonService {
         orderDAO.setOrderItems(allItems);
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         orderAmountDAO = orderService.setOrderAmountSpecificDetails(orderDetails.getOrderAmountDetails(), orderDAO);
-        OrderSummary orderSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
+        OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         return orderSummary;
     }
@@ -92,7 +92,7 @@ public class OrderOrderItemCommonService {
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
         }
-        OrderSummary orderSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
+        OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderItems);
         return orderSummary;
     }
@@ -105,8 +105,8 @@ public class OrderOrderItemCommonService {
         }
         OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId());
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-        orderService.generateInvoiceV2(orderDAO.getId());
-        OrderSummary orderItemSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
+        orderService.generateInvoiceV2(orderDAO);
+        OrderSummary orderItemSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         return orderItemSummary;
     }

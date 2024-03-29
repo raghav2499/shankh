@@ -76,7 +76,11 @@ public class OrderDAO {
         return priceBreakupSum;
     }
 
-    public Long getId() {
+    /**
+     * Return boutiqueOrderId as orderId whenever interacting with client
+     * @return
+     */
+    public Long getBoutiqueOrderId() {
         if (this.boutiqueOrderId != null) {
             return this.boutiqueOrderId;
         }

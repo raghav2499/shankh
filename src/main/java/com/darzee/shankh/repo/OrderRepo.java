@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
@@ -84,6 +85,8 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
 
 
     List<Order> findAllByCustomerId(Long customerId);
+
+    Optional<Order> findByBoutiqueOrderIdAndBoutiqueId(Long boutiqueOrderId, Long boutiqueId);
 
     Integer countByBoutiqueId(Long boutiqueId);
 }

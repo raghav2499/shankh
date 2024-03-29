@@ -175,27 +175,23 @@ public class OrderService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity getOrderDetails(Long orderId) throws Exception {
-        Optional<Order> optionalOrder = orderRepo.findById(orderId);
-        if (optionalOrder.isPresent()) {
-            OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
-            OrderAmountDAO orderAmount = order.getOrderAmount();
-            CustomerDAO customer = order.getCustomer();
-            List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
-            String message = "Details fetched succesfully";
-            OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount,
-                    orderItemDetailsList, message);
-            return new ResponseEntity(response, HttpStatus.OK);
-        }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
-    }
-
-    public ResponseEntity getOrderInvoiceLink(Long orderId) {
-        String link = bucketService.getInvoiceShortLivedLink(orderId);
-        link = link.trim();
-        GetFileResponse response = new GetFileResponse(link);
+    public ResponseEntity getOrderDetails(Long orderId, Long boutiqueId) throws Exception {
+        OrderDAO order = findOrder(orderId, boutiqueId);
+        OrderAmountDAO orderAmount = order.getOrderAmount();
+        CustomerDAO customer = order.getCustomer();
+        List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
+        String message = "Details fetched succesfully";
+        OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount,
+                orderItemDetailsList, message);
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
+//    public ResponseEntity getOrderInvoiceLink(Long orderId) {
+//        String link = bucketService.getInvoiceShortLivedLink(orderId);
+//        link = link.trim();
+//        GetFileResponse response = new GetFileResponse(link);
+//        return new ResponseEntity(response, HttpStatus.OK);
+//    }
 
 //    @Transactional
 //    public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {
@@ -224,20 +220,19 @@ public class OrderService {
 //        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
 //    }
 
-    public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long orderId, OrderCreationRequest request) {
-        OrderSummary orderSummary = confirmOrder(orderId, request);
-        generateInvoiceV2(orderId);
-        return new ResponseEntity<>(orderSummary, HttpStatus.OK);
+    public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId,
+                                                                       OrderCreationRequest request) {
+        OrderDAO orderDAO = confirmOrder(boutiqueOrderId, boutiqueId, request);
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
+                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
+        generateInvoiceV2(orderDAO);
+        return new ResponseEntity<>(summary, HttpStatus.OK);
     }
 
     @Transactional
-    public OrderSummary confirmOrder(Long orderId, OrderCreationRequest request) {
-        Optional<Order> order = orderRepo.findById(orderId);
-        if (!order.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order with ID " + orderId + " doesn't exist");
-        }
-        OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
-
+    public OrderDAO confirmOrder(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) {
+        OrderDAO orderDAO = findOrder(boutiqueOrderId, boutiqueId);
         if (!orderDAO.validateMandatoryOrderFields()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Some mandatory fields in order are missing." +
                     " Boutique ID and customer ID are mandatory fields");
@@ -263,9 +258,7 @@ public class OrderService {
             paymentService.recordPayment(advanceAmount, PaymentMode.CASH, Boolean.TRUE, orderDAO);
         }
         updateBoutiqueLedgerOnOrderConfirmation(orderAmountDAO, orderDAO);
-        OrderSummary summary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(), totalOrderAmount,
-                orderDAO.getOrderAmount().getAmountRecieved(), orderDAO.getNonDeletedItems());
-        return summary;
+        return orderDAO;
     }
 
     public SalesDashboard getWeekWiseSales(Long boutiqueId, int month, int year) {
@@ -328,74 +321,58 @@ public class OrderService {
 
 
     @Transactional
-    public ResponseEntity recieveOrderPayment(Long orderId, RecievePaymentRequest request) {
-        Optional<Order> order = orderRepo.findById(orderId);
-        if (order.isPresent()) {
-            OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
-            OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-            Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
-            Double amountRecieved = request.getAmount();
-            if (amountRecieved > pendingAmount) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Amount recieved is greater than pending order amount");
-            }
-
-            orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() + amountRecieved);
-            orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
-                    new CycleAvoidingMappingContext()));
-
-            boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(null, orderDAO.getBoutiqueId(),
-                    -amountRecieved, amountRecieved);
-            String message = "Order payment recorded successfully";
-            Double pendingAmountLeft = pendingAmount - amountRecieved;
-
-            PaymentMode paymentMode = PaymentMode.getPaymentTypeEnumOrdinalMap().get(request.getPaymentMode());
-            paymentService.recordPayment(amountRecieved, paymentMode, Boolean.FALSE, orderDAO);
-            generateInvoice(orderDAO.getId());
-
-            RecievePaymentResponse response = new RecievePaymentResponse(message,
-                    orderId,
-                    pendingAmountLeft);
-            return new ResponseEntity(response, HttpStatus.OK);
+    public ResponseEntity recieveOrderPayment(Long orderId, Long boutiqueId, RecievePaymentRequest request) {
+        OrderDAO orderDAO = findOrder(orderId, boutiqueId);
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
+        Double amountRecieved = request.getAmount();
+        if (amountRecieved > pendingAmount) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Amount recieved is greater than pending order amount");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Order Id");
+        orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() + amountRecieved);
+        orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
+                new CycleAvoidingMappingContext()));
+
+        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(null, orderDAO.getBoutiqueId(),
+                -amountRecieved, amountRecieved);
+        String message = "Order payment recorded successfully";
+        Double pendingAmountLeft = pendingAmount - amountRecieved;
+        PaymentMode paymentMode = PaymentMode.getPaymentTypeEnumOrdinalMap().get(request.getPaymentMode());
+        paymentService.recordPayment(amountRecieved, paymentMode, Boolean.FALSE, orderDAO);
+        generateInvoice(orderDAO);
+
+        RecievePaymentResponse response = new RecievePaymentResponse(message,
+                orderId,
+                pendingAmountLeft);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    public String generateInvoice(Long orderId) {
-        Optional<Order> order = orderRepo.findById(orderId);
-        if (order.isPresent()) {
-            OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
-            CustomerDAO customerDAO = orderDAO.getCustomer();
-            String customerName = customerDAO.constructName();
-            OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-            BoutiqueDAO boutique = orderDAO.getBoutique();
-            File bill = billGenerator.generateBill(customerName,
-                    customerDAO.getPhoneNumber(),
-                    orderDAO,
-                    orderAmountDAO,
-                    boutique);
-            String fileUploadUrl = bucketService.uploadInvoice(bill, orderId);
-            bill.delete();
-            return fileUploadUrl;
-        }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order id");
+    public String generateInvoice(OrderDAO orderDAO) {
+        CustomerDAO customerDAO = orderDAO.getCustomer();
+        String customerName = customerDAO.constructName();
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        BoutiqueDAO boutique = orderDAO.getBoutique();
+        File bill = billGenerator.generateBill(customerName,
+                customerDAO.getPhoneNumber(),
+                orderDAO,
+                orderAmountDAO,
+                boutique);
+        String fileUploadUrl = bucketService.uploadInvoice(bill, orderDAO.getId());
+        bill.delete();
+        return fileUploadUrl;
     }
 
-    public String generateInvoiceV2(Long orderId) {
-        Optional<Order> order = orderRepo.findById(orderId);
-        if (order.isPresent()) {
-            OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
-            CustomerDAO customerDAO = orderDAO.getCustomer();
-            String customerName = customerDAO.constructName();
-            BoutiqueDAO boutique = orderDAO.getBoutique();
-            TailorDAO tailorDAO = boutique.getAdminTailor();
-            File bill = billGenerator.generateBillV2(boutique, customerName,
-                    tailorDAO.getPhoneNumber(), orderDAO);
-            String fileUploadUrl = bucketService.uploadInvoice(bill, orderId);
-            bill.delete();
-            return fileUploadUrl;
-        }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order id");
+    public String generateInvoiceV2(OrderDAO orderDAO) {
+        CustomerDAO customerDAO = orderDAO.getCustomer();
+        String customerName = customerDAO.constructName();
+        BoutiqueDAO boutique = orderDAO.getBoutique();
+        TailorDAO tailorDAO = boutique.getAdminTailor();
+        File bill = billGenerator.generateBillV2(boutique, customerName,
+                tailorDAO.getPhoneNumber(), orderDAO);
+        String fileUploadUrl = bucketService.uploadInvoice(bill, orderDAO.getId());
+        bill.delete();
+        return fileUploadUrl;
     }
 
 //    @Transactional
@@ -549,7 +526,7 @@ public class OrderService {
         if (allItemsDeleted && !Boolean.TRUE.equals(orderDAO.getIsDeleted())) {
             orderDAO.setIsDeleted(Boolean.TRUE);
             boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderDeletion(boutiqueLedgerDAO,
-                    orderDAO.getBoutiqueId(),orderDAO);
+                    orderDAO.getBoutiqueId(), orderDAO);
         }
         Double orderItemsPriceSum = orderItems.stream().mapToDouble(item -> item.calculateItemPrice()).sum();
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
@@ -641,5 +618,17 @@ public class OrderService {
         if (orderStatusList == null && orderItemStatusList == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either order status or item status is necessary to get orders");
         }
+    }
+
+    private OrderDAO findOrder(Long boutiqueOrderId, Long boutiqueId) {
+        Optional<Order> order = orderRepo.findByBoutiqueOrderIdAndBoutiqueId(boutiqueOrderId, boutiqueId);
+        if (!order.isPresent()) {
+            order = orderRepo.findById(boutiqueOrderId);
+            if (!order.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
+            }
+        }
+        OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
+        return orderDAO;
     }
 }
