@@ -31,9 +31,9 @@ public class OrderDAO {
     private OrderAmountDAO orderAmount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long boutiqueOrderId;
     private CustomerDAO customer;
     private List<OrderItemDAO> orderItems;
-//    private List<PaymentDAO> payment;
 
     public OrderDAO(String invoiceNo, BoutiqueDAO boutique, CustomerDAO customer) {
         this.invoiceNo = invoiceNo;
@@ -67,12 +67,30 @@ public class OrderDAO {
 
     public Double getPriceBreakupSum() {
         Double priceBreakupSum = 0d;
-        if(Boolean.TRUE.equals(isDeleted)) {
+        if (Boolean.TRUE.equals(isDeleted)) {
             return priceBreakupSum;
         }
         priceBreakupSum = getNonDeletedItems().stream()
                 .map(item -> item.getActivePriceBreakUpList()).flatMap(List::stream)
                 .mapToDouble(pb -> (pb.getValue() * pb.getQuantity())).sum();
         return priceBreakupSum;
+    }
+
+    public Long getId() {
+        if (this.boutiqueOrderId != null) {
+            return this.boutiqueOrderId;
+        }
+        return this.id;
+    }
+
+    public String getInvoiceNo() {
+        if (this.boutiqueOrderId != null) {
+            return "INVC" + boutiqueOrderId;
+        }
+        return this.invoiceNo;
+    }
+
+    public Long getBoutiqueId() {
+        return this.boutique.getId();
     }
 }

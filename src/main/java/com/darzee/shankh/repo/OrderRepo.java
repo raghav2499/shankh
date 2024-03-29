@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
@@ -28,7 +29,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             @Param("endDate") LocalDate endDate);
 
 
-    @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, ord.order_type AS orderType " +
+    @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, ord_ite.order_type AS orderType " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.id = ord_amt.order_id " +
             "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +
@@ -63,6 +64,24 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             @Param("boutiqueId") Long boutiqueId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    @Query(value = "SELECT COUNT(oi.id) FROM OrderItem oi INNER JOIN oi.order o " +
+            "WHERE o.boutique.id = :boutiqueId AND o.orderStatus = 1 " +
+            "AND oi.isDeleted != true AND o.isDeleted != true " +
+            "AND oi.createdAt >= :startDate AND oi.createdAt < :endDate")
+    Integer getNewItemsCount(@Param("boutiqueId") Long boutiqueId,
+                             @Param("startDate") LocalDateTime startDate,
+                             @Param("endDate") LocalDateTime endDate);
+
+    @Query(value = "SELECT COUNT(oi.id) FROM OrderItem oi INNER JOIN oi.order o " +
+            "WHERE o.boutique.id = :boutiqueId AND o.orderStatus = 2 " +
+            "AND oi.isDeleted != true AND o.isDeleted != true " +
+            "AND oi.updatedAt >= :startDate " +
+            "AND oi.updatedAt < :endDate")
+    Integer getCompletedItemsCount(@Param("boutiqueId") Long boutiqueId,
+                                   @Param("startDate") LocalDateTime startDate,
+                                   @Param("endDate") LocalDateTime endDate);
+
 
     List<Order> findAllByCustomerId(Long customerId);
 

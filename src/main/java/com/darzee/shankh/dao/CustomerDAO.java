@@ -20,7 +20,6 @@ public class CustomerDAO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private BoutiqueDAO boutique;
-//    private List<OrderDAO> orders;
 
     public CustomerDAO(Integer age, String phoneNumber, String firstName, String lastName, Gender gender, BoutiqueDAO boutiqueDAO) {
         this.age = age;

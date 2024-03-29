@@ -95,13 +95,12 @@ public class AmazonClient {
         return generateShortLivedUrl(privateBucketName, fileName);
     }
 
-    public String generateShortLivedUrlForPortfolio(String fileName) {
-        return generateShortLivedUrl(portfolioBucketName, fileName);
+    public String generateShortLivedUrlForAudio(String fileName) {
+        return generateShortLivedUrl(audioBucketName, fileName);
     }
 
-    public String generateShortLivedUrlForAudio(String fileName) {
-        String shortLivedUrl = generateShortLivedUrl(audioBucketName, fileName);
-        return shortLivedUrl;
+    public String generateShortLivedUrlForPortfolio(String fileName) {
+        return generateShortLivedUrl(portfolioBucketName, fileName);
     }
 
     public List<String> generateShortLivedUrls(List<String> fileNames) {
