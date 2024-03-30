@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Table(name = "boutique_measurement_param")
+@Table(name = "boutique_measurement")
 @Entity
 @Getter
 @Setter

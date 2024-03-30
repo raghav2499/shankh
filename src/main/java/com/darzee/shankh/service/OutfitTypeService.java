@@ -17,4 +17,6 @@ public interface OutfitTypeService {
     public String getTopHeading();
 
     public String getBottomHeading();
+
+    public String getOutfitImageLink();
 }

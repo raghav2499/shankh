@@ -169,7 +169,13 @@ public class OrderService {
         }
         List<OrderItemStatus> finalOrderItemStatuses = orderItemStatuses;
         List<OrderDetailResponse> orderDetailsList = orderDAOList.stream()
-                .map(order -> getOrderDetails(order, finalOrderItemStatuses))
+                .map(order -> {
+                    try {
+                        return getOrderDetails(order, finalOrderItemStatuses);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .collect(Collectors.toList());
         GetOrderResponse response = new GetOrderResponse(orderDetailsList, totalRecordsCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -442,14 +448,15 @@ public class OrderService {
         return totalAmountPaid;
     }
 
-    private OrderDetailResponse getOrderDetails(OrderDAO orderDAO, List<OrderItemStatus> eligibleStatuses) {
+    private OrderDetailResponse getOrderDetails(OrderDAO orderDAO, List<OrderItemStatus> eligibleStatuses) throws Exception {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
         List<Pair<OrderItemDAO, String>> orderItemOutfitLinkPairList = new ArrayList<>();
         List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems().stream()
                 .filter(item -> eligibleStatuses.contains(item.getOrderItemStatus()))
                 .collect(Collectors.toList());
         for (OrderItemDAO orderItem : orderItems) {
-            String outfitImgLink = outfitImageLinkService.getOutfitImageLink(orderItem.getOutfitType());
+            OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType());
+            String outfitImgLink = outfitTypeService.getOutfitImageLink();
             orderItemOutfitLinkPairList.add(Pair.of(orderItem, outfitImgLink));
         }
 

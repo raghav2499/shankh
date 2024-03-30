@@ -14,14 +14,7 @@ public class BucketConfig {
         this.staticBucket = staticBucket;
     }
 
-    @Value("/Outfits")
-    private static String outfitsDirectory;
-
     public static String getStaticBucket() {
         return staticBucket;
-    }
-
-    public static String getOutfitsFolder() {
-        return getStaticBucket() + outfitsDirectory;
     }
 }

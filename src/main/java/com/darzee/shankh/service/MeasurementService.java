@@ -30,9 +30,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.darzee.shankh.config.BucketConfig.getOutfitsFolder;
-import static com.darzee.shankh.config.BucketConfig.getStaticBucket;
-
 @Service
 public class MeasurementService {
 
@@ -264,11 +261,11 @@ public class MeasurementService {
                                 paramList, paramDetailMap, nonEmptyValuesOnly);
                 if (OutfitSide.TOP.equals(outfitSideParamList.getKey())) {
                     String heading = outfitTypeService.getTopHeading();
-                    String imageLink = getTopMeasurementParamImageLink();
+                    String imageLink = s3Client.generateShortLivedUrlForMeasurement("/top.svg");
                     innerMeasurementDetails = new InnerMeasurementDetails(heading, measurementDetails, imageLink);
                 } else {
                     String heading = outfitTypeService.getBottomHeading();
-                    String imageLink = getBottomMeasurementParamImageLink();
+                    String imageLink = s3Client.generateShortLivedUrlForMeasurement("/bottom.svg");
                     innerMeasurementDetails = new InnerMeasurementDetails(heading, measurementDetails, imageLink);
                 }
                 innerMeasurementDetailsList.add(innerMeasurementDetails);
@@ -320,7 +317,7 @@ public class MeasurementService {
         for (String param : params) {
             String value = String.valueOf(measurementValue.get(param) / dividingFactor);
             MeasurementParamDAO measurementParam = getMeasurementParams(paramDetailMap, param);
-            String imageLink = getMeasurementParamImageLink(measurementParam.getFileName());
+            String imageLink = s3Client.generateShortLivedUrlForMeasurement(measurementParam.getFileName());
             MeasurementDetails measurementDetails = new MeasurementDetails(imageLink,
                     measurementParam.getDisplayName(), value, String.valueOf(idx));
             idx++;
@@ -342,17 +339,5 @@ public class MeasurementService {
         MeasurementParamDAO measurementDetails = new MeasurementParamDAO(param, param, "");
         return measurementDetails;
 
-    }
-
-    private String getMeasurementParamImageLink(String fileName) {
-        return "https://s3.amazonaws.com/" + getOutfitsFolder() + "/" + fileName + ".svg";
-    }
-
-    private String getTopMeasurementParamImageLink() {
-        return "https://s3.amazonaws.com/" + getStaticBucket() + "/top.svg";
-    }
-
-    private String getBottomMeasurementParamImageLink() {
-        return "https://s3.amazonaws.com/" + getStaticBucket() + "/bottom.svg";
     }
 }

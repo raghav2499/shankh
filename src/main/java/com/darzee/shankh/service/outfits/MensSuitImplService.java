@@ -1,8 +1,8 @@
 package com.darzee.shankh.service.outfits;
 
+import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.response.OutfitDetails;
-import com.darzee.shankh.service.OutfitImageLinkService;
 import com.darzee.shankh.service.OutfitTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,13 +17,13 @@ import static com.darzee.shankh.constants.MeasurementTitles.MENS_SUIT_TOP_OUTFIT
 public class MensSuitImplService implements OutfitTypeService {
 
     @Autowired
-    private OutfitImageLinkService outfitImageLinkService;
+    private AmazonClient s3Client;
 
     @Override
     public OutfitDetails getOutfitDetails() {
         OutfitType outfitType = OutfitType.MENS_SUIT;
         return new OutfitDetails(outfitType.getOrdinal(), outfitType.getName(), outfitType.getDisplayString(),
-                outfitImageLinkService.getOutfitImageLink(outfitType), 2, isPortfolioEligible());
+                getOutfitImageLink(), 2, isPortfolioEligible());
     }
 
     public Map<Integer, String> getSubOutfitMap() {
@@ -54,5 +54,11 @@ public class MensSuitImplService implements OutfitTypeService {
     @Override
     public String getBottomHeading() {
         return MENS_SUIT_PANTS_OUTFIT_TYPE_HEADING;
+    }
+
+
+    @Override
+    public String getOutfitImageLink() {
+        return s3Client.generateShortLivedUrlForOutfit("/mens+suit.svg");
     }
 }
