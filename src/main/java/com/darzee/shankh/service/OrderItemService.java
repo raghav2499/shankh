@@ -140,15 +140,15 @@ public class OrderItemService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item ID is invalid");
         }
         if (orderItem.isStatusUpdated(updateItemDetail.getItemStatus())) {
-            OrderItemStatus status = OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(updateItemDetail.getItemStatus());
+            OrderItemStatus status = OrderItemStatus.getOrderItemStatusEnumOrdinalMap().get(updateItemDetail.getItemStatus());
             OrderItemStatus initialState = orderItem.getOrderItemStatus();
             orderItemStateMachineService.isTransitionAllowed(initialState, status);
             orderItem.setOrderItemStatus(status);
-            ledgerService.handleBoutiqueLedgerOnOrderItemUpdation(orderItem.getOrder().getBoutique().getId(), initialState, status);
+//            ledgerService.handleBoutiqueLedgerOnOrderItemUpdation(orderItem.getOrder().getBoutique().getId(), initialState, status);
         }
         if (Boolean.TRUE.equals(updateItemDetail.getIsDeleted())) {
             orderItem.setIsDeleted(Boolean.TRUE);
-            ledgerService.handleBoutiqueLedgerOnOrderItemDeletion(orderItem.getOrder().getBoutique().getId(), orderItem);
+//            ledgerService.handleBoutiqueLedgerOnOrderItemDeletion(orderItem.getOrder().getBoutique().getId(), orderItem);
         }
         if (orderItem.isTrialDateUpdated(updateItemDetail.getTrialDate())) {
             orderItem.setTrialDate(updateItemDetail.getTrialDate());
@@ -273,7 +273,7 @@ public class OrderItemService {
 
         for (String audioFileRefId : audioFileRefIds) {
             ImageReferenceDAO audioFileReference = mapper.imageReferenceToImageReferenceDAO(fileReferenceRepo.findByReferenceId(audioFileRefId).get());
-            String url = s3Client.generateShortLivedUrl(audioFileReference.getImageName());
+            String url = s3Client.generateShortLivedUrlForAudio(audioFileReference.getImageName());
             FileDetail fileDetail = new FileDetail(audioFileRefId, url);
             fileDetails.add(fileDetail);
         }

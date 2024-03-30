@@ -27,15 +27,16 @@ public class Order {
     @Enumerated(EnumType.ORDINAL)
     private OrderStatus orderStatus = OrderStatus.DRAFTED;
 
+    @Column(name = "boutique_order_id")
+    private Long boutiqueOrderId;
+
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
     @Column(name = "created_at")
-//    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-//    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @ManyToOne
@@ -52,8 +53,4 @@ public class Order {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
     private List<OrderItem> orderItems;
-
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
-//    private List<Payment> payment = new ArrayList<>();
-
 }

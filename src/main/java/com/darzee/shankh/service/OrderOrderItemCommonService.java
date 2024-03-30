@@ -15,13 +15,12 @@ import com.darzee.shankh.response.OrderSummary;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 
 @Service
 public class OrderOrderItemCommonService {
@@ -62,25 +61,23 @@ public class OrderOrderItemCommonService {
                 .stream().filter(itemDetail -> itemDetail.getId() != null).collect(Collectors.toList());
         List<OrderItemDetailRequest> newItems = orderDetails.getOrderItems()
                 .stream().filter(itemDetail -> itemDetail.getId() == null).collect(Collectors.toList());
-        List<OrderItemDAO> newOrderItems = orderItemService.createOrderItems(newItems, orderDAO);
+        List<OrderItemDAO> allOrderItems = orderItemService.createOrderItems(newItems, orderDAO);
 
         List<OrderItemDAO> savedItems = new ArrayList<>();
         for (OrderItemDetailRequest itemDetailRequest : alreadySavedItems) {
             OrderItemDAO orderItemDAO = orderItemService.updateOrderItem(itemDetailRequest.getId(), itemDetailRequest);
             savedItems.add(orderItemDAO);
         }
-        List<OrderItemDAO> allItems = new ArrayList<>();
-        allItems.addAll(newOrderItems);
-        allItems.addAll(savedItems);
+        List<OrderItemDAO> allItems = collateAllItems(allOrderItems, savedItems);
         orderDAO.setOrderItems(allItems);
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         orderAmountDAO = orderService.setOrderAmountSpecificDetails(orderDetails.getOrderAmountDetails(), orderDAO);
-        OrderSummary orderSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
+        OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         return orderSummary;
     }
 
-    @Transactional(REQUIRES_NEW)
+    @Transactional
     public OrderSummary createOrderItem(OrderCreationRequest orderCreationRequest) {
         OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
         OrderDAO orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(), orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
@@ -91,9 +88,11 @@ public class OrderOrderItemCommonService {
                 new CycleAvoidingMappingContext());
         if (orderDAO.getOrderAmount() == null) {
             orderDAO.setOrderAmount(orderAmountDAO);
-            orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
+            orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
+                            new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext());
         }
-        OrderSummary orderSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
+        OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderItems);
         return orderSummary;
     }
@@ -106,9 +105,24 @@ public class OrderOrderItemCommonService {
         }
         OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId());
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-        OrderSummary orderItemSummary = new OrderSummary(orderDAO.getId(), orderDAO.getInvoiceNo(),
-                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getOrderItems());
+        orderService.generateInvoiceV2(orderDAO);
+        OrderSummary orderItemSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
+                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         return orderItemSummary;
     }
 
+
+    private List<OrderItemDAO> collateAllItems(List<OrderItemDAO> allItems, List<OrderItemDAO> updatedItems) {
+        Map<Long, OrderItemDAO> allItemsMap = allItems.stream().collect(Collectors.toMap(OrderItemDAO::getId, orderItem -> orderItem));
+        Map<Long, OrderItemDAO> updatedItemsMap = updatedItems.stream().collect(Collectors.toMap(OrderItemDAO::getId, orderItem -> orderItem));
+        List<OrderItemDAO> updatedItemsList = new ArrayList<>();
+        for (Map.Entry<Long, OrderItemDAO> orderItemEntrySet : allItemsMap.entrySet()) {
+            if(updatedItemsMap.containsKey(orderItemEntrySet.getKey())) {
+                updatedItemsList.add(updatedItemsMap.get(orderItemEntrySet.getKey()));
+            } else {
+                updatedItemsList.add(allItemsMap.get(orderItemEntrySet.getKey()));
+            }
+        }
+        return updatedItemsList;
+    }
 }

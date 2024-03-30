@@ -62,4 +62,10 @@ public class BoutiqueController {
         return boutiqueLedgerService.resetBoutiqueLedgerData(boutiqueId);
     }
 
+    @GetMapping(value = "/{id}/items_count", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity getItemsCount(@PathVariable("id") String boutiqueId) {
+        return dashboardService.getItemsCount(boutiqueId);
+    }
+
 }

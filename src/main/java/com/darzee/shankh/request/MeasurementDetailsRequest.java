@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @Validated
 @AllArgsConstructor
 @NoArgsConstructor
-public class MeasurementDetails {
+public class MeasurementDetailsRequest {
     @NotNull(message = "customer_id is mandatory for saving measurement")
     private Long customerId;
     @NotNull(message = "outfit_type is mandatory for saving measurement")

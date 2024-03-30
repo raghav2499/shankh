@@ -9,11 +9,11 @@ import java.util.Map;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum OutfitSide {
 
-    @JsonProperty("top")
-    TOP("top"),
+    @JsonProperty("Top")
+    TOP("Top"),
 
-    @JsonProperty("bottom")
-    BOTTOM("bottom");
+    @JsonProperty("Bottom")
+    BOTTOM("Bottom");
 
     private String view;
 

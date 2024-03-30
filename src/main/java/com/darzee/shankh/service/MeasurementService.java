@@ -2,6 +2,7 @@ package com.darzee.shankh.service;
 
 import com.amazonaws.util.StringUtils;
 import com.darzee.shankh.client.AmazonClient;
+import com.darzee.shankh.constants.Constants;
 import com.darzee.shankh.dao.CustomerDAO;
 import com.darzee.shankh.dao.MeasurementRevisionsDAO;
 import com.darzee.shankh.dao.MeasurementsDAO;
@@ -14,7 +15,7 @@ import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
-import com.darzee.shankh.request.MeasurementDetails;
+import com.darzee.shankh.request.MeasurementDetailsRequest;
 import com.darzee.shankh.request.MeasurementRequest;
 import com.darzee.shankh.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,13 +111,13 @@ public class MeasurementService {
         return overallMeasurementDetails;
     }
 
-    public ResponseEntity saveMeasurementDetails(MeasurementDetails measurementDetails) throws Exception {
+    public ResponseEntity saveMeasurementDetails(MeasurementDetailsRequest measurementDetails) throws Exception {
         MeasurementsDAO measurementsDAO = setMeasurementDetails(measurementDetails);
         CreateMeasurementResponse response = generateCreateMeasurementResponse(measurementsDAO, measurementDetails.getCustomerId());
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    public MeasurementsDAO setMeasurementDetails(MeasurementDetails measurementDetails) throws Exception {
+    public MeasurementsDAO setMeasurementDetails(MeasurementDetailsRequest measurementDetails) throws Exception {
         MeasurementRequest measurementRequest = measurementDetails.getMeasurements();
         Optional<Customer> optionalCustomer = customerRepo.findById(measurementDetails.getCustomerId());
         if (optionalCustomer.isPresent()) {
@@ -148,13 +149,15 @@ public class MeasurementService {
                                                                                    Integer outfitOrdinal,
                                                                                    String scale) {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitOrdinal);
+        MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
+        Double dividingFactor = MeasurementScale.INCH.equals(measurementScale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
         List<MeasurementRevisionsDAO> measurementRevisions = mapper.measurementRevisionsListToDAOList(
                 measurementRevisionsRepo.findAllByCustomerIdAndOutfitType(customerId, outfitType));
         List<MeasurementRevisionData> data = new ArrayList<>(measurementRevisions.size());
         for (MeasurementRevisionsDAO revision : measurementRevisions) {
             MeasurementRevisionData revisionData = null;
-            if (!revision.getMeasurementValue().isEmpty()) {
-                revisionData = new MeasurementRevisionData(revision);
+            if (!CollectionUtils.isEmpty(revision.getMeasurementValue())){
+                revisionData = new MeasurementRevisionData(revision, dividingFactor);
             } else {
                 String referenceId = objectFilesService.getMeasurementRevisionReferenceId(revision.getId());
                 String measurementRevImageUrl = measurementRevisionService.getMeasurementRevisionImageLink(referenceId);
@@ -202,8 +205,4 @@ public class MeasurementService {
                 customerId, measurementDAO.getId(), measurementDAO.getMeasurementRevision().getId());
         return response;
     }
-
-
 }
-
-
