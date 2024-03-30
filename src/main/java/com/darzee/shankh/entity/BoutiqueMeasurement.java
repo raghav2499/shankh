@@ -1,5 +1,6 @@
 package com.darzee.shankh.entity;
 
+import com.darzee.shankh.enums.OutfitSide;
 import com.darzee.shankh.enums.OutfitType;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +26,12 @@ public class BoutiqueMeasurement {
     private Long boutiqueId;
 
     @Column(name = "outfit_type")
+    @Enumerated(EnumType.ORDINAL)
     private OutfitType outfitType;
+
+    @Column(name = "outfit_side")
+    @Enumerated(EnumType.ORDINAL)
+    private OutfitSide outfitSide;
 
     @Type(type = "jsonb")
     @Column(name = "param", columnDefinition = "jsonb")
