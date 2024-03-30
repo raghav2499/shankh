@@ -72,9 +72,6 @@ public class OrderService {
     private OutfitTypeObjectService outfitTypeObjectService;
 
     @Autowired
-    private OutfitImageLinkService outfitImageLinkService;
-
-    @Autowired
     private ObjectFilesService objectFilesService;
 
     @Autowired
@@ -186,18 +183,14 @@ public class OrderService {
         OrderAmountDAO orderAmount = order.getOrderAmount();
         CustomerDAO customer = order.getCustomer();
         List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
+        for (OrderItemDAO item : order.getOrderItems()) {
+            orderItemDetailsList.add(new OrderItemDetails(item, null));
+        }
         String message = "Details fetched succesfully";
         OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount,
                 orderItemDetailsList, message);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-
-//    public ResponseEntity getOrderInvoiceLink(Long orderId) {
-//        String link = bucketService.getInvoiceShortLivedLink(orderId);
-//        link = link.trim();
-//        GetFileResponse response = new GetFileResponse(link);
-//        return new ResponseEntity(response, HttpStatus.OK);
-//    }
 
 //    @Transactional
 //    public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {

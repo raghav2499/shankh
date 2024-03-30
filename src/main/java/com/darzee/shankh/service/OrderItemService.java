@@ -58,9 +58,6 @@ public class OrderItemService {
     private ObjectFilesService objectFilesService;
 
     @Autowired
-    private OutfitImageLinkService outfitImageLinkService;
-
-    @Autowired
     private FileReferenceRepo fileReferenceRepo;
 
     @Autowired

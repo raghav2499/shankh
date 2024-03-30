@@ -3,7 +3,6 @@ package com.darzee.shankh.service.outfits;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.response.OutfitDetails;
-import com.darzee.shankh.service.OutfitImageLinkService;
 import com.darzee.shankh.service.OutfitTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +14,6 @@ import static com.darzee.shankh.constants.MeasurementTitles.DRESS_OUTFIT_TYPE_HE
 
 @Service
 public class DressImplService implements OutfitTypeService {
-    @Autowired
-    private OutfitImageLinkService outfitImageLinkService;
 
     @Autowired
     private AmazonClient s3Client;
