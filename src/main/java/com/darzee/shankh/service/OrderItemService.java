@@ -265,7 +265,11 @@ public class OrderItemService {
         }
 
         for (String clothImageRefId : clothImageRefIds) {
-            ImageReferenceDAO clothImageReferences = mapper.imageReferenceToImageReferenceDAO(fileReferenceRepo.findByReferenceId(clothImageRefId).get());
+            Optional<ImageReference> imageRef = fileReferenceRepo.findByReferenceId(clothImageRefId);
+            if (!imageRef.isPresent()) {
+                continue;
+            }
+            ImageReferenceDAO clothImageReferences = mapper.imageReferenceToImageReferenceDAO(imageRef.get());
             String url = s3Client.generateShortLivedUrl(clothImageReferences.getImageName());
             FileDetail fileDetail = new FileDetail(clothImageRefId, url);
             fileDetails.add(fileDetail);

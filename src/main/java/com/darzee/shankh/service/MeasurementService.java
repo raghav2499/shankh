@@ -314,6 +314,9 @@ public class MeasurementService {
                                                                Boolean nonEmptyValuesOnly) {
         List<MeasurementDetails> measurementDetailsList = new ArrayList<>();
         int idx = 0;
+        if (CollectionUtils.isEmpty(measurementValue)) {
+            return measurementDetailsList;
+        }
         for (String param : params) {
             String value = String.valueOf(measurementValue.get(param) / dividingFactor);
             MeasurementParamDAO measurementParam = getMeasurementParams(paramDetailMap, param);
@@ -329,6 +332,7 @@ public class MeasurementService {
                     .filter(measurement -> org.apache.commons.lang3.StringUtils.isNotEmpty(measurement.getValue()))
                     .collect(Collectors.toList());
         }
+
         return measurementDetailsList;
     }
 
