@@ -174,6 +174,12 @@
             padding-right: 15px;
             padding-left: 15px;
         }
+
+        .new-row {
+            display: block;
+            width: 100%;
+            clear: both;
+        }
     </style>
 </head>
 
@@ -367,8 +373,8 @@
                 <!-- Iterate over each image -->
                 <div class="image-col" th:each="image, i : ${images}">
                     <div class="card">
-                        <img th:src="@{'/path/to/images/' + ${imageUrl}}" width="100px" height="100px" class="card-img-top"
-                            alt="Image">
+                        <img th:src="@{'/path/to/images/' + ${imageUrl}}" width="100px" height="100px"
+                            class="card-img-top" alt="Image">
                         <div class="card-body">
                             <h5 class="card-title" th:text="${'Image ' + (i.index + 1)}">Image</h5>
                         </div>
@@ -376,8 +382,8 @@
                 </div>
                 <div class="image-col" th:each="image, i : ${images}">
                     <div class="card">
-                        <img th:src="@{'/path/to/images/' + ${imageUrl}}" width="100px" height="100px" class="card-img-top"
-                            alt="Image">
+                        <img th:src="@{'/path/to/images/' + ${imageUrl}}" width="100px" height="100px"
+                            class="card-img-top" alt="Image">
                         <div class="card-body">
                             <h5 class="card-title" th:text="${'Image ' + (i.index + 1)}">Image</h5>
                         </div>
@@ -385,8 +391,8 @@
                 </div>
                 <div class="image-col" th:each="image, i : ${images}">
                     <div class="card">
-                        <img th:src="@{'/path/to/images/' + ${imageUrl}}" width="100px" height="100px" class="card-img-top"
-                            alt="Image">
+                        <img th:src="@{'/path/to/images/' + ${imageUrl}}" width="100px" height="100px"
+                            class="card-img-top" alt="Image">
                         <div class="card-body">
                             <h5 class="card-title" th:text="${'Image ' + (i.index + 1)}">Image</h5>
                         </div>
