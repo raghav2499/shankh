@@ -7,17 +7,22 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
     @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, DATE_TRUNC('week', ord.created_at) AS week " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.id = ord_amt.order_id " +
+            "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +
             "WHERE ord.boutique_id = :boutiqueId " +
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +
             "AND ord.is_deleted != true " +
+            "AND ord.order_status != 0 " +
+            "AND ord_ite.order_item_status != 6 " +
             "GROUP BY DATE_TRUNC('week', ord.created_at) ORDER BY DATE_TRUNC('week', ord.created_at)", nativeQuery = true)
     List<Object[]> getTotalAmountByWeek(
             @Param("boutiqueId") Long boutiqueId,
@@ -25,14 +30,18 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             @Param("endDate") LocalDate endDate);
 
 
-    @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, ord.order_type AS orderType " +
+    @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, ord_ite.order_type AS orderType " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.id = ord_amt.order_id " +
+            "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +
             "WHERE ord.boutique_id = :boutiqueId " +
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +
             "AND ord.is_deleted != true " +
-            "GROUP BY ord.order_type", nativeQuery = true)
+            "AND ord_ite.is_deleted != true " +
+            "AND ord.order_status != 0 " +
+            "AND ord_ite.order_item_status != 6 " +
+            "GROUP BY ord_ite.order_type", nativeQuery = true)
     List<Object[]> getTotalAmountByOrderType(
             @Param("boutiqueId") Long boutiqueId,
             @Param("startDate") LocalDate startDate,
@@ -41,10 +50,14 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
     @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, ord.customer_id AS customerId " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.id = ord_amt.order_id " +
+            "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +
             "WHERE ord.boutique_id = :boutiqueId " +
             "AND ord.created_at >= :startDate " +
             "AND ord.created_at < :endDate " +
             "AND ord.is_deleted != true " +
+            "AND ord_ite.is_deleted != true " +
+            "AND ord.order_status != 0 " +
+            "AND ord_ite.order_item_status != 6 " +
             "GROUP BY ord.customer_id " +
             "ORDER BY totalAmount DESC " +
             "LIMIT 2", nativeQuery = true)
@@ -53,7 +66,27 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
+    @Query(value = "SELECT COUNT(oi.id) FROM OrderItem oi INNER JOIN oi.order o " +
+            "WHERE o.boutique.id = :boutiqueId AND o.orderStatus = 1 " +
+            "AND oi.isDeleted != true AND o.isDeleted != true " +
+            "AND oi.createdAt >= :startDate AND oi.createdAt < :endDate")
+    Integer getNewItemsCount(@Param("boutiqueId") Long boutiqueId,
+                             @Param("startDate") LocalDateTime startDate,
+                             @Param("endDate") LocalDateTime endDate);
+
+    @Query(value = "SELECT COUNT(oi.id) FROM OrderItem oi INNER JOIN oi.order o " +
+            "WHERE o.boutique.id = :boutiqueId AND o.orderStatus = 2 " +
+            "AND oi.isDeleted != true AND o.isDeleted != true " +
+            "AND oi.updatedAt >= :startDate " +
+            "AND oi.updatedAt < :endDate")
+    Integer getCompletedItemsCount(@Param("boutiqueId") Long boutiqueId,
+                                   @Param("startDate") LocalDateTime startDate,
+                                   @Param("endDate") LocalDateTime endDate);
+
+
     List<Order> findAllByCustomerId(Long customerId);
+
+    Optional<Order> findByBoutiqueOrderIdAndBoutiqueId(Long boutiqueOrderId, Long boutiqueId);
 
     Integer countByBoutiqueId(Long boutiqueId);
 }

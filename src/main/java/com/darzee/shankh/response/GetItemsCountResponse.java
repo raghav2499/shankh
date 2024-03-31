@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetInvoiceResponse {
-
-    private String link;
+public class GetItemsCountResponse {
+    private ItemsCount daily;
+    private ItemsCount weekly;
+    private ItemsCount total;
 }

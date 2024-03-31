@@ -60,7 +60,7 @@ public class OrderItemDetails {
         this.pieces = outfitType.getPieces();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
         this.customerName = orderItem.getOrder().getCustomer().constructName();
-        this.orderId = orderItem.getOrder().getId();
+        this.orderId = orderItem.getOrder().getBoutiqueOrderId();
         this.itemPrice = orderItem.calculateItemPrice();
         this.outfitAlias = orderItem.getOutfitAlias();
         this.deliveryDate = orderItem.getDeliveryDate().toString();

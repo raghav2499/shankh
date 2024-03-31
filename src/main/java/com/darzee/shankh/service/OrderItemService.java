@@ -43,6 +43,9 @@ public class OrderItemService {
     private OrderItemStateMachineService orderItemStateMachineService;
 
     @Autowired
+    private OutfitTypeObjectService outfitTypeObjectService;
+
+    @Autowired
     private OrderItemRepo orderItemRepo;
 
     @Autowired
@@ -53,9 +56,6 @@ public class OrderItemService {
 
     @Autowired
     private ObjectFilesService objectFilesService;
-
-    @Autowired
-    private OutfitImageLinkService outfitImageLinkService;
 
     @Autowired
     private FileReferenceRepo fileReferenceRepo;
@@ -140,15 +140,15 @@ public class OrderItemService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item ID is invalid");
         }
         if (orderItem.isStatusUpdated(updateItemDetail.getItemStatus())) {
-            OrderItemStatus status = OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(updateItemDetail.getItemStatus());
+            OrderItemStatus status = OrderItemStatus.getOrderItemStatusEnumOrdinalMap().get(updateItemDetail.getItemStatus());
             OrderItemStatus initialState = orderItem.getOrderItemStatus();
             orderItemStateMachineService.isTransitionAllowed(initialState, status);
             orderItem.setOrderItemStatus(status);
-            ledgerService.handleBoutiqueLedgerOnOrderItemUpdation(orderItem.getOrder().getBoutique().getId(), initialState, status);
+//            ledgerService.handleBoutiqueLedgerOnOrderItemUpdation(orderItem.getOrder().getBoutique().getId(), initialState, status);
         }
         if (Boolean.TRUE.equals(updateItemDetail.getIsDeleted())) {
             orderItem.setIsDeleted(Boolean.TRUE);
-            ledgerService.handleBoutiqueLedgerOnOrderItemDeletion(orderItem.getOrder().getBoutique().getId(), orderItem);
+//            ledgerService.handleBoutiqueLedgerOnOrderItemDeletion(orderItem.getOrder().getBoutique().getId(), orderItem);
         }
         if (orderItem.isTrialDateUpdated(updateItemDetail.getTrialDate())) {
             orderItem.setTrialDate(updateItemDetail.getTrialDate());
@@ -213,7 +213,14 @@ public class OrderItemService {
         List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems, new CycleAvoidingMappingContext());
         List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream()
                 .map(orderItem ->
-                        new OrderItemDetails(orderItem, outfitImageLinkService.getOutfitImageLink(orderItem.getOutfitType())))
+                {
+                    try {
+                        return new OrderItemDetails(orderItem,
+                                outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .collect(Collectors.toList());
         GetOrderItemResponse response = new GetOrderItemResponse(orderItemDetails, totalCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -221,7 +228,8 @@ public class OrderItemService {
 
     public OrderItemDetails getOrderItemDetails(OrderItemDAO orderItem) throws Exception {
         OutfitType outfitType = orderItem.getOutfitType();
-        String outfitImageLink = outfitImageLinkService.getOutfitImageLink(outfitType);
+        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
+        String outfitImageLink = outfitTypeService.getOutfitImageLink();
         List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(orderItem.getId());
         List<FileDetail> clothImageFileDetails = getClothImageDetails(clothImagesReferenceIds);
         List<String> audioReferenceIds = objectFilesService.getAudioReferenceIds(orderItem.getId());
@@ -257,7 +265,11 @@ public class OrderItemService {
         }
 
         for (String clothImageRefId : clothImageRefIds) {
-            ImageReferenceDAO clothImageReferences = mapper.imageReferenceToImageReferenceDAO(fileReferenceRepo.findByReferenceId(clothImageRefId).get());
+            Optional<ImageReference> imageRef = fileReferenceRepo.findByReferenceId(clothImageRefId);
+            if (!imageRef.isPresent()) {
+                continue;
+            }
+            ImageReferenceDAO clothImageReferences = mapper.imageReferenceToImageReferenceDAO(imageRef.get());
             String url = s3Client.generateShortLivedUrl(clothImageReferences.getImageName());
             FileDetail fileDetail = new FileDetail(clothImageRefId, url);
             fileDetails.add(fileDetail);
@@ -273,7 +285,7 @@ public class OrderItemService {
 
         for (String audioFileRefId : audioFileRefIds) {
             ImageReferenceDAO audioFileReference = mapper.imageReferenceToImageReferenceDAO(fileReferenceRepo.findByReferenceId(audioFileRefId).get());
-            String url = s3Client.generateShortLivedUrl(audioFileReference.getImageName());
+            String url = s3Client.generateShortLivedUrlForAudio(audioFileReference.getImageName());
             FileDetail fileDetail = new FileDetail(audioFileRefId, url);
             fileDetails.add(fileDetail);
         }

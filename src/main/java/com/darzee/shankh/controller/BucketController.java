@@ -7,6 +7,7 @@ import com.darzee.shankh.response.UploadMultipleFileResponse;
 import com.darzee.shankh.service.BucketService;
 import com.darzee.shankh.service.SampleImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,22 +24,6 @@ public class BucketController {
 
     @Autowired
     private SampleImageService sampleImageService;
-
-//    @PostMapping("/uploadFile")
-//    @CrossOrigin
-//    public UploadFileResponse uploadFile(@RequestPart(value = "file") MultipartFile file,
-//                                          @RequestPart(value = "file_type", required = false) String uploadFileType)
-//            throws Exception {
-//        return bucketService.uploadSingleImage(file, uploadFileType);
-//    }
-
-//    @PostMapping("/upload_multiple")
-//    @CrossOrigin
-//    public ResponseEntity<UploadMultipleFileResponse> uploadMultiple(@RequestPart(value = "files") List<MultipartFile> files,
-//                                                                     @RequestPart(value = "file_type", required = false) String uploadFileType)
-//            throws Exception {
-//        return bucketService.uploadMultipleImages(files, uploadFileType);
-//    }
 
     //for audio/images file upload endpoint
     @PostMapping("/upload_multiple_files")
@@ -58,5 +43,12 @@ public class BucketController {
     @CrossOrigin
     public ResponseEntity<GetSampleImageResponse> getSampleCoverImages(@RequestParam(value = "type") String type) {
         return sampleImageService.getSampleImages(type);
+    }
+
+    @GetMapping(value = "/file/link", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity getFileLink(@RequestParam("entity_id") Long entityId,
+                                      @RequestParam("entity_type") String entityType) {
+        return bucketService.getFileLinkResponse(entityType, entityId);
     }
 }

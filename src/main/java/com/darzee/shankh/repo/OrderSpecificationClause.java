@@ -87,6 +87,7 @@ public class OrderSpecificationClause {
             });
             Specification<Order> defaultSpecification = findNonDeletedOrders();
             predicateList.add(defaultSpecification.toPredicate(root, cq, cb));
+            cq.distinct(true);
             return cb.and(predicateList.toArray(new Predicate[0]));
         };
     }

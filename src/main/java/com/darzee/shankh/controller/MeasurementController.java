@@ -1,6 +1,6 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.request.MeasurementDetails;
+import com.darzee.shankh.request.MeasurementDetailsRequest;
 import com.darzee.shankh.service.MeasurementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,8 +30,8 @@ public class MeasurementController {
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity saveMeasurementDetails(@RequestBody @Valid MeasurementDetails measurementDetails) throws Exception {
-        return measurementService.saveMeasurementDetails(measurementDetails);
+    public ResponseEntity saveMeasurementDetails(@RequestBody @Valid MeasurementDetailsRequest measurementDetailsRequest) throws Exception {
+        return measurementService.saveMeasurementDetails(measurementDetailsRequest);
     }
 
     @GetMapping(value = "/revisions", produces = MediaType.APPLICATION_JSON_VALUE)
