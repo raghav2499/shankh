@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Data
+    @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Validated
 public class BoutiqueDetails {

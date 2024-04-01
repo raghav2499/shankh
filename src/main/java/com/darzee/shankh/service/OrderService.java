@@ -8,6 +8,7 @@ import com.darzee.shankh.enums.*;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
+import com.darzee.shankh.request.BoutiqueDetails;
 import com.darzee.shankh.request.CreateOrderRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.UpdateOrderRequest;
@@ -32,6 +33,8 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -512,5 +515,44 @@ public class OrderService {
             weekwiseSales.add(new WeekwiseSalesSplit(0d, null));
         }
     }
+
+   //get invoice details of an order by order id and boutique id
+    public ResponseEntity getOrderInvoiceDetails(Long orderId, Long boutiqueId) {
+        Optional<Order> order = orderRepo.findById(orderId);
+        if (order.isPresent()) {
+            OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
+            OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+            CustomerDAO customerDAO = orderDAO.getCustomer();
+
+            //invoice details 
+            String invoice_number = orderDAO.getInvoiceNo();
+            LocalDateTime invoiceDate = LocalDateTime.now();
+             
+          
+            //boutique name
+            String boutiqueName = orderDAO.getBoutique().getName();
+            //customer name 
+            String customerName =  CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());;
+
+
+
+            //order summary details 
+            OutfitType outfitType = orderDAO.getOutfitType();
+            double total = orderAmountDAO.getTotalAmount();
+            double advance = orderAmountDAO.getAmountRecieved();
+            double balanceDue = total - advance;
+            LocalDateTime deliveryDate = orderDAO.getDeliveryDate();
+
+        InvoiceDetailsResponse response = new InvoiceDetailsResponse(invoice_number, invoiceDate.format(
+            DateTimeFormatter.ISO_DATE_TIME
+        ), orderId.intValue(), boutiqueName, customerName, outfitType, total, advance, balanceDue, deliveryDate.format(
+            DateTimeFormatter.ISO_DATE_TIME
+        ), 
+        orderAmountDAO.getStichingCost(), orderAmountDAO.getMaterialCost());
+        return new ResponseEntity(response, HttpStatus.OK);    
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
+    }
+
 
 }

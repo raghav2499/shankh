@@ -20,4 +20,12 @@ public class OrderAmountDAO {
         this.amountRecieved = amountRecieved;
         this.order = orderDAO;
     }
+
+    public double getStichingCost (){
+        return totalAmount - amountRecieved;
+    }
+
+    public double getMaterialCost (){
+        return amountRecieved;
+    }
 }
