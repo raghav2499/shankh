@@ -318,7 +318,8 @@ public class MeasurementService {
             return measurementDetailsList;
         }
         for (String param : params) {
-            String value = String.valueOf(measurementValue.get(param) / dividingFactor);
+            Double measurementVal = Optional.ofNullable(measurementValue.get(param)).orElse(0d);
+            String value = String.valueOf(measurementVal / dividingFactor);
             MeasurementParamDAO measurementParam = getMeasurementParams(paramDetailMap, param);
             String imageLink = s3Client.generateShortLivedUrlForMeasurement(measurementParam.getFileName());
             MeasurementDetails measurementDetails = new MeasurementDetails(imageLink,
