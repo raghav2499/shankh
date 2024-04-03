@@ -30,8 +30,8 @@ public class MeasurementController {
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity saveMeasurementDetails(@RequestBody @Valid MeasurementDetailsRequest measurementDetails) throws Exception {
-        return measurementService.saveMeasurementDetails(measurementDetails);
+    public ResponseEntity saveMeasurementDetails(@RequestBody @Valid MeasurementDetailsRequest measurementDetailsRequest) throws Exception {
+        return measurementService.saveMeasurementDetails(measurementDetailsRequest);
     }
 
     @GetMapping(value = "/revisions", produces = MediaType.APPLICATION_JSON_VALUE)

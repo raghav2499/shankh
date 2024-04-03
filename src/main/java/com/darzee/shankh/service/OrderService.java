@@ -74,9 +74,6 @@ public class OrderService {
     private OutfitTypeObjectService outfitTypeObjectService;
 
     @Autowired
-    private OutfitImageLinkService outfitImageLinkService;
-
-    @Autowired
     private ObjectFilesService objectFilesService;
 
     @Autowired
@@ -171,7 +168,13 @@ public class OrderService {
         }
         List<OrderItemStatus> finalOrderItemStatuses = orderItemStatuses;
         List<OrderDetailResponse> orderDetailsList = orderDAOList.stream()
-                .map(order -> getOrderDetails(order, finalOrderItemStatuses))
+                .map(order -> {
+                    try {
+                        return getOrderDetails(order, finalOrderItemStatuses);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .collect(Collectors.toList());
         GetOrderResponse response = new GetOrderResponse(orderDetailsList, totalRecordsCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -182,53 +185,41 @@ public class OrderService {
         OrderAmountDAO orderAmount = order.getOrderAmount();
         CustomerDAO customer = order.getCustomer();
         List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
+        for (OrderItemDAO item : order.getOrderItems()) {
+            orderItemDetailsList.add(new OrderItemDetails(item, null));
+        }
         String message = "Details fetched succesfully";
         OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount,
                 orderItemDetailsList, message);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    // public ResponseEntity getOrderInvoiceLink(Long orderId) {
-    // String link = bucketService.getInvoiceShortLivedLink(orderId);
-    // link = link.trim();
-    // GetFileResponse response = new GetFileResponse(link);
-    // return new ResponseEntity(response, HttpStatus.OK);
-    // }
-
-    // @Transactional
-    // public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {
-    // Optional<Order> optionalOrder = orderRepo.findById(orderId);
-    // if (optionalOrder.isPresent()) {
-    // OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new
-    // CycleAvoidingMappingContext());
-    // OrderAmountDAO orderAmountDAO = order.getOrderAmount();
-    // UpdateOrderDetails orderDetails = request.getOrderDetails();
-    // UpdateOrderAmountDetails orderAmountDetails =
-    // request.getOrderAmountDetails();
-    // if (orderDetails != null) {
-    // order = updateOrderDetails(orderDetails, order);
-    // }
-    // if (orderAmountDetails != null) {
-    // orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO,
-    // order,
-    // order.getBoutique().getId());
-    // }
-    // List<PriceBreakupDAO> priceBreakupDAOList =
-    // order.getNonDeletedItems().stream()
-    // .map(OrderItemDAO::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
-    // postUpdateOrderValidation(orderAmountDAO.getTotalAmount(),
-    // priceBreakupDAOList);
-    // OrderSummary orderSummary = new OrderSummary(order.getId(),
-    // order.getInvoiceNo(),
-    // orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
-    // order.getNonDeletedItems());
-    // CreateOrderResponse response = new CreateOrderResponse("Order updated
-    // successfully", orderSummary);
-    // return new ResponseEntity(response, HttpStatus.OK);
-    // }
-    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is
-    // invalid");
-    // }
+//    @Transactional
+//    public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {
+//        Optional<Order> optionalOrder = orderRepo.findById(orderId);
+//        if (optionalOrder.isPresent()) {
+//            OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
+//            OrderAmountDAO orderAmountDAO = order.getOrderAmount();
+//            UpdateOrderDetails orderDetails = request.getOrderDetails();
+//            UpdateOrderAmountDetails orderAmountDetails = request.getOrderAmountDetails();
+//            if (orderDetails != null) {
+//                order = updateOrderDetails(orderDetails, order);
+//            }
+//            if (orderAmountDetails != null) {
+//                orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO, order,
+//                        order.getBoutique().getId());
+//            }
+//            List<PriceBreakupDAO> priceBreakupDAOList = order.getNonDeletedItems().stream()
+//                    .map(OrderItemDAO::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
+//            postUpdateOrderValidation(orderAmountDAO.getTotalAmount(), priceBreakupDAOList);
+//            OrderSummary orderSummary = new OrderSummary(order.getId(), order.getInvoiceNo(),
+//                    orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
+//                    order.getNonDeletedItems());
+//            CreateOrderResponse response = new CreateOrderResponse("Order updated successfully", orderSummary);
+//            return new ResponseEntity(response, HttpStatus.OK);
+//        }
+//        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
+//    }
 
     public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId,
             OrderCreationRequest request) {
@@ -496,14 +487,15 @@ public class OrderService {
         return totalAmountPaid;
     }
 
-    private OrderDetailResponse getOrderDetails(OrderDAO orderDAO, List<OrderItemStatus> eligibleStatuses) {
+    private OrderDetailResponse getOrderDetails(OrderDAO orderDAO, List<OrderItemStatus> eligibleStatuses) throws Exception {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
         List<Pair<OrderItemDAO, String>> orderItemOutfitLinkPairList = new ArrayList<>();
         List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems().stream()
                 .filter(item -> eligibleStatuses.contains(item.getOrderItemStatus()))
                 .collect(Collectors.toList());
         for (OrderItemDAO orderItem : orderItems) {
-            String outfitImgLink = outfitImageLinkService.getOutfitImageLink(orderItem.getOutfitType());
+            OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType());
+            String outfitImgLink = outfitTypeService.getOutfitImageLink();
             orderItemOutfitLinkPairList.add(Pair.of(orderItem, outfitImgLink));
         }
 

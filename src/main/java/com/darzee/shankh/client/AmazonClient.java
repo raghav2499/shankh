@@ -42,6 +42,15 @@ public class AmazonClient {
     @Value("measurement_revision/")
     private String measurementRevisionDirectory;
 
+    @Value("${amazonProperties.s3.staticBucketName:defaultBucketName}")
+    private String staticBucket;
+
+    @Value("Measurement")
+    private String measurementDirectory;
+
+    @Value("OutfitType/OutfitType")
+    private String outfitsDirectory;
+
     @PostConstruct
     private void initializeAmazon() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
@@ -103,6 +112,14 @@ public class AmazonClient {
         return generateShortLivedUrl(portfolioBucketName, fileName);
     }
 
+    public String generateShortLivedUrlForMeasurement(String fileName) {
+        return generateShortLivedUrl(staticBucket, measurementDirectory + "/" + fileName);
+    }
+
+    public String generateShortLivedUrlForOutfit(String fileName) {
+        return generateShortLivedUrl(staticBucket, outfitsDirectory + "/" + fileName);
+    }
+
     public List<String> generateShortLivedUrls(List<String> fileNames) {
         List<String> urlList = new ArrayList<>(fileNames.size());
         for (String fileName : fileNames) {
@@ -114,7 +131,7 @@ public class AmazonClient {
 
     private String generateShortLivedUrl(String bucketName, String fileName) {
         String region = S3Bucket.getBucketRegionMap().get(bucketName);
-        String shortLivedUrl = "https://s3." + region + ".amazonaws.com/" + bucketName + "/" + fileName;
+        String shortLivedUrl = "https://s3." + region + ".amazonaws.com/" + bucketName + "/" + fileName + ".svg";
         return shortLivedUrl;
     }
 }
