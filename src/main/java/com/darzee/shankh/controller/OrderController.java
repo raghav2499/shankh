@@ -70,4 +70,11 @@ public class OrderController {
                                        @Validated(OrderCreationRequest.ConfirmOrder.class) @RequestBody OrderCreationRequest request) {
         return orderService.confirmOrderAndGenerateInvoice(boutiqueOrderId, boutiqueId, request);
     }
+
+    @GetMapping(value = "/{id}/invoice_detail", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity getInvoiceDetail(@PathVariable("id") Long boutiqueOrderId,
+                                           @RequestParam("boutique_id") Long boutiqueId) {
+        return orderService.getInvoiceDetail(boutiqueOrderId, boutiqueId);
+    }
 }

@@ -15,4 +15,5 @@ public class MeasurementDetails {
     private String title;
     private String value;
     private String index;
+    private String name;
 }

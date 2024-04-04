@@ -105,7 +105,7 @@ public class MeasurementService {
             measurementRevision = measurementRevisionsRepo.findTopByCustomerIdAndOutfitTypeOrderByIdDesc(customerId,
                     outfitType);
         }
-        MeasurementRevisionsDAO revisionsDAO = new MeasurementRevisionsDAO();
+        MeasurementRevisionsDAO revisionsDAO = new MeasurementRevisionsDAO(customerId, outfitType, new HashMap<>());
         if (measurementRevision != null) {
             revisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(measurementRevision);
         }
@@ -314,15 +314,14 @@ public class MeasurementService {
                                                                Boolean nonEmptyValuesOnly) {
         List<MeasurementDetails> measurementDetailsList = new ArrayList<>();
         int idx = 0;
-        if (CollectionUtils.isEmpty(measurementValue)) {
-            return measurementDetailsList;
-        }
         for (String param : params) {
-            String value = String.valueOf(measurementValue.get(param) / dividingFactor);
+            String value = measurementValue.get(param) == null
+                    ? ""
+                    : String.valueOf(measurementValue.get(param) / dividingFactor);
             MeasurementParamDAO measurementParam = getMeasurementParams(paramDetailMap, param);
             String imageLink = s3Client.generateShortLivedUrlForMeasurement(measurementParam.getFileName());
             MeasurementDetails measurementDetails = new MeasurementDetails(imageLink,
-                    measurementParam.getDisplayName(), value, String.valueOf(idx));
+                    measurementParam.getDisplayName(), value, String.valueOf(idx), measurementParam.getName());
             idx++;
             measurementDetailsList.add(measurementDetails);
         }
