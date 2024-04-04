@@ -10,7 +10,6 @@ import com.darzee.shankh.repo.FileReferenceRepo;
 import com.darzee.shankh.request.DownloadImageRequest;
 import com.darzee.shankh.response.DownloadImageResponse;
 import com.darzee.shankh.response.FileDetail;
-import com.darzee.shankh.response.GetFileResponse;
 import com.darzee.shankh.response.UploadMultipleFileResponse;
 import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.s3utils.FileUtil;
@@ -130,14 +129,20 @@ public class BucketService {
         return null;
     }
 
-    public String uploadInvoice(File file, Long orderId) {
-        String fileName = String.valueOf(orderId);
+    public String uploadInvoice(File file, Long orderId, Long boutiqueId) {
+        String fileName = boutiqueId + "_" + orderId;
         ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, invoiceDirectory + fileName);
         return fileUploadResult.getValue();
     }
 
-    public String getInvoiceShortLivedLink(Long orderId) {
-        String fileLocation = invoiceDirectory + orderId;
+    public String uploadItemDetailsPDF(File file, Long orderItemId) {
+        String fileName = String.valueOf(orderItemId);
+        ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, itemDetailsDirectory + fileName);
+        return fileUploadResult.getValue();
+    }
+
+    public String getInvoiceShortLivedLink(Long orderId, Long boutiqueId) {
+        String fileLocation = invoiceDirectory + boutiqueId + "_" + orderId;
         return client.generateShortLivedUrl(fileLocation);
     }
 
@@ -195,21 +200,4 @@ public class BucketService {
     }
 
 
-    public ResponseEntity<GetFileResponse> getFileLinkResponse(String entityType, Long entityId) {
-        String link = getFileLink(entityType, entityId);
-        GetFileResponse response = new GetFileResponse(link);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-
-    private String getFileLink(String entityType, Long entityId) {
-        switch(entityType) {
-            case "invoice":
-                return getInvoiceShortLivedLink(entityId);
-            case "item_details":
-                return getItemDetailsShortLivedLink(entityId);
-            default:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This entity_type is not supported");
-        }
-    }
 }

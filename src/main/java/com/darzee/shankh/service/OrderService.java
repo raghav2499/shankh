@@ -5,7 +5,6 @@ import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.Order;
-import com.darzee.shankh.entity.OrderItem;
 import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.enums.OrderType;
@@ -19,6 +18,7 @@ import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.pdfutils.BillGenerator;
+import com.darzee.shankh.utils.pdfutils.ItemPdfGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -81,6 +81,10 @@ public class OrderService {
 
     @Autowired
     private BillGenerator billGenerator;
+
+    @Autowired
+    private ItemPdfGenerator itemPdfGenerator;
+
     @Autowired
     private BoutiqueLedgerService boutiqueLedgerService;
 
@@ -221,15 +225,6 @@ public class OrderService {
 //        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is invalid");
 //    }
 
-    public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId,
-            OrderCreationRequest request) {
-        OrderDAO orderDAO = confirmOrder(boutiqueOrderId, boutiqueId, request);
-        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-        OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
-                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
-        generateInvoiceV2(orderDAO);
-        return new ResponseEntity<>(summary, HttpStatus.OK);
-    }
 
     @Transactional
     public OrderDAO confirmOrder(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) {
@@ -345,7 +340,6 @@ public class OrderService {
         PaymentMode paymentMode = PaymentMode.getPaymentTypeEnumOrdinalMap().get(request.getPaymentMode());
         paymentService.recordPayment(amountRecieved, paymentMode, Boolean.FALSE, orderDAO);
         generateInvoice(orderDAO);
-
         RecievePaymentResponse response = new RecievePaymentResponse(message,
                 orderId,
                 pendingAmountLeft);
@@ -362,7 +356,7 @@ public class OrderService {
                 orderDAO,
                 orderAmountDAO,
                 boutique);
-        String fileUploadUrl = bucketService.uploadInvoice(bill, orderDAO.getId());
+        String fileUploadUrl = bucketService.uploadInvoice(bill, orderDAO.getId(), boutique.getId());
         bill.delete();
         return fileUploadUrl;
     }
@@ -374,7 +368,8 @@ public class OrderService {
         TailorDAO tailorDAO = boutique.getAdminTailor();
         File bill = billGenerator.generateBillV2(boutique, customerName,
                 tailorDAO.getPhoneNumber(), orderDAO);
-        String fileUploadUrl = bucketService.uploadInvoice(bill, orderDAO.getId());
+        Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
+        String fileUploadUrl = bucketService.uploadInvoice(bill, orderNo, boutique.getId());
         bill.delete();
         return fileUploadUrl;
     }
@@ -678,7 +673,7 @@ public class OrderService {
         }
     }
 
-    private OrderDAO findOrder(Long boutiqueOrderId, Long boutiqueId) {
+    public OrderDAO findOrder(Long boutiqueOrderId, Long boutiqueId) {
         Optional<Order> order = orderRepo.findByBoutiqueOrderIdAndBoutiqueId(boutiqueOrderId, boutiqueId);
         if (!order.isPresent()) {
             order = orderRepo.findById(boutiqueOrderId);

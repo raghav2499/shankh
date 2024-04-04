@@ -1,10 +1,12 @@
 package com.darzee.shankh.controller;
 
 import com.darzee.shankh.request.DownloadImageRequest;
+import com.darzee.shankh.request.GetFileLinkRequest;
 import com.darzee.shankh.response.DownloadImageResponse;
 import com.darzee.shankh.response.GetSampleImageResponse;
 import com.darzee.shankh.response.UploadMultipleFileResponse;
 import com.darzee.shankh.service.BucketService;
+import com.darzee.shankh.service.FileLinkService;
 import com.darzee.shankh.service.SampleImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,6 +23,9 @@ public class BucketController {
 
     @Autowired
     private BucketService bucketService;
+
+    @Autowired
+    private FileLinkService fileLinkService;
 
     @Autowired
     private SampleImageService sampleImageService;
@@ -45,10 +50,9 @@ public class BucketController {
         return sampleImageService.getSampleImages(type);
     }
 
-    @GetMapping(value = "/file/link", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/file/link", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity getFileLink(@RequestParam("entity_id") Long entityId,
-                                      @RequestParam("entity_type") String entityType) {
-        return bucketService.getFileLinkResponse(entityType, entityId);
+    public ResponseEntity getFileLink(@Valid @RequestBody GetFileLinkRequest request) {
+        return fileLinkService.getFileLinkResponse(request);
     }
 }

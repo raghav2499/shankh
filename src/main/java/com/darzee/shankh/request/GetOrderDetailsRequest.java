@@ -97,6 +97,9 @@ public class GetOrderDetailsRequest {
             case "created_at":
                 paramsSortValue = CREATED_AT.getOrderSortString();
                 break;
+            case "id":
+                paramsSortValue = ITEM_ID.getOrderSortString();
+                break;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorting is not supported for " + requestSortKey);
         }
