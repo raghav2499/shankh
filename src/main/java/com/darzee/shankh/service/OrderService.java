@@ -17,8 +17,7 @@ import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.response.*;
-import com.darzee.shankh.utils.pdfutils.BillGenerator;
-import com.darzee.shankh.utils.pdfutils.ItemPdfGenerator;
+import com.darzee.shankh.utils.pdfutils.PdfGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -80,10 +79,7 @@ public class OrderService {
     private BucketService bucketService;
 
     @Autowired
-    private BillGenerator billGenerator;
-
-    @Autowired
-    private ItemPdfGenerator itemPdfGenerator;
+    private PdfGenerator pdfGenerator;
 
     @Autowired
     private BoutiqueLedgerService boutiqueLedgerService;
@@ -351,7 +347,7 @@ public class OrderService {
         String customerName = customerDAO.constructName();
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         BoutiqueDAO boutique = orderDAO.getBoutique();
-        File bill = billGenerator.generateBill(customerName,
+        File bill = pdfGenerator.generateBill(customerName,
                 customerDAO.getPhoneNumber(),
                 orderDAO,
                 orderAmountDAO,
@@ -366,7 +362,7 @@ public class OrderService {
         String customerName = customerDAO.constructName();
         BoutiqueDAO boutique = orderDAO.getBoutique();
         TailorDAO tailorDAO = boutique.getAdminTailor();
-        File bill = billGenerator.generateBillV2(boutique, customerName,
+        File bill = pdfGenerator.generateBillV2(boutique, customerName,
                 tailorDAO.getPhoneNumber(), orderDAO);
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
         String fileUploadUrl = bucketService.uploadInvoice(bill, orderNo, boutique.getId());

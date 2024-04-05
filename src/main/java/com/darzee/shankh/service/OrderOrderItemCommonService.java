@@ -12,7 +12,7 @@ import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.response.OrderSummary;
-import com.darzee.shankh.utils.pdfutils.ItemPdfGenerator;
+import com.darzee.shankh.utils.pdfutils.PdfGenerator;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,7 +49,7 @@ public class OrderOrderItemCommonService {
     private OrderAmountRepo orderAmountRepo;
 
     @Autowired
-    private ItemPdfGenerator itemPdfGenerator;
+    private PdfGenerator pdfGenerator;
 
     @Autowired
     private MeasurementService measurementService;
@@ -181,7 +181,7 @@ public class OrderOrderItemCommonService {
         }
         List<String> clothImageLinks = orderItemService.getClothImageLinks(orderItemDAO.getId());
 
-        File itemDetailPdf = itemPdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions,
+        File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions,
                 innerMeasurementDetailsList, clothImageLinks, orderItemDAO);
         String fileUploadUrl = bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
     }
