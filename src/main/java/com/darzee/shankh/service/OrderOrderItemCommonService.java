@@ -1,9 +1,7 @@
 package com.darzee.shankh.service;
 
-import com.darzee.shankh.dao.OrderAmountDAO;
-import com.darzee.shankh.dao.OrderDAO;
-import com.darzee.shankh.dao.OrderItemDAO;
-import com.darzee.shankh.dao.PriceBreakupDAO;
+import com.darzee.shankh.dao.*;
+import com.darzee.shankh.entity.MeasurementRevisions;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
@@ -11,15 +9,22 @@ import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.request.innerObjects.OrderDetails;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
+import com.darzee.shankh.response.InnerMeasurementDetails;
+import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.response.OrderSummary;
+import com.darzee.shankh.utils.pdfutils.PdfGenerator;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +49,18 @@ public class OrderOrderItemCommonService {
     private OrderAmountRepo orderAmountRepo;
 
     @Autowired
+    private PdfGenerator pdfGenerator;
+
+    @Autowired
+    private MeasurementService measurementService;
+
+    @Autowired
+    private StitchOptionService stitchOptionService;
+
+    @Autowired
+    private BucketService bucketService;
+
+    @Autowired
     private DaoEntityMapper mapper;
 
     @Autowired
@@ -51,6 +68,17 @@ public class OrderOrderItemCommonService {
 
     @Autowired
     private OrderStitchOptionsRepo orderStitchOptionsRepo;
+
+    public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId,
+                                                                       OrderCreationRequest request) throws Exception {
+        OrderDAO orderDAO = orderService.confirmOrder(boutiqueOrderId, boutiqueId, request);
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
+                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
+        orderService.generateInvoiceV2(orderDAO);
+//        generateItemDetailPdfs(orderDAO);
+        return new ResponseEntity<>(summary, HttpStatus.OK);
+    }
 
     @Transactional
     public OrderSummary createOrder(OrderCreationRequest orderCreationRequest) {
@@ -97,7 +125,7 @@ public class OrderOrderItemCommonService {
         return orderSummary;
     }
 
-    public OrderSummary updateOrderItem(Long orderItemId, OrderItemDetailRequest orderItemDetails) {
+    public OrderSummary updateOrderItem(Long orderItemId, OrderItemDetailRequest orderItemDetails) throws Exception {
         OrderItemDAO updatedItem = orderItemService.updateOrderItem(orderItemId, orderItemDetails);
         if (!Collections.isEmpty(orderItemDetails.getPriceBreakup())) {
             List<PriceBreakupDAO> updatedPriceBreakup =
@@ -106,6 +134,9 @@ public class OrderOrderItemCommonService {
         OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId());
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         orderService.generateInvoiceV2(orderDAO);
+        Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
+        generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(),
+                orderDAO.getBoutique().getName(), orderNo);
         OrderSummary orderItemSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         return orderItemSummary;
@@ -117,12 +148,41 @@ public class OrderOrderItemCommonService {
         Map<Long, OrderItemDAO> updatedItemsMap = updatedItems.stream().collect(Collectors.toMap(OrderItemDAO::getId, orderItem -> orderItem));
         List<OrderItemDAO> updatedItemsList = new ArrayList<>();
         for (Map.Entry<Long, OrderItemDAO> orderItemEntrySet : allItemsMap.entrySet()) {
-            if(updatedItemsMap.containsKey(orderItemEntrySet.getKey())) {
+            if (updatedItemsMap.containsKey(orderItemEntrySet.getKey())) {
                 updatedItemsList.add(updatedItemsMap.get(orderItemEntrySet.getKey()));
             } else {
                 updatedItemsList.add(allItemsMap.get(orderItemEntrySet.getKey()));
             }
         }
         return updatedItemsList;
+    }
+
+    public void generateItemDetailPdfs(OrderDAO orderDAO) throws Exception {
+        List<OrderItemDAO> orderItems = orderDAO.getOrderItems();
+        Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
+        for (OrderItemDAO orderItem : orderItems) {
+            generateItemDetailPdf(orderItem, orderDAO.getCustomer().getId(),
+                    orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
+        }
+    }
+
+    public void generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId, String boutiqueName,
+                                      Long orderNo) throws Exception {
+        Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions =
+                stitchOptionService.getOrderItemStitchOptions(orderItemDAO.getId());
+        MeasurementRevisions measurementRevisions =
+                measurementService.getMeasurementObject(customerId, orderItemDAO.getId(),
+                        orderItemDAO.getOutfitType());
+        List<InnerMeasurementDetails> innerMeasurementDetailsList = new ArrayList<>();
+        if (measurementRevisions != null) {
+            MeasurementRevisionsDAO revisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(measurementRevisions);
+            innerMeasurementDetailsList = measurementService.generateInnerMeasurementDetails(
+                    boutiqueId, orderItemDAO.getOutfitType(), revisionsDAO, true);
+        }
+        List<String> clothImageLinks = orderItemService.getClothImageLinks(orderItemDAO.getId());
+
+        File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions,
+                innerMeasurementDetailsList, clothImageLinks, orderItemDAO);
+        String fileUploadUrl = bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
     }
 }

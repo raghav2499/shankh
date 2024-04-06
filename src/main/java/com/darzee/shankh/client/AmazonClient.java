@@ -131,7 +131,7 @@ public class AmazonClient {
 
     private String generateShortLivedUrl(String bucketName, String fileName) {
         String region = S3Bucket.getBucketRegionMap().get(bucketName);
-        String shortLivedUrl = "https://s3." + region + ".amazonaws.com/" + bucketName + "/" + fileName + ".svg";
+        String shortLivedUrl = "https://s3." + region + ".amazonaws.com/" + bucketName + "/" + fileName;
         return shortLivedUrl;
     }
 }

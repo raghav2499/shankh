@@ -243,6 +243,13 @@ public class OrderItemService {
         return orderItemDetails;
     }
 
+    public List<String> getClothImageLinks(Long orderItemId) {
+        List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(orderItemId);
+        List<FileDetail> clothImageFileDetails = getClothImageDetails(clothImagesReferenceIds);
+        return clothImageFileDetails.stream().map(fileDetail -> fileDetail.getShortLivedUrl())
+                .collect(Collectors.toList());
+    }
+
     private List<String> getClothProfilePicLink(List<String> clothImageReferenceId) {
         if (Collections.isEmpty(clothImageReferenceId)) {
             return new ArrayList<>();

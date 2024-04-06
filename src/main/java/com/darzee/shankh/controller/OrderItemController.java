@@ -42,7 +42,7 @@ public class OrderItemController {
     @PutMapping(value = "/order_item/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<OrderSummary> updateOrderItem(@PathVariable("id") Long orderItemId,
-                                                        @Valid @RequestBody OrderItemDetailRequest orderItemDetails) {
+                                                        @Valid @RequestBody OrderItemDetailRequest orderItemDetails) throws Exception {
         OrderSummary orderSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
         return new ResponseEntity<>(orderSummary, HttpStatus.OK);
     }
@@ -70,7 +70,7 @@ public class OrderItemController {
                                                               @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
                                                               @RequestParam(name = "delivery_date_from", required = false) String deliveryDateFrom,
                                                               @RequestParam(name = "delivery_date_till", required = false) String deliveryDateTill,
-                                                              @RequestParam(name = "sort_key", required = false, defaultValue = "trial_date") String sortKey,
+                                                              @RequestParam(name = "sort_key", required = false, defaultValue = "id") String sortKey,
                                                               @RequestParam(name = "sort_order", required = false, defaultValue = "desc") String sortOrder,
                                                               @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                               @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {

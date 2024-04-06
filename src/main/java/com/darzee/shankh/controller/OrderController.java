@@ -67,8 +67,8 @@ public class OrderController {
     @CrossOrigin
     public ResponseEntity confirmOrder(@PathVariable("id") Long boutiqueOrderId,
                                        @RequestParam("boutique_id") Long boutiqueId,
-                                       @Validated(OrderCreationRequest.ConfirmOrder.class) @RequestBody OrderCreationRequest request) {
-        return orderService.confirmOrderAndGenerateInvoice(boutiqueOrderId, boutiqueId, request);
+                                       @Validated(OrderCreationRequest.ConfirmOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
+        return orderOrderItemCommonService.confirmOrderAndGenerateInvoice(boutiqueOrderId, boutiqueId, request);
     }
 
     @GetMapping(value = "/{id}/invoice_detail", produces = MediaType.APPLICATION_JSON_VALUE)

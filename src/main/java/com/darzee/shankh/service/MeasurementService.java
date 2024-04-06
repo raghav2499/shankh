@@ -3,10 +3,7 @@ package com.darzee.shankh.service;
 import com.amazonaws.util.StringUtils;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.constants.Constants;
-import com.darzee.shankh.dao.CustomerDAO;
-import com.darzee.shankh.dao.MeasurementParamDAO;
-import com.darzee.shankh.dao.MeasurementRevisionsDAO;
-import com.darzee.shankh.dao.MeasurementsDAO;
+import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.BoutiqueMeasurement;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.MeasurementRevisions;
@@ -29,6 +26,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.darzee.shankh.constants.Constants.CM_TO_INCH_DIVIDING_FACTOR;
 
 @Service
 public class MeasurementService {
@@ -94,6 +93,21 @@ public class MeasurementService {
         Long boutiqueId = customerRepo.findById(customerId).get().getBoutique().getId();
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
+
+        MeasurementRevisions measurementRevision = getMeasurementObject(customerId, orderItemId, outfitType);
+        MeasurementRevisionsDAO revisionsDAO = new MeasurementRevisionsDAO(customerId, outfitType, new HashMap<>());
+        if (measurementRevision != null) {
+            revisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(measurementRevision);
+        }
+        OverallMeasurementDetails overallMeasurementDetails = null;
+        MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
+        overallMeasurementDetails = setMeasurementDetails(revisionsDAO, measurementScale, boutiqueId,
+                nonEmptyValuesOnly);
+        return overallMeasurementDetails;
+    }
+
+    public MeasurementRevisions getMeasurementObject(Long customerId, Long orderItemId,
+                                                     OutfitType outfitType) {
         MeasurementRevisions measurementRevision = null;
         if (orderItemId != null) {
             Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
@@ -105,15 +119,7 @@ public class MeasurementService {
             measurementRevision = measurementRevisionsRepo.findTopByCustomerIdAndOutfitTypeOrderByIdDesc(customerId,
                     outfitType);
         }
-        MeasurementRevisionsDAO revisionsDAO = new MeasurementRevisionsDAO(customerId, outfitType, new HashMap<>());
-        if (measurementRevision != null) {
-            revisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(measurementRevision);
-        }
-        OverallMeasurementDetails overallMeasurementDetails = null;
-        MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
-        overallMeasurementDetails = setMeasurementDetails(revisionsDAO, measurementScale, boutiqueId,
-                nonEmptyValuesOnly);
-        return overallMeasurementDetails;
+        return measurementRevision;
     }
 
     public ResponseEntity saveMeasurementDetails(MeasurementDetailsRequest measurementDetails) throws Exception {
@@ -153,7 +159,7 @@ public class MeasurementService {
                                                                                    String scale) {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitOrdinal);
         MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
-        Double dividingFactor = MeasurementScale.INCH.equals(measurementScale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
+        Double dividingFactor = MeasurementScale.INCH.equals(measurementScale) ? CM_TO_INCH_DIVIDING_FACTOR : 1;
         List<MeasurementRevisionsDAO> measurementRevisions = mapper.measurementRevisionsListToDAOList(
                 measurementRevisionsRepo.findAllByCustomerIdAndOutfitTypeOrderByCreatedAtDesc(customerId, outfitType));
         List<MeasurementRevisionData> data = new ArrayList<>(measurementRevisions.size());
@@ -180,6 +186,41 @@ public class MeasurementService {
             measurementRevisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(mRevision.get());
         }
         return measurementRevisionsDAO;
+    }
+
+    public List<InnerMeasurementDetails> generateInnerMeasurementDetails(Long boutiqueId, OutfitType outfitType,
+                                                                         MeasurementRevisionsDAO revisionsDAO,
+                                                                         Boolean nonEmptyValuesOnly)
+            throws Exception {
+        Map<OutfitSide, List<String>> boutiqueMeasurementParams = getBoutiqueMeasurementParams(boutiqueId, outfitType);
+        List<InnerMeasurementDetails> innerMeasurementDetailsList = new ArrayList<>();
+        List<String> eligibleMeasurementParams = boutiqueMeasurementParams.values().stream().flatMap(List::stream)
+                .collect(Collectors.toList());
+        List<MeasurementParamDAO> measurementParamDetails =
+                mapper.measurementParamToDAOList(measurementParamRepo.findAllByNameIn(eligibleMeasurementParams));
+
+        Map<String, MeasurementParamDAO> paramDetailMap = measurementParamDetails.stream()
+                .collect(Collectors.toMap(MeasurementParamDAO::getName,
+                        measurementParam -> measurementParam));
+        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(revisionsDAO.getOutfitType());
+        for (Map.Entry<OutfitSide, List<String>> outfitSideParamList : boutiqueMeasurementParams.entrySet()) {
+            InnerMeasurementDetails innerMeasurementDetails = null;
+            List<String> paramList = outfitSideParamList.getValue();
+            List<MeasurementDetails> measurementDetails =
+                    getMeasurementDetailsList(revisionsDAO.getMeasurementValue(), CM_TO_INCH_DIVIDING_FACTOR,
+                            paramList, paramDetailMap, nonEmptyValuesOnly);
+            if (OutfitSide.TOP.equals(outfitSideParamList.getKey())) {
+                String heading = outfitTypeService.getTopHeading();
+                String imageLink = s3Client.generateShortLivedUrlForMeasurement("/top.svg");
+                innerMeasurementDetails = new InnerMeasurementDetails(heading, measurementDetails, imageLink);
+            } else {
+                String heading = outfitTypeService.getBottomHeading();
+                String imageLink = s3Client.generateShortLivedUrlForMeasurement("/bottom.svg");
+                innerMeasurementDetails = new InnerMeasurementDetails(heading, measurementDetails, imageLink);
+            }
+            innerMeasurementDetailsList.add(innerMeasurementDetails);
+        }
+        return innerMeasurementDetailsList;
     }
 
     private String getMeasurementDetailsMessage(OverallMeasurementDetails measurementDetails) {
@@ -236,7 +277,7 @@ public class MeasurementService {
     private OverallMeasurementDetails setMeasurementDetails(MeasurementRevisionsDAO revisionsDAO, MeasurementScale scale,
                                                             Long boutiqueId, Boolean nonEmptyValuesOnly) throws Exception {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? Constants.CM_TO_INCH_DIVIDING_FACTOR : 1;
+        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? CM_TO_INCH_DIVIDING_FACTOR : 1;
         List<InnerMeasurementDetails> innerMeasurementDetailsList = new ArrayList<>();
         String measurementRevisionImgLink = null;
 
@@ -244,32 +285,8 @@ public class MeasurementService {
                 && measurementRevisionService.measurementRevisionImageExists(revisionsDAO.getId())) {
             measurementRevisionImgLink = measurementRevisionService.getMeasurementRevisionImageLink(revisionsDAO.getId());
         } else {
-            Map<OutfitSide, List<String>> boutiqueMeasurementParams = getBoutiqueMeasurementParams(boutiqueId, revisionsDAO.getOutfitType());
-            List<String> eligibleMeasurementParams = boutiqueMeasurementParams.values().stream().flatMap(List::stream)
-                    .collect(Collectors.toList());
-            List<MeasurementParamDAO> measurementParamDetails = mapper.measurementParamToDAOList(measurementParamRepo.findAllByNameIn(eligibleMeasurementParams));
-
-            Map<String, MeasurementParamDAO> paramDetailMap = measurementParamDetails.stream()
-                    .collect(Collectors.toMap(MeasurementParamDAO::getName,
-                            measurementParam -> measurementParam));
-            OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(revisionsDAO.getOutfitType());
-            for (Map.Entry<OutfitSide, List<String>> outfitSideParamList : boutiqueMeasurementParams.entrySet()) {
-                InnerMeasurementDetails innerMeasurementDetails = null;
-                List<String> paramList = outfitSideParamList.getValue();
-                List<MeasurementDetails> measurementDetails =
-                        getMeasurementDetailsList(revisionsDAO.getMeasurementValue(), dividingFactor,
-                                paramList, paramDetailMap, nonEmptyValuesOnly);
-                if (OutfitSide.TOP.equals(outfitSideParamList.getKey())) {
-                    String heading = outfitTypeService.getTopHeading();
-                    String imageLink = s3Client.generateShortLivedUrlForMeasurement("/top.svg");
-                    innerMeasurementDetails = new InnerMeasurementDetails(heading, measurementDetails, imageLink);
-                } else {
-                    String heading = outfitTypeService.getBottomHeading();
-                    String imageLink = s3Client.generateShortLivedUrlForMeasurement("/bottom.svg");
-                    innerMeasurementDetails = new InnerMeasurementDetails(heading, measurementDetails, imageLink);
-                }
-                innerMeasurementDetailsList.add(innerMeasurementDetails);
-            }
+            innerMeasurementDetailsList = generateInnerMeasurementDetails(boutiqueId, revisionsDAO.getOutfitType(),
+                    revisionsDAO, nonEmptyValuesOnly);
         }
         overallMeasurementDetails.setInnerMeasurementDetails(innerMeasurementDetailsList);
         overallMeasurementDetails.setMeasurementImageLink(measurementRevisionImgLink);
