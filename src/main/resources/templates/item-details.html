@@ -154,8 +154,9 @@
             color: white;
             margin-top: 15px;
             margin-bottom: 15px;
+
             /* Text color */
-            padding: 5px 10px;
+            padding: 5px 5px;
             /* Adjust padding as needed */
             border-radius: 10px;
             /* Adjust border radius to make it more rounded */
@@ -198,27 +199,85 @@
 </head>
 
 <body>
-    
+
     <div class="container">
         <div class="main-div-header">
             <div class="left" style="float: left;">
                 <h1 id="main-heading">Item Details</h1>
-                <p class="invoice-details" id="main-para" th:text="${businessName}">Item Details</p>
+                <p class="invoice-details" id="main-para" th:text="${businessName}"></p>
             </div>
             <div class="right" style="float: right;">
-                <p class="invoice-details">Order Number: <span class="black" th:text="${orderUpdationDate}"></span></p>
+                <p class="invoice-details">Order Number: <span class="black" th:text="${orderNo}"></span></p>
                 <p class="invoice-details">Finish By: <span class="black" th:text="${invoiceNo}"></span></p>
             </div>
         </div>
         <hr style="height: 1px; border: none; background-color: #000;">
         </hr>
         <div class="main-div-content">
-            <th:block th:if="${#lists.size(rows) > 0}">
+
+            <!--If only one item is present starts-->
+
+            <th:block th:if="${#lists.size(outfitPieces) == 1}">
+                <div class="top">
+                    <div>
+                        <button class="badge rounded-pill text-bg-primary">
+                            <img th:src="@{outfitImageLink}" alt="Icon" width="20" height="20" style="margin-right: 5px;"></img>
+                            <span th:text="${outfitType}" style="float: right;margin-top: 3px;">Pant</span>
+                        </button>
+                    </div>
+                    <p class="invoice mt-4">Measurements</p>
+
+                    <fieldset class="clother_measurements_div"
+                        style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
+
+                        <div class="size-chart">
+                            <table>
+                                <thead>
+                                    <!-- Iterate over each row -->
+                                    <tr th:each="row : ${measurementDetails}">
+                                        <!-- Iterate over each column in the row -->
+                                        <th
+                                            th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
+                                            <img th:src="@{row.imageLink}" alt="No Image"></img>
+                                            <div>
+                                                <!-- Access the outer and inner spans -->
+                                                <span class="span-outer" th:text="${row.title}"></span>
+                                                <span class="span-inner" th:text="${row.value}"></span>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+
+
+                        </div>
+                        <div th:each="stich_options : ${groupedStitchOptions}" class="stich_options"
+                            style="display: flex; flex-wrap: wrap;width: 100%;">
+                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
+                            <div style="width: 100%; height: 0; clear: both;"></div>
+                            <div class="small" style="margin-right: 50px;" th:text="${stich_options.label}"> <span
+                                    style="font-weight: bold;" th:text="${stich_options.value}"></span>
+                            </div>
+
+                            <div style="width: 100%; height: 0; clear: both;"></div>
+
+                        </div>
+                        <div style="width: 100%; height: 0; clear: both;"></div>
+                    </fieldset>
+                </div>
+            </th:block>
+
+            <!--If only one item is present ends-->
+
+
+            <!--If more than one item is present starts -->
+            <th:block th:if="${#lists.size(outfitPieces) > 1}">
                 <div class="top">
                     <button class="badge rounded-pill text-bg-primary">Pant</button>
                     </button>
                     <p class="invoice mt-4">Measurements</p>
-                   
+
                     <fieldset class="clother_measurements_div"
                         style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
                         <legend class="invoice mt-4">Top</legend>
@@ -226,30 +285,15 @@
                             <table>
                                 <thead>
                                     <!-- Iterate over each row -->
-                                    <tr th:each="row : ${rows}">
+                                    <tr th:each="row : ${measurementDetails}">
                                         <!-- Iterate over each column in the row -->
-                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
-                                            <img src="https://picsum.photos/200/300" alt="No Image"></img>
+                                        <th 
+                                            th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
+                                            <img th:src="@{row.imageLink}" alt="No Image"></img>
                                             <div>
                                                 <!-- Access the outer and inner spans -->
-                                                <span class="span-outer" th:text="${column.outer}">Length</span>
-                                                <span class="span-inner" th:text="${column.inner}">10px</span>
-                                            </div>
-                                        </th>
-                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
-                                            <img src="https://picsum.photos/200/300" alt="No Image"></img>
-                                            <div>
-                                                <!-- Access the outer and inner spans -->
-                                                <span class="span-outer" th:text="${column.outer}">Length</span>
-                                                <span class="span-inner" th:text="${column.inner}">10px</span>
-                                            </div>
-                                        </th>
-                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
-                                            <img src="https://picsum.photos/200/300" alt="No Image"></img>
-                                            <div>
-                                                <!-- Access the outer and inner spans -->
-                                                <span class="span-outer" th:text="${column.outer}">Length</span>
-                                                <span class="span-inner" th:text="${column.inner}">10px</span>
+                                                <span class="span-outer" th:text="${row.title}"></span>
+                                                <span class="span-inner" th:text="${row.value}"></span>
                                             </div>
                                         </th>
                                     </tr>
@@ -259,40 +303,23 @@
 
 
                         </div>
-                        <div class="stich_options" style="display: flex; flex-wrap: wrap;width: 100%;">
+                        <div th:each="stich_options : ${groupedStitchOptions}" class="stich_options"
+                            style="display: flex; flex-wrap: wrap;width: 100%;">
                             <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
                             <div style="width: 100%; height: 0; clear: both;"></div>
-                            <div class="small" style="margin-right: 50px;">Type: <span
-                                    style="font-weight: bold;">1</span>
+                            <div class="small" style="margin-right: 50px;" th:text="${stich_options.label}"> <span
+                                    style="font-weight: bold;" th:text="${stich_options.value}"></span>
                             </div>
-                            <div class="small" style="margin-right: 50px;">Collar: <span
-                                    style="font-weight: bold;">1</span>
-                            </div>
-                            <div class="small" style="margin-right: 50px;">Pocket: <span
-                                    style="font-weight: bold;">1</span>
-                            </div>
-                            <div class="small" style="margin-right: 50px;">Lapels: <span
-                                    style="font-weight: bold;">1</span>
-                            </div>
-                            <div class="small" style="margin-right: 50px;">Vents: <span
-                                    style="font-weight: bold;">1</span>
-                            </div>
-                            <div class="small" style="margin-right: 50px;">Pocket Square: <span
-                                    style="font-weight: bold;">1</span></div>
+
+                            <div style="width: 100%; height: 0; clear: both;"></div>
+
                         </div>
                         <div style="width: 100%; height: 0; clear: both;"></div>
-                        <div class="mt-3 small" style="margin-top: 10px;margin-bottom: 20px;">Number Of Buttons: <span
-                                style="font-weight: bold;">1</span></div>
-                    </div>
-                </fieldset>
-            </th:block>
+                    </fieldset>
+                </div>
 
-            <!--Bottom-->
-            <th:block th:if="${#lists.size(rows) > 0}">
+                <!--Bottom Starts-->
                 <div class="bottom" style="margin-top: 30px;">
-
-
-                   
                     <fieldset class="clother_measurements_div"
                         style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
                         <legend class="invoice mt-4">Bottom</legend>
@@ -300,32 +327,18 @@
                             <table>
                                 <thead>
                                     <!-- Iterate over each row -->
-                                    <tr th:each="row : ${rows}">
+                                    <tr th:each="row : ${measurementDetails}">
                                         <!-- Iterate over each column in the row -->
-                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
-                                            <img src="https://picsum.photos/200/300" alt="No Image"></img>
+                                        <th
+                                            th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
+                                            <img th:src="@{row.imageLink}" alt="No Image"></img>
                                             <div>
                                                 <!-- Access the outer and inner spans -->
-                                                <span class="span-outer" th:text="${column.outer}">Length</span>
-                                                <span class="span-inner" th:text="${column.inner}">10px</span>
+                                                <span class="span-outer" th:text="${row.title}"></span>
+                                                <span class="span-inner" th:text="${row.value}"></span>
                                             </div>
                                         </th>
-                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
-                                            <img src="https://picsum.photos/200/300" alt="No Image"></img>
-                                            <div>
-                                                <!-- Access the outer and inner spans -->
-                                                <span class="span-outer" th:text="${column.outer}">Length</span>
-                                                <span class="span-inner" th:text="${column.inner}">10px</span>
-                                            </div>
-                                        </th>
-                                        <th th:each="column : ${row}" th:class="${#lists.size(row) > 3}? 'new-row'">
-                                            <img src="https://picsum.photos/200/300" alt="No Image"></img>
-                                            <div>
-                                                <!-- Access the outer and inner spans -->
-                                                <span class="span-outer" th:text="${column.outer}">Length</span>
-                                                <span class="span-inner" th:text="${column.inner}">10px</span>
-                                            </div>
-                                        </th>
+
                                     </tr>
                                 </thead>
                             </table>
@@ -333,88 +346,46 @@
 
 
                         </div>
-                        <div class="stich_options" style="display: flex; flex-wrap: wrap;width: 100%;">
+                        <div th:each="stich_options : ${groupedStitchOptions}" class="stich_options"
+                            style="display: flex; flex-wrap: wrap;width: 100%;">
                             <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
                             <div style="width: 100%; height: 0; clear: both;"></div>
-                            <div class="small" style="margin-right: 50px;">Type: <span
-                                    style="font-weight: bold;">1</span>
+                            <div class="small" style="margin-right: 50px;" th:text="${stich_options.label}"> <span
+                                    style="font-weight: bold;" th:text="${stich_options.value}"></span>
                             </div>
-                            <div class="small" style="margin-right: 50px;">Collar: <span
-                                    style="font-weight: bold;">1</span>
-                            </div>
-                            <div class="small" style="margin-right: 50px;">Pocket: <span
-                                    style="font-weight: bold;">1</span>
-                            </div>
-                            <div class="small" style="margin-right: 50px;">Lapels: <span
-                                    style="font-weight: bold;">1</span>
-                            </div>
-                            <div class="small" style="margin-right: 50px;">Vents: <span
-                                    style="font-weight: bold;">1</span>
-                            </div>
-                            <div class="small" style="margin-right: 50px;">Pocket Square: <span
-                                    style="font-weight: bold;">1</span></div>
+
+                            <div style="width: 100%; height: 0; clear: both;"></div>
+
                         </div>
                         <div style="width: 100%; height: 0; clear: both;"></div>
-                        <div class="mt-3 small" style="margin-top: 10px;margin-bottom: 20px;">Number Of Buttons: <span
-                                style="font-weight: bold;">1</span></div>
                     </fieldset>
                 </div>
-
             </th:block>
-
-
-
-
-
+            <!--If more than one item is present ends -->
         </div>
 
         <div class="special-instructions">
             <p class="invoice">Special Instructions</p>
-            <p class="black">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
-                ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa
-                qui officia deserunt mollit anim id est laborum.</p>
+            <p class="black" th:text="${specialInstructions}"></p>
         </div>
 
         <div class="Inspiration">
             <p class="invoice">Inspiration</p>
-            <a href="http://www.google.com">google</a>
+            <a th:href="@{inspiration}"></a>
         </div>
-
-
 
         <div class="image_div">
             <p class="invoice">Cloth Images</p>
             <div class="image-row">
                 <!-- Iterate over each image -->
-                <div class="image-col" th:each="image, i : ${images}">
+                <div class="image-col">
                     <div class="card">
-                        <img src="https://picsum.photos/200/300" width="100%" height="150px" class="card-img-top"
-                            alt="Image"></img>
-
-                    </div>
-                </div>
-                <div class="image-col" th:each="image, i : ${images}">
-                    <div class="card">
-                        <img src="https://picsum.photos/200/300" width="100%" height="150px" class="card-img-top"
-                            alt="Image"></img>
-
-                    </div>
-                </div>
-                <div class="image-col" th:each="image, i : ${images}">
-                    <div class="card">
-                        <img src="https://picsum.photos/200/300" width="100%" height="150px" class="card-img-top"
-                            alt="Placeholder Image" /></img>
-
+                        <img th:src="@{clothImages}" width="100%" height="150px" class="card-img-top" alt="Image"></img>
                     </div>
                 </div>
             </div>
         </div>
-
-
-
-
+    </div>
 </body>
 
 </html>

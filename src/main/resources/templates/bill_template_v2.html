@@ -108,7 +108,21 @@
             margin-right: 20px;
         }
        
-
+        .right-item1{
+            position: absolute;
+            right: 70px;
+            top: 17px;
+        }
+        .right-item2{
+            position: absolute;
+            right: 60px;
+            top: 17px;
+        }
+        .right-item3{
+            position: absolute;
+            right: 60px;
+            top: 17px;
+        }
       
     </style>
 </head>
@@ -121,7 +135,7 @@
                 <p class="invoice-details" id="main-para" th:text="${businessName}"></p>
             </div>
             <div class="right" style="float: right;">
-                <p class="invoice-details">Invoice Date: <span class="black" th:text="${orderCreationDate}"></span></p>
+                <p class="invoice-details">Invoice Date: <span class="black" th:text="${orderUpdationDate}"></span></p>
                 <p class="invoice-details">Invoice Number: <span class="black" th:text="${invoiceNo}"></span></p>
             </div>
         </div>
@@ -162,15 +176,15 @@
                 </div>
 
                 <div class="total">
-                    <p class="invoice-details left-item" style="font-size: 14px;">Total: <span class="black right-item"
+                    <p class="invoice-details left-item" style="font-size: 14px;">Total: <span class="black right-item1">Rs</span><span class="black right-item"
                             style="float:right;font-size: 14px;" th:text="${totalAmount}"></span></p>
                 </div>
                 <div class="total1">
-                    <p class="invoice-details left-item" style="font-size: 14px;">Advance (if any): <span class="black right-item"
+                    <p class="invoice-details left-item" style="font-size: 14px;">Advance (if any): <span class="black right-item2">Rs</span><span class="black right-item"
                             style="float:right; font-size: 14px;" th:text="${amountPaid}"></span></p>
                 </div>
                 <div class="balanceDue">
-                    <p class="invoice-details left-item" style="font-size: 14px;">Balance Due: <span id="balanceDue" class="black right-item"
+                    <p class="invoice-details left-item" style="font-size: 14px;">Balance Due: <span class="black right-item3">Rs</span><span id="balanceDue" class="black right-item"
                             style="float:right; font-size: 14px;color:red" th:text="${balanceDue}"></span></p>
                 </div>
             </div>
