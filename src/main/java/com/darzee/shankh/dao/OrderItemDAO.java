@@ -129,11 +129,15 @@ public class OrderItemDAO {
     }
 
     public Double calculateItemPrice() {
-        return getActivePriceBreakUpList().stream()
-                .mapToDouble(pb -> pb.getValue() * pb.getQuantity())
-                .sum();
+        List<PriceBreakupDAO> priceBreakupList = getActivePriceBreakUpList();
+        if (!CollectionUtils.isEmpty(priceBreakupList)) {
+            return priceBreakupList.stream()
+                    .mapToDouble(pb -> pb.getValue() * pb.getQuantity())
+                    .sum();
+        }
+        return 0d;
     }
-    
+
     public List<PriceBreakupDAO> getActivePriceBreakUpList() {
         return this.getPriceBreakup().stream()
                 .filter(pb -> !Boolean.TRUE.equals(pb.getIsDeleted()))
