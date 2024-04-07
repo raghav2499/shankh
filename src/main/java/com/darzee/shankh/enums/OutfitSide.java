@@ -33,4 +33,17 @@ public enum OutfitSide {
     public String getView() {
         return this.view;
     }
+
+    public static OutfitSide getEnum(String value) {
+        return outfitSideMap.get(value);
+    }
+
+    public static OutfitSide getEnumByOrdinal(Integer ordinal) {
+        for (OutfitSide outfitSide : OutfitSide.values()) {
+            if (outfitSide.ordinal() == ordinal) {
+                return outfitSide;
+            }
+        }
+        return null;
+    }
 }

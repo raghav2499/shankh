@@ -17,4 +17,24 @@ public class BoutiqueMeasurementDAO {
     private List<String> param;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public BoutiqueMeasurementDAO(Long boutiqueId, OutfitType outfitType, OutfitSide outfitSide, List<String> param) {
+        this.boutiqueId = boutiqueId;
+        this.outfitType = outfitType;
+        this.outfitSide = outfitSide;
+        this.param = param;
+    }
+
+    public boolean isBoutiqueIdUpdated(Long value) {
+        return value != null && !this.boutiqueId.equals(value);
+    }
+
+    public boolean isOutfitTypeUpdated(Integer value) {
+        return value != null && !this.outfitType.getOrdinal().equals(value);
+    }
+
+    
+    
+
+
 }
