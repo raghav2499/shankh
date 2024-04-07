@@ -76,7 +76,7 @@ public class OrderOrderItemCommonService {
         OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         orderService.generateInvoiceV2(orderDAO);
-//        generateItemDetailPdfs(orderDAO);
+        generateItemDetailPdfs(orderDAO);
         return new ResponseEntity<>(summary, HttpStatus.OK);
     }
 
