@@ -102,7 +102,7 @@ public class PdfGenerator {
             context.setVariable("tailorContactNo", tailorContactNo);
             context.setVariable("invoiceNo", order.getInvoiceNo());
             context.setVariable("customerName", customerName);
-            context.setVariable("orderId", order.getId());
+            context.setVariable("orderId", Optional.ofNullable(order.getBoutiqueOrderId()).orElse(order.getId()));
             context.setVariable("orderCreationDate", order.getCreatedAt().format(dateFormatter));
             ZonedDateTime creationZonedDateTime = order.getCreatedAt().atZone(ZoneId.of("Asia/Kolkata"));
             ZonedDateTime updationZonedDateTime = order.getUpdatedAt() == null

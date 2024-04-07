@@ -58,6 +58,6 @@ public class UnderSkirtImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("/underskirt.svg");
+        return s3Client.generateShortLivedUrlForOutfit("underskirt.svg");
     }
 }

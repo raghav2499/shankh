@@ -60,6 +60,6 @@ public class RidaImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("/burqa.svg");
+        return s3Client.generateShortLivedUrlForOutfit("burqa.svg");
     }
 }

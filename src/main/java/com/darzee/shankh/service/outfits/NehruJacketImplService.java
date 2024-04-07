@@ -56,6 +56,6 @@ public class NehruJacketImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("/nehrujacket.svg");
+        return s3Client.generateShortLivedUrlForOutfit("nehrujacket.svg");
     }
 }

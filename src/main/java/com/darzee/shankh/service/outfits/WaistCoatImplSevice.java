@@ -61,7 +61,7 @@ public class WaistCoatImplSevice implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("/waistcost.svg");
+        return s3Client.generateShortLivedUrlForOutfit("waistcost.svg");
     }
 }
 

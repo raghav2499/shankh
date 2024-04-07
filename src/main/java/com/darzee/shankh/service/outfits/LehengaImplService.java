@@ -68,6 +68,6 @@ public class LehengaImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("/lehenga.svg");
+        return s3Client.generateShortLivedUrlForOutfit("lehenga.svg");
     }
 }

@@ -59,6 +59,6 @@ public class ShirtImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("/shirt.svg");
+        return s3Client.generateShortLivedUrlForOutfit("shirt.svg");
     }
 }
