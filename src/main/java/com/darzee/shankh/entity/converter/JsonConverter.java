@@ -8,7 +8,6 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 @Converter
-//@TypeDef(name = "jsonb", typeClass = JsonNodeBinaryType.class)
 public class JsonConverter implements AttributeConverter<JsonNode, String> {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();

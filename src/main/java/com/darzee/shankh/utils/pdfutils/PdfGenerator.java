@@ -3,6 +3,11 @@ package com.darzee.shankh.utils.pdfutils;
 import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.dao.OrderDAO;
+import com.darzee.shankh.dao.OrderItemDAO;
+import com.darzee.shankh.response.InnerMeasurementDetails;
+import com.darzee.shankh.response.OrderStitchOptionDetail;
+import com.darzee.shankh.service.OutfitTypeObjectService;
+import com.darzee.shankh.service.OutfitTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
@@ -14,20 +19,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Component
-public class BillGenerator {
+public class PdfGenerator {
+
+    @Autowired
+    private OutfitTypeObjectService outfitTypeObjectService;
 
     private final TemplateEngine templateEngine;
 
     @Autowired
-    public BillGenerator(TemplateEngine templateEngine) {
+    public PdfGenerator(TemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
         configureTemplateResolver();
     }
@@ -39,8 +44,9 @@ public class BillGenerator {
         templateResolver.setTemplateMode("HTML");
         templateResolver.setCharacterEncoding("UTF-8");
         Set<String> resolvablePatterns = new HashSet<>();
-        resolvablePatterns.add("bill_template");
+//        resolvablePatterns.add("bill_template");
         resolvablePatterns.add("bill_template_v2");
+        resolvablePatterns.add("item-details");
         templateResolver.setResolvablePatterns(resolvablePatterns);
         templateResolver.setCheckExistence(true);
         templateEngine.setTemplateResolver(templateResolver);
@@ -96,16 +102,19 @@ public class BillGenerator {
             context.setVariable("tailorContactNo", tailorContactNo);
             context.setVariable("invoiceNo", order.getInvoiceNo());
             context.setVariable("customerName", customerName);
-            context.setVariable("orderId", order.getId());
+            context.setVariable("orderId", Optional.ofNullable(order.getBoutiqueOrderId()).orElse(order.getId()));
             context.setVariable("orderCreationDate", order.getCreatedAt().format(dateFormatter));
-            ZonedDateTime zonedDateTime = order.getCreatedAt().atZone(ZoneId.of("Asia/Kolkata"));
-            String formattedTime = zonedDateTime.format(timeFormatter);
-            context.setVariable("orderCreationTime", formattedTime);
+            ZonedDateTime creationZonedDateTime = order.getCreatedAt().atZone(ZoneId.of("Asia/Kolkata"));
+            ZonedDateTime updationZonedDateTime = order.getUpdatedAt() == null
+                    ? creationZonedDateTime
+                    : order.getUpdatedAt().atZone(ZoneId.of("Asia/Kolkata")) ;
+            String formattedCreationTime = creationZonedDateTime.format(timeFormatter);
+            context.setVariable("orderCreationTime", formattedCreationTime);
             context.setVariable("orderItems", order.getNonDeletedItems());
             context.setVariable("totalAmount", orderAmount.getTotalAmount());
             context.setVariable("amountPaid", orderAmount.getAmountRecieved());
             context.setVariable("balanceDue", orderAmount.getTotalAmount() - orderAmount.getAmountRecieved());
-            context.setVariable("orderUpdationDate", Date.from(order.getUpdatedAt().toInstant(ZoneOffset.UTC)));
+            context.setVariable("orderUpdationDate", updationZonedDateTime);
             // Process the HTML template with the Thymeleaf template engine
             String processedHtml = templateEngine.process("bill_template_v2", context);
 
@@ -126,5 +135,46 @@ public class BillGenerator {
         }
 
         return null;
+    }
+
+    public File generateItemPdf(Long orderNo, String boutiqueName,
+                                Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions,
+                                List<InnerMeasurementDetails> measurementDetails,
+                                List<String> clothImages,
+                                OrderItemDAO orderItem) throws Exception {
+        Context context = new Context();
+        String outfitType = orderItem.getOutfitType().getDisplayString();
+        Integer outfitPieces = orderItem.getOutfitType().getPieces();
+        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType());
+        String outfitImageLink = outfitTypeService.getOutfitImageLink();
+        String specialInstructions = Optional.ofNullable(orderItem.getSpecialInstructions()).orElse("");
+        String inspiration = Optional.ofNullable(orderItem.getInspiration()).orElse("");
+
+        // Create a JavaScript object and set the dynamic data
+        context.setVariable("businessName", boutiqueName);
+        context.setVariable("orderNo", orderNo);
+        context.setVariable("outfitType", outfitType);
+        context.setVariable("outfitImageLink", outfitImageLink);
+        context.setVariable("outfitPieces", outfitPieces);
+        context.setVariable("measurementDetails", measurementDetails);
+        context.setVariable("groupedStitchOptions", groupedStitchOptions);
+        context.setVariable("specialInstructions", specialInstructions);
+        context.setVariable("inspiration", inspiration);
+        context.setVariable("clothImages", clothImages);
+
+        // Process the HTML template with the Thymeleaf template engine
+        String processedHtml = templateEngine.process("item-details", context);
+
+        // Generate PDF from the processed HTML
+        ITextRenderer renderer = new ITextRenderer();
+        renderer.setDocumentFromString(processedHtml);
+        renderer.layout();
+
+        File outputFile = File.createTempFile("item_details", ".pdf");
+        try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+            renderer.createPDF(outputStream);
+        }
+
+        return outputFile;
     }
 }

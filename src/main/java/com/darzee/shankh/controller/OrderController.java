@@ -41,7 +41,6 @@ public class OrderController {
                                                      @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
                                                      @RequestParam(name = "payment_due", required = false) Boolean paymentDue,
                                                      @RequestParam(name = "order_status_list", required = false, defaultValue = "1,2,3") String orderStatusList,
-//                                                     @RequestParam(name = "sort_key", required = false, defaultValue = "delivery_date") String sortKey,
                                                      @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                      @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
         return orderService.getOrder(boutiqueId, orderItemStatusList, orderStatusList,
@@ -51,34 +50,31 @@ public class OrderController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity getOrderDetails(@PathVariable("id") Long orderId) throws Exception {
-        return orderService.getOrderDetails(orderId);
+    public ResponseEntity getOrderDetails(@PathVariable("id") Long boutiqueOrderId, 
+                                          @RequestParam("boutique_id") Long boutiqueId) throws Exception {
+        return orderService.getOrderDetails(boutiqueOrderId, boutiqueId);
     }
-
-//    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @CrossOrigin
-//    public ResponseEntity updateOrder(@PathVariable("id") Long orderId,
-//                                      @Valid @RequestBody UpdateOrderRequest request) {
-//        return orderService.updateOrder(orderId, request);
-//    }
 
     @PostMapping(value = "/{id}/recieve_payment", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity recievePayment(@PathVariable("id") Long orderId,
+    public ResponseEntity recievePayment(@PathVariable("id") Long boutiqueOrderId,
+                                         @RequestParam("boutique_id") Long boutiqueId,
                                          @Validated @RequestBody RecievePaymentRequest request) {
-        return orderService.recieveOrderPayment(orderId, request);
-    }
-
-    @GetMapping(value = "/{id}/invoice", produces = MediaType.APPLICATION_JSON_VALUE)
-    @CrossOrigin
-    public ResponseEntity getInvoice(@PathVariable("id") Long orderId) {
-        return orderService.getOrderInvoiceLink(orderId);
+        return orderService.recieveOrderPayment(boutiqueOrderId, boutiqueId, request);
     }
 
     @PostMapping(value = "/{id}/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity confirmOrder(@PathVariable("id") Long orderId,
-                                       @Validated(OrderCreationRequest.ConfirmOrder.class) @RequestBody OrderCreationRequest request) {
-        return orderService.confirmOrderAndGenerateInvoice(orderId, request);
+    public ResponseEntity confirmOrder(@PathVariable("id") Long boutiqueOrderId,
+                                       @RequestParam("boutique_id") Long boutiqueId,
+                                       @Validated(OrderCreationRequest.ConfirmOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
+        return orderOrderItemCommonService.confirmOrderAndGenerateInvoice(boutiqueOrderId, boutiqueId, request);
+    }
+
+    @GetMapping(value = "/{id}/invoice_detail", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity getInvoiceDetail(@PathVariable("id") Long boutiqueOrderId,
+                                           @RequestParam("boutique_id") Long boutiqueId) {
+        return orderService.getInvoiceDetail(boutiqueOrderId, boutiqueId);
     }
 }

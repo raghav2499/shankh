@@ -78,7 +78,7 @@ public class OrderItemDAO {
     }
 
     public boolean isStatusUpdated(Integer valueOrd) {
-        OrderItemStatus value = OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(valueOrd);
+        OrderItemStatus value = OrderItemStatus.getOrderItemStatusEnumOrdinalMap().get(valueOrd);
         return value != null && !value.equals(this.getOrderItemStatus());
     }
 
@@ -129,9 +129,15 @@ public class OrderItemDAO {
     }
 
     public Double calculateItemPrice() {
-        return this.priceBreakup.stream().mapToDouble(pb -> pb.getValue() * pb.getQuantity()).sum();
+        List<PriceBreakupDAO> priceBreakupList = getActivePriceBreakUpList();
+        if (!CollectionUtils.isEmpty(priceBreakupList)) {
+            return priceBreakupList.stream()
+                    .mapToDouble(pb -> pb.getValue() * pb.getQuantity())
+                    .sum();
+        }
+        return 0d;
     }
-    
+
     public List<PriceBreakupDAO> getActivePriceBreakUpList() {
         return this.getPriceBreakup().stream()
                 .filter(pb -> !Boolean.TRUE.equals(pb.getIsDeleted()))

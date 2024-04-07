@@ -45,6 +45,9 @@ public class BucketService {
     @Value("invoice/")
     private String invoiceDirectory;
 
+    @Value("items/")
+    private String itemDetailsDirectory;
+
     public FileDetail uploadSingleImage(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
         try {
             Pair<String, String> fileUploadResult = uploadPhoto(multipartFile, uploadFileTypeOrdinal);
@@ -126,14 +129,25 @@ public class BucketService {
         return null;
     }
 
-    public String uploadInvoice(File file, Long orderId) {
-        String fileName = "bill" + orderId;
+    public String uploadInvoice(File file, Long orderId, Long boutiqueId) {
+        String fileName = boutiqueId + "_" + orderId;
         ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, invoiceDirectory + fileName);
         return fileUploadResult.getValue();
     }
 
-    public String getInvoiceShortLivedLink(Long orderId) {
-        String fileLocation = invoiceDirectory + "bill" + orderId;
+    public String uploadItemDetailsPDF(File file, Long orderItemId) {
+        String fileName = String.valueOf(orderItemId);
+        ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, itemDetailsDirectory + fileName);
+        return fileUploadResult.getValue();
+    }
+
+    public String getInvoiceShortLivedLink(Long orderId, Long boutiqueId) {
+        String fileLocation = invoiceDirectory + boutiqueId + "_" + orderId;
+        return client.generateShortLivedUrl(fileLocation);
+    }
+
+    public String getItemDetailsShortLivedLink(Long orderItemId) {
+        String fileLocation = itemDetailsDirectory + orderItemId;
         return client.generateShortLivedUrl(fileLocation);
     }
 
@@ -184,4 +198,6 @@ public class BucketService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception " + e.getMessage(), e);
         }
     }
+
+
 }

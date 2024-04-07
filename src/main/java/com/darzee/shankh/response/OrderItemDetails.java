@@ -42,6 +42,7 @@ public class OrderItemDetails {
     private OverallMeasurementDetails measurementDetails;
     private Map<String, List<OrderStitchOptionDetail>> orderItemStitchOptions;
     private Long orderId;
+    private Long customerId;
     private String customerName;
     private String status;
     private String outfitAlias;
@@ -60,7 +61,8 @@ public class OrderItemDetails {
         this.pieces = outfitType.getPieces();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
         this.customerName = orderItem.getOrder().getCustomer().constructName();
-        this.orderId = orderItem.getOrder().getId();
+        this.customerId = orderItem.getOrder().getCustomer().getId();
+        this.orderId = orderItem.getOrder().getBoutiqueOrderId();
         this.itemPrice = orderItem.calculateItemPrice();
         this.outfitAlias = orderItem.getOutfitAlias();
         this.deliveryDate = orderItem.getDeliveryDate().toString();

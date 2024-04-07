@@ -46,7 +46,7 @@ public class GetOrderDetailsRequest {
                             .split(","))
                     .stream()
                     .map(Integer::parseInt)
-                    .map(requestOrdinal -> OrderItemStatus.getOrderItemTypeEnumOrdinalMap().get(requestOrdinal))
+                    .map(requestOrdinal -> OrderItemStatus.getOrderItemStatusEnumOrdinalMap().get(requestOrdinal))
                     .map(orderItemStatus -> orderItemStatus.ordinal())
                     .collect(Collectors.toList());
             filterMap.put(ITEM_STATUS.getFilterName(), statusList);
@@ -96,6 +96,9 @@ public class GetOrderDetailsRequest {
                 break;
             case "created_at":
                 paramsSortValue = CREATED_AT.getOrderSortString();
+                break;
+            case "id":
+                paramsSortValue = ITEM_ID.getOrderSortString();
                 break;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorting is not supported for " + requestSortKey);

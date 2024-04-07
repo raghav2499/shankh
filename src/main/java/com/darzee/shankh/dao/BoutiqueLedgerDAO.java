@@ -29,14 +29,24 @@ public class BoutiqueLedgerDAO {
         this.setMonthlyPendingAmount(this.getMonthlyPendingAmount() + pendingAmount);
     }
 
-    public void decrementActiveOrderCount() {
-        this.setTotalActiveOrders(Math.max(this.getTotalActiveOrders() - 1, 0));
-        this.setMonthlyActiveOrders(this.getTotalActiveOrders());
+    public void decrementActiveOrderCount(Integer decrValue) {
+        this.setTotalActiveOrders(Math.max(this.getTotalActiveOrders() - decrValue, 0));
+        this.setMonthlyActiveOrders(Math.max(this.getMonthlyActiveOrders() - decrValue, 0));
     }
 
-    public void decrementClosedOrderCount() {
-        this.setTotalClosedOrders(Math.max(this.getTotalClosedOrders() - 1, 0));
-        this.setMonthlyClosedOrders(Math.max(this.getMonthlyClosedOrders() - 1, 0));
+    public void decrementClosedOrderCount(Integer decrValue) {
+        this.setTotalClosedOrders(Math.max(this.getTotalClosedOrders() - decrValue, 0));
+        this.setMonthlyClosedOrders(Math.max(this.getMonthlyClosedOrders() - decrValue, 0));
+    }
+
+    public void incrementActiveOrderCount(Integer incrValue) {
+        this.setTotalActiveOrders(Math.max(this.getTotalActiveOrders() + incrValue, 0));
+        this.setMonthlyActiveOrders(Math.max(this.getMonthlyActiveOrders() + incrValue, 0));
+    }
+
+    public void incrementClosedOrderCount(Integer incrValue) {
+        this.setTotalClosedOrders(Math.max(this.getTotalClosedOrders() + incrValue, 0));
+        this.setMonthlyClosedOrders(Math.max(this.getMonthlyClosedOrders() + incrValue, 0));
     }
 
     public void resetMonthlyDetailsInLedger() {

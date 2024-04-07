@@ -9,11 +9,11 @@ import java.util.Map;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum OutfitSide {
 
-    @JsonProperty("top")
-    TOP("top"),
+    @JsonProperty("Top")
+    TOP("Top"),
 
-    @JsonProperty("bottom")
-    BOTTOM("bottom");
+    @JsonProperty("Bottom")
+    BOTTOM("Bottom");
 
     private String view;
 
@@ -32,5 +32,18 @@ public enum OutfitSide {
 
     public String getView() {
         return this.view;
+    }
+
+    public static OutfitSide getEnum(String value) {
+        return outfitSideMap.get(value);
+    }
+
+    public static OutfitSide getEnumByOrdinal(Integer ordinal) {
+        for (OutfitSide outfitSide : OutfitSide.values()) {
+            if (outfitSide.ordinal() == ordinal) {
+                return outfitSide;
+            }
+        }
+        return null;
     }
 }

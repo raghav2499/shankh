@@ -24,10 +24,10 @@ public class MeasurementRevisionData {
     private Long revisionId;
     private LocalDateTime createdAt;
 
-    public MeasurementRevisionData(MeasurementRevisionsDAO measurementRevisions) {
+    public MeasurementRevisionData(MeasurementRevisionsDAO measurementRevisions, Double dividingFactor) {
         this.customerId = measurementRevisions.getCustomerId();
         this.outfitType = measurementRevisions.getOutfitType().getOrdinal();
-        this.measurementValue = measurementRevisions.getMeasurementValue();
+        this.measurementValue = measurementRevisions.getMeasurementValue(dividingFactor);
         this.createdAt = measurementRevisions.getCreatedAt();
         this.revisionId = measurementRevisions.getId();
     }
