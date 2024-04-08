@@ -31,4 +31,8 @@ public enum PaymentMode {
         paymentOrdinalEnumMap.put(OTHER.ordinal, OTHER);
         return paymentOrdinalEnumMap;
     }
+
+    public Integer getOrdinal() {
+        return ordinal;
+    }
 }

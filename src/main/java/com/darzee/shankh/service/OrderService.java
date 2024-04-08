@@ -5,6 +5,7 @@ import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.entity.Payment;
 import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.enums.OrderType;
@@ -127,7 +128,7 @@ public class OrderService {
                     new CycleAvoidingMappingContext());
             OrderAmountDAO orderAmountDAO = new OrderAmountDAO();
             orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(
-                    mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
+                            mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
             OrderDAO orderDAO = setOrderSpecificDetails(boutiqueDAO, customerDAO);
             orderDAO.setOrderAmount(orderAmountDAO);
@@ -140,10 +141,10 @@ public class OrderService {
     }
 
     public ResponseEntity<GetOrderResponse> getOrder(Long boutiqueId, String orderItemStatusList,
-            String orderStatusList,
-            Boolean priorityOrdersOnly, Long customerId,
-            String deliveryDateFrom, String deliveryDateTill,
-            Boolean paymentDue, Integer countPerPage, Integer pageCount) {
+                                                     String orderStatusList,
+                                                     Boolean priorityOrdersOnly, Long customerId,
+                                                     String deliveryDateFrom, String deliveryDateTill,
+                                                     Boolean paymentDue, Integer countPerPage, Integer pageCount) {
         validateGetOrderRequest(orderItemStatusList, orderStatusList);
         Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, null,
                 orderStatusList, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill,
@@ -188,9 +189,15 @@ public class OrderService {
         for (OrderItemDAO item : order.getOrderItems()) {
             orderItemDetailsList.add(new OrderItemDetails(item, null));
         }
+        Integer paymentMode = null;
+        Optional<Payment> payment = paymentRepo.findTopByOrderIdOrderByIdDesc(orderId);
+        if (payment.isPresent()) {
+            PaymentDAO paymentDAO = mapper.paymentToPaymentDAO(payment.get(), new CycleAvoidingMappingContext());
+            paymentMode = paymentDAO.getPaymentMode().getOrdinal();
+        }
         String message = "Details fetched succesfully";
         OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount,
-                orderItemDetailsList, message);
+                orderItemDetailsList, paymentMode, message);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -470,20 +477,20 @@ public class OrderService {
     // return orderAmount;
     // }
 
-    private Double getAdvancePaid(List<PaymentDAO> payments) {
-        Double advancePaid = 0d;
-        advancePaid = payments.stream()
-                .filter(paymentDAO -> Boolean.TRUE.equals(paymentDAO.getIsAdvancePayment()))
-                .mapToDouble(PaymentDAO::getAmount)
-                .sum();
-        return advancePaid;
-    }
+//    private Double getAdvancePaid(List<PaymentDAO> payments) {
+//        Double advancePaid = 0d;
+//        advancePaid = payments.stream()
+//                .filter(paymentDAO -> Boolean.TRUE.equals(paymentDAO.getIsAdvancePayment()))
+//                .mapToDouble(PaymentDAO::getAmount)
+//                .sum();
+//        return advancePaid;
+//    }
 
-    private Double getTotalAmountPaid(List<PaymentDAO> payments) {
-        Double totalAmountPaid = 0d;
-        totalAmountPaid = payments.stream().mapToDouble(PaymentDAO::getAmount).sum();
-        return totalAmountPaid;
-    }
+//    private Double getTotalAmountPaid(List<PaymentDAO> payments) {
+//        Double totalAmountPaid = 0d;
+//        totalAmountPaid = payments.stream().mapToDouble(PaymentDAO::getAmount).sum();
+//        return totalAmountPaid;
+//    }
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO, List<OrderItemStatus> eligibleStatuses)
             throws Exception {

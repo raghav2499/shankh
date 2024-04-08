@@ -4,6 +4,7 @@ import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.response.FileDetail;
+import com.darzee.shankh.utils.TimeUtils;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,6 +61,7 @@ public class OrderItemDAO {
 
     private LocalDateTime updatedAt;
 
+    private String formattedDeliveryDate;
     private OrderDAO order;
 
     public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions,
@@ -144,4 +147,8 @@ public class OrderItemDAO {
                 .collect(Collectors.toList());
     }
 
+    public void setFormattedDeliveryDate() {
+        DateTimeFormatter deliveryDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm a");
+        this.formattedDeliveryDate = TimeUtils.convertUTCToIST(this.deliveryDate).format(deliveryDateFormatter);
+    }
 }

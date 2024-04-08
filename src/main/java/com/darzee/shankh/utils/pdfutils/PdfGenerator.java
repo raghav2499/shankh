@@ -8,6 +8,7 @@ import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.service.OutfitTypeObjectService;
 import com.darzee.shankh.service.OutfitTypeService;
+import com.darzee.shankh.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
@@ -18,8 +19,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -94,27 +94,31 @@ public class PdfGenerator {
                                OrderDAO order) {
         try {
             Context context = new Context();
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMM, yyyy");
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm z");
+            DateTimeFormatter createdAtDateFormatter = DateTimeFormatter.ofPattern("dd-MM-YYYY");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm a");
             OrderAmountDAO orderAmount = order.getOrderAmount();
             // Create a JavaScript object and set the dynamic data
+            LocalDateTime createdAt = TimeUtils.convertUTCToIST(order.getCreatedAt());
             context.setVariable("businessName", boutiqueDAO.getName());
             context.setVariable("tailorContactNo", tailorContactNo);
             context.setVariable("invoiceNo", order.getInvoiceNo());
             context.setVariable("customerName", customerName);
             context.setVariable("orderId", Optional.ofNullable(order.getBoutiqueOrderId()).orElse(order.getId()));
-            context.setVariable("orderCreationDate", order.getCreatedAt().format(dateFormatter));
-            ZonedDateTime creationZonedDateTime = order.getCreatedAt().atZone(ZoneId.of("Asia/Kolkata"));
-            ZonedDateTime updationZonedDateTime = order.getUpdatedAt() == null
-                    ? creationZonedDateTime
-                    : order.getUpdatedAt().atZone(ZoneId.of("Asia/Kolkata")) ;
-            String formattedCreationTime = creationZonedDateTime.format(timeFormatter);
+            context.setVariable("orderCreationDate", createdAt.format(createdAtDateFormatter));
+            String updationDate = order.getUpdatedAt() == null
+                    ? createdAt.format(createdAtDateFormatter)
+                    : TimeUtils.convertUTCToIST(order.getUpdatedAt()).format(createdAtDateFormatter);
+            String formattedCreationTime = createdAt.format(timeFormatter);
+            List<OrderItemDAO> orderItems = order.getNonDeletedItems();
+            for(OrderItemDAO orderItem : orderItems) {
+                orderItem.setFormattedDeliveryDate();
+            }
             context.setVariable("orderCreationTime", formattedCreationTime);
-            context.setVariable("orderItems", order.getNonDeletedItems());
+            context.setVariable("orderItems", orderItems);
             context.setVariable("totalAmount", orderAmount.getTotalAmount());
             context.setVariable("amountPaid", orderAmount.getAmountRecieved());
             context.setVariable("balanceDue", orderAmount.getTotalAmount() - orderAmount.getAmountRecieved());
-            context.setVariable("orderUpdationDate", updationZonedDateTime);
+            context.setVariable("orderUpdationDate", updationDate);
             // Process the HTML template with the Thymeleaf template engine
             String processedHtml = templateEngine.process("bill_template_v2", context);
 

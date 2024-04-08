@@ -203,22 +203,23 @@ public class MeasurementService {
                 .collect(Collectors.toMap(MeasurementParamDAO::getName,
                         measurementParam -> measurementParam));
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(revisionsDAO.getOutfitType());
-        for (Map.Entry<OutfitSide, List<String>> outfitSideParamList : boutiqueMeasurementParams.entrySet()) {
-            InnerMeasurementDetails innerMeasurementDetails = null;
-            List<String> paramList = outfitSideParamList.getValue();
+        if (boutiqueMeasurementParams.keySet().contains(OutfitSide.TOP)) {
+            List<String> paramList = boutiqueMeasurementParams.get(OutfitSide.TOP);
             List<MeasurementDetails> measurementDetails =
                     getMeasurementDetailsList(revisionsDAO.getMeasurementValue(), CM_TO_INCH_DIVIDING_FACTOR,
                             paramList, paramDetailMap, nonEmptyValuesOnly);
-            if (OutfitSide.TOP.equals(outfitSideParamList.getKey())) {
-                String heading = outfitTypeService.getTopHeading();
-                String imageLink = s3Client.generateShortLivedUrlForMeasurement("/top.svg");
-                innerMeasurementDetails = new InnerMeasurementDetails(heading, measurementDetails, imageLink);
-            } else {
-                String heading = outfitTypeService.getBottomHeading();
-                String imageLink = s3Client.generateShortLivedUrlForMeasurement("/bottom.svg");
-                innerMeasurementDetails = new InnerMeasurementDetails(heading, measurementDetails, imageLink);
-            }
-            innerMeasurementDetailsList.add(innerMeasurementDetails);
+            String heading = outfitTypeService.getTopHeading();
+            String imageLink = s3Client.generateShortLivedUrlForMeasurement("top.svg");
+            innerMeasurementDetailsList.add(new InnerMeasurementDetails(heading, measurementDetails, imageLink));
+        }
+        if (boutiqueMeasurementParams.keySet().contains(OutfitSide.BOTTOM)) {
+            List<String> paramList = boutiqueMeasurementParams.get(OutfitSide.TOP);
+            List<MeasurementDetails> measurementDetails =
+                    getMeasurementDetailsList(revisionsDAO.getMeasurementValue(), CM_TO_INCH_DIVIDING_FACTOR,
+                            paramList, paramDetailMap, nonEmptyValuesOnly);
+            String heading = outfitTypeService.getBottomHeading();
+            String imageLink = s3Client.generateShortLivedUrlForMeasurement("bottom.svg");
+            innerMeasurementDetailsList.add(new InnerMeasurementDetails(heading, measurementDetails, imageLink));
         }
         return innerMeasurementDetailsList;
     }
@@ -277,7 +278,6 @@ public class MeasurementService {
     private OverallMeasurementDetails setMeasurementDetails(MeasurementRevisionsDAO revisionsDAO, MeasurementScale scale,
                                                             Long boutiqueId, Boolean nonEmptyValuesOnly) throws Exception {
         OverallMeasurementDetails overallMeasurementDetails = new OverallMeasurementDetails();
-        Double dividingFactor = MeasurementScale.INCH.equals(scale) ? CM_TO_INCH_DIVIDING_FACTOR : 1;
         List<InnerMeasurementDetails> innerMeasurementDetailsList = new ArrayList<>();
         String measurementRevisionImgLink = null;
 

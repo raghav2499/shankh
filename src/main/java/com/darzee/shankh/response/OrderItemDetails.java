@@ -1,5 +1,6 @@
 package com.darzee.shankh.response;
 
+import com.darzee.shankh.dao.CustomerDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
 import com.darzee.shankh.enums.OutfitType;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -42,7 +43,7 @@ public class OrderItemDetails {
     private OverallMeasurementDetails measurementDetails;
     private Map<String, List<OrderStitchOptionDetail>> orderItemStitchOptions;
     private Long orderId;
-    private Long customerId;
+    private CustomerDetails customerDetails;
     private String customerName;
     private String status;
     private String outfitAlias;
@@ -61,7 +62,6 @@ public class OrderItemDetails {
         this.pieces = outfitType.getPieces();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
         this.customerName = orderItem.getOrder().getCustomer().constructName();
-        this.customerId = orderItem.getOrder().getCustomer().getId();
         this.orderId = orderItem.getOrder().getBoutiqueOrderId();
         this.itemPrice = orderItem.calculateItemPrice();
         this.outfitAlias = orderItem.getOutfitAlias();
@@ -97,5 +97,7 @@ public class OrderItemDetails {
         this.outfitAlias = orderItem.getOutfitAlias();
         this.priceBreakupSummaryList = orderItem.getActivePriceBreakUpList().stream()
                 .map(priceBreakup -> new PriceBreakupSummary(priceBreakup)).collect(Collectors.toList());
+        CustomerDAO customerDAO = orderItem.getOrder().getCustomer();
+        this.customerDetails = new CustomerDetails(customerDAO.getId(), customerDAO.getPhoneNumber());
     }
 }

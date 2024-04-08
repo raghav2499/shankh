@@ -21,4 +21,12 @@ public class TimeUtils {
         return utcDateTime;
 
     }
+
+    public static LocalDateTime convertUTCToIST(LocalDateTime utcLocalDateTime) {
+        ZoneId utcZoneId = ZoneId.of("UTC");
+        LocalDateTime istDateTime = utcLocalDateTime.atZone(utcZoneId).withZoneSameInstant(ZoneId.of("Asia/Kolkata"))
+                .toLocalDateTime();
+        return istDateTime;
+
+    }
 }
