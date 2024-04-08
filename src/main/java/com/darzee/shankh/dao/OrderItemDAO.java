@@ -4,7 +4,6 @@ import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.response.FileDetail;
-import com.darzee.shankh.utils.TimeUtils;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -149,6 +148,6 @@ public class OrderItemDAO {
 
     public void setFormattedDeliveryDate() {
         DateTimeFormatter deliveryDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm a");
-        this.formattedDeliveryDate = TimeUtils.convertUTCToIST(this.deliveryDate).format(deliveryDateFormatter);
+        this.formattedDeliveryDate = this.deliveryDate.format(deliveryDateFormatter);
     }
 }

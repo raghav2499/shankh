@@ -33,7 +33,7 @@ public class OrderItemSummary {
 
     public OrderItemSummary(OrderItemDAO orderItem) {
         this.id = orderItem.getId();
-        this.deliveryDate = orderItem.getDeliveryDate().toString();
+        this.deliveryDate = orderItem.getDeliveryDate() != null ? orderItem.getDeliveryDate().toString() : null;
         this.outfitType = orderItem.getOutfitType().getDisplayString();
         this.trialDate = orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null;
         this.quantity = orderItem.getQuantity();
