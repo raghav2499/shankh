@@ -92,6 +92,7 @@
             padding: 1px;
             position: relative;
             font-size: 14px;
+            font-family: Arial, sans-serif;
         }
 
         #main-para {
@@ -115,13 +116,14 @@
         }
         .right-item2{
             position: absolute;
-            right: 60px;
+            right: 55px;
             top: 17px;
         }
         .right-item3{
             position: absolute;
             right: 60px;
-            top: 17px;
+            top: 16.5px;
+            color: red;
         }
       
     </style>
@@ -156,14 +158,12 @@
                 <div class="order-summary">
                     <h4>Order Summary</h4>
                     <div th:each="item : ${orderItems}" class="order-summary-content">
-                        <h5 class="order-left" th:text="${item.outfitType.getDisplayString()}">
-
-                            <span class="order-right" style="float:right" th:text="${item.calculateItemPrice()}"></span>
-                        </h5>
+                        <h5 class="order-left" th:text="${item.outfitType.getDisplayString()}"></h5>
+                        <span style="float:right;font-size: 14px;margin-top: -40px;font-weight: bold;margin-right: 45px;">Rs</span><span class="order-right" style="float:right;font-size: 14px;margin-top: -40px;font-weight: bold;" th:text="${totalAmount}"></span>
                         <p class="invoice-details" style="font-size: 14px;" th:each="pb : ${item.getPriceBreakup()}">
                            
                             <span class="order-right"
-                                th:text="${pb.component + ' ' + pb.quantity + ' x ' + pb.value + ' =  ₹' + pb.getTotalBreakUpValue()}">
+                                th:text="${pb.component + ' ' + pb.quantity + ' x ' + pb.value + ' =  Rs ' + pb.getTotalBreakUpValue()}">
                                 
                             </span>
                         </p>
@@ -176,17 +176,15 @@
                 </div>
 
                 <div class="total">
-                    <p class="invoice-details left-item" style="font-size: 14px;">Total: <span class="black right-item1">Rs</span><span class="black right-item"
-                            style="float:right;font-size: 14px;" th:text="${totalAmount}"></span></p>
+                    <p class="invoice-details left-item" style="font-size: 14px;">Total: <span class="right-item1">Rs</span><span class="black right-item" style="float:right;font-size: 14px;" th:text="${totalAmount}"></span></p>
                 </div>
                 <div class="total1">
-                    <p class="invoice-details left-item" style="font-size: 14px;">Advance (if any): <span class="black right-item2">Rs</span><span class="black right-item"
-                            style="float:right; font-size: 14px;" th:text="${amountPaid}"></span></p>
+                    <p class="invoice-details left-item" style="font-size: 14px;">Advance (if any): <span class="right-item2">Rs</span><span class="black right-item" style="float:right; font-size: 14px;" th:text="${amountPaid}"></span></p>
                 </div>
                 <div class="balanceDue">
-                    <p class="invoice-details left-item" style="font-size: 14px;">Balance Due: <span class="black right-item3">Rs</span><span id="balanceDue" class="black right-item"
-                            style="float:right; font-size: 14px;color:red" th:text="${balanceDue}"></span></p>
+                    <p class="invoice-details left-item" style="font-size: 14px;">Balance Due: <span class="right-item3">Rs</span><span id="balanceDue" class="black right-item" style="float:right; font-size: 14px;color:red" th:text="${balanceDue}"></span></p>
                 </div>
+                
             </div>
         </div>
         <hr style="height: 1px; border: none; background-color: #000;">
