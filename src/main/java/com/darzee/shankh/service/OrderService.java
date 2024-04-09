@@ -1,5 +1,6 @@
 package com.darzee.shankh.service;
 
+import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
@@ -128,7 +129,7 @@ public class OrderService {
                     new CycleAvoidingMappingContext());
             OrderAmountDAO orderAmountDAO = new OrderAmountDAO();
             orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(
-                            mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
+                    mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
             OrderDAO orderDAO = setOrderSpecificDetails(boutiqueDAO, customerDAO);
             orderDAO.setOrderAmount(orderAmountDAO);
@@ -141,10 +142,10 @@ public class OrderService {
     }
 
     public ResponseEntity<GetOrderResponse> getOrder(Long boutiqueId, String orderItemStatusList,
-                                                     String orderStatusList,
-                                                     Boolean priorityOrdersOnly, Long customerId,
-                                                     String deliveryDateFrom, String deliveryDateTill,
-                                                     Boolean paymentDue, Integer countPerPage, Integer pageCount) {
+            String orderStatusList,
+            Boolean priorityOrdersOnly, Long customerId,
+            String deliveryDateFrom, String deliveryDateTill,
+            Boolean paymentDue, Integer countPerPage, Integer pageCount) {
         validateGetOrderRequest(orderItemStatusList, orderStatusList);
         Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, null,
                 orderStatusList, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill,
@@ -477,20 +478,20 @@ public class OrderService {
     // return orderAmount;
     // }
 
-//    private Double getAdvancePaid(List<PaymentDAO> payments) {
-//        Double advancePaid = 0d;
-//        advancePaid = payments.stream()
-//                .filter(paymentDAO -> Boolean.TRUE.equals(paymentDAO.getIsAdvancePayment()))
-//                .mapToDouble(PaymentDAO::getAmount)
-//                .sum();
-//        return advancePaid;
-//    }
+    // private Double getAdvancePaid(List<PaymentDAO> payments) {
+    // Double advancePaid = 0d;
+    // advancePaid = payments.stream()
+    // .filter(paymentDAO -> Boolean.TRUE.equals(paymentDAO.getIsAdvancePayment()))
+    // .mapToDouble(PaymentDAO::getAmount)
+    // .sum();
+    // return advancePaid;
+    // }
 
-//    private Double getTotalAmountPaid(List<PaymentDAO> payments) {
-//        Double totalAmountPaid = 0d;
-//        totalAmountPaid = payments.stream().mapToDouble(PaymentDAO::getAmount).sum();
-//        return totalAmountPaid;
-//    }
+    // private Double getTotalAmountPaid(List<PaymentDAO> payments) {
+    // Double totalAmountPaid = 0d;
+    // totalAmountPaid = payments.stream().mapToDouble(PaymentDAO::getAmount).sum();
+    // return totalAmountPaid;
+    // }
 
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO, List<OrderItemStatus> eligibleStatuses)
             throws Exception {
@@ -558,12 +559,16 @@ public class OrderService {
     // todo : move this logic to spring state machine
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
     public OrderDAO updateOrderPostItemUpdation(Long orderId) {
+
         OrderDAO orderDAO = mapper.orderObjectToDao(orderRepo.findById(orderId).get(),
                 new CycleAvoidingMappingContext());
+
         BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(
                 boutiqueLedgerRepo.findByBoutiqueId(orderDAO.getBoutiqueId()),
                 new CycleAvoidingMappingContext());
+
         List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems();
+
         boolean allItemsAccepted = orderItems.stream()
                 .filter(item -> OrderItemStatus.ACCEPTED.equals(item.getOrderItemStatus()))
                 .collect(Collectors.toList()).size() == orderItems.size();
@@ -575,10 +580,14 @@ public class OrderService {
         boolean allItemsDelivered = orderItems.stream()
                 .filter(item -> OrderItemStatus.DELIVERED.equals(item.getOrderItemStatus()))
                 .collect(Collectors.toList()).size() == orderItems.size();
+
         if (allItemsDelivered && !OrderStatus.DELIVERED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.DELIVERED);
+
+            // -------------------Error in this line---------------------
             boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO,
                     orderDAO.getBoutiqueId(), 0, 1);
+
         }
         boolean allItemsDeleted = (orderItems.size() == 0);
         if (allItemsDeleted && !Boolean.TRUE.equals(orderDAO.getIsDeleted())) {
@@ -588,6 +597,7 @@ public class OrderService {
         }
         Double orderItemsPriceSum = orderItems.stream().mapToDouble(item -> item.calculateItemPrice()).sum();
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        
         Double orderAmountDelta = 0d;
         if (!orderAmountDAO.getTotalAmount().equals(orderItemsPriceSum)) {
             orderAmountDelta = orderItemsPriceSum - orderAmountDAO.getTotalAmount();

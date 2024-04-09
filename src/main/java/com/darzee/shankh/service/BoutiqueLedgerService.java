@@ -56,36 +56,37 @@ public class BoutiqueLedgerService {
     }
 
     /*
-    Boutique Ledger amount updates in 4 scenarios as of today
-    1. Order confirmation
-        a. + Total amount -> Order Amount
-        b. + Amount Recieved -> Amount Recieved
-    2. Order price updation for any of the items
-    3. Recieving some order payment
-    4. Order deletion
-        a. - Total amount -> Order Amount
-        b. - Amount Recieved -> Order Amount
+     * Boutique Ledger amount updates in 4 scenarios as of today
+     * 1. Order confirmation
+     * a. + Total amount -> Order Amount
+     * b. + Amount Recieved -> Amount Recieved
+     * 2. Order price updation for any of the items
+     * 3. Recieving some order payment
+     * 4. Order deletion
+     * a. - Total amount -> Order Amount
+     * b. - Amount Recieved -> Order Amount
      */
     @Transactional
     public BoutiqueLedgerDAO updateBoutiqueLedgerAmountDetails(BoutiqueLedgerDAO boutiqueLedgerDAO,
-                                                               Long boutiqueId, Double deltaPendingAmount,
-                                                               Double deltaAmountRecieved) {
+            Long boutiqueId, Double deltaPendingAmount,
+            Double deltaAmountRecieved) {
         if (boutiqueLedgerDAO == null) {
             BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
             if (boutiqueLedger != null) {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId),
                         new CycleAvoidingMappingContext());
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Boutique ledger doesn't exist for boutique " + boutiqueId);
             }
         }
         boutiqueLedgerDAO.addOrderAmountToBoutiqueLedger(deltaPendingAmount, deltaAmountRecieved);
-        boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
+        boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(
+                repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
         return boutiqueLedgerDAO;
     }
-
 
     @Transactional
     public BoutiqueLedgerDAO updateCountOnOrderConfirmation(BoutiqueLedgerDAO boutiqueLedgerDAO, Long boutiqueId) {
@@ -95,12 +96,14 @@ public class BoutiqueLedgerService {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId),
                         new CycleAvoidingMappingContext());
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Boutique ledger doesn't exist for boutique " + boutiqueId);
             }
         }
         boutiqueLedgerDAO.incrementActiveOrderCount(1);
-        boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
-                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        boutiqueLedgerDAO = mapper
+                .boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
+                        new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return boutiqueLedgerDAO;
     }
 
@@ -111,37 +114,52 @@ public class BoutiqueLedgerService {
      */
     @Transactional
     public BoutiqueLedgerDAO handleBoutiqueLedgerOnOrderUpdation(BoutiqueLedgerDAO boutiqueLedgerDAO, Long boutiqueId,
-                                                                 Integer activeOrderCountChange,
-                                                                 Integer closedOrderCountChange) {
+            Integer activeOrderCountChange,
+            Integer closedOrderCountChange) {
+
+        System.out.println("Inside handleBoutiqueLedgerOnOrderUpdation");
         if (boutiqueLedgerDAO == null) {
             BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
+            System.out.println("boutiqueLedger : " + boutiqueLedger);
             if (boutiqueLedger != null) {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId),
                         new CycleAvoidingMappingContext());
+                System.out.println("boutiqueLedgerDAO if boutique is not null : " + boutiqueLedgerDAO);
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
+                System.out.println("boutiqueLedger is null");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Boutique ledger doesn't exist for boutique " + boutiqueId);
             }
         }
+
+        System.out.println("Outside if block");
         if (activeOrderCountChange != 0) {
             boutiqueLedgerDAO.incrementActiveOrderCount(activeOrderCountChange);
         }
         if (closedOrderCountChange != 0) {
             boutiqueLedgerDAO.incrementClosedOrderCount(closedOrderCountChange);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
+
+        boutiqueLedgerDAO = mapper
+                .boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
+                        new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+
+        return boutiqueLedgerDAO;
+
     }
 
     @Transactional
     public BoutiqueLedgerDAO handleBoutiqueLedgerOnOrderDeletion(BoutiqueLedgerDAO boutiqueLedgerDAO,
-                                                                 Long boutiqueId,
-                                                                 OrderDAO orderDAO) {
+            Long boutiqueId,
+            OrderDAO orderDAO) {
         if (boutiqueLedgerDAO == null) {
             BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
             if (boutiqueLedger != null) {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId),
                         new CycleAvoidingMappingContext());
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Boutique ledger doesn't exist for boutique " + boutiqueId);
             }
         }
         if (ACTIVE_ORDER_STATUS_LIST.contains(orderDAO.getOrderStatus())) {
@@ -150,8 +168,9 @@ public class BoutiqueLedgerService {
         if (CLOSED_ORDER_STATUS_LIST.contains(orderDAO.getOrderStatus())) {
             boutiqueLedgerDAO.decrementClosedOrderCount(1);
         }
-        boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
-                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        boutiqueLedgerDAO = mapper
+                .boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
+                        new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return boutiqueLedgerDAO;
 
     }
@@ -167,7 +186,8 @@ public class BoutiqueLedgerService {
             Integer month = previousMonthDate.getMonthValue();
             Integer year = previousMonthDate.getYear();
 
-            BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotDAO = new BoutiqueLedgerSnapshotDAO(boutiqueLedgerDAO.getMonthlyPendingAmount(),
+            BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotDAO = new BoutiqueLedgerSnapshotDAO(
+                    boutiqueLedgerDAO.getMonthlyPendingAmount(),
                     boutiqueLedgerDAO.getMonthlyAmountRecieved(),
                     boutiqueLedgerDAO.getMonthlyActiveOrders(),
                     boutiqueId,
@@ -178,7 +198,8 @@ public class BoutiqueLedgerService {
             repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));
             return new ResponseEntity("Boutique data reset successfully", HttpStatus.OK);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ledger doesn't exist for boutique " + boutiqueIdString);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Ledger doesn't exist for boutique " + boutiqueIdString);
     }
 
     public LedgerDashboardData getLedgerDashboardDetails(Long boutiqueId, int month, int year) {
@@ -199,8 +220,8 @@ public class BoutiqueLedgerService {
             Optional<BoutiqueLedgerSnapshot> ledgerSnapshot = snapshotRepo.findByBoutiqueIdAndMonthAndYear(boutiqueId,
                     month, year);
             if (ledgerSnapshot.isPresent()) {
-                BoutiqueLedgerSnapshotDAO ledgerSnapshotDAO =
-                        mapper.boutiqueLedgerSnapshotToSnapshotDAO(ledgerSnapshot.get());
+                BoutiqueLedgerSnapshotDAO ledgerSnapshotDAO = mapper
+                        .boutiqueLedgerSnapshotToSnapshotDAO(ledgerSnapshot.get());
                 ledgerDashboardData = new LedgerDashboardData(ledgerSnapshotDAO);
             }
         }
