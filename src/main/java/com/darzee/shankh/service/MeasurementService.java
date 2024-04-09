@@ -213,7 +213,7 @@ public class MeasurementService {
             innerMeasurementDetailsList.add(new InnerMeasurementDetails(heading, measurementDetails, imageLink));
         }
         if (boutiqueMeasurementParams.keySet().contains(OutfitSide.BOTTOM)) {
-            List<String> paramList = boutiqueMeasurementParams.get(OutfitSide.TOP);
+            List<String> paramList = boutiqueMeasurementParams.get(OutfitSide.BOTTOM);
             List<MeasurementDetails> measurementDetails =
                     getMeasurementDetailsList(revisionsDAO.getMeasurementValue(), CM_TO_INCH_DIVIDING_FACTOR,
                             paramList, paramDetailMap, nonEmptyValuesOnly);

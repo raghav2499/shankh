@@ -4,6 +4,7 @@ import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
+import com.darzee.shankh.enums.OutfitSide;
 import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.service.OutfitTypeObjectService;
@@ -110,7 +111,7 @@ public class PdfGenerator {
                     : TimeUtils.convertUTCToIST(order.getUpdatedAt()).format(createdAtDateFormatter);
             String formattedCreationTime = createdAt.format(timeFormatter);
             List<OrderItemDAO> orderItems = order.getNonDeletedItems();
-            for(OrderItemDAO orderItem : orderItems) {
+            for (OrderItemDAO orderItem : orderItems) {
                 orderItem.setFormattedDeliveryDate();
             }
             context.setVariable("orderCreationTime", formattedCreationTime);
@@ -153,6 +154,13 @@ public class PdfGenerator {
         String outfitImageLink = outfitTypeService.getOutfitImageLink();
         String specialInstructions = Optional.ofNullable(orderItem.getSpecialInstructions()).orElse("");
         String inspiration = Optional.ofNullable(orderItem.getInspiration()).orElse("");
+        List<List<OrderStitchOptionDetail>> groupedStitchOptionList = new ArrayList<>();
+        if (groupedStitchOptions.containsKey(OutfitSide.TOP.getView())) {
+            groupedStitchOptionList.add(groupedStitchOptions.get(OutfitSide.TOP.getView()));
+        }
+        if (groupedStitchOptions.containsKey(OutfitSide.BOTTOM.getView())) {
+            groupedStitchOptionList.add(groupedStitchOptions.get(OutfitSide.BOTTOM.getView()));
+        }
 
         // Create a JavaScript object and set the dynamic data
         context.setVariable("businessName", boutiqueName);
@@ -161,7 +169,7 @@ public class PdfGenerator {
         context.setVariable("outfitImageLink", outfitImageLink);
         context.setVariable("outfitPieces", outfitPieces);
         context.setVariable("measurementDetails", measurementDetails);
-        context.setVariable("groupedStitchOptions", groupedStitchOptions);
+        context.setVariable("groupedStitchOptions", groupedStitchOptionList);
         context.setVariable("specialInstructions", specialInstructions);
         context.setVariable("inspiration", inspiration);
         context.setVariable("clothImages", clothImages);
