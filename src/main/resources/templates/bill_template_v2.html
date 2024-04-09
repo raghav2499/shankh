@@ -111,7 +111,7 @@
        
         .right-item1{
             position: absolute;
-            right: 70px;
+            right: 72.5px;
             top: 17px;
         }
         .right-item2{
@@ -121,7 +121,7 @@
         }
         .right-item3{
             position: absolute;
-            right: 60px;
+            right: 62.5px;
             top: 16.5px;
             color: red;
         }
@@ -159,7 +159,7 @@
                     <h4>Order Summary</h4>
                     <div th:each="item : ${orderItems}" class="order-summary-content">
                         <h5 class="order-left" th:text="${item.outfitType.getDisplayString()}"></h5>
-                        <span style="float:right;font-size: 14px;margin-top: -40px;font-weight: bold;margin-right: 45px;">Rs</span><span class="order-right" style="float:right;font-size: 14px;margin-top: -40px;font-weight: bold;" th:text="${totalAmount}"></span>
+                        <span style="float:right;font-size: 14px;margin-top: -40px;font-weight: bold;margin-right: 48.5px;">Rs</span><span class="order-right" style="float:right;font-size: 14px;margin-top: -40px;font-weight: bold;" th:text="${item.calculateItemPrice()}"></span>
                         <p class="invoice-details" style="font-size: 14px;" th:each="pb : ${item.getPriceBreakup()}">
                            
                             <span class="order-right"
