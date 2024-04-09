@@ -92,8 +92,6 @@ public class MeasurementService {
         validateGetMeasurementRequestParams(customerId, orderItemId, outfitTypeIndex, scale);
         Long boutiqueId = customerRepo.findById(customerId).get().getBoutique().getId();
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);
-        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
-
         MeasurementRevisions measurementRevision = getMeasurementObject(customerId, orderItemId, outfitType);
         MeasurementRevisionsDAO revisionsDAO = new MeasurementRevisionsDAO(customerId, outfitType, new HashMap<>());
         if (measurementRevision != null) {
@@ -332,9 +330,13 @@ public class MeasurementService {
         List<MeasurementDetails> measurementDetailsList = new ArrayList<>();
         int idx = 0;
         for (String param : params) {
-            String value = measurementValue.get(param) == null
-                    ? ""
-                    : String.valueOf(measurementValue.get(param) / dividingFactor);
+            Double paramValue = measurementValue.get(param);
+            String value = "";
+            if (paramValue != null) {
+                Double normalisedValue = (paramValue / dividingFactor);
+                Double roundedValue = Math.round(normalisedValue * 100.0) / 100.0;
+                value = String.valueOf(roundedValue);
+            }
             MeasurementParamDAO measurementParam = getMeasurementParams(paramDetailMap, param);
             String imageLink = s3Client.generateShortLivedUrlForMeasurement(measurementParam.getFileName());
             MeasurementDetails measurementDetails = new MeasurementDetails(imageLink,

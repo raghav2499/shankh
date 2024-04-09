@@ -36,9 +36,10 @@ public class MeasurementRevisionsDAO {
     }
 
     public Map<String, Double> getMeasurementValue(Double dividingFactor) {
-        for(String key: measurementValue.keySet()) {
-           Double val  = measurementValue.get(key)/dividingFactor;
-           measurementValue.put(key, val);
+        for (String key : measurementValue.keySet()) {
+            Double normalisedValue = measurementValue.get(key) / dividingFactor;
+            Double roundedValue = Math.round(normalisedValue * 100.0) / 100.0;
+            measurementValue.put(key, roundedValue);
         }
         return measurementValue;
     }
