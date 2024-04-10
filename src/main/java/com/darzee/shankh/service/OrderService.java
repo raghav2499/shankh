@@ -389,12 +389,10 @@ public class OrderService {
         try {
             OrderDAO orderDAO = findOrder(orderId, boutiqueId);
             if (orderDAO == null) {
-
                 return new ResponseEntity("Order not found", HttpStatus.NOT_FOUND);
             }
 
             OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-
             String invoiceDateTime = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
             String boutiqueName = orderDAO.getBoutique().getName();
             String customerName = orderDAO.getCustomer().constructName();

@@ -264,9 +264,11 @@ public class MeasurementService {
         List<String> boutiqueParams = boutiqueMeasurementParams.values().stream().flatMap(List::stream)
                 .collect(Collectors.toList());
         Map<String, Double> customerMeasurementDetails = measurementRequest.getMeasurements();
-        for (String boutiqueParam : boutiqueParams) {
-            if (customerMeasurementDetails.containsKey(boutiqueParam)) {
-                measurementValue.put(boutiqueParam, customerMeasurementDetails.get(boutiqueParam) * multiplyingFactor);
+        if(!CollectionUtils.isEmpty(customerMeasurementDetails)) {
+            for (String boutiqueParam : boutiqueParams) {
+                if (customerMeasurementDetails.containsKey(boutiqueParam)) {
+                    measurementValue.put(boutiqueParam, customerMeasurementDetails.get(boutiqueParam) * multiplyingFactor);
+                }
             }
         }
         MeasurementRevisionsDAO revisions = new MeasurementRevisionsDAO(customerId, outfitType, measurementValue);
