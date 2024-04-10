@@ -7,6 +7,7 @@ import com.darzee.shankh.response.OutfitDetails;
 import com.darzee.shankh.response.PortfolioSubOutfit;
 import com.darzee.shankh.response.SubOutfitTypeDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +25,8 @@ public class OutfitService {
 
     @Autowired
     private OutfitTypeObjectService outfitTypeObjectService;
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     private StitchOptionsRepo stitchOptionsRepo;
@@ -39,12 +44,14 @@ public class OutfitService {
         return new ResponseEntity(outfitDetailsList, HttpStatus.OK);
     }
 
-    public ResponseEntity<SubOutfitTypeDetailResponse> getSubOutfits(Integer outfitTypeOrdinal) throws Exception {
+    public ResponseEntity<SubOutfitTypeDetailResponse> getSubOutfits(Integer outfitTypeOrdinal, Locale locale) throws Exception {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeOrdinal);
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         Map<Integer, String> subOutfitDetails = outfitTypeService.getSubOutfitMap();
         List<PortfolioSubOutfit> subOutfits = subOutfitDetails.entrySet().stream()
-                .map(subOutfit -> new PortfolioSubOutfit(subOutfit.getKey(), subOutfit.getValue()))
+                .map(subOutfit -> new PortfolioSubOutfit(subOutfit.getKey(),
+                        messageSource.getMessage("suboutfit." + subOutfit.getValue().toLowerCase().replace(" ", "_"),
+                                null, locale)))
                 .collect(Collectors.toList());
         String successMessage = "Details fetched successfully";
         SubOutfitTypeDetailResponse response = new SubOutfitTypeDetailResponse(successMessage, subOutfits);

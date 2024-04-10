@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
+
 @RestController
 @RequestMapping("/outfit")
 public class OutfitController {
@@ -28,8 +30,10 @@ public class OutfitController {
 
     @GetMapping(value = "/sub_outfit", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<SubOutfitTypeDetailResponse> getSubOutfits(@RequestParam("outfit_type") Integer outfitType) throws Exception {
-        return outfitService.getSubOutfits(outfitType);
+    public ResponseEntity<SubOutfitTypeDetailResponse> getSubOutfits(
+            @RequestHeader(name = "Accept-Language", required = false) final Locale locale,
+            @RequestParam("outfit_type") Integer outfitType) throws Exception {
+        return outfitService.getSubOutfits(outfitType, locale);
     }
 
     @GetMapping(value = "/{outfit_type}/stitch_options", produces = MediaType.APPLICATION_JSON_VALUE)
