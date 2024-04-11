@@ -106,14 +106,13 @@ public class OrderService {
     public OrderDAO findOrCreateNewOrder(Long orderId, Long boutiqueId, Long customerId) {
         OrderDAO orderDAO = null;
         if (orderId != null) {
-            Optional<Order> optionalOrder = orderRepo.findById(orderId);
-            if (optionalOrder.isPresent()) {
-                orderDAO = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
+            try {
+                orderDAO = findOrder(orderId, boutiqueId);
+                return orderDAO;
+            } catch (Exception e) {
             }
         }
-        if (orderDAO == null) {
-            orderDAO = createNewOrder(boutiqueId, customerId);
-        }
+        orderDAO = createNewOrder(boutiqueId, customerId);
         return orderDAO;
     }
 
@@ -237,7 +236,7 @@ public class OrderService {
     // }
 
     @Transactional
-    public OrderDAO confirmOrder(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) {
+    public OrderDAO confirmOrder(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
         OrderDAO orderDAO = findOrder(boutiqueOrderId, boutiqueId);
         if (!orderDAO.validateMandatoryOrderFields()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
@@ -330,14 +329,15 @@ public class OrderService {
     }
 
     @Transactional
-    public ResponseEntity recieveOrderPayment(Long orderId, Long boutiqueId, RecievePaymentRequest request) {
+    public ResponseEntity recieveOrderPayment(Long orderId, Long boutiqueId, RecievePaymentRequest request) throws Exception {
         OrderDAO orderDAO = findOrder(orderId, boutiqueId);
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
         Double amountRecieved = request.getAmount();
         if (amountRecieved > pendingAmount) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Amount recieved is greater than pending order amount");
+                    "Amount recieved is greater than pending order amount. Amount Received : "
+                            + amountRecieved + " Pending Amount : " + pendingAmount);
         }
         orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() + amountRecieved);
         orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
@@ -385,7 +385,6 @@ public class OrderService {
     }
 
     public ResponseEntity<InvoiceDetailResponse> getInvoiceDetail(Long orderId, Long boutiqueId) {
-
         try {
             OrderDAO orderDAO = findOrder(orderId, boutiqueId);
             if (orderDAO == null) {
@@ -592,8 +591,7 @@ public class OrderService {
             orderAmountDAO.setTotalAmount(orderItemsPriceSum);
         }
         orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
-        orderAmountRepo
-                .save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
+        orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
         if (orderAmountDelta != 0) {
             Double deltaPendingAmount = orderAmountDelta;
             boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(boutiqueLedgerDAO, orderDAO.getBoutiqueId(),
@@ -683,12 +681,12 @@ public class OrderService {
         }
     }
 
-    public OrderDAO findOrder(Long boutiqueOrderId, Long boutiqueId) {
+    public OrderDAO findOrder(Long boutiqueOrderId, Long boutiqueId) throws Exception {
         Optional<Order> order = orderRepo.findByBoutiqueOrderIdAndBoutiqueId(boutiqueOrderId, boutiqueId);
         if (!order.isPresent()) {
             order = orderRepo.findById(boutiqueOrderId);
             if (!order.isPresent()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
+                throw new Exception("Invalid order ID");
             }
         }
         OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());

@@ -52,7 +52,7 @@ public class BucketController {
 
     @PostMapping(value = "/file/link", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity getFileLink(@Valid @RequestBody GetFileLinkRequest request) {
+    public ResponseEntity getFileLink(@Valid @RequestBody GetFileLinkRequest request) throws Exception {
         return fileLinkService.getFileLinkResponse(request);
     }
 }

@@ -147,6 +147,9 @@ public class OrderItemDAO {
     }
 
     public void setFormattedDeliveryDate() {
+        if (this.deliveryDate == null) {
+            return;
+        }
         DateTimeFormatter deliveryDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm a");
         this.formattedDeliveryDate = this.deliveryDate.format(deliveryDateFormatter);
     }
