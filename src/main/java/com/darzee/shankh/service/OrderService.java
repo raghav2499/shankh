@@ -602,7 +602,7 @@ public class OrderService {
 
     public Pair getItemsCount(Long boutiqueId, LocalDateTime startTime, LocalDateTime endTime) {
         Integer newItemsCount = orderRepo.getNewItemsCount(boutiqueId, startTime, endTime);
-        Integer closedItemsCount = orderRepo.getNewItemsCount(boutiqueId, startTime, endTime);
+        Integer closedItemsCount = orderRepo.getCompletedItemsCount(boutiqueId, startTime, endTime);
         return Pair.of(newItemsCount, closedItemsCount);
     }
 

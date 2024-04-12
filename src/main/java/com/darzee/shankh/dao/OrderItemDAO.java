@@ -42,7 +42,7 @@ public class OrderItemDAO {
     private String inspiration;
 
     private Boolean isPriorityOrder;
-    private Boolean isDeleted;
+    private Boolean isDeleted = Boolean.FALSE;
 
     private OrderItemStatus orderItemStatus = OrderItemStatus.DRAFTED;
 
