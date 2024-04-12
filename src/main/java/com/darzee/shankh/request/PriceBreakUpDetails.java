@@ -11,4 +11,5 @@ public class PriceBreakUpDetails {
     private String component;
     private Double value;
     private Integer componentQuantity = 1;
+    private Boolean isDeleted;
 }

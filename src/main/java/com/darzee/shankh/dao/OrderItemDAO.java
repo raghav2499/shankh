@@ -134,6 +134,7 @@ public class OrderItemDAO {
         List<PriceBreakupDAO> priceBreakupList = getActivePriceBreakUpList();
         if (!CollectionUtils.isEmpty(priceBreakupList)) {
             return priceBreakupList.stream()
+                    .filter(pb -> !Boolean.TRUE.equals(pb.getIsDeleted()))
                     .mapToDouble(pb -> pb.getValue() * pb.getQuantity())
                     .sum();
         }
