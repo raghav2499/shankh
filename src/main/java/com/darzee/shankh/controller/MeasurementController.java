@@ -21,11 +21,13 @@ public class MeasurementController {
     public ResponseEntity getMeasurementDetails(@RequestParam(value = "customer_id", required = false) Long customerId,
                                                 @RequestParam(value = "outfit_type", required = false) Integer outfitTypeIndex,
                                                 @RequestParam(value = "order_item_id", required = false) Long orderItemId,
+                                                @RequestParam(value = "measurement_revision_id", required = false) Long measurementRevisionId,
                                                 @RequestParam(value = "scale", defaultValue = "inch") String scale,
                                                 @RequestParam(value = "non_empty_values_only", required = false)
                                                 Boolean nonEmptyValuesOnly)
             throws Exception {
-        return measurementService.getMeasurementDetailsResponse(customerId, orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
+        return measurementService.getMeasurementDetailsResponse(customerId, measurementRevisionId,
+                orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
     }
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)

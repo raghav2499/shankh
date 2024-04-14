@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -94,6 +95,9 @@ public class OrderOrderItemCommonService {
         List<OrderItemDAO> savedItems = new ArrayList<>();
         for (OrderItemDetailRequest itemDetailRequest : alreadySavedItems) {
             OrderItemDAO orderItemDAO = orderItemService.updateOrderItem(itemDetailRequest.getId(), itemDetailRequest);
+            if (!CollectionUtils.isEmpty(itemDetailRequest.getPriceBreakup())) {
+                priceBreakUpService.updatePriceBreakups(itemDetailRequest.getPriceBreakup(), orderItemDAO);
+            }
             savedItems.add(orderItemDAO);
         }
         List<OrderItemDAO> allItems = collateAllItems(allOrderItems, savedItems);
@@ -171,7 +175,7 @@ public class OrderOrderItemCommonService {
         Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions =
                 stitchOptionService.getOrderItemStitchOptions(orderItemDAO.getId());
         MeasurementRevisions measurementRevisions =
-                measurementService.getMeasurementObject(customerId, orderItemDAO.getId(),
+                measurementService.getMeasurementObject(null, customerId, orderItemDAO.getId(),
                         orderItemDAO.getOutfitType());
         List<InnerMeasurementDetails> innerMeasurementDetailsList = new ArrayList<>();
         if (measurementRevisions != null) {
