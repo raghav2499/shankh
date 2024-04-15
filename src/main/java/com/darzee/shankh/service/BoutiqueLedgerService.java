@@ -85,6 +85,8 @@ public class BoutiqueLedgerService {
                 repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
+        System.out.println("++++++++++++++boutiqueLedgerDAO inside updateBoutiqueLedgerAmountDetails++++++++++++ : "
+                + boutiqueLedgerDAO);
         return boutiqueLedgerDAO;
     }
 
@@ -139,13 +141,10 @@ public class BoutiqueLedgerService {
         if (closedOrderCountChange != 0) {
             boutiqueLedgerDAO.incrementClosedOrderCount(closedOrderCountChange);
         }
-
         boutiqueLedgerDAO = mapper
                 .boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
                         new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-
         return boutiqueLedgerDAO;
-
     }
 
     @Transactional

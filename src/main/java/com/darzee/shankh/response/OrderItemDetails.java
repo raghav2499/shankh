@@ -55,7 +55,7 @@ public class OrderItemDetails {
         this.isPriorityOrder = Optional.ofNullable(orderItem.getIsPriorityOrder()).orElse(Boolean.FALSE);
         this.outfitType = outfitType.getDisplayString();
         this.trialDate = (orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null);
-        this.deliveryDate = orderItem.getDeliveryDate().toString();
+        this.deliveryDate = (orderItem.getDeliveryDate() != null ? orderItem.getDeliveryDate().toString() : null);
         this.itemQuantity = orderItem.getQuantity();
         this.outfitTypeIndex = outfitType.getOrdinal();
         this.outfitTypeImageLink = outfitTypeImgLink;

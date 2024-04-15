@@ -108,14 +108,13 @@ public class OrderService {
     public OrderDAO findOrCreateNewOrder(Long orderId, Long boutiqueId, Long customerId) {
         OrderDAO orderDAO = null;
         if (orderId != null) {
-            Optional<Order> optionalOrder = orderRepo.findById(orderId);
-            if (optionalOrder.isPresent()) {
-                orderDAO = mapper.orderObjectToDao(optionalOrder.get(), new CycleAvoidingMappingContext());
+            try {
+                orderDAO = findOrder(orderId, boutiqueId);
+                return orderDAO;
+            } catch (Exception e) {
             }
         }
-        if (orderDAO == null) {
-            orderDAO = createNewOrder(boutiqueId, customerId);
-        }
+        orderDAO = createNewOrder(boutiqueId, customerId);
         return orderDAO;
     }
 
@@ -239,17 +238,26 @@ public class OrderService {
     // }
 
     @Transactional
-    public OrderDAO confirmOrder(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) {
+    public OrderDAO confirmOrder(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
+
+        System.out.println("+++++++++++++Inside confirmOrder++++++++++++++ : " + request);
+
         OrderDAO orderDAO = findOrder(boutiqueOrderId, boutiqueId);
+
+        System.out.println("+++++++++++++Inside confirmOrder orderDAO++++++++++++++ : " + orderDAO);
         if (!orderDAO.validateMandatoryOrderFields()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Some mandatory fields in order are missing." +
                             " Boutique ID and customer ID are mandatory fields");
         }
         orderItemService.validateMandatoryOrderItemFields(orderDAO.getOrderItems());
+        System.out.println("+++++++++++++Inside confirmOrder orderDAO++++++++++++++ : "
+                + orderItemService.validateMandatoryOrderItemFields(orderDAO.getOrderItems()));
+
         Double priceBreakupSum = orderDAO.getPriceBreakupSum();
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         Double totalOrderAmount = orderAmountDAO.getTotalAmount();
+
         if (!priceBreakupSum.equals(totalOrderAmount)) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Items' Price Breakups are not summing up to total amount. " +
@@ -260,15 +268,24 @@ public class OrderService {
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
                 new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         orderItemService.acceptOrderItems(orderDAO.getNonDeletedItems());
+
+        System.out.println("+++++++++++++Request advance amount++++++++++ : "
+                + request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived());
         if (request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived() != null) {
             Double advanceAmount = request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived();
 
-            System.out.println("+++++++++++++++advance amount++++++++++++ : " + advanceAmount);
+//-------------------Erorr causing line
             orderAmountDAO.setAmountRecieved(advanceAmount);
             orderAmountRepo
                     .save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
+            
+            //get the saved order amount from DB
+            
+        
+
             paymentService.recordPayment(advanceAmount, PaymentMode.CASH, Boolean.TRUE, orderDAO);
         }
+
         updateBoutiqueLedgerOnOrderConfirmation(orderAmountDAO, orderDAO);
         return orderDAO;
     }
@@ -334,14 +351,16 @@ public class OrderService {
     }
 
     @Transactional
-    public ResponseEntity recieveOrderPayment(Long orderId, Long boutiqueId, RecievePaymentRequest request) {
+    public ResponseEntity recieveOrderPayment(Long orderId, Long boutiqueId, RecievePaymentRequest request)
+            throws Exception {
         OrderDAO orderDAO = findOrder(orderId, boutiqueId);
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
         Double amountRecieved = request.getAmount();
         if (amountRecieved > pendingAmount) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Amount recieved is greater than pending order amount");
+                    "Amount recieved is greater than pending order amount. Amount Received : "
+                            + amountRecieved + " Pending Amount : " + pendingAmount);
         }
         orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() + amountRecieved);
         orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
@@ -380,6 +399,11 @@ public class OrderService {
         String customerName = customerDAO.constructName();
         BoutiqueDAO boutique = orderDAO.getBoutique();
         TailorDAO tailorDAO = boutique.getAdminTailor();
+
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+
+        System.out.println("+++++++++++++++Amount Recieved in GenerateInvoice++++++++++++ : "
+                + orderAmountDAO.getAmountRecieved());
         File bill = pdfGenerator.generateBillV2(boutique, customerName,
                 tailorDAO.getPhoneNumber(), orderDAO);
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
@@ -389,16 +413,13 @@ public class OrderService {
     }
 
     public ResponseEntity<InvoiceDetailResponse> getInvoiceDetail(Long orderId, Long boutiqueId) {
-
         try {
             OrderDAO orderDAO = findOrder(orderId, boutiqueId);
             if (orderDAO == null) {
-
                 return new ResponseEntity("Order not found", HttpStatus.NOT_FOUND);
             }
 
             OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-
             String invoiceDateTime = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
             String boutiqueName = orderDAO.getBoutique().getName();
             String customerName = orderDAO.getCustomer().constructName();
@@ -566,6 +587,7 @@ public class OrderService {
                 orderDAO.getBoutiqueId(),
                 amountPending, amountRecieved);
         boutiqueLedgerService.updateCountOnOrderConfirmation(ledger, orderDAO.getBoutiqueId());
+
     }
 
     // todo : move this logic to spring state machine
@@ -628,7 +650,7 @@ public class OrderService {
 
     public Pair getItemsCount(Long boutiqueId, LocalDateTime startTime, LocalDateTime endTime) {
         Integer newItemsCount = orderRepo.getNewItemsCount(boutiqueId, startTime, endTime);
-        Integer closedItemsCount = orderRepo.getNewItemsCount(boutiqueId, startTime, endTime);
+        Integer closedItemsCount = orderRepo.getCompletedItemsCount(boutiqueId, startTime, endTime);
         return Pair.of(newItemsCount, closedItemsCount);
     }
 
@@ -707,12 +729,12 @@ public class OrderService {
         }
     }
 
-    public OrderDAO findOrder(Long boutiqueOrderId, Long boutiqueId) {
+    public OrderDAO findOrder(Long boutiqueOrderId, Long boutiqueId) throws Exception {
         Optional<Order> order = orderRepo.findByBoutiqueOrderIdAndBoutiqueId(boutiqueOrderId, boutiqueId);
         if (!order.isPresent()) {
             order = orderRepo.findById(boutiqueOrderId);
             if (!order.isPresent()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order ID");
+                throw new Exception("Invalid order ID");
             }
         }
         OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());

@@ -59,7 +59,7 @@ public class OrderController {
     @CrossOrigin
     public ResponseEntity recievePayment(@PathVariable("id") Long boutiqueOrderId,
                                          @RequestParam("boutique_id") Long boutiqueId,
-                                         @Validated @RequestBody RecievePaymentRequest request) {
+                                         @Validated @RequestBody RecievePaymentRequest request) throws Exception {
         return orderService.recieveOrderPayment(boutiqueOrderId, boutiqueId, request);
     }
 

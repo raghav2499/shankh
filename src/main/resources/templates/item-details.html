@@ -198,6 +198,9 @@
 
 
 
+
+
+
     </style>
 </head>
 
@@ -238,18 +241,20 @@
                         <table>
                             <thead>
                             <!-- Iterate over each row -->
-                            <tr th:each="row : ${measurementDetails.get(0).getMeasurementDetailsList()}">
-                                <!-- Iterate over each column in the row -->
-                                <th
-                                        th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
-                                    <img th:src="@{row.imageLink}" alt="No Image"></img>
-                                    <div>
-                                        <!-- Access the outer and inner spans -->
-                                        <span class="span-outer" th:text="${row.getTitle()}"></span>
-                                        <span class="span-inner" th:text="${row.getValue()}"></span>
-                                    </div>
-                                </th>
-                            </tr>
+                            <div th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 1}">
+                                <tr th:each="row : ${measurementDetails.get(0).getMeasurementDetailsList()}">
+                                    <!-- Iterate over each column in the row -->
+                                    <th
+                                            th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
+                                        <img th:src="@{row.imageLink}" alt="No Image"></img>
+                                        <div>
+                                            <!-- Access the outer and inner spans -->
+                                            <span class="span-outer" th:text="${row.getTitle()}"></span>
+                                            <span class="span-inner" th:text="${row.getValue()}"></span>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </div>
                             </thead>
                         </table>
 
@@ -291,18 +296,20 @@
                         <table>
                             <thead>
                             <!-- Iterate over each row -->
-                            <tr th:each="row : ${measurementDetails.get(0}.getMeasurementDetailsList()">
-                                <!-- Iterate over each column in the row -->
-                                <th
-                                        th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
-                                    <img th:src="@{row.imageLink}" alt="No Image"></img>
-                                    <div>
-                                        <!-- Access the outer and inner spans -->
-                                        <span class="span-outer" th:text="${row.getTitle()}"></span>
-                                        <span class="span-inner" th:text="${row.getValue()}"></span>
-                                    </div>
-                                </th>
-                            </tr>
+                            <div th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 1}">
+                                <tr th:each="row : ${measurementDetails.get(0}.getMeasurementDetailsList()">
+                                    <!-- Iterate over each column in the row -->
+                                    <th
+                                            th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
+                                        <img th:src="@{row.imageLink}" alt="No Image"></img>
+                                        <div>
+                                            <!-- Access the outer and inner spans -->
+                                            <span class="span-outer" th:text="${row.getTitle()}"></span>
+                                            <span class="span-inner" th:text="${row.getValue()}"></span>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </div>
                             </thead>
                         </table>
 
@@ -335,19 +342,21 @@
                         <table>
                             <thead>
                             <!-- Iterate over each row -->
-                            <tr th:each="row : ${measurementDetails.get(1).getMeasurementDetailsList()}">
-                                <!-- Iterate over each column in the row -->
-                                <th
-                                        th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
-                                    <img th:src="@{row.imageLink}" alt="No Image"></img>
-                                    <div>
-                                        <!-- Access the outer and inner spans -->
-                                        <span class="span-outer" th:text="${row.getTitle()}"></span>
-                                        <span class="span-inner" th:text="${row.getValue()}"></span>
-                                    </div>
-                                </th>
+                            <div th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 2}">
+                                <tr th:each="row : ${measurementDetails.get(1).getMeasurementDetailsList()}">
+                                    <!-- Iterate over each column in the row -->
+                                    <th
+                                            th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
+                                        <img th:src="@{row.imageLink}" alt="No Image"></img>
+                                        <div>
+                                            <!-- Access the outer and inner spans -->
+                                            <span class="span-outer" th:text="${row.getTitle()}"></span>
+                                            <span class="span-inner" th:text="${row.getValue()}"></span>
+                                        </div>
+                                    </th>
 
-                            </tr>
+                                </tr>
+                            </div>
                             </thead>
                         </table>
 
