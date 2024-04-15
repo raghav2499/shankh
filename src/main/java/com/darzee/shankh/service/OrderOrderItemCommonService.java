@@ -72,10 +72,17 @@ public class OrderOrderItemCommonService {
         public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId,
                         OrderCreationRequest request) throws Exception {
                 OrderDAO orderDAO = orderService.confirmOrder(boutiqueOrderId, boutiqueId, request);
+
+                System.out.println("+++++++++++++++++OrderDAO++++++++++++++++" + orderDAO);
                 OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+                System.out.println(
+                                "+++++++++++++++++OrderAmountDAO++++++++++++++++" + orderAmountDAO.getAmountRecieved());
                 OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
                                 orderDAO.getNonDeletedItems());
+
+                System.out.println("+++++++++++++++++summary++++++++++++" + summary);
+
                 orderService.generateInvoiceV2(orderDAO);
                 generateItemDetailPdfs(orderDAO);
                 return new ResponseEntity<>(summary, HttpStatus.OK);

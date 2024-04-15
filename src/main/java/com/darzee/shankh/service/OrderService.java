@@ -27,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -261,6 +262,8 @@ public class OrderService {
         orderItemService.acceptOrderItems(orderDAO.getNonDeletedItems());
         if (request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived() != null) {
             Double advanceAmount = request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived();
+
+            System.out.println("+++++++++++++++advance amount++++++++++++ : " + advanceAmount);
             orderAmountDAO.setAmountRecieved(advanceAmount);
             orderAmountRepo
                     .save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
@@ -402,9 +405,18 @@ public class OrderService {
             String recieveDateTime = orderDAO.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME);
             OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                     orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
+            PaymentDAO paymentDAO = paymentService.getPaymentDAOByOrderId(orderId);
+            Integer paymentMode;
+
+            if (paymentDAO != null) {
+                paymentMode = paymentDAO.getPaymentMode().getOrdinal();
+            } else {
+                paymentMode = null;
+            }
 
             InvoiceDetailResponse response = new InvoiceDetailResponse(invoiceDateTime,
-                    boutiqueName, customerName, recieveDateTime, summary);
+                    boutiqueName, customerName, recieveDateTime, summary,
+                    paymentMode);
 
             return new ResponseEntity(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -597,7 +609,7 @@ public class OrderService {
         }
         Double orderItemsPriceSum = orderItems.stream().mapToDouble(item -> item.calculateItemPrice()).sum();
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-        
+
         Double orderAmountDelta = 0d;
         if (!orderAmountDAO.getTotalAmount().equals(orderItemsPriceSum)) {
             orderAmountDelta = orderItemsPriceSum - orderAmountDAO.getTotalAmount();

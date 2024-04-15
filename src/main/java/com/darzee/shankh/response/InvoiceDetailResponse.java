@@ -1,6 +1,7 @@
 package com.darzee.shankh.response;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.darzee.shankh.dao.PriceBreakupDAO;
 import com.darzee.shankh.entity.Order;
@@ -26,13 +27,15 @@ public class InvoiceDetailResponse {
     String boutiqueName;
     String customerName;
     String recieveDateTime;
+    Optional<Integer> paymentMode;
 
     OrderSummary orderSummary;
 
     public InvoiceDetailResponse( String invoiceDateTime, String boutiqueName,
             String customerName,
             String recieveDateTime,
-            OrderSummary orderSummary
+            OrderSummary orderSummary,
+            Integer paymentMode
 
     ) {
 
@@ -41,6 +44,7 @@ public class InvoiceDetailResponse {
         this.customerName = customerName;
         this.recieveDateTime = recieveDateTime;
         this.orderSummary = orderSummary;
+        this.paymentMode = Optional.ofNullable(paymentMode);
     }
 
 }
