@@ -124,6 +124,7 @@
             border: 1.5px solid #DEDEDF;
             font-weight: 700;
         }
+       
 
         .span-outer {
             float: left;
@@ -139,16 +140,16 @@
             margin-right: 14px;
         }
 
-        table th img {
+        /* table th img {
             height: 54px;
             width: 69px;
             float: left;
             box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.15);
             vertical-align: middle;
-        }
+        } */
 
         .text-bg-primary {
-            width: 70px;
+            width: auto;
             background-color: #007bff;
             /* Primary color */
             color: white;
@@ -156,7 +157,7 @@
             margin-bottom: 15px;
 
             /* Text color */
-            padding: 5px 5px;
+            padding: 5px 10px;
             /* Adjust padding as needed */
             border-radius: 10px;
             /* Adjust border radius to make it more rounded */
@@ -180,7 +181,6 @@
         .new-row {
             display: block;
             width: 100%;
-            clear: both;
         }
 
         .card {
@@ -217,12 +217,14 @@
 
             <!--If only one item is present starts-->
 
-            <th:block th:if="${#lists.size(outfitPieces) == 1}">
+            <th:block th:if="${outfitPieces == 1}">
+                <span th:text="${outfitPieces}"></span>
                 <div class="top">
                     <div>
                         <button class="badge rounded-pill text-bg-primary">
-                            <img th:src="@{outfitImageLink}" alt="Icon" width="20" height="20" style="margin-right: 5px;"></img>
-                            <span th:text="${outfitType}" style="float: right;margin-top: 3px;">Pant</span>
+                            <img th:src="@{outfitImageLink}" alt="Icon" width="20" height="20"
+                                style="margin-right: 5px;"></img>
+                            <span th:text="${outfitType}" style="margin-bottom: 10px;"></span>
                         </button>
                     </div>
                     <p class="invoice mt-4">Measurements</p>
@@ -233,35 +235,38 @@
                         <div class="size-chart">
                             <table>
                                 <thead>
-                                    <!-- Iterate over each row -->
-                                    <tr th:each="row : ${measurementDetails}">
-                                        <!-- Iterate over each column in the row -->
-                                        <th
-                                            th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
+
+                                    <tr th:if="${measurementDetails != null}"
+                                        th:each="row : ${measurementDetails.get(0).getMeasurementDetailsList()}">
+
+                                        <th th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
                                             <img th:src="@{row.imageLink}" alt="No Image"></img>
                                             <div>
-                                                <!-- Access the outer and inner spans -->
-                                                <span class="span-outer" th:text="${row.title}"></span>
-                                                <span class="span-inner" th:text="${row.value}"></span>
+
+                                                <span class="span-outer" th:text="${row.getTitle()}"></span>
+                                                <span class="span-inner" th:text="${row.getValue()}"></span>
                                             </div>
                                         </th>
                                     </tr>
+
                                 </thead>
                             </table>
 
 
-
                         </div>
-                        <div th:each="stich_options : ${groupedStitchOptions}" class="stich_options"
-                            style="display: flex; flex-wrap: wrap;width: 100%;">
-                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
-                            <div style="width: 100%; height: 0; clear: both;"></div>
-                            <div class="small" style="margin-right: 50px;" th:text="${stich_options.label}"> <span
-                                    style="font-weight: bold;" th:text="${stich_options.value}"></span>
+                        <div th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 1}">
+                            <div th:each="stich_options : ${groupedStitchOptions.get(0)}" class="stich_options"
+                                style="display: flex; flex-wrap: wrap;width: 100%;">
+                                <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+                                <div>
+                                    <span th:text="${stich_options.getLabel()}"> </span>
+                                    <span th:text="${stich_options.getValue()}"> </span>
+                                </div>
+
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+
                             </div>
-
-                            <div style="width: 100%; height: 0; clear: both;"></div>
-
                         </div>
                         <div style="width: 100%; height: 0; clear: both;"></div>
                     </fieldset>
@@ -272,119 +277,151 @@
 
 
             <!--If more than one item is present starts -->
-            <th:block th:if="${#lists.size(outfitPieces) > 1}">
+            <th:block th:if="${outfitPieces > 1}">
                 <div class="top">
-                    <button class="badge rounded-pill text-bg-primary">Pant</button>
-                    </button>
+                    <div>
+                        <button class="badge rounded-pill text-bg-primary">
+                            <img th:src="@{outfitImageLink}" alt="Icon" width="20" height="20"
+                                style="margin-right: 5px;"></img>
+                            <span th:text="${outfitType}" style="margin-bottom: 10px;"></span>
+                        </button>
+                    </div>
                     <p class="invoice mt-4">Measurements</p>
 
                     <fieldset class="clother_measurements_div"
                         style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
-                        <legend class="invoice mt-4">Top</legend>
+                        <legend
+                            style="padding: 0 10px; border: 1px solid #DEDEDF; border-radius: 5px; background-color: #FFFFFF; color: #333333;">
+                            Top</legend>
                         <div class="size-chart">
                             <table>
-                                <thead>    
-                                    <!-- Iterate over each row -->
-                                    <tr th:each="row : ${measurementDetails}">
-                                        <!-- Iterate over each column in the row -->
-                                        <th 
-                                            th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
-                                            <img th:src="@{row.imageLink}" alt="No Image"></img>
+                                <tbody>
+                                    <tr th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
+                                        <td th:each="detail, detailStat: ${row}" 
+                                            th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}">
+                                            <img th:src="@{https://picsum.photos/200/300}" alt="No Image" />
                                             <div>
-                                                <!-- Access the outer and inner spans -->
-                                                <span class="span-outer" th:text="${row.title}"></span>
-                                                <span class="span-inner" th:text="${row.value}"></span>
+                                                
+                                                <span class="span-outer" th:text="${detail.getTitle()}"></span>
+                                                <span class="span-inner" th:text="${detail.getValue()}"></span>
                                             </div>
-                                        </th>
+                                        </td>
                                     </tr>
-                                </thead>
+                                </tbody>
                             </table>
 
 
-
                         </div>
-                        <div th:each="stich_options : ${groupedStitchOptions}" class="stich_options"
-                            style="display: flex; flex-wrap: wrap;width: 100%;">
-                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
-                            <div style="width: 100%; height: 0; clear: both;"></div>
-                            <div class="small" style="margin-right: 50px;" th:text="${stich_options.label}"> <span
-                                    style="font-weight: bold;" th:text="${stich_options.value}"></span>
+                        <div th:if="${groupedStitchOptions != null}">
+                            <div th:each="stich_options : ${groupedStitchOptions.get(0)}" class="stich_options"
+                                style="display: flex; flex-wrap: wrap;width: 100%;">
+                                <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+                                <div>
+                                    <span th:text="${stich_options.getLabel()}"> </span>
+                                    <span th:text="${stich_options.getValue()}"> </span>
+                                </div>
+
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+
                             </div>
-
-                            <div style="width: 100%; height: 0; clear: both;"></div>
-
                         </div>
                         <div style="width: 100%; height: 0; clear: both;"></div>
                     </fieldset>
                 </div>
 
-                <!--Bottom Starts-->
+                <!-- Bottom Starts -->
                 <div class="bottom" style="margin-top: 30px;">
                     <fieldset class="clother_measurements_div"
                         style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
-                        <legend class="invoice mt-4">Bottom</legend>
+                        <legend
+                            style="padding: 0 10px; border: 1px solid #DEDEDF; border-radius: 5px; background-color: #FFFFFF; color: #333333;">
+                            Bottom</legend>
                         <div class="size-chart">
                             <table>
-                                <thead>
-                                    <!-- Iterate over each row -->
-                                    <tr th:each="row : ${measurementDetails}">
-                                        <!-- Iterate over each column in the row -->
-                                        <th
-                                            th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
-                                            <img th:src="@{row.imageLink}" alt="No Image"></img>
+                                <tbody>
+                                    <tr th:each="row, rowStat: ${measurementDetails.get(1).getMeasurementDetailsList()}">
+                                        <td th:each="detail, detailStat: ${row}" 
+                                            th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}">
+                                            <img th:src="@{https://picsum.photos/200/300}" alt="No Image" />
                                             <div>
-                                                <!-- Access the outer and inner spans -->
-                                                <span class="span-outer" th:text="${row.title}"></span>
-                                                <span class="span-inner" th:text="${row.value}"></span>
+                                                
+                                                <span class="span-outer" th:text="${detail.getTitle()}"></span>
+                                                <span class="span-inner" th:text="${detail.getValue()}"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <!-- <table>
+                                <thead>
+
+                                    <tr>
+                                        <th th:each="row, rowStat: ${measurementDetails.get(1).getMeasurementDetailsList()}"
+                                            th:classappend="${rowStat.index != 0 and rowStat.index % 3 == 0 ? 'new-row' : ''}">
+                                            <div th:if="${rowStat.index % 3 == 0}" th:remove="tag"></div>
+                                            <img th:src="@{${row.imageLink}}" alt="No Image" />
+                                            <div>
+
+                                                <span class="span-outer" th:text="${row.getTitle()}"></span>
+                                                <span class="span-inner" th:text="${row.getValue()}"></span>
+                                            </div>
+                                            <div th:if="${rowStat.index % 3 == 2 or rowStat.last}" th:remove="tag">
                                             </div>
                                         </th>
 
                                     </tr>
                                 </thead>
-                            </table>
-
+                            </table> -->
 
 
                         </div>
-                        <div th:each="stich_options : ${groupedStitchOptions}" class="stich_options"
-                            style="display: flex; flex-wrap: wrap;width: 100%;">
-                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
-                            <div style="width: 100%; height: 0; clear: both;"></div>
-                            <div class="small" style="margin-right: 50px;" th:text="${stich_options.label}"> <span
-                                    style="font-weight: bold;" th:text="${stich_options.value}"></span>
+                        <div th:if="${groupedStitchOptions != null}">
+                            <div th:each="stich_options : ${groupedStitchOptions.get(1)}" class="stich_options"
+                                style="display: flex; flex-wrap: wrap;width: 100%;">
+                                <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+                                <div>
+                                    <span th:text="${stich_options.getLabel()}"> </span>
+                                    <span th:text="${stich_options.getValue()}"> </span>
+                                </div>
+
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+
                             </div>
-
-                            <div style="width: 100%; height: 0; clear: both;"></div>
-
                         </div>
                         <div style="width: 100%; height: 0; clear: both;"></div>
                     </fieldset>
                 </div>
             </th:block>
+
             <!--If more than one item is present ends -->
         </div>
 
-        <div class="special-instructions">
+        <div class="special-instructions" th:if="${not #lists.isEmpty(specialInstructions)}">
             <p class="invoice">Special Instructions</p>
             <p class="black" th:text="${specialInstructions}"></p>
         </div>
 
-        <div class="Inspiration">
+        <div class="Inspiration" th:if="${not #lists.isEmpty(inspiration)}">
             <p class="invoice">Inspiration</p>
-            <a th:href="@{inspiration}"></a>
+            <a th:href="${inspiration}" target="_blank" rel="noopener noreferrer">Link to Inspiration</a>
         </div>
 
-        <div class="image_div">
+
+        <div class="image_div" th:if="${not #lists.isEmpty(clothImages)}">
             <p class="invoice">Cloth Images</p>
             <div class="image-row">
                 <!-- Iterate over each image -->
-                <div class="image-col">
+                <div class="image-col" th:each="image : ${clothImages}">
                     <div class="card">
-                        <img th:src="@{clothImages}" width="100%" height="150px" class="card-img-top" alt="Image"></img>
+                        <img th:src="${image.url}" width="100%" height="150px" class="card-img-top" alt="Image"></img>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </body>
 
