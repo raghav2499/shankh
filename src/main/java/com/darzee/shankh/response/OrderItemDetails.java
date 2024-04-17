@@ -65,7 +65,7 @@ public class OrderItemDetails {
         this.orderId = orderItem.getOrder().getBoutiqueOrderId();
         this.itemPrice = orderItem.calculateItemPrice();
         this.outfitAlias = orderItem.getOutfitAlias();
-        this.deliveryDate = orderItem.getDeliveryDate().toString();
+        this.deliveryDate = orderItem.getDeliveryDate() != null ? orderItem.getDeliveryDate().toString() : null;
         this.priceBreakupSummaryList = orderItem.getActivePriceBreakUpList().stream()
                 .map(priceBreakup -> new PriceBreakupSummary(priceBreakup)).collect(Collectors.toList());
     }

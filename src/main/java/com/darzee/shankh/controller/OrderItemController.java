@@ -62,6 +62,15 @@ public class OrderItemController {
         return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);
     }
 
+    @PutMapping(value = "/order_item/stitch_options", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity<CreateStitchResponse> updateStitchOptions(@Valid @RequestBody CreateStitchOptionRequest request) {
+        StitchSummary stitchSummary = stitchOptionService.updateStitchOptions(request);
+        CreateStitchResponse createStitchResponse = new CreateStitchResponse("Stitch options created successfully",
+                stitchSummary);
+        return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);
+    }
+
     @GetMapping(value = "/order_item", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<GetOrderItemResponse> getOrderItems(@RequestParam(name = "boutique_id", required = false) Long boutiqueId,

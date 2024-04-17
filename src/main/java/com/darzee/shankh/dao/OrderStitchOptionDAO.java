@@ -19,6 +19,7 @@ public class OrderStitchOptionDAO {
     private Long stitchOptionId;
     private List<String> values;
     private Long orderItemId;
+    private Boolean isValid = Boolean.TRUE;
 
     public OrderStitchOptionDAO(Long stitchOptionId, List<String> values) {
         this.stitchOptionId = stitchOptionId;

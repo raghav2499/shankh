@@ -123,7 +123,7 @@ public class OrderItemDAO {
                             + outfitAlias
                             + "are missing. Delivery date, Order type, Outfit Type are Mandatory params");
         }
-        if (CollectionUtils.isEmpty(this.priceBreakup)) {
+        if (CollectionUtils.isEmpty(this.getActivePriceBreakUpList())) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Price Break Up of Order Item " + outfitAlias + " is missing");
         }
