@@ -62,10 +62,11 @@ public class OrderItemController {
         return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/order_item/stitch_options", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/order_item/{id}/stitch_options", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<CreateStitchResponse> updateStitchOptions(@Valid @RequestBody CreateStitchOptionRequest request) {
-        StitchSummary stitchSummary = stitchOptionService.updateStitchOptions(request);
+    public ResponseEntity<CreateStitchResponse> updateStitchOptions(@PathVariable("id") Long orderItemId,
+                                                                    @Valid @RequestBody CreateStitchOptionRequest request) {
+        StitchSummary stitchSummary = stitchOptionService.updateStitchOptions(orderItemId, request);
         CreateStitchResponse createStitchResponse = new CreateStitchResponse("Stitch options created successfully",
                 stitchSummary);
         return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);
@@ -75,7 +76,7 @@ public class OrderItemController {
     @CrossOrigin
     public ResponseEntity<GetOrderItemResponse> getOrderItems(@RequestParam(name = "boutique_id", required = false) Long boutiqueId,
                                                               @RequestParam(name = "order_id", required = false) Long orderId,
-                                                              @RequestParam(name = "order_item_status_list",required = false, defaultValue = "1,2,3,4,5,6,7") String orderItemStatusList,
+                                                              @RequestParam(name = "order_item_status_list", required = false, defaultValue = "1,2,3,4,5,6,7") String orderItemStatusList,
                                                               @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
                                                               @RequestParam(name = "delivery_date_from", required = false) String deliveryDateFrom,
                                                               @RequestParam(name = "delivery_date_till", required = false) String deliveryDateTill,

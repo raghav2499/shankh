@@ -7,15 +7,20 @@ import com.darzee.shankh.entity.StitchOptions;
 import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.OrderItemRepo;
+import com.darzee.shankh.repo.OrderRepo;
 import com.darzee.shankh.repo.OrderStitchOptionsRepo;
 import com.darzee.shankh.repo.StitchOptionsRepo;
 import com.darzee.shankh.request.CreateStitchOptionRequest;
 import com.darzee.shankh.request.innerObjects.StitchDetails;
-import com.darzee.shankh.response.*;
+import com.darzee.shankh.response.GetOrderStitchOptionResponse;
+import com.darzee.shankh.response.GetStitchOptionsResponse;
+import com.darzee.shankh.response.OrderStitchOptionDetail;
+import com.darzee.shankh.response.StitchSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
@@ -38,6 +43,8 @@ public class StitchOptionService {
 
     @Autowired
     private DaoEntityMapper mapper;
+    @Autowired
+    private OrderRepo orderRepo;
 
     @Transactional
     public StitchSummary createStitchOptions(CreateStitchOptionRequest createStitchOptionRequest) {
@@ -57,23 +64,26 @@ public class StitchOptionService {
     }
 
     @Transactional
-    public StitchSummary updateStitchOptions(CreateStitchOptionRequest updateStitchOptionRequest) {
+    public StitchSummary updateStitchOptions(Long orderItemId, CreateStitchOptionRequest updateStitchOptionRequest) {
         validateUpdateStitchOptionRequest(updateStitchOptionRequest);
-        Long orderItemId = updateStitchOptionRequest.getOrderItemId();
         List<StitchDetails> stitchDetails = updateStitchOptionRequest.getStitchDetails();
-        List<OrderStitchOptionDAO> orderStitchOptionDAOs = mapper.orderStitchOptionListToOrderStitchOptionDAOList(
+        List<OrderStitchOptionDAO> existingStitchOptions = mapper.orderStitchOptionListToOrderStitchOptionDAOList(
                 orderStitchOptionsRepo.findAllByOrderItemIdAndIsValid(orderItemId, Boolean.TRUE));
-        for(OrderStitchOptionDAO existingStitchOptions : orderStitchOptionDAOs) {
-            existingStitchOptions.setIsValid(Boolean.FALSE);
+        for(OrderStitchOptionDAO stitchOption : existingStitchOptions) {
+            stitchOption.setIsValid(Boolean.FALSE);
         }
+        List<OrderStitchOptionDAO> newStitchOptions = new ArrayList<>();
         for (StitchDetails newStitchDetail : stitchDetails) {
             OrderStitchOptionDAO orderStitchOptionDAO = new OrderStitchOptionDAO(newStitchDetail.getStitchOptionId(),
-                    newStitchDetail.getValues());
-            orderStitchOptionDAOs.add(orderStitchOptionDAO);
+                    newStitchDetail.getValues(), orderItemId);
+            newStitchOptions.add(orderStitchOptionDAO);
         }
-        orderStitchOptionDAOs = mapper.orderStitchOptionListToOrderStitchOptionDAOList(
-                orderStitchOptionsRepo.saveAll(mapper.orderStitchOptionDAOListToOrderStitchOptionList(orderStitchOptionDAOs)));
-        return new StitchSummary(orderStitchOptionDAOs);
+        if(!CollectionUtils.isEmpty(existingStitchOptions)) {
+            orderStitchOptionsRepo.saveAll(mapper.orderStitchOptionDAOListToOrderStitchOptionList(existingStitchOptions));
+        }
+        newStitchOptions = mapper.orderStitchOptionListToOrderStitchOptionDAOList(
+                orderStitchOptionsRepo.saveAll(mapper.orderStitchOptionDAOListToOrderStitchOptionList(newStitchOptions)));
+        return new StitchSummary(newStitchOptions);
     }
 
     @Transactional
@@ -104,9 +114,6 @@ public class StitchOptionService {
         List<StitchOptions> stitchOptions = stitchOptionsRepo.findAllByIdIn(stitchOptionIdInRequest);
         if (stitchOptions == null || stitchOptions.size() != request.getStitchDetails().size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some Stitch Option ID is invalid");
-        }
-        if(request.getOrderItemId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order Item ID is mandatory");
         }
     }
 
