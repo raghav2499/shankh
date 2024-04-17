@@ -124,7 +124,7 @@
             border: 1.5px solid #DEDEDF;
             font-weight: 700;
         }
-       
+
 
         .span-outer {
             float: left;
@@ -296,12 +296,13 @@
                         <div class="size-chart">
                             <table>
                                 <tbody>
-                                    <tr th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
-                                        <td th:each="detail, detailStat: ${row}" 
+                                    <tr
+                                        th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
+                                        <td th:each="detail, detailStat: ${row}"
                                             th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}">
                                             <img th:src="@{https://picsum.photos/200/300}" alt="No Image" />
                                             <div>
-                                                
+
                                                 <span class="span-outer" th:text="${detail.getTitle()}"></span>
                                                 <span class="span-inner" th:text="${detail.getValue()}"></span>
                                             </div>
@@ -340,12 +341,13 @@
                         <div class="size-chart">
                             <table>
                                 <tbody>
-                                    <tr th:each="row, rowStat: ${measurementDetails.get(1).getMeasurementDetailsList()}">
-                                        <td th:each="detail, detailStat: ${row}" 
+                                    <tr
+                                        th:each="row, rowStat: ${measurementDetails.get(1).getMeasurementDetailsList()}">
+                                        <td th:each="detail, detailStat: ${row}"
                                             th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}">
                                             <img th:src="@{https://picsum.photos/200/300}" alt="No Image" />
                                             <div>
-                                                
+
                                                 <span class="span-outer" th:text="${detail.getTitle()}"></span>
                                                 <span class="span-inner" th:text="${detail.getValue()}"></span>
                                             </div>
@@ -353,28 +355,6 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            
-                            <!-- <table>
-                                <thead>
-
-                                    <tr>
-                                        <th th:each="row, rowStat: ${measurementDetails.get(1).getMeasurementDetailsList()}"
-                                            th:classappend="${rowStat.index != 0 and rowStat.index % 3 == 0 ? 'new-row' : ''}">
-                                            <div th:if="${rowStat.index % 3 == 0}" th:remove="tag"></div>
-                                            <img th:src="@{${row.imageLink}}" alt="No Image" />
-                                            <div>
-
-                                                <span class="span-outer" th:text="${row.getTitle()}"></span>
-                                                <span class="span-inner" th:text="${row.getValue()}"></span>
-                                            </div>
-                                            <div th:if="${rowStat.index % 3 == 2 or rowStat.last}" th:remove="tag">
-                                            </div>
-                                        </th>
-
-                                    </tr>
-                                </thead>
-                            </table> -->
-
 
                         </div>
                         <div th:if="${groupedStitchOptions != null}">
