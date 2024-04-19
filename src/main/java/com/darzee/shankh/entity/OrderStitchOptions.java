@@ -27,4 +27,7 @@ public class OrderStitchOptions {
 
     @Column(name = "order_item_id")
     private Long orderItemId;
+
+    @Column(name = "is_valid")
+    private Boolean isValid;
 }

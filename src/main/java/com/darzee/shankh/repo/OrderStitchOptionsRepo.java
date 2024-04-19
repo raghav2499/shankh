@@ -11,5 +11,5 @@ public interface OrderStitchOptionsRepo extends JpaRepository<OrderStitchOptions
     List<OrderStitchOptions> findAllByIdIn(List<Long> ids);
     List<OrderStitchOptions> findAllByOrderItemIdIn(List<Long> orderItemIds);
 
-    List<OrderStitchOptions> findAllByOrderItemId(Long orderItemId);
+    List<OrderStitchOptions> findAllByOrderItemIdAndIsValid(Long orderItemId, Boolean isValid);
 }
