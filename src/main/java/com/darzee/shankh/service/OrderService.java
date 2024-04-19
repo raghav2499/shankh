@@ -1,6 +1,5 @@
 package com.darzee.shankh.service;
 
-import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
@@ -112,8 +111,10 @@ public class OrderService {
                 orderDAO = findOrder(orderId, boutiqueId);
                 return orderDAO;
             } catch (Exception e) {
+                System.out.println(e);
             }
         }
+
         orderDAO = createNewOrder(boutiqueId, customerId);
         return orderDAO;
     }
@@ -269,20 +270,15 @@ public class OrderService {
                 new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         orderItemService.acceptOrderItems(orderDAO.getNonDeletedItems());
 
-        System.out.println("+++++++++++++Request advance amount++++++++++ : "
-                + request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived());
         if (request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived() != null) {
             Double advanceAmount = request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived();
 
-//-------------------Erorr causing line
             orderAmountDAO.setAmountRecieved(advanceAmount);
             orderAmountRepo
-                    .save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
-            
-            //get the saved order amount from DB
-            
-        
+                    .saveAndFlush(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
+                            new CycleAvoidingMappingContext()));
 
+            // get the saved order amount from DB
             paymentService.recordPayment(advanceAmount, PaymentMode.CASH, Boolean.TRUE, orderDAO);
         }
 
@@ -402,8 +398,6 @@ public class OrderService {
 
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
 
-        System.out.println("+++++++++++++++Amount Recieved in GenerateInvoice++++++++++++ : "
-                + orderAmountDAO.getAmountRecieved());
         File bill = pdfGenerator.generateBillV2(boutique, customerName,
                 tailorDAO.getPhoneNumber(), orderDAO);
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());

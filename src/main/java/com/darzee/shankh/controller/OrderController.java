@@ -24,12 +24,24 @@ public class OrderController {
     @Autowired
     private OrderOrderItemCommonService orderOrderItemCommonService;
 
+    /**
+     * Creates new or Updates existing order.
+     *
+     * @param request
+     *      The request containing the order details.
+     * @return
+     *      The summary of the created order.
+     * @throws Exception
+     *      In case of any error.
+     */
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<OrderSummary> createOrder(@Validated(OrderCreationRequest.CreateOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
+    public ResponseEntity<OrderSummary> createOrder(@Validated(OrderCreationRequest.CreateOrder.class) @RequestBody OrderCreationRequest request)
+            throws Exception {
         OrderSummary response = orderOrderItemCommonService.createOrder(request);
-        return new ResponseEntity(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin

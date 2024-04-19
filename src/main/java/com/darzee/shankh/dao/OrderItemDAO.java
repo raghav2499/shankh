@@ -3,6 +3,7 @@ package com.darzee.shankh.dao;
 import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderType;
 import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.request.PriceBreakUpDetails;
 import com.darzee.shankh.response.FileDetail;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -64,8 +65,8 @@ public class OrderItemDAO {
     private OrderDAO order;
 
     public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions,
-                        OrderType orderType, OutfitType outfitType, String inspiration, Boolean isPriorityOrder,
-                        Integer quantity, String outfitAlias, MeasurementRevisionsDAO measurementRevision, OrderDAO orderDAO) {
+            OrderType orderType, OutfitType outfitType, String inspiration, Boolean isPriorityOrder,
+            Integer quantity, String outfitAlias, MeasurementRevisionsDAO measurementRevision, OrderDAO orderDAO) {
         this.trialDate = trialDate;
         this.deliveryDate = deliveryDate;
         this.specialInstructions = specialInstructions;
@@ -100,7 +101,6 @@ public class OrderItemDAO {
         return value != null && !value.equals(this.getInspiration());
     }
 
-
     public boolean isPriorityUpdated(Boolean value) {
         return value != null && !value.equals(this.getIsPriorityOrder());
     }
@@ -112,7 +112,7 @@ public class OrderItemDAO {
     public boolean isMeasurementRevisionUpdated(Long value) {
         return (this.measurementRevision == null && value != null)
                 || (this.measurementRevision != null && value != null && !value.equals(
-                this.getMeasurementRevision().getId()));
+                        this.getMeasurementRevision().getId()));
     }
 
     public boolean mandatoryFieldsPresent() {
@@ -154,4 +154,29 @@ public class OrderItemDAO {
         DateTimeFormatter deliveryDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm a");
         this.formattedDeliveryDate = this.deliveryDate.format(deliveryDateFormatter);
     }
+
+    public boolean isPriceBreakupListUpdated(List<PriceBreakUpDetails> priceBreakupList) {
+        // If any of the lists is empty, then they are definitely not equal
+        if (CollectionUtils.isEmpty(priceBreakupList) || CollectionUtils.isEmpty(this.priceBreakup)) {
+            return !CollectionUtils.isEmpty(priceBreakupList) || !CollectionUtils.isEmpty(this.priceBreakup);
+        }
+        // If the size of the lists is different, then they are definitely not equal
+        if (priceBreakupList.size() != this.priceBreakup.size()) {
+            return true;
+        }
+        // Check if any of the elements in the list are different
+        return priceBreakupList.stream().anyMatch(pb -> {
+            // Find the element in the OrderItem list with a matching id
+            Optional<PriceBreakupDAO> existingPb = this.priceBreakup.stream()
+                    .filter(epb -> epb.getId().equals(pb.getId())).findFirst();
+            // If the element is not found, or any of the fields are different, then it's a
+            // different list
+            return !existingPb.isPresent() ||
+                    !existingPb.get().getValue().equals(pb.getValue()) ||
+                    !existingPb.get().getQuantity().equals(pb.getComponentQuantity()) ||
+                    !existingPb.get().getIsDeleted().equals(pb.getIsDeleted())
+                    || !existingPb.get().getComponent().equals(pb.getComponent());
+        });
+    }
+
 }
