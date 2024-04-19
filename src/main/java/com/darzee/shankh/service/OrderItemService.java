@@ -65,20 +65,28 @@ public class OrderItemService {
 
     @Autowired
     private AmazonClient s3Client;
+
     @Autowired
     private DaoEntityMapper mapper;
+
     @Autowired
     private MeasurementService measurementService;
+
     @Autowired
     private ObjectFilesRepo objectFilesRepo;
+
     @Autowired
     private OrderRepo orderRepo;
+
+    @Autowired
+    private PriceBreakUpRepo priceBrekupRepo;
 
     @Transactional
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
         Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
         Map<String, Long> audioRefOrderItemIdMap = new HashMap<>();
         List<OrderItemDAO> orderItemList = Optional.ofNullable(order.getNonDeletedItems()).orElse(new ArrayList<>());
+
         for (OrderItemDetailRequest itemDetail : orderItemDetails) {
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
             if (outfitType == null) {
@@ -99,8 +107,12 @@ public class OrderItemService {
             orderItemDAO = mapper
                     .orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItemDAO,
                             new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+
             List<PriceBreakupDAO> priceBreakupDAOList = priceBreakUpService
                     .generatePriceBreakupList(itemDetail.getPriceBreakup(), orderItemDAO);
+            priceBreakupDAOList = priceBreakUpService.savePriceBreakUp(priceBreakupDAOList);
+            orderItemDAO.setPriceBreakup(priceBreakupDAOList);
+
             if (!CollectionUtils.isEmpty(itemDetail.getClothImageReferenceIds())) {
                 for (String imageRef : itemDetail.getClothImageReferenceIds()) {
                     clothRefOrderItemIdMap.put(imageRef, orderItemDAO.getId());
@@ -115,13 +127,14 @@ public class OrderItemService {
                 List<FileDetail> audioFileDetails = getAudioDetails(itemDetail.getAudioReferenceIds());
                 orderItemDAO.setAudioFileDetails(audioFileDetails);
             }
+
             if (!CollectionUtils.isEmpty(itemDetail.getStitchOptionReferences())) {
                 stitchOptionService.addOrderItemId(itemDetail.getStitchOptionReferences(), orderItemDAO.getId());
             }
-            priceBreakupDAOList = priceBreakUpService.savePriceBreakUp(priceBreakupDAOList);
-            orderItemDAO.setPriceBreakup(priceBreakupDAOList);
+
             orderItemList.add(orderItemDAO);
         }
+
         if (!CollectionUtils.isEmpty(clothRefOrderItemIdMap)) {
             objectFilesService.saveObjectFiles(clothRefOrderItemIdMap, FileEntityType.ORDER_ITEM.getEntityType());
         }
@@ -132,6 +145,33 @@ public class OrderItemService {
         return orderItemList;
     }
 
+    // private List<FileDetail> getClothImageDetails(List<String>
+    // clothImageReferenceIds) {
+    // List<FileDetail> clothImageFileDetails = new ArrayList<>();
+    // for (String clothImageReferenceId : clothImageReferenceIds) {
+    // FileReference fileReference =
+    // fileReferenceRepo.findById(clothImageReferenceId).orElse(null);
+    // if (fileReference != null) {
+    // clothImageFileDetails.add(new FileDetail(fileReference.getFileUrl(),
+    // fileReference.getFileName()));
+    // }
+    // }
+    // return clothImageFileDetails;
+    // }
+
+    // private List<FileDetail> getAudioDetails(List<String> audioReferenceIds) {
+    // List<FileDetail> audioFileDetails = new ArrayList<>();
+    // for (String audioReferenceId : audioReferenceIds) {
+    // FileReference fileReference =
+    // fileReferenceRepo.findById(audioReferenceId).orElse(null);
+    // if (fileReference != null) {
+    // audioFileDetails.add(new FileDetail(fileReference.getFileUrl(),
+    // fileReference.getFileName()));
+    // }
+    // }
+    // return audioFileDetails;
+    // }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
     public OrderItemDAO updateOrderItem(Long orderItemId, OrderItemDetailRequest updateItemDetail) {
         OrderItemDAO orderItem = null;
@@ -141,6 +181,7 @@ public class OrderItemService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item ID is invalid");
         }
+
         if (orderItem.isStatusUpdated(updateItemDetail.getItemStatus())) {
             OrderItemStatus status = OrderItemStatus.getOrderItemStatusEnumOrdinalMap()
                     .get(updateItemDetail.getItemStatus());
@@ -150,40 +191,50 @@ public class OrderItemService {
             // ledgerService.handleBoutiqueLedgerOnOrderItemUpdation(orderItem.getOrder().getBoutique().getId(),
             // initialState, status);
         }
+
         if (Boolean.TRUE.equals(updateItemDetail.getIsDeleted())) {
             orderItem.setIsDeleted(Boolean.TRUE);
             // ledgerService.handleBoutiqueLedgerOnOrderItemDeletion(orderItem.getOrder().getBoutique().getId(),
             // orderItem);
         }
+
         if (orderItem.isTrialDateUpdated(updateItemDetail.getTrialDate())) {
             orderItem.setTrialDate(updateItemDetail.getTrialDate());
         }
+
         if (orderItem.isDeliveryDateUpdated(updateItemDetail.getDeliveryDate())) {
             orderItem.setDeliveryDate(updateItemDetail.getDeliveryDate());
         }
+
         if (orderItem.isPriorityUpdated(updateItemDetail.getIsPriorityOrder())) {
             orderItem.setIsPriorityOrder(updateItemDetail.getIsPriorityOrder());
         }
+
         if (orderItem.isInspirationUpdated(updateItemDetail.getInspiration())) {
             orderItem.setInspiration(updateItemDetail.getInspiration());
         }
+
         if (orderItem.areSpecialInstructionsUpdated(updateItemDetail.getSpecialInstructions())) {
             orderItem.setSpecialInstructions(updateItemDetail.getSpecialInstructions());
         }
+
         if (orderItem.isQuantityUpdated(updateItemDetail.getItemQuantity())) {
             orderItem.setQuantity(updateItemDetail.getItemQuantity());
         }
+
         if (orderItem.isMeasurementRevisionUpdated(updateItemDetail.getMeasurementRevisionId())) {
             MeasurementRevisionsDAO measurementRevisionsDAO = measurementService
                     .getMeasurementRevisionById(updateItemDetail.getMeasurementRevisionId());
             orderItem.setMeasurementRevision(measurementRevisionsDAO);
         }
+
         if (!Collections.isEmpty(updateItemDetail.getClothImageReferenceIds())) {
             objectFilesService.invalidateExistingReferenceIds(FileEntityType.ORDER_ITEM.getEntityType(),
                     orderItemId);
             objectFilesService.saveObjectFiles(updateItemDetail.getClothImageReferenceIds(),
                     FileEntityType.ORDER_ITEM.getEntityType(), orderItemId);
         }
+
         if (!Collections.isEmpty(updateItemDetail.getAudioReferenceIds())) {
             objectFilesService.invalidateExistingReferenceIds(FileEntityType.AUDIO.getEntityType(),
                     orderItemId);
@@ -192,7 +243,11 @@ public class OrderItemService {
         }
         orderItem = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItem,
                 new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-        
+
+        if (orderItem.isPriceBreakupListUpdated(updateItemDetail.getPriceBreakup())) {
+            priceBreakUpService.updatePriceBreakups(updateItemDetail.getPriceBreakup(), orderItem);
+        }
+
         return orderItem;
     }
 
@@ -238,20 +293,27 @@ public class OrderItemService {
     }
 
     public OrderItemDetails getOrderItemDetails(OrderItemDAO orderItem) throws Exception {
+
         OutfitType outfitType = orderItem.getOutfitType();
         OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         String outfitImageLink = outfitTypeService.getOutfitImageLink();
+
         List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(orderItem.getId());
         List<FileDetail> clothImageFileDetails = getClothImageDetails(clothImagesReferenceIds);
+
         List<String> audioReferenceIds = objectFilesService.getAudioReferenceIds(orderItem.getId());
         List<FileDetail> audioFileDetails = getAudioDetails(audioReferenceIds);
+
+        // Get the customer ID and get the overall measurement details for the customer
+        // and order item
         Long customerId = orderItem.getOrder().getCustomer().getId();
-        
         OverallMeasurementDetails overallMeasurementDetails = measurementService.getMeasurementDetails(customerId, null,
                 orderItem.getId(),
                 outfitType.getOrdinal(), null, true);
+
         Map<String, List<OrderStitchOptionDetail>> orderItemStitchOptions = stitchOptionService
                 .getOrderItemStitchOptions(orderItem.getId());
+
         OrderItemDetails orderItemDetails = new OrderItemDetails(clothImageFileDetails, audioFileDetails,
                 overallMeasurementDetails, orderItemStitchOptions, outfitImageLink, orderItem);
         return orderItemDetails;

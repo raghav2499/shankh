@@ -112,7 +112,7 @@ public class OrderItemDAO {
     public boolean isMeasurementRevisionUpdated(Long value) {
         return (this.measurementRevision == null && value != null)
                 || (this.measurementRevision != null && value != null && !value.equals(
-                        this.getMeasurementRevision().getId()));
+                    this.getMeasurementRevision().getId()));
     }
 
     public boolean mandatoryFieldsPresent() {
@@ -155,22 +155,25 @@ public class OrderItemDAO {
         this.formattedDeliveryDate = this.deliveryDate.format(deliveryDateFormatter);
     }
 
+
+    /*
+     * To check if price break up list is updated or not. If the list is empty or null, it will return true.
+     */
     public boolean isPriceBreakupListUpdated(List<PriceBreakUpDetails> priceBreakupList) {
-        // If any of the lists is empty, then they are definitely not equal
+     
         if (CollectionUtils.isEmpty(priceBreakupList) || CollectionUtils.isEmpty(this.priceBreakup)) {
             return !CollectionUtils.isEmpty(priceBreakupList) || !CollectionUtils.isEmpty(this.priceBreakup);
         }
-        // If the size of the lists is different, then they are definitely not equal
+
         if (priceBreakupList.size() != this.priceBreakup.size()) {
             return true;
         }
-        // Check if any of the elements in the list are different
+
         return priceBreakupList.stream().anyMatch(pb -> {
-            // Find the element in the OrderItem list with a matching id
+      
             Optional<PriceBreakupDAO> existingPb = this.priceBreakup.stream()
                     .filter(epb -> epb.getId().equals(pb.getId())).findFirst();
-            // If the element is not found, or any of the fields are different, then it's a
-            // different list
+            
             return !existingPb.isPresent() ||
                     !existingPb.get().getValue().equals(pb.getValue()) ||
                     !existingPb.get().getQuantity().equals(pb.getComponentQuantity()) ||

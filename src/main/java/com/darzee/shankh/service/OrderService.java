@@ -241,19 +241,14 @@ public class OrderService {
     @Transactional
     public OrderDAO confirmOrder(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
 
-        System.out.println("+++++++++++++Inside confirmOrder++++++++++++++ : " + request);
-
         OrderDAO orderDAO = findOrder(boutiqueOrderId, boutiqueId);
 
-        System.out.println("+++++++++++++Inside confirmOrder orderDAO++++++++++++++ : " + orderDAO);
         if (!orderDAO.validateMandatoryOrderFields()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Some mandatory fields in order are missing." +
                             " Boutique ID and customer ID are mandatory fields");
         }
         orderItemService.validateMandatoryOrderItemFields(orderDAO.getOrderItems());
-        System.out.println("+++++++++++++Inside confirmOrder orderDAO++++++++++++++ : "
-                + orderItemService.validateMandatoryOrderItemFields(orderDAO.getOrderItems()));
 
         Double priceBreakupSum = orderDAO.getPriceBreakupSum();
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
@@ -275,7 +270,7 @@ public class OrderService {
 
             orderAmountDAO.setAmountRecieved(advanceAmount);
             orderAmountRepo
-                    .saveAndFlush(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
+                    .save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
                             new CycleAvoidingMappingContext()));
 
             // get the saved order amount from DB
@@ -612,7 +607,6 @@ public class OrderService {
         if (allItemsDelivered && !OrderStatus.DELIVERED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.DELIVERED);
 
-            // -------------------Error in this line---------------------
             boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO,
                     orderDAO.getBoutiqueId(), 0, 1);
 

@@ -85,8 +85,6 @@ public class BoutiqueLedgerService {
                 repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
-        System.out.println("++++++++++++++boutiqueLedgerDAO inside updateBoutiqueLedgerAmountDetails++++++++++++ : "
-                + boutiqueLedgerDAO);
         return boutiqueLedgerDAO;
     }
 
@@ -118,15 +116,11 @@ public class BoutiqueLedgerService {
     public BoutiqueLedgerDAO handleBoutiqueLedgerOnOrderUpdation(BoutiqueLedgerDAO boutiqueLedgerDAO, Long boutiqueId,
             Integer activeOrderCountChange,
             Integer closedOrderCountChange) {
-
-        System.out.println("Inside handleBoutiqueLedgerOnOrderUpdation");
         if (boutiqueLedgerDAO == null) {
             BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
-            System.out.println("boutiqueLedger : " + boutiqueLedger);
             if (boutiqueLedger != null) {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId),
                         new CycleAvoidingMappingContext());
-                System.out.println("boutiqueLedgerDAO if boutique is not null : " + boutiqueLedgerDAO);
             } else {
                 System.out.println("boutiqueLedger is null");
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -134,7 +128,6 @@ public class BoutiqueLedgerService {
             }
         }
 
-        System.out.println("Outside if block");
         if (activeOrderCountChange != 0) {
             boutiqueLedgerDAO.incrementActiveOrderCount(activeOrderCountChange);
         }

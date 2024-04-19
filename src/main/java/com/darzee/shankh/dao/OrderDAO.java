@@ -35,7 +35,6 @@ public class OrderDAO {
     private CustomerDAO customer;
     private List<OrderItemDAO> orderItems;
 
-
     public OrderDAO(String invoiceNo, BoutiqueDAO boutique, CustomerDAO customer) {
         this.invoiceNo = invoiceNo;
         this.boutique = boutique;
@@ -79,6 +78,7 @@ public class OrderDAO {
 
     /**
      * Return boutiqueOrderId as orderId whenever interacting with client
+     * 
      * @return
      */
     public Long getBoutiqueOrderId() {
@@ -98,7 +98,4 @@ public class OrderDAO {
     public Long getBoutiqueId() {
         return this.boutique.getId();
     }
-
-
-
 }

@@ -42,47 +42,36 @@ public class PriceBreakUpService {
     public List<PriceBreakupDAO> updatePriceBreakups(List<PriceBreakUpDetails> priceBreakupList,
             OrderItemDAO orderItem) {
 
-        // Ensure that the price breakup list and order item are not null
         if (priceBreakupList == null) {
             throw new IllegalArgumentException("Price breakup list cannot be null");
         }
 
         if (orderItem == null) {
             throw new IllegalArgumentException("Order item cannot be null");
-        } 
+        }
 
         List<PriceBreakupDAO> priceBreakupDAOList = new ArrayList<>();
 
-        // Iterate through each price breakup detail and update the corresponding price
-        // breakup if it exists,
-        // or create a new one if the id is null
         for (PriceBreakUpDetails priceBreakUpDetail : priceBreakupList) {
 
-            // Ensure that the price breakup detail is not null
             if (priceBreakUpDetail == null) {
                 throw new IllegalArgumentException("Price breakup detail cannot be null");
             }
 
-            // If the price breakup detail contains an id, then try to find the
-            // corresponding price breakup
             if (priceBreakUpDetail.getId() != null) {
                 Optional<PriceBreakup> priceBreakup = priceBreakUpRepo.findById(priceBreakUpDetail.getId());
 
-                // If the price breakup is present, update it with the new details
                 if (priceBreakup.isPresent()) {
                     PriceBreakupDAO priceBreakupDAO = mapper.priceBreakupToPriceBreakupDAO(priceBreakup.get(),
-                            new CycleAvoidingMappingContext()); 
+                            new CycleAvoidingMappingContext());
                     updatePriceBreakup(priceBreakupDAO, priceBreakUpDetail);
                     priceBreakupDAOList.add(priceBreakupDAO);
 
-                    // If the price breakup is not present, throw a bad request exception
                 } else {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Price Breakup ID is incorrect");
                 }
 
-                // If the price breakup detail does not contain an id, create a new price
-                // breakup
             } else {
                 PriceBreakupDAO priceBreakupDAO = new PriceBreakupDAO(priceBreakUpDetail, orderItem);
                 priceBreakupDAOList.add(priceBreakupDAO);
@@ -90,17 +79,14 @@ public class PriceBreakUpService {
         }
 
         try {
-            // Save the updated or new price breakups
             priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(
                     priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList,
                             new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
 
-            // Catch any exceptions and wrap them in a runtime exception
         } catch (Exception e) {
             throw new RuntimeException("Failed to save price breakups", e);
         }
-
 
         return priceBreakupDAOList;
     }
@@ -129,7 +115,7 @@ public class PriceBreakUpService {
         if (priceBreakupDAO.isQuantityUpdated(updatedDetails.getComponentQuantity())) {
             priceBreakupDAO.setQuantity(updatedDetails.getComponentQuantity());
         }
-    
+
         if (Boolean.TRUE.equals(updatedDetails.getIsDeleted())) {
             priceBreakupDAO.setIsDeleted(Boolean.TRUE);
         }
