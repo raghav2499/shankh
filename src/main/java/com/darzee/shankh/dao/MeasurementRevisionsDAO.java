@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
@@ -18,7 +19,7 @@ public class MeasurementRevisionsDAO {
     private Long id;
     private Long customerId;
     private OutfitType outfitType;
-    private Map<String, Double> measurementValue;
+    private Map<String, Double> measurementValue = new HashMap<>();
     private LocalDateTime createdAt;
 
     public MeasurementRevisionsDAO(Long customerId, OutfitType outfitType, Map<String, Double> measurementValue) {
@@ -42,5 +43,12 @@ public class MeasurementRevisionsDAO {
             measurementValue.put(key, roundedValue);
         }
         return measurementValue;
+    }
+
+    public Map<String, Double> getMeasurementValue() {
+        if(this.measurementValue == null) {
+            return new HashMap<>();
+        }
+        return this.measurementValue;
     }
 }

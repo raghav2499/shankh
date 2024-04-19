@@ -189,7 +189,7 @@ public class OrderService {
             orderItemDetailsList.add(new OrderItemDetails(item, null));
         }
         Integer paymentMode = null;
-        Optional<Payment> payment = paymentRepo.findTopByOrderIdOrderByIdDesc(orderId);
+        Optional<Payment> payment = paymentRepo.findTopByOrderIdOrderByIdDesc(order.getId());
         if (payment.isPresent()) {
             PaymentDAO paymentDAO = mapper.paymentToPaymentDAO(payment.get(), new CycleAvoidingMappingContext());
             paymentMode = paymentDAO.getPaymentMode().getOrdinal();
