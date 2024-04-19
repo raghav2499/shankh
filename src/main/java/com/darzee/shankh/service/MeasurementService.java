@@ -203,7 +203,7 @@ public class MeasurementService {
         Map<String, MeasurementParamDAO> paramDetailMap = measurementParamDetails.stream()
                 .collect(Collectors.toMap(MeasurementParamDAO::getName,
                         measurementParam -> measurementParam));
-        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(revisionsDAO.getOutfitType());
+        OutfitTypeService outfitTypeService = outfitTypeObjectService.getOutfitTypeObject(outfitType);
         if (boutiqueMeasurementParams.keySet().contains(OutfitSide.TOP)) {
             List<String> paramList = boutiqueMeasurementParams.get(OutfitSide.TOP);
             List<MeasurementDetails> measurementDetails =
@@ -288,6 +288,8 @@ public class MeasurementService {
         if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue())
                 && measurementRevisionService.measurementRevisionImageExists(revisionsDAO.getId())) {
             measurementRevisionImgLink = measurementRevisionService.getMeasurementRevisionImageLink(revisionsDAO.getId());
+            innerMeasurementDetailsList = generateInnerMeasurementDetails(boutiqueId, revisionsDAO.getOutfitType(),
+                    revisionsDAO, false);
         } else {
             innerMeasurementDetailsList = generateInnerMeasurementDetails(boutiqueId, revisionsDAO.getOutfitType(),
                     revisionsDAO, nonEmptyValuesOnly);
