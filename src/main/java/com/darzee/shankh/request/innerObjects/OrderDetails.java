@@ -11,7 +11,6 @@ import java.util.List;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderDetails {
-
     @NotNull(message = "customer_id cannot be null", groups = {OrderCreationRequest.CreateOrder.class})
     private Long customerId;
 

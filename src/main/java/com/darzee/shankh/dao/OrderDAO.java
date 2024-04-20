@@ -75,7 +75,6 @@ public class OrderDAO {
 
     /**
      * Return boutiqueOrderId as orderId whenever interacting with client
-     *
      * @return
      */
     public Long getBoutiqueOrderId() {

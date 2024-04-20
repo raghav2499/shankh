@@ -103,7 +103,6 @@ public class BoutiqueLedgerService {
             if (boutiqueLedger != null) {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
             } else {
-                System.out.println("boutiqueLedger is null");
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
             }
         }

@@ -13,5 +13,4 @@ public class OrderAmountDAO {
     private Long id;
     private Double totalAmount = 0d;
     private Double amountRecieved = 0d;
-    private Integer paymentMode;
 }

@@ -119,11 +119,9 @@ public class OrderItemService {
                 List<FileDetail> audioFileDetails = getAudioDetails(itemDetail.getAudioReferenceIds());
                 orderItemDAO.setAudioFileDetails(audioFileDetails);
             }
-
             if (!CollectionUtils.isEmpty(itemDetail.getStitchOptionReferences())) {
                 stitchOptionService.addOrderItemId(itemDetail.getStitchOptionReferences(), orderItemDAO.getId());
             }
-
             orderItemList.add(orderItemDAO);
         }
 
@@ -179,14 +177,10 @@ public class OrderItemService {
             OrderItemStatus initialState = orderItem.getOrderItemStatus();
             orderItemStateMachineService.isTransitionAllowed(initialState, status);
             orderItem.setOrderItemStatus(status);
-            // ledgerService.handleBoutiqueLedgerOnOrderItemUpdation(orderItem.getOrder().getBoutique().getId(),
-            // initialState, status);
         }
 
         if (Boolean.TRUE.equals(updateItemDetail.getIsDeleted())) {
             orderItem.setIsDeleted(Boolean.TRUE);
-            // ledgerService.handleBoutiqueLedgerOnOrderItemDeletion(orderItem.getOrder().getBoutique().getId(),
-            // orderItem);
         }
 
         if (orderItem.isTrialDateUpdated(updateItemDetail.getTrialDate())) {
@@ -277,8 +271,6 @@ public class OrderItemService {
         List<String> audioReferenceIds = objectFilesService.getAudioReferenceIds(orderItem.getId());
         List<FileDetail> audioFileDetails = getAudioDetails(audioReferenceIds);
 
-        // Get the customer ID and get the overall measurement details for the customer
-        // and order item
         Long customerId = orderItem.getOrder().getCustomer().getId();
         OverallMeasurementDetails overallMeasurementDetails = measurementService.getMeasurementDetails(customerId, null, orderItem.getId(), outfitType.getOrdinal(), null, true);
 

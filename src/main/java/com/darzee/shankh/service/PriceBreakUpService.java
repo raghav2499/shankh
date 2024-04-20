@@ -30,17 +30,13 @@ public class PriceBreakUpService {
     private PriceBreakUpRepo priceBreakUpRepo;
 
     public List<PriceBreakupDAO> savePriceBreakUp(List<PriceBreakupDAO> priceBreakupDAOList) {
-        priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(
-                priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList,
-                        new CycleAvoidingMappingContext())),
-                new CycleAvoidingMappingContext());
+        priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return priceBreakupDAOList;
 
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
-    public List<PriceBreakupDAO> updatePriceBreakups(List<PriceBreakUpDetails> priceBreakupList,
-            OrderItemDAO orderItem) {
+    public List<PriceBreakupDAO> updatePriceBreakups(List<PriceBreakUpDetails> priceBreakupList, OrderItemDAO orderItem) {
 
         if (priceBreakupList == null) {
             throw new IllegalArgumentException("Price breakup list cannot be null");
@@ -62,14 +58,12 @@ public class PriceBreakUpService {
                 Optional<PriceBreakup> priceBreakup = priceBreakUpRepo.findById(priceBreakUpDetail.getId());
 
                 if (priceBreakup.isPresent()) {
-                    PriceBreakupDAO priceBreakupDAO = mapper.priceBreakupToPriceBreakupDAO(priceBreakup.get(),
-                            new CycleAvoidingMappingContext());
+                    PriceBreakupDAO priceBreakupDAO = mapper.priceBreakupToPriceBreakupDAO(priceBreakup.get(), new CycleAvoidingMappingContext());
                     updatePriceBreakup(priceBreakupDAO, priceBreakUpDetail);
                     priceBreakupDAOList.add(priceBreakupDAO);
 
                 } else {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Price Breakup ID is incorrect");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price Breakup ID is incorrect");
                 }
 
             } else {
@@ -79,10 +73,7 @@ public class PriceBreakUpService {
         }
 
         try {
-            priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(
-                    priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList,
-                            new CycleAvoidingMappingContext())),
-                    new CycleAvoidingMappingContext());
+            priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to save price breakups", e);
@@ -91,8 +82,7 @@ public class PriceBreakUpService {
         return priceBreakupDAOList;
     }
 
-    public List<PriceBreakupDAO> generatePriceBreakupList(List<PriceBreakUpDetails> priceBreakUpDetails,
-            OrderItemDAO orderItemDAO) {
+    public List<PriceBreakupDAO> generatePriceBreakupList(List<PriceBreakUpDetails> priceBreakUpDetails, OrderItemDAO orderItemDAO) {
         List<PriceBreakupDAO> priceBreakupDAOList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(priceBreakUpDetails)) {
             for (PriceBreakUpDetails priceBreakUpDetail : priceBreakUpDetails) {

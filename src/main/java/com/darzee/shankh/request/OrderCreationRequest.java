@@ -13,11 +13,10 @@ import javax.validation.constraints.NotNull;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderCreationRequest {
 
-    // This interface represents the validation group for creating an order.
+
     public interface CreateOrder {
     }
 
-    //This interface represents the validation group for confirming an order.
     public interface ConfirmOrder {
     }
 

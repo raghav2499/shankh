@@ -133,5 +133,4 @@ public class StitchOptionService {
         Map<String, List<OrderStitchOptionDetail>> groupedOrderStitchOptionDetail = orderStitchOptionDetails.stream().collect(Collectors.groupingBy(OrderStitchOptionDetail::getOutfitSide));
         return groupedOrderStitchOptionDetail;
     }
-
 }

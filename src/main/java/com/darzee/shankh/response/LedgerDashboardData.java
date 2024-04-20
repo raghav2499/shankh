@@ -13,12 +13,10 @@ public class LedgerDashboardData {
     public Double amountRecieved = 0d;
     public Double pendingAmount = 0d;
     public Integer activeOrderCount = 0;
-
     public Integer closedOrderCount = 0;
 
     public LedgerDashboardData(BoutiqueLedgerSnapshotDAO ledgerSnapshot) {
         this.amountRecieved = ledgerSnapshot.getAmountRecieved();
-        ;
         this.pendingAmount = ledgerSnapshot.getPendingAmount();
         this.activeOrderCount = ledgerSnapshot.getActiveOrderCount();
     }

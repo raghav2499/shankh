@@ -142,10 +142,6 @@ public class OrderItemDAO {
         this.formattedDeliveryDate = this.deliveryDate.format(deliveryDateFormatter);
     }
 
-
-    /*
-     * To check if price break up list is updated or not. If the list is empty or null, it will return true.
-     */
     public boolean isPriceBreakupListUpdated(List<PriceBreakUpDetails> priceBreakupList) {
 
         if (CollectionUtils.isEmpty(priceBreakupList) || CollectionUtils.isEmpty(this.priceBreakup)) {

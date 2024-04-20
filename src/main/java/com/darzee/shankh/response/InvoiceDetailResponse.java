@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.Optional;
 
 @Data
@@ -23,7 +22,7 @@ public class InvoiceDetailResponse {
     String boutiqueName;
     String customerName;
     String recieveDateTime;
-    Optional<Integer> paymentMode;
+    Integer paymentMode;
 
     OrderSummary orderSummary;
 
@@ -36,7 +35,7 @@ public class InvoiceDetailResponse {
         this.customerName = customerName;
         this.recieveDateTime = recieveDateTime;
         this.orderSummary = orderSummary;
-        this.paymentMode = Optional.ofNullable(paymentMode);
+        this.paymentMode = paymentMode;
     }
 
 }

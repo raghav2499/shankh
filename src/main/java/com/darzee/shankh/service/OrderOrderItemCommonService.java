@@ -85,10 +85,8 @@ public class OrderOrderItemCommonService {
     @Transactional
     public OrderSummary createOrder(OrderCreationRequest orderCreationRequest) {
 
-        // get order details from request
         OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
 
-        // find or create new order
         OrderDAO orderDAO = null;
         try {
             orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(), orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
@@ -99,7 +97,6 @@ public class OrderOrderItemCommonService {
             throw new RuntimeException("Null order returned from orderService findOrCreateNewOrder method");
         }
 
-        // create new order items
         List<OrderItemDetailRequest> newItems = orderDetails.getOrderItems().stream().filter(itemDetail -> itemDetail.getId() == null).collect(Collectors.toList());
         List<OrderItemDAO> allOrderItems = null;
         try {
@@ -111,7 +108,6 @@ public class OrderOrderItemCommonService {
             throw new RuntimeException("Null order items returned from orderItemService createOrderItems method");
         }
 
-        // update items which already exists
         List<OrderItemDetailRequest> alreadySavedItems = orderDetails.getOrderItems().stream().filter(itemDetail -> itemDetail.getId() != null).collect(Collectors.toList());
         List<OrderItemDAO> savedItems = new ArrayList<>();
         for (OrderItemDetailRequest itemDetailRequest : alreadySavedItems) {
@@ -127,12 +123,9 @@ public class OrderOrderItemCommonService {
 
             if (!CollectionUtils.isEmpty(itemDetailRequest.getPriceBreakup())) {
                 try {
-                    // updating priceBreakup DAO
                     List<PriceBreakupDAO> updatedPriceBreakupDAOList = priceBreakUpService.updatePriceBreakups(itemDetailRequest.getPriceBreakup(), orderItemDAO);
 
-                    // updating priceBreakup DAO list of orderItemDAO
                     orderItemDAO.setPriceBreakup(updatedPriceBreakupDAOList);
-                    ;
 
                 } catch (Exception e) {
                     throw new RuntimeException("Exception while updating price breakups", e);
@@ -141,13 +134,10 @@ public class OrderOrderItemCommonService {
             savedItems.add(orderItemDAO);
         }
 
-        // collate all items
         List<OrderItemDAO> allItems = collateAllItems(allOrderItems, savedItems);
         if (allItems == null) {
             throw new RuntimeException("Null all items returned from collateAllItems method");
         }
-
-        // update order amount and items
         try {
             orderDAO.setOrderItems(allItems);
         } catch (NullPointerException e) {
@@ -163,14 +153,12 @@ public class OrderOrderItemCommonService {
             throw new RuntimeException("Null order amount returned from orderService setOrderAmountSpecificDetails method");
         }
 
-        // create order summary
         OrderSummary orderSummary = null;
         try {
             orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         } catch (NullPointerException e) {
             throw new RuntimeException("NullPointerException while creating new order summary", e);
         }
-
         return orderSummary;
     }
 

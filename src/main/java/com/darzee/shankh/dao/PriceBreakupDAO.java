@@ -41,5 +41,4 @@ public class PriceBreakupDAO {
     public boolean isQuantityUpdated(Integer value) {
         return value != null && !this.quantity.equals(value);
     }
-
 }

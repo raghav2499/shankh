@@ -85,36 +85,23 @@ public class MeasurementService {
     }
 
     public OverallMeasurementDetails getMeasurementDetails(Long customerId, Long measurementRevisionId, Long orderItemId, Integer outfitTypeIndex, String scale, Boolean nonEmptyValuesOnly) throws Exception {
-        // Validate request parameters
+
         validateGetMeasurementRequestParams(customerId, measurementRevisionId, orderItemId, outfitTypeIndex, scale);
 
-        // Get Boutique ID
         Long boutiqueId = customerRepo.findById(customerId).get().getBoutique().getId();
-
-        // Get Outfit Type
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);
 
-        // Get Measurement Revision
         MeasurementRevisions measurementRevision = getMeasurementObject(measurementRevisionId, customerId, orderItemId, outfitType);
-
-        // Create Measurement Revision DAO
         MeasurementRevisionsDAO revisionsDAO = new MeasurementRevisionsDAO(customerId, outfitType, new HashMap<>());
 
-        // If Measurement Revision exists, map it to DAO
         if (measurementRevision != null) {
             revisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(measurementRevision);
         }
 
-        // Get Overall Measurement Details
         OverallMeasurementDetails overallMeasurementDetails = null;
-
-        // Get Measurement Scale
         MeasurementScale measurementScale = MeasurementScale.getEnumMap().get(scale);
-
-        // Set Measurement Details
         overallMeasurementDetails = setMeasurementDetails(revisionsDAO, measurementScale, boutiqueId, nonEmptyValuesOnly);
 
-        // Return Overall Measurement Details
         return overallMeasurementDetails;
     }
 
@@ -271,6 +258,7 @@ public class MeasurementService {
 
         if (CollectionUtils.isEmpty(revisionsDAO.getMeasurementValue()) && measurementRevisionService.measurementRevisionImageExists(revisionsDAO.getId())) {
             measurementRevisionImgLink = measurementRevisionService.getMeasurementRevisionImageLink(revisionsDAO.getId());
+            innerMeasurementDetailsList = generateInnerMeasurementDetails(boutiqueId, revisionsDAO.getOutfitType(), revisionsDAO, false);
         } else {
             innerMeasurementDetailsList = generateInnerMeasurementDetails(boutiqueId, revisionsDAO.getOutfitType(), revisionsDAO, nonEmptyValuesOnly);
         }

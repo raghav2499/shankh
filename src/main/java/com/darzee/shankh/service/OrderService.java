@@ -110,7 +110,7 @@ public class OrderService {
                 orderDAO = findOrder(orderId, boutiqueId);
                 return orderDAO;
             } catch (Exception e) {
-                System.out.println(e);
+                return null;
             }
         }
 
@@ -244,7 +244,6 @@ public class OrderService {
             orderAmountDAO.setAmountRecieved(advanceAmount);
             orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
 
-            // get the saved order amount from DB
             paymentService.recordPayment(advanceAmount, PaymentMode.CASH, Boolean.TRUE, orderDAO);
         }
 
@@ -369,10 +368,7 @@ public class OrderService {
 
             if (paymentDAO != null) {
                 paymentMode = paymentDAO.getPaymentMode().getOrdinal();
-            } else {
-                paymentMode = null;
             }
-
             InvoiceDetailResponse response = new InvoiceDetailResponse(invoiceDateTime, boutiqueName, customerName, recieveDateTime, summary, paymentMode);
 
             return new ResponseEntity(response, HttpStatus.OK);
@@ -471,12 +467,10 @@ public class OrderService {
             String outfitImgLink = outfitTypeService.getOutfitImageLink();
             orderItemOutfitLinkPairList.add(Pair.of(orderItem, outfitImgLink));
         }
-
         return new OrderDetailResponse(orderDAO, orderItemOutfitLinkPairList, customerProfilePicLink);
     }
 
     private OrderDAO setOrderSpecificDetails(BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
-
         String invoiceNo = generateOrderInvoiceNo();
         OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
         return orderDAO;
@@ -501,7 +495,6 @@ public class OrderService {
             amountRecieved = orderAmountDetails.getAdvanceReceived();
         }
         Double totalOrderAmount = calculateTotalOrderAmount(orderDAO.getNonDeletedItems());
-
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         orderAmountDAO.setTotalAmount(totalOrderAmount);
         orderAmountDAO.setAmountRecieved(amountRecieved);
@@ -514,7 +507,6 @@ public class OrderService {
         Double amountPending = orderAmount.getTotalAmount() - amountRecieved;
         BoutiqueLedgerDAO ledger = boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(null, orderDAO.getBoutiqueId(), amountPending, amountRecieved);
         boutiqueLedgerService.updateCountOnOrderConfirmation(ledger, orderDAO.getBoutiqueId());
-
     }
 
     // todo : move this logic to spring state machine
@@ -522,9 +514,7 @@ public class OrderService {
     public OrderDAO updateOrderPostItemUpdation(Long orderId) {
 
         OrderDAO orderDAO = mapper.orderObjectToDao(orderRepo.findById(orderId).get(), new CycleAvoidingMappingContext());
-
         BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(boutiqueLedgerRepo.findByBoutiqueId(orderDAO.getBoutiqueId()), new CycleAvoidingMappingContext());
-
         List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems();
 
         boolean allItemsAccepted = orderItems.stream().filter(item -> OrderItemStatus.ACCEPTED.equals(item.getOrderItemStatus())).collect(Collectors.toList()).size() == orderItems.size();
@@ -536,7 +526,6 @@ public class OrderService {
 
         if (allItemsDelivered && !OrderStatus.DELIVERED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.DELIVERED);
-
             boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), 0, 1);
 
         }
