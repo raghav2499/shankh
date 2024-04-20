@@ -129,8 +129,7 @@ public class OrderService {
             CustomerDAO customerDAO = mapper.customerObjectToDao(optionalCustomer.get(),
                     new CycleAvoidingMappingContext());
             OrderAmountDAO orderAmountDAO = new OrderAmountDAO();
-            orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(
-                            mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
+            orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
             OrderDAO orderDAO = setOrderSpecificDetails(boutiqueDAO, customerDAO);
             orderDAO.setOrderAmount(orderAmountDAO);
@@ -142,11 +141,7 @@ public class OrderService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid customer id or boutique id");
     }
 
-    public ResponseEntity<GetOrderResponse> getOrder(Long boutiqueId, String orderItemStatusList,
-                                                     String orderStatusList,
-                                                     Boolean priorityOrdersOnly, Long customerId,
-                                                     String deliveryDateFrom, String deliveryDateTill,
-                                                     Boolean paymentDue, Integer countPerPage, Integer pageCount) {
+    public ResponseEntity<GetOrderResponse> getOrder(Long boutiqueId, String orderItemStatusList,String orderStatusList, Boolean priorityOrdersOnly, Long customerId,String deliveryDateFrom, String deliveryDateTill, Boolean paymentDue, Integer countPerPage, Integer pageCount) {
         validateGetOrderRequest(orderItemStatusList, orderStatusList);
         Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, null,
                 orderStatusList, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill,

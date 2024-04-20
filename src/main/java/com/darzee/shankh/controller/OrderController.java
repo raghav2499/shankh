@@ -52,7 +52,7 @@ public class OrderController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity getOrderDetails(@PathVariable("id") Long boutiqueOrderId,
+    public ResponseEntity getOrderDetails(@PathVariable("id") Long boutiqueOrderId, 
                                           @RequestParam("boutique_id") Long boutiqueId) throws Exception {
         return orderService.getOrderDetails(boutiqueOrderId, boutiqueId);
     }
@@ -62,7 +62,6 @@ public class OrderController {
     public ResponseEntity recievePayment(@PathVariable("id") Long boutiqueOrderId,
                                          @RequestParam("boutique_id") Long boutiqueId,
                                          @Validated @RequestBody RecievePaymentRequest request) throws Exception {
-
         ResponseEntity response = orderService.recieveOrderPayment(boutiqueOrderId, boutiqueId, request);
         return response;
     }
