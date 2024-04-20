@@ -118,6 +118,8 @@
             border-collapse: collapse;
         }
 
+
+
         table th {
             font-size: 14px;
             padding: 10px;
@@ -234,22 +236,20 @@
 
                         <div class="size-chart">
                             <table>
-                                <thead>
-
-                                    <tr th:if="${measurementDetails != null}"
-                                        th:each="row : ${measurementDetails.get(0).getMeasurementDetailsList()}">
-
-                                        <th th:class="${#lists.size(measurementDetails) > 3}? 'new-row'">
-                                            <img th:src="@{row.imageLink}" alt="No Image"></img>
+                                <tbody>
+                                    <tr
+                                        th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
+                                        <td th:each="detail, detailStat: ${row}"
+                                            th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}">
+                                            <img th:src="@{row.imageLink}" alt="No Image" />
                                             <div>
 
-                                                <span class="span-outer" th:text="${row.getTitle()}"></span>
-                                                <span class="span-inner" th:text="${row.getValue()}"></span>
+                                                <span class="span-outer" th:text="${detail.getTitle()}"></span>
+                                                <span class="span-inner" th:text="${detail.getValue()}"></span>
                                             </div>
-                                        </th>
+                                        </td>
                                     </tr>
-
-                                </thead>
+                                </tbody>
                             </table>
 
 
@@ -299,10 +299,12 @@
                                     <tr
                                         th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
                                         <td th:each="detail, detailStat: ${row}"
-                                            th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}">
-                                            <img th:src="@{https://picsum.photos/200/300}" alt="No Image" />
-                                            <div>
+                                            th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}"
+                                            style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
 
+                                            <div>
+                                                <img th:src="@{https://picsum.photos/200/300}" width="60" height="70"
+                                                    alt="No Image" style="float: left;margin-bottom: 10px;" />
                                                 <span class="span-outer" th:text="${detail.getTitle()}"></span>
                                                 <span class="span-inner" th:text="${detail.getValue()}"></span>
                                             </div>
@@ -344,10 +346,12 @@
                                     <tr
                                         th:each="row, rowStat: ${measurementDetails.get(1).getMeasurementDetailsList()}">
                                         <td th:each="detail, detailStat: ${row}"
-                                            th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}">
-                                            <img th:src="@{https://picsum.photos/200/300}" alt="No Image" />
-                                            <div>
+                                            th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}"
+                                            style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
 
+                                            <div>
+                                                <img th:src="@{https://picsum.photos/200/300}" width="60" height="70"
+                                                    alt="No Image" style="float: left;margin-bottom: 10px;" />
                                                 <span class="span-outer" th:text="${detail.getTitle()}"></span>
                                                 <span class="span-inner" th:text="${detail.getValue()}"></span>
                                             </div>
