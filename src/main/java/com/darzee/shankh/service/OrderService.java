@@ -415,7 +415,9 @@ public class OrderService {
             String recieveDateTime = orderDAO.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME);
             OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                     orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
-            PaymentDAO paymentDAO = paymentService.getPaymentDAOByOrderId(orderId);
+
+            PaymentDAO paymentDAO = paymentService.getPaymentDAOByOrderId(
+                    orderDAO.getId());
             Integer paymentMode;
 
             if (paymentDAO != null) {

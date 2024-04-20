@@ -62,7 +62,9 @@ public class OrderController {
     public ResponseEntity recievePayment(@PathVariable("id") Long boutiqueOrderId,
                                          @RequestParam("boutique_id") Long boutiqueId,
                                          @Validated @RequestBody RecievePaymentRequest request) throws Exception {
-        return orderService.recieveOrderPayment(boutiqueOrderId, boutiqueId, request);
+                                            
+        ResponseEntity response = orderService.recieveOrderPayment(boutiqueOrderId, boutiqueId, request);
+        return response;
     }
 
     @PostMapping(value = "/{id}/confirm", produces = MediaType.APPLICATION_JSON_VALUE)

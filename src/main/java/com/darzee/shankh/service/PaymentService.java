@@ -8,7 +8,7 @@ import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.PaymentRepo;
 
-import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,20 +71,10 @@ public class PaymentService {
         return null;
     }
 
-    // public PaymentDAO getPaymentDAOByOrderId(Long orderId) {
-    // List<Payment> paymentDAO = paymentRepo.findAllByOrderId(orderId);
-
-    // if (paymentDAO != null && !paymentDAO.isEmpty()) {
-    // return mapper.paymentToPaymentDAO(paymentDAO.get(0), new
-    // CycleAvoidingMappingContext());
-    // }
-    // return null;
-    // }
-
     public PaymentDAO getPaymentDAOByOrderId(Long orderId) {
-        Payment payment = paymentRepo.findTopByOrderIdOrderByIdDesc(orderId).orElse(null);
-        if (payment != null) {
-            return mapper.paymentToPaymentDAO(payment, new CycleAvoidingMappingContext());
+        Optional<Payment> payment = paymentRepo.findTopByOrderIdOrderByIdDesc(orderId);
+        if (payment.isPresent()) {
+            return mapper.paymentToPaymentDAO(payment.orElse(null), new CycleAvoidingMappingContext());
         }
         return null;
     }
