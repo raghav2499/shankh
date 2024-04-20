@@ -13,7 +13,6 @@ public class StitchDetails {
     private Long stitchOptionId;
     @NotNull(message = "Values are mandatory to create stitch options")
     private List<String> values;
-
     public Long getStitchOptionId() {
         return stitchOptionId;
     }

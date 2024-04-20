@@ -8,11 +8,9 @@ import lombok.Data;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderCreationRequest {
-
 
     public interface CreateOrder {
     }

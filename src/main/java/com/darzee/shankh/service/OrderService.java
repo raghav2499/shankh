@@ -364,7 +364,7 @@ public class OrderService {
             OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
 
             PaymentDAO paymentDAO = paymentService.getPaymentDAOByOrderId(orderDAO.getId());
-            Integer paymentMode;
+            Integer paymentMode=null;
 
             if (paymentDAO != null) {
                 paymentMode = paymentDAO.getPaymentMode().getOrdinal();

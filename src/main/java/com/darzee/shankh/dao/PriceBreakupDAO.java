@@ -20,7 +20,6 @@ public class PriceBreakupDAO {
 
     public PriceBreakupDAO(PriceBreakUpDetails priceBreakUpDetails, OrderItemDAO orderItem) {
         this.component = priceBreakUpDetails.getComponent();
-        ;
         this.value = priceBreakUpDetails.getValue();
         this.quantity = priceBreakUpDetails.getComponentQuantity();
         this.orderItem = orderItem;

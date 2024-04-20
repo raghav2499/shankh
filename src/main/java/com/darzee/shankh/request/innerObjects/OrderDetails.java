@@ -16,11 +16,7 @@ public class OrderDetails {
 
     @NotNull(message = "boutique_id cannot be null", groups = {OrderCreationRequest.CreateOrder.class})
     private Long boutiqueId;
-
     private Long orderId;
-
     private List<OrderItemDetailRequest> orderItems;
-
     private OrderAmountDetails orderAmountDetails;
-
 }
