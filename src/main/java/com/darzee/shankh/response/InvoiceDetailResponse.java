@@ -1,15 +1,14 @@
 package com.darzee.shankh.response;
 
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Optional;
 
 @Data
 @Getter
@@ -28,11 +27,7 @@ public class InvoiceDetailResponse {
 
     OrderSummary orderSummary;
 
-    public InvoiceDetailResponse( String invoiceDateTime, String boutiqueName,
-            String customerName,
-            String recieveDateTime,
-            OrderSummary orderSummary,
-            Integer paymentMode
+    public InvoiceDetailResponse(String invoiceDateTime, String boutiqueName, String customerName, String recieveDateTime, OrderSummary orderSummary, Integer paymentMode
 
     ) {
 

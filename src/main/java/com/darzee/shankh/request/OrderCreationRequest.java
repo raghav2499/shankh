@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderCreationRequest {
-	
+
     // This interface represents the validation group for creating an order.
     public interface CreateOrder {
     }
@@ -20,7 +20,7 @@ public class OrderCreationRequest {
     //This interface represents the validation group for confirming an order.
     public interface ConfirmOrder {
     }
-	
+
     @Valid
     @NotNull(message = "order_details are mandatory for order creation", groups = {CreateOrder.class})
     private OrderDetails orderDetails;

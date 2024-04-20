@@ -7,11 +7,10 @@ import com.darzee.shankh.enums.PaymentMode;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.PaymentRepo;
-
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class PaymentService {
@@ -22,11 +21,9 @@ public class PaymentService {
     @Autowired
     private DaoEntityMapper mapper;
 
-    public PaymentDAO recordPayment(Double amount, PaymentMode paymentMode, Boolean isAdvancePayment,OrderDAO order) {
+    public PaymentDAO recordPayment(Double amount, PaymentMode paymentMode, Boolean isAdvancePayment, OrderDAO order) {
         PaymentDAO paymentDAO = new PaymentDAO(amount, paymentMode, isAdvancePayment, order);
-        paymentDAO = mapper.paymentToPaymentDAO(paymentRepo.save(mapper.paymentDAOToPayment(paymentDAO,
-                new CycleAvoidingMappingContext())),
-                new CycleAvoidingMappingContext());
+        paymentDAO = mapper.paymentToPaymentDAO(paymentRepo.save(mapper.paymentDAOToPayment(paymentDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return paymentDAO;
     }
 
@@ -57,12 +54,11 @@ public class PaymentService {
     // return finalPayment;
     // }
 
-    public PaymentDAO reversePaymentAndUpdateAmount(PaymentDAO paymentDAO, Double finalPaymentAmount,Boolean isAdvancePayment) {
+    public PaymentDAO reversePaymentAndUpdateAmount(PaymentDAO paymentDAO, Double finalPaymentAmount, Boolean isAdvancePayment) {
         PaymentDAO reversePayment = PaymentDAO.reversePayment(paymentDAO);
         paymentRepo.save(mapper.paymentDAOToPayment(reversePayment, new CycleAvoidingMappingContext()));
         if (finalPaymentAmount > 0) {
-            PaymentDAO finalPayment = new PaymentDAO(finalPaymentAmount, paymentDAO.getPaymentMode(), isAdvancePayment,
-                    paymentDAO.getOrder());
+            PaymentDAO finalPayment = new PaymentDAO(finalPaymentAmount, paymentDAO.getPaymentMode(), isAdvancePayment, paymentDAO.getOrder());
             paymentRepo.save(mapper.paymentDAOToPayment(finalPayment, new CycleAvoidingMappingContext()));
             return finalPayment;
         }

@@ -12,10 +12,10 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderDetails {
 
-    @NotNull(message = "customer_id cannot be null", groups = { OrderCreationRequest.CreateOrder.class })
+    @NotNull(message = "customer_id cannot be null", groups = {OrderCreationRequest.CreateOrder.class})
     private Long customerId;
 
-    @NotNull(message = "boutique_id cannot be null", groups = { OrderCreationRequest.CreateOrder.class })
+    @NotNull(message = "boutique_id cannot be null", groups = {OrderCreationRequest.CreateOrder.class})
     private Long boutiqueId;
 
     private Long orderId;

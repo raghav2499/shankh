@@ -31,266 +31,214 @@ import java.util.stream.Collectors;
 @Service
 public class OrderOrderItemCommonService {
 
-        @Autowired
-        private OrderService orderService;
+    @Autowired
+    private OrderService orderService;
 
-        @Autowired
-        private OrderItemService orderItemService;
+    @Autowired
+    private OrderItemService orderItemService;
 
-        @Autowired
-        private PriceBreakUpService priceBreakUpService;
+    @Autowired
+    private PriceBreakUpService priceBreakUpService;
 
-        @Autowired
-        private OrderRepo orderRepo;
+    @Autowired
+    private OrderRepo orderRepo;
 
-        @Autowired
-        private StitchOptionsRepo stitchOptionsRepo;
+    @Autowired
+    private StitchOptionsRepo stitchOptionsRepo;
 
-        @Autowired
-        private OrderAmountRepo orderAmountRepo;
+    @Autowired
+    private OrderAmountRepo orderAmountRepo;
 
-        @Autowired
-        private PdfGenerator pdfGenerator;
+    @Autowired
+    private PdfGenerator pdfGenerator;
 
-        @Autowired
-        private MeasurementService measurementService;
+    @Autowired
+    private MeasurementService measurementService;
 
-        @Autowired
-        private StitchOptionService stitchOptionService;
+    @Autowired
+    private StitchOptionService stitchOptionService;
 
-        @Autowired
-        private BucketService bucketService;
+    @Autowired
+    private BucketService bucketService;
 
-        @Autowired
-        private DaoEntityMapper mapper;
+    @Autowired
+    private DaoEntityMapper mapper;
 
-        @Autowired
-        private OrderItemRepo orderItemRepo;
+    @Autowired
+    private OrderItemRepo orderItemRepo;
 
-        @Autowired
-        private OrderStitchOptionsRepo orderStitchOptionsRepo;
+    @Autowired
+    private OrderStitchOptionsRepo orderStitchOptionsRepo;
 
-        public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId,
-                        OrderCreationRequest request) throws Exception {
-                OrderDAO orderDAO = orderService.confirmOrder(boutiqueOrderId, boutiqueId, request);
+    public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
+        OrderDAO orderDAO = orderService.confirmOrder(boutiqueOrderId, boutiqueId, request);
 
-                OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
 
-                OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
-                                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
-                                orderDAO.getNonDeletedItems());
+        OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
 
-                orderService.generateInvoiceV2(orderDAO);
-                generateItemDetailPdfs(orderDAO);
-                return new ResponseEntity<>(summary, HttpStatus.OK);
+        orderService.generateInvoiceV2(orderDAO);
+        generateItemDetailPdfs(orderDAO);
+        return new ResponseEntity<>(summary, HttpStatus.OK);
+    }
+
+    @Transactional
+    public OrderSummary createOrder(OrderCreationRequest orderCreationRequest) {
+
+        // get order details from request
+        OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
+
+        // find or create new order
+        OrderDAO orderDAO = null;
+        try {
+            orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(), orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
+        } catch (NullPointerException e) {
+            throw new RuntimeException("NullPointerException while finding or creating new order", e);
+        }
+        if (orderDAO == null) {
+            throw new RuntimeException("Null order returned from orderService findOrCreateNewOrder method");
         }
 
-        @Transactional
-        public OrderSummary createOrder(OrderCreationRequest orderCreationRequest) {
+        // create new order items
+        List<OrderItemDetailRequest> newItems = orderDetails.getOrderItems().stream().filter(itemDetail -> itemDetail.getId() == null).collect(Collectors.toList());
+        List<OrderItemDAO> allOrderItems = null;
+        try {
+            allOrderItems = orderItemService.createOrderItems(newItems, orderDAO);
+        } catch (Exception e) {
+            throw new RuntimeException("Exception while creating new order items", e);
+        }
+        if (allOrderItems == null) {
+            throw new RuntimeException("Null order items returned from orderItemService createOrderItems method");
+        }
 
-                // get order details from request
-                OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
+        // update items which already exists
+        List<OrderItemDetailRequest> alreadySavedItems = orderDetails.getOrderItems().stream().filter(itemDetail -> itemDetail.getId() != null).collect(Collectors.toList());
+        List<OrderItemDAO> savedItems = new ArrayList<>();
+        for (OrderItemDetailRequest itemDetailRequest : alreadySavedItems) {
+            OrderItemDAO orderItemDAO = null;
+            try {
+                orderItemDAO = orderItemService.updateOrderItem(itemDetailRequest.getId(), itemDetailRequest);
+            } catch (Exception e) {
+                throw new RuntimeException("Exception while updating order item", e);
+            }
+            if (orderItemDAO == null) {
+                throw new RuntimeException("Null order item returned from orderItemService updateOrderItem method");
+            }
 
-                // find or create new order
-                OrderDAO orderDAO = null;
+            if (!CollectionUtils.isEmpty(itemDetailRequest.getPriceBreakup())) {
                 try {
-                        orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(),
-                                        orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
-                } catch (NullPointerException e) {
-                        throw new RuntimeException("NullPointerException while finding or creating new order",
-                                        e);
-                }
-                if (orderDAO == null) {
-                        throw new RuntimeException(
-                                        "Null order returned from orderService findOrCreateNewOrder method");
-                }
+                    // updating priceBreakup DAO
+                    List<PriceBreakupDAO> updatedPriceBreakupDAOList = priceBreakUpService.updatePriceBreakups(itemDetailRequest.getPriceBreakup(), orderItemDAO);
 
-                // create new order items
-                List<OrderItemDetailRequest> newItems = orderDetails.getOrderItems()
-                                .stream()
-                                .filter(itemDetail -> itemDetail.getId() == null)
-                                .collect(Collectors.toList());
-                List<OrderItemDAO> allOrderItems = null;
-                try {
-                        allOrderItems = orderItemService.createOrderItems(newItems, orderDAO);
+                    // updating priceBreakup DAO list of orderItemDAO
+                    orderItemDAO.setPriceBreakup(updatedPriceBreakupDAOList);
+                    ;
+
                 } catch (Exception e) {
-                        throw new RuntimeException("Exception while creating new order items",
-                                        e);
+                    throw new RuntimeException("Exception while updating price breakups", e);
                 }
-                if (allOrderItems == null) {
-                        throw new RuntimeException(
-                                        "Null order items returned from orderItemService createOrderItems method");
-                }
-
-                // update items which already exists
-                List<OrderItemDetailRequest> alreadySavedItems = orderDetails.getOrderItems()
-                                .stream()
-                                .filter(itemDetail -> itemDetail.getId() != null)
-                                .collect(Collectors.toList());
-                List<OrderItemDAO> savedItems = new ArrayList<>();
-                for (OrderItemDetailRequest itemDetailRequest : alreadySavedItems) {
-                        OrderItemDAO orderItemDAO = null;
-                        try {
-                                orderItemDAO = orderItemService.updateOrderItem(itemDetailRequest.getId(),
-                                                itemDetailRequest);
-                        } catch (Exception e) {
-                                throw new RuntimeException("Exception while updating order item",
-                                                e);
-                        }
-                        if (orderItemDAO == null) {
-                                throw new RuntimeException(
-                                                "Null order item returned from orderItemService updateOrderItem method");
-                        }
-
-                        if (!CollectionUtils.isEmpty(itemDetailRequest.getPriceBreakup())) {
-                                try {
-                                        // updating priceBreakup DAO
-                                        List<PriceBreakupDAO> updatedPriceBreakupDAOList = priceBreakUpService
-                                                        .updatePriceBreakups(itemDetailRequest.getPriceBreakup(),
-                                                                        orderItemDAO);
-
-                                        // updating priceBreakup DAO list of orderItemDAO
-                                        orderItemDAO.setPriceBreakup(updatedPriceBreakupDAOList);
-                                        ;
-
-                                } catch (Exception e) {
-                                        throw new RuntimeException("Exception while updating price breakups", e);
-                                }
-                        }
-                        savedItems.add(orderItemDAO);
-                }
-
-                // collate all items
-                List<OrderItemDAO> allItems = collateAllItems(allOrderItems, savedItems);
-                if (allItems == null) {
-                        throw new RuntimeException("Null all items returned from collateAllItems method");
-                }
-
-                // update order amount and items
-                try {
-                        orderDAO.setOrderItems(allItems);
-                } catch (NullPointerException e) {
-                        throw new RuntimeException("NullPointerException while setting order items in orderDAO",
-                                        e);
-                }
-                OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-                try {
-                        orderAmountDAO = orderService.setOrderAmountSpecificDetails(
-                                        orderDetails.getOrderAmountDetails(),
-                                        orderDAO);
-                } catch (Exception e) {
-                        throw new RuntimeException("Exception while setting order amount specific details",
-                                        e);
-                }
-                if (orderAmountDAO == null) {
-                        throw new RuntimeException(
-                                        "Null order amount returned from orderService setOrderAmountSpecificDetails method");
-                }
-
-                // create order summary
-                OrderSummary orderSummary = null;
-                try {
-                        orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
-                                        orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
-                                        orderDAO.getNonDeletedItems());
-                } catch (NullPointerException e) {
-                        throw new RuntimeException("NullPointerException while creating new order summary",
-                                        e);
-                }
-
-                return orderSummary;
+            }
+            savedItems.add(orderItemDAO);
         }
 
-        @Transactional
-        public OrderSummary createOrderItem(OrderCreationRequest orderCreationRequest) {
-                OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
-                OrderDAO orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(),
-                                orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
-                List<OrderItemDAO> orderItems = orderItemService.createOrderItems(orderDetails.getOrderItems(),
-                                orderDAO);
-                OrderAmountDAO orderAmountDAO = orderService.setOrderAmountSpecificDetails(new OrderAmountDetails(),
-                                orderDAO);
-                orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(
-                                orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
-                                                new CycleAvoidingMappingContext())),
-                                new CycleAvoidingMappingContext());
-                if (orderDAO.getOrderAmount() == null) {
-                        orderDAO.setOrderAmount(orderAmountDAO);
-                        orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
-                                        new CycleAvoidingMappingContext())),
-                                        new CycleAvoidingMappingContext());
-                }
-                OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
-                                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderItems);
-                return orderSummary;
+        // collate all items
+        List<OrderItemDAO> allItems = collateAllItems(allOrderItems, savedItems);
+        if (allItems == null) {
+            throw new RuntimeException("Null all items returned from collateAllItems method");
         }
 
-        public OrderSummary updateOrderItem(Long orderItemId, OrderItemDetailRequest orderItemDetails)
-                        throws Exception {
-                OrderItemDAO updatedItem = orderItemService.updateOrderItem(orderItemId, orderItemDetails);
-
-                if (!Collections.isEmpty(orderItemDetails.getPriceBreakup())) {
-                        List<PriceBreakupDAO> updatedPriceBreakup = priceBreakUpService
-                                        .updatePriceBreakups(orderItemDetails.getPriceBreakup(), updatedItem);
-
-                }
-                OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId());
-
-                OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-                orderService.generateInvoiceV2(orderDAO);
-                Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
-                generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(),
-                                orderDAO.getBoutique().getName(), orderNo);
-                OrderSummary orderItemSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
-                                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
-                                orderDAO.getNonDeletedItems());
-                return orderItemSummary;
+        // update order amount and items
+        try {
+            orderDAO.setOrderItems(allItems);
+        } catch (NullPointerException e) {
+            throw new RuntimeException("NullPointerException while setting order items in orderDAO", e);
+        }
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        try {
+            orderAmountDAO = orderService.setOrderAmountSpecificDetails(orderDetails.getOrderAmountDetails(), orderDAO);
+        } catch (Exception e) {
+            throw new RuntimeException("Exception while setting order amount specific details", e);
+        }
+        if (orderAmountDAO == null) {
+            throw new RuntimeException("Null order amount returned from orderService setOrderAmountSpecificDetails method");
         }
 
-        private List<OrderItemDAO> collateAllItems(List<OrderItemDAO> allItems, List<OrderItemDAO> updatedItems) {
-                Map<Long, OrderItemDAO> allItemsMap = allItems.stream()
-                                .collect(Collectors.toMap(OrderItemDAO::getId, orderItem -> orderItem));
-                Map<Long, OrderItemDAO> updatedItemsMap = updatedItems.stream()
-                                .collect(Collectors.toMap(OrderItemDAO::getId, orderItem -> orderItem));
-                List<OrderItemDAO> updatedItemsList = new ArrayList<>();
-                for (Map.Entry<Long, OrderItemDAO> orderItemEntrySet : allItemsMap.entrySet()) {
-                        if (updatedItemsMap.containsKey(orderItemEntrySet.getKey())) {
-                                updatedItemsList.add(updatedItemsMap.get(orderItemEntrySet.getKey()));
-                        } else {
-                                updatedItemsList.add(allItemsMap.get(orderItemEntrySet.getKey()));
-                        }
-                }
-                return updatedItemsList;
+        // create order summary
+        OrderSummary orderSummary = null;
+        try {
+            orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
+        } catch (NullPointerException e) {
+            throw new RuntimeException("NullPointerException while creating new order summary", e);
         }
 
-        public void generateItemDetailPdfs(OrderDAO orderDAO) throws Exception {
-                List<OrderItemDAO> orderItems = orderDAO.getOrderItems();
-                Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
-                for (OrderItemDAO orderItem : orderItems) {
-                        generateItemDetailPdf(orderItem, orderDAO.getCustomer().getId(),
-                                        orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
-                }
-        }
+        return orderSummary;
+    }
 
-        public void generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId,
-                        String boutiqueName,
-                        Long orderNo) throws Exception {
-                Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions = stitchOptionService
-                                .getOrderItemStitchOptions(orderItemDAO.getId());
-                MeasurementRevisions measurementRevisions = measurementService.getMeasurementObject(null, customerId,
-                                orderItemDAO.getId(),
-                                orderItemDAO.getOutfitType());
-                List<InnerMeasurementDetails> innerMeasurementDetailsList = new ArrayList<>();
-                if (measurementRevisions != null) {
-                        MeasurementRevisionsDAO revisionsDAO = mapper
-                                        .measurementRevisionsToMeasurementRevisionDAO(measurementRevisions);
-                        innerMeasurementDetailsList = measurementService.generateInnerMeasurementDetails(
-                                        boutiqueId, orderItemDAO.getOutfitType(), revisionsDAO, true);
-                }
-                List<String> clothImageLinks = orderItemService.getClothImageLinks(orderItemDAO.getId());
-
-                File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions,
-                                innerMeasurementDetailsList, clothImageLinks, orderItemDAO);
-                String fileUploadUrl = bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
+    @Transactional
+    public OrderSummary createOrderItem(OrderCreationRequest orderCreationRequest) {
+        OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
+        OrderDAO orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(), orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
+        List<OrderItemDAO> orderItems = orderItemService.createOrderItems(orderDetails.getOrderItems(), orderDAO);
+        OrderAmountDAO orderAmountDAO = orderService.setOrderAmountSpecificDetails(new OrderAmountDetails(), orderDAO);
+        orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        if (orderDAO.getOrderAmount() == null) {
+            orderDAO.setOrderAmount(orderAmountDAO);
+            orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         }
+        OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderItems);
+        return orderSummary;
+    }
+
+    public OrderSummary updateOrderItem(Long orderItemId, OrderItemDetailRequest orderItemDetails) throws Exception {
+        OrderItemDAO updatedItem = orderItemService.updateOrderItem(orderItemId, orderItemDetails);
+
+        if (!Collections.isEmpty(orderItemDetails.getPriceBreakup())) {
+            List<PriceBreakupDAO> updatedPriceBreakup = priceBreakUpService.updatePriceBreakups(orderItemDetails.getPriceBreakup(), updatedItem);
+
+        }
+        OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId());
+
+        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        orderService.generateInvoiceV2(orderDAO);
+        Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
+        generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
+        OrderSummary orderItemSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
+        return orderItemSummary;
+    }
+
+    private List<OrderItemDAO> collateAllItems(List<OrderItemDAO> allItems, List<OrderItemDAO> updatedItems) {
+        Map<Long, OrderItemDAO> allItemsMap = allItems.stream().collect(Collectors.toMap(OrderItemDAO::getId, orderItem -> orderItem));
+        Map<Long, OrderItemDAO> updatedItemsMap = updatedItems.stream().collect(Collectors.toMap(OrderItemDAO::getId, orderItem -> orderItem));
+        List<OrderItemDAO> updatedItemsList = new ArrayList<>();
+        for (Map.Entry<Long, OrderItemDAO> orderItemEntrySet : allItemsMap.entrySet()) {
+            if (updatedItemsMap.containsKey(orderItemEntrySet.getKey())) {
+                updatedItemsList.add(updatedItemsMap.get(orderItemEntrySet.getKey()));
+            } else {
+                updatedItemsList.add(allItemsMap.get(orderItemEntrySet.getKey()));
+            }
+        }
+        return updatedItemsList;
+    }
+
+    public void generateItemDetailPdfs(OrderDAO orderDAO) throws Exception {
+        List<OrderItemDAO> orderItems = orderDAO.getOrderItems();
+        Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
+        for (OrderItemDAO orderItem : orderItems) {
+            generateItemDetailPdf(orderItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
+        }
+    }
+
+    public void generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId, String boutiqueName, Long orderNo) throws Exception {
+        Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions = stitchOptionService.getOrderItemStitchOptions(orderItemDAO.getId());
+        MeasurementRevisions measurementRevisions = measurementService.getMeasurementObject(null, customerId, orderItemDAO.getId(), orderItemDAO.getOutfitType());
+        List<InnerMeasurementDetails> innerMeasurementDetailsList = new ArrayList<>();
+        if (measurementRevisions != null) {
+            MeasurementRevisionsDAO revisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(measurementRevisions);
+            innerMeasurementDetailsList = measurementService.generateInnerMeasurementDetails(boutiqueId, orderItemDAO.getOutfitType(), revisionsDAO, true);
+        }
+        List<String> clothImageLinks = orderItemService.getClothImageLinks(orderItemDAO.getId());
+
+        File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions, innerMeasurementDetailsList, clothImageLinks, orderItemDAO);
+        String fileUploadUrl = bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
+    }
 }

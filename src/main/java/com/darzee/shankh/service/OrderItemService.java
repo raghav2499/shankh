@@ -90,26 +90,18 @@ public class OrderItemService {
         for (OrderItemDetailRequest itemDetail : orderItemDetails) {
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
             if (outfitType == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Invalid outfit type " + itemDetail.getOutfitType());
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid outfit type " + itemDetail.getOutfitType());
             }
 
             MeasurementRevisionsDAO measurementRevisionsDAO = null;
             if (itemDetail.getMeasurementRevisionId() != null) {
-                measurementRevisionsDAO = measurementService
-                        .getMeasurementRevisionById(itemDetail.getMeasurementRevisionId());
+                measurementRevisionsDAO = measurementService.getMeasurementRevisionById(itemDetail.getMeasurementRevisionId());
             }
 
-            OrderItemDAO orderItemDAO = new OrderItemDAO(itemDetail.getTrialDate(), itemDetail.getDeliveryDate(),
-                    itemDetail.getSpecialInstructions(), itemDetail.getOrderType(), outfitType,
-                    itemDetail.getInspiration(), itemDetail.getIsPriorityOrder(), itemDetail.getItemQuantity(),
-                    itemDetail.getOutfitAlias(), measurementRevisionsDAO, order);
-            orderItemDAO = mapper
-                    .orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItemDAO,
-                            new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+            OrderItemDAO orderItemDAO = new OrderItemDAO(itemDetail.getTrialDate(), itemDetail.getDeliveryDate(), itemDetail.getSpecialInstructions(), itemDetail.getOrderType(), outfitType, itemDetail.getInspiration(), itemDetail.getIsPriorityOrder(), itemDetail.getItemQuantity(), itemDetail.getOutfitAlias(), measurementRevisionsDAO, order);
+            orderItemDAO = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItemDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
-            List<PriceBreakupDAO> priceBreakupDAOList = priceBreakUpService
-                    .generatePriceBreakupList(itemDetail.getPriceBreakup(), orderItemDAO);
+            List<PriceBreakupDAO> priceBreakupDAOList = priceBreakUpService.generatePriceBreakupList(itemDetail.getPriceBreakup(), orderItemDAO);
             priceBreakupDAOList = priceBreakUpService.savePriceBreakUp(priceBreakupDAOList);
             orderItemDAO.setPriceBreakup(priceBreakupDAOList);
 
@@ -183,8 +175,7 @@ public class OrderItemService {
         }
 
         if (orderItem.isStatusUpdated(updateItemDetail.getItemStatus())) {
-            OrderItemStatus status = OrderItemStatus.getOrderItemStatusEnumOrdinalMap()
-                    .get(updateItemDetail.getItemStatus());
+            OrderItemStatus status = OrderItemStatus.getOrderItemStatusEnumOrdinalMap().get(updateItemDetail.getItemStatus());
             OrderItemStatus initialState = orderItem.getOrderItemStatus();
             orderItemStateMachineService.isTransitionAllowed(initialState, status);
             orderItem.setOrderItemStatus(status);
@@ -223,26 +214,20 @@ public class OrderItemService {
         }
 
         if (orderItem.isMeasurementRevisionUpdated(updateItemDetail.getMeasurementRevisionId())) {
-            MeasurementRevisionsDAO measurementRevisionsDAO = measurementService
-                    .getMeasurementRevisionById(updateItemDetail.getMeasurementRevisionId());
+            MeasurementRevisionsDAO measurementRevisionsDAO = measurementService.getMeasurementRevisionById(updateItemDetail.getMeasurementRevisionId());
             orderItem.setMeasurementRevision(measurementRevisionsDAO);
         }
 
         if (!Collections.isEmpty(updateItemDetail.getClothImageReferenceIds())) {
-            objectFilesService.invalidateExistingReferenceIds(FileEntityType.ORDER_ITEM.getEntityType(),
-                    orderItemId);
-            objectFilesService.saveObjectFiles(updateItemDetail.getClothImageReferenceIds(),
-                    FileEntityType.ORDER_ITEM.getEntityType(), orderItemId);
+            objectFilesService.invalidateExistingReferenceIds(FileEntityType.ORDER_ITEM.getEntityType(), orderItemId);
+            objectFilesService.saveObjectFiles(updateItemDetail.getClothImageReferenceIds(), FileEntityType.ORDER_ITEM.getEntityType(), orderItemId);
         }
 
         if (!Collections.isEmpty(updateItemDetail.getAudioReferenceIds())) {
-            objectFilesService.invalidateExistingReferenceIds(FileEntityType.AUDIO.getEntityType(),
-                    orderItemId);
-            objectFilesService.saveObjectFiles(updateItemDetail.getClothImageReferenceIds(),
-                    FileEntityType.AUDIO.getEntityType(), orderItemId);
+            objectFilesService.invalidateExistingReferenceIds(FileEntityType.AUDIO.getEntityType(), orderItemId);
+            objectFilesService.saveObjectFiles(updateItemDetail.getClothImageReferenceIds(), FileEntityType.AUDIO.getEntityType(), orderItemId);
         }
-        orderItem = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItem,
-                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        orderItem = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItem, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
         if (orderItem.isPriceBreakupListUpdated(updateItemDetail.getPriceBreakup())) {
             priceBreakUpService.updatePriceBreakups(updateItemDetail.getPriceBreakup(), orderItem);
@@ -260,34 +245,22 @@ public class OrderItemService {
         return getOrderItemDetails(orderItemDAO);
     }
 
-    public ResponseEntity<GetOrderItemResponse> getOrderItemDetails(Long boutiqueId, Long orderId,
-            String orderItemStatusList,
-            Boolean priorityOrdersOnly, String sortKey,
-            String sortOrder, Integer countPerPage, Integer pageCount, String deliveryDateFrom,
-            String deliveryDateTill) {
+    public ResponseEntity<GetOrderItemResponse> getOrderItemDetails(Long boutiqueId, Long orderId, String orderItemStatusList, Boolean priorityOrdersOnly, String sortKey, String sortOrder, Integer countPerPage, Integer pageCount, String deliveryDateFrom, String deliveryDateTill) {
         validateGetOrderItemRequest(boutiqueId, orderId);
-        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList, null,
-                priorityOrdersOnly, null, deliveryDateFrom, deliveryDateTill, orderId, null);
-        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount,
-                sortKey, sortOrder);
-        Specification<OrderItem> orderItemSpecification = OrderItemSpecificationClause
-                .getSpecificationBasedOnFilters(filterMap);
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList, null, priorityOrdersOnly, null, deliveryDateFrom, deliveryDateTill, orderId, null);
+        Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, sortKey, sortOrder);
+        Specification<OrderItem> orderItemSpecification = OrderItemSpecificationClause.getSpecificationBasedOnFilters(filterMap);
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingCriteriaMap);
         List<OrderItem> orderItems = orderItemRepo.findAll(orderItemSpecification, pagingCriteria).getContent();
         Long totalCount = orderItemRepo.count(orderItemSpecification);
-        List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems,
-                new CycleAvoidingMappingContext());
-        List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream()
-                .map(orderItem -> {
-                    try {
-                        return new OrderItemDetails(orderItem,
-                                outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType())
-                                        .getOutfitImageLink());
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
+        List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems, new CycleAvoidingMappingContext());
+        List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream().map(orderItem -> {
+            try {
+                return new OrderItemDetails(orderItem, outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
         GetOrderItemResponse response = new GetOrderItemResponse(orderItemDetails, totalCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -307,23 +280,18 @@ public class OrderItemService {
         // Get the customer ID and get the overall measurement details for the customer
         // and order item
         Long customerId = orderItem.getOrder().getCustomer().getId();
-        OverallMeasurementDetails overallMeasurementDetails = measurementService.getMeasurementDetails(customerId, null,
-                orderItem.getId(),
-                outfitType.getOrdinal(), null, true);
+        OverallMeasurementDetails overallMeasurementDetails = measurementService.getMeasurementDetails(customerId, null, orderItem.getId(), outfitType.getOrdinal(), null, true);
 
-        Map<String, List<OrderStitchOptionDetail>> orderItemStitchOptions = stitchOptionService
-                .getOrderItemStitchOptions(orderItem.getId());
+        Map<String, List<OrderStitchOptionDetail>> orderItemStitchOptions = stitchOptionService.getOrderItemStitchOptions(orderItem.getId());
 
-        OrderItemDetails orderItemDetails = new OrderItemDetails(clothImageFileDetails, audioFileDetails,
-                overallMeasurementDetails, orderItemStitchOptions, outfitImageLink, orderItem);
+        OrderItemDetails orderItemDetails = new OrderItemDetails(clothImageFileDetails, audioFileDetails, overallMeasurementDetails, orderItemStitchOptions, outfitImageLink, orderItem);
         return orderItemDetails;
     }
 
     public List<String> getClothImageLinks(Long orderItemId) {
         List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(orderItemId);
         List<FileDetail> clothImageFileDetails = getClothImageDetails(clothImagesReferenceIds);
-        return clothImageFileDetails.stream().map(fileDetail -> fileDetail.getShortLivedUrl())
-                .collect(Collectors.toList());
+        return clothImageFileDetails.stream().map(fileDetail -> fileDetail.getShortLivedUrl()).collect(Collectors.toList());
     }
 
     private List<String> getClothProfilePicLink(List<String> clothImageReferenceId) {
@@ -332,10 +300,8 @@ public class OrderItemService {
         }
         List<ImageReference> clothImageReferences = fileReferenceRepo.findAllByReferenceIdIn(clothImageReferenceId);
         if (!Collections.isEmpty(clothImageReferences)) {
-            List<ImageReferenceDAO> imageReferenceDAOs = CommonUtils.mapList(clothImageReferences,
-                    mapper::imageReferenceToImageReferenceDAO);
-            List<String> clothImageFileNames = imageReferenceDAOs.stream().map(imageRef -> imageRef.getImageName())
-                    .collect(Collectors.toList());
+            List<ImageReferenceDAO> imageReferenceDAOs = CommonUtils.mapList(clothImageReferences, mapper::imageReferenceToImageReferenceDAO);
+            List<String> clothImageFileNames = imageReferenceDAOs.stream().map(imageRef -> imageRef.getImageName()).collect(Collectors.toList());
             return s3Client.generateShortLivedUrls(clothImageFileNames);
         }
         return new ArrayList<>();
@@ -367,8 +333,7 @@ public class OrderItemService {
         }
 
         for (String audioFileRefId : audioFileRefIds) {
-            ImageReferenceDAO audioFileReference = mapper
-                    .imageReferenceToImageReferenceDAO(fileReferenceRepo.findByReferenceId(audioFileRefId).get());
+            ImageReferenceDAO audioFileReference = mapper.imageReferenceToImageReferenceDAO(fileReferenceRepo.findByReferenceId(audioFileRefId).get());
             String url = s3Client.generateShortLivedUrlForAudio(audioFileReference.getImageName());
             FileDetail fileDetail = new FileDetail(audioFileRefId, url);
             fileDetails.add(fileDetail);

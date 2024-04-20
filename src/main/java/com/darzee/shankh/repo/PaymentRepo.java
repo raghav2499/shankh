@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface PaymentRepo extends JpaRepository<Payment, Long> {
 
     List<Payment> findAllByOrderId(Long orderId);
-    Optional<Payment> findTopByOrderIdOrderByIdDesc(Long orderId);  
+
+    Optional<Payment> findTopByOrderIdOrderByIdDesc(Long orderId);
 }

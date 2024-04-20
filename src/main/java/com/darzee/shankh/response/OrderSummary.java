@@ -32,7 +32,7 @@ public class OrderSummary {
         this.invoiceNo = invoiceNo;
         this.totalOrderAmount = totalOrderAmount;
         this.orderAdvanceRecieved = orderAdvanceRecieved;
-        for(OrderItemDAO orderItem : orderItemDAOs) {
+        for (OrderItemDAO orderItem : orderItemDAOs) {
             orderItemSummaryList.add(new OrderItemSummary(orderItem));
         }
     }

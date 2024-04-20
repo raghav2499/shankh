@@ -64,9 +64,7 @@ public class OrderItemDAO {
     private String formattedDeliveryDate;
     private OrderDAO order;
 
-    public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions,
-            OrderType orderType, OutfitType outfitType, String inspiration, Boolean isPriorityOrder,
-            Integer quantity, String outfitAlias, MeasurementRevisionsDAO measurementRevision, OrderDAO orderDAO) {
+    public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions, OrderType orderType, OutfitType outfitType, String inspiration, Boolean isPriorityOrder, Integer quantity, String outfitAlias, MeasurementRevisionsDAO measurementRevision, OrderDAO orderDAO) {
         this.trialDate = trialDate;
         this.deliveryDate = deliveryDate;
         this.specialInstructions = specialInstructions;
@@ -110,22 +108,16 @@ public class OrderItemDAO {
     }
 
     public boolean isMeasurementRevisionUpdated(Long value) {
-        return (this.measurementRevision == null && value != null)
-                || (this.measurementRevision != null && value != null && !value.equals(
-                    this.getMeasurementRevision().getId()));
+        return (this.measurementRevision == null && value != null) || (this.measurementRevision != null && value != null && !value.equals(this.getMeasurementRevision().getId()));
     }
 
     public boolean mandatoryFieldsPresent() {
         String outfitAlias = Optional.ofNullable(this.outfitAlias).orElse(this.outfitType.getDisplayString());
         if (this.deliveryDate == null || this.orderType == null || this.outfitType == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Some Mandatory fields in Order Item "
-                            + outfitAlias
-                            + "are missing. Delivery date, Order type, Outfit Type are Mandatory params");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Some Mandatory fields in Order Item " + outfitAlias + "are missing. Delivery date, Order type, Outfit Type are Mandatory params");
         }
         if (CollectionUtils.isEmpty(this.getActivePriceBreakUpList())) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Price Break Up of Order Item " + outfitAlias + " is missing");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Price Break Up of Order Item " + outfitAlias + " is missing");
         }
         return true;
     }
@@ -133,18 +125,13 @@ public class OrderItemDAO {
     public Double calculateItemPrice() {
         List<PriceBreakupDAO> priceBreakupList = getActivePriceBreakUpList();
         if (!CollectionUtils.isEmpty(priceBreakupList)) {
-            return priceBreakupList.stream()
-                    .filter(pb -> !Boolean.TRUE.equals(pb.getIsDeleted()))
-                    .mapToDouble(pb -> pb.getValue() * pb.getQuantity())
-                    .sum();
+            return priceBreakupList.stream().filter(pb -> !Boolean.TRUE.equals(pb.getIsDeleted())).mapToDouble(pb -> pb.getValue() * pb.getQuantity()).sum();
         }
         return 0d;
     }
 
     public List<PriceBreakupDAO> getActivePriceBreakUpList() {
-        return this.getPriceBreakup().stream()
-                .filter(pb -> !Boolean.TRUE.equals(pb.getIsDeleted()))
-                .collect(Collectors.toList());
+        return this.getPriceBreakup().stream().filter(pb -> !Boolean.TRUE.equals(pb.getIsDeleted())).collect(Collectors.toList());
     }
 
     public void setFormattedDeliveryDate() {
@@ -160,7 +147,7 @@ public class OrderItemDAO {
      * To check if price break up list is updated or not. If the list is empty or null, it will return true.
      */
     public boolean isPriceBreakupListUpdated(List<PriceBreakUpDetails> priceBreakupList) {
-     
+
         if (CollectionUtils.isEmpty(priceBreakupList) || CollectionUtils.isEmpty(this.priceBreakup)) {
             return !CollectionUtils.isEmpty(priceBreakupList) || !CollectionUtils.isEmpty(this.priceBreakup);
         }
@@ -170,15 +157,10 @@ public class OrderItemDAO {
         }
 
         return priceBreakupList.stream().anyMatch(pb -> {
-      
-            Optional<PriceBreakupDAO> existingPb = this.priceBreakup.stream()
-                    .filter(epb -> epb.getId().equals(pb.getId())).findFirst();
-            
-            return !existingPb.isPresent() ||
-                    !existingPb.get().getValue().equals(pb.getValue()) ||
-                    !existingPb.get().getQuantity().equals(pb.getComponentQuantity()) ||
-                    !existingPb.get().getIsDeleted().equals(pb.getIsDeleted())
-                    || !existingPb.get().getComponent().equals(pb.getComponent());
+
+            Optional<PriceBreakupDAO> existingPb = this.priceBreakup.stream().filter(epb -> epb.getId().equals(pb.getId())).findFirst();
+
+            return !existingPb.isPresent() || !existingPb.get().getValue().equals(pb.getValue()) || !existingPb.get().getQuantity().equals(pb.getComponentQuantity()) || !existingPb.get().getIsDeleted().equals(pb.getIsDeleted()) || !existingPb.get().getComponent().equals(pb.getComponent());
         });
     }
 

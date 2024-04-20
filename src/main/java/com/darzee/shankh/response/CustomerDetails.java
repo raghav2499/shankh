@@ -41,7 +41,7 @@ public class CustomerDetails {
     }
 
     public CustomerDetails(CustomerDAO customerDAO, String customerProfilePicLink) {
-        if(customerDAO != null) {
+        if (customerDAO != null) {
             this.customerName = customerDAO.constructName();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.profilePicLink = customerProfilePicLink;
@@ -52,7 +52,7 @@ public class CustomerDetails {
     }
 
     public CustomerDetails(CustomerDAO customerDAO, String referenceId, String customerProfilePicLink, Double revenue) {
-        if(customerDAO != null) {
+        if (customerDAO != null) {
             this.customerName = customerDAO.constructName();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.referenceId = referenceId;
@@ -65,7 +65,7 @@ public class CustomerDetails {
     }
 
     public CustomerDetails(CustomerDAO customerDAO) {
-        if(customerDAO != null) {
+        if (customerDAO != null) {
             this.customerName = customerDAO.constructName();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.customerId = customerDAO.getId();
