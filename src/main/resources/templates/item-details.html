@@ -197,21 +197,22 @@
         .image_div {
             margin-top: 30px;
         }
+
+
+
+
+
+
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="main-div-header">
-            <div class="left" style="float: left;">
-                <h1 id="main-heading">Item Details</h1>
-                <p class="invoice-details" id="main-para" th:text="${businessName}"></p>
-            </div>
-            <div class="right" style="float: right;">
-                <p class="invoice-details">Order Number: <span class="black" th:text="${orderNo}"></span></p>
-                <p class="invoice-details">Finish By: <span class="black" th:text="${invoiceNo}"></span></p>
-            </div>
+<div class="container">
+    <div class="main-div-header">
+        <div class="left" style="float: left;">
+            <h1 id="main-heading">Item Details</h1>
+            <p class="invoice-details" id="main-para" th:text="${businessName}"></p>
         </div>
         <hr style="height: 1px; border: none; background-color: #000;">
         </hr>
@@ -329,9 +330,10 @@
 
                             </div>
                         </div>
-                        <div style="width: 100%; height: 0; clear: both;"></div>
-                    </fieldset>
-                </div>
+                    </div>
+                    <div style="width: 100%; height: 0; clear: both;"></div>
+                </fieldset>
+            </div>
 
                 <!-- Bottom Starts -->
                 <div class="bottom" style="margin-top: 30px;">
@@ -407,6 +409,7 @@
         </div>
 
     </div>
+</div>
 </body>
 
 </html>

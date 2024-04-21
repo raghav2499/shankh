@@ -128,7 +128,9 @@ public class BoutiqueLedgerService {
         if (closedOrderCountChange != 0) {
             boutiqueLedgerDAO.incrementClosedOrderCount(closedOrderCountChange);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
+        boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO,
+                        new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        return boutiqueLedgerDAO;
     }
 
     @Transactional

@@ -235,7 +235,8 @@ public class OrderItemService {
         List<String> audioReferenceIds = objectFilesService.getAudioReferenceIds(orderItem.getId());
         List<FileDetail> audioFileDetails = getAudioDetails(audioReferenceIds);
         Long customerId = orderItem.getOrder().getCustomer().getId();
-        OverallMeasurementDetails overallMeasurementDetails = measurementService.getMeasurementDetails(customerId, orderItem.getId(),
+        OverallMeasurementDetails overallMeasurementDetails = measurementService.getMeasurementDetails(customerId, null,
+                orderItem.getId(),
                 outfitType.getOrdinal(), null, true);
         Map<String, List<OrderStitchOptionDetail>> orderItemStitchOptions = stitchOptionService.getOrderItemStitchOptions(orderItem.getId());
         OrderItemDetails orderItemDetails = new OrderItemDetails(clothImageFileDetails, audioFileDetails,

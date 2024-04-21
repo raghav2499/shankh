@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,7 +42,7 @@ public class OrderItemDAO {
     private String inspiration;
 
     private Boolean isPriorityOrder;
-    private Boolean isDeleted;
+    private Boolean isDeleted = Boolean.FALSE;
 
     private OrderItemStatus orderItemStatus = OrderItemStatus.DRAFTED;
 
@@ -59,6 +60,7 @@ public class OrderItemDAO {
 
     private LocalDateTime updatedAt;
 
+    private String formattedDeliveryDate;
     private OrderDAO order;
 
     public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions,
@@ -121,7 +123,7 @@ public class OrderItemDAO {
                             + outfitAlias
                             + "are missing. Delivery date, Order type, Outfit Type are Mandatory params");
         }
-        if (CollectionUtils.isEmpty(this.priceBreakup)) {
+        if (CollectionUtils.isEmpty(this.getActivePriceBreakUpList())) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Price Break Up of Order Item " + outfitAlias + " is missing");
         }
@@ -132,6 +134,7 @@ public class OrderItemDAO {
         List<PriceBreakupDAO> priceBreakupList = getActivePriceBreakUpList();
         if (!CollectionUtils.isEmpty(priceBreakupList)) {
             return priceBreakupList.stream()
+                    .filter(pb -> !Boolean.TRUE.equals(pb.getIsDeleted()))
                     .mapToDouble(pb -> pb.getValue() * pb.getQuantity())
                     .sum();
         }
@@ -144,4 +147,11 @@ public class OrderItemDAO {
                 .collect(Collectors.toList());
     }
 
+    public void setFormattedDeliveryDate() {
+        if (this.deliveryDate == null) {
+            return;
+        }
+        DateTimeFormatter deliveryDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm a");
+        this.formattedDeliveryDate = this.deliveryDate.format(deliveryDateFormatter);
+    }
 }

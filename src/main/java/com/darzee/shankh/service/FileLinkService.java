@@ -20,13 +20,13 @@ public class FileLinkService {
     @Autowired
     private BucketService bucketService;
 
-    public ResponseEntity<GetFileResponse> getFileLinkResponse(GetFileLinkRequest fileLinkRequest) {
+    public ResponseEntity<GetFileResponse> getFileLinkResponse(GetFileLinkRequest fileLinkRequest) throws Exception {
         String link = getFileLink(fileLinkRequest);
         GetFileResponse response = new GetFileResponse(link);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    private String getFileLink(GetFileLinkRequest request) {
+    private String getFileLink(GetFileLinkRequest request) throws Exception {
         String entityType = request.getEntityType();
         switch(entityType) {
             case "invoice":

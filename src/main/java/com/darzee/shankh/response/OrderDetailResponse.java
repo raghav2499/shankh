@@ -27,6 +27,7 @@ public class OrderDetailResponse {
     private List<OrderItemDetails> orderItemDetails = new ArrayList<>();
     private OrderAmountDetails orderAmountDetails;
     private CustomerDetails customerDetails;
+    private Integer paymentMode;
 
     private String message;
 
@@ -48,12 +49,13 @@ public class OrderDetailResponse {
     }
 
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, OrderAmountDAO orderAmountDAO,
-                               List<OrderItemDetails> orderItemDetails, String message) {
+                               List<OrderItemDetails> orderItemDetails, Integer paymentMode, String message) {
         this.orderId = order.getBoutiqueOrderId();
         this.orderStatus = order.getOrderStatus().getDisplayString();
         this.orderAmountDetails = new OrderAmountDetails(orderAmountDAO);
         this.customerDetails = new CustomerDetails(customer);
         this.orderItemDetails = orderItemDetails;
+        this.paymentMode = paymentMode;
         this.message = message;
     }
 

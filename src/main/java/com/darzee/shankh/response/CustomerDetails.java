@@ -73,4 +73,9 @@ public class CustomerDetails {
             this.gender = customerDAO.getGender().getString();
         }
     }
+
+    public CustomerDetails(Long customerId, String phoneNumber) {
+        this.customerId = customerId;
+        this.phoneNumber = phoneNumber;
+    }
 }

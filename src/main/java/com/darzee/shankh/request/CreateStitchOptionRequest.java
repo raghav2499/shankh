@@ -9,5 +9,5 @@ import java.util.List;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateStitchOptionRequest {
-    List<StitchDetails> stitchDetails;
+    private List<StitchDetails> stitchDetails;
 }

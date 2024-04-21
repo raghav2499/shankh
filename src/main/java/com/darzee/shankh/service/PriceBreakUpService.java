@@ -85,5 +85,8 @@ public class PriceBreakUpService {
         if (priceBreakupDAO.isQuantityUpdated(updatedDetails.getComponentQuantity())) {
             priceBreakupDAO.setQuantity(updatedDetails.getComponentQuantity());
         }
+        if(Boolean.TRUE.equals(priceBreakupDAO.getIsDeleted())) {
+            priceBreakupDAO.setIsDeleted(Boolean.TRUE);
+        }
     }
 }
