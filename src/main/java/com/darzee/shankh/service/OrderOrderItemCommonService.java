@@ -72,11 +72,9 @@ public class OrderOrderItemCommonService {
 
     public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
         OrderDAO orderDAO = orderService.confirmOrder(boutiqueOrderId, boutiqueId, request);
-
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-
-        OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
-
+        OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
+                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         orderService.generateInvoiceV2(orderDAO);
         generateItemDetailPdfs(orderDAO);
         return new ResponseEntity<>(summary, HttpStatus.OK);
@@ -98,14 +96,8 @@ public class OrderOrderItemCommonService {
         for (OrderItemDetailRequest itemDetailRequest : alreadySavedItems) {
             OrderItemDAO orderItemDAO = orderItemService.updateOrderItem(itemDetailRequest.getId(), itemDetailRequest);
             if (!CollectionUtils.isEmpty(itemDetailRequest.getPriceBreakup())) {
-                try {
-                    List<PriceBreakupDAO> updatedPriceBreakupDAOList = priceBreakUpService.updatePriceBreakups(itemDetailRequest.getPriceBreakup(), orderItemDAO);
-
-                    orderItemDAO.setPriceBreakup(updatedPriceBreakupDAOList);
-
-                } catch (Exception e) {
-                    throw new RuntimeException("Exception while updating price breakups", e);
-                }
+                List<PriceBreakupDAO> updatedPriceBreakupDAOList = priceBreakUpService.updatePriceBreakups(itemDetailRequest.getPriceBreakup(), orderItemDAO);
+                orderItemDAO.setPriceBreakup(updatedPriceBreakupDAOList);
             }
             savedItems.add(orderItemDAO);
         }
@@ -173,9 +165,13 @@ public class OrderOrderItemCommonService {
         }
     }
 
-    public void generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId, String boutiqueName, Long orderNo) throws Exception {
-        Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions = stitchOptionService.getOrderItemStitchOptions(orderItemDAO.getId());
-        MeasurementRevisions measurementRevisions = measurementService.getMeasurementObject(null, customerId, orderItemDAO.getId(), orderItemDAO.getOutfitType());
+    public void generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId, String boutiqueName,
+                                      Long orderNo) throws Exception {
+        Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions =
+                stitchOptionService.getOrderItemStitchOptions(orderItemDAO.getId());
+        MeasurementRevisions measurementRevisions =
+                measurementService.getMeasurementObject(null, customerId, orderItemDAO.getId(),
+                        orderItemDAO.getOutfitType());
         List<InnerMeasurementDetails> innerMeasurementDetailsList = new ArrayList<>();
         if (measurementRevisions != null) {
             MeasurementRevisionsDAO revisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(measurementRevisions);

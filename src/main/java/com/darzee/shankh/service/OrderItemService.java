@@ -13,7 +13,6 @@ import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.response.*;
-import com.darzee.shankh.utils.CommonUtils;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -265,19 +264,6 @@ public class OrderItemService {
         return clothImageFileDetails.stream().map(fileDetail -> fileDetail.getShortLivedUrl()).collect(Collectors.toList());
     }
 
-    private List<String> getClothProfilePicLink(List<String> clothImageReferenceId) {
-        if (Collections.isEmpty(clothImageReferenceId)) {
-            return new ArrayList<>();
-        }
-        List<ImageReference> clothImageReferences = fileReferenceRepo.findAllByReferenceIdIn(clothImageReferenceId);
-        if (!Collections.isEmpty(clothImageReferences)) {
-            List<ImageReferenceDAO> imageReferenceDAOs = CommonUtils.mapList(clothImageReferences, mapper::imageReferenceToImageReferenceDAO);
-            List<String> clothImageFileNames = imageReferenceDAOs.stream().map(imageRef -> imageRef.getImageName()).collect(Collectors.toList());
-            return s3Client.generateShortLivedUrls(clothImageFileNames);
-        }
-        return new ArrayList<>();
-    }
-
     private List<FileDetail> getClothImageDetails(List<String> clothImageRefIds) {
         List<FileDetail> fileDetails = new ArrayList<>();
         if (Collections.isEmpty(clothImageRefIds)) {
@@ -290,7 +276,7 @@ public class OrderItemService {
                 continue;
             }
             ImageReferenceDAO clothImageReferences = mapper.imageReferenceToImageReferenceDAO(imageRef.get());
-            String url = s3Client.generateShortLivedUrl(clothImageReferences.getImageName());
+            String url = s3Client.generateShortLivedUrl(clothImageReferences.getImageName(), true);
             FileDetail fileDetail = new FileDetail(clothImageRefId, url);
             fileDetails.add(fileDetail);
         }

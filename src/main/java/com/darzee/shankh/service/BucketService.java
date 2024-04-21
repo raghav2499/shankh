@@ -94,7 +94,7 @@ public class BucketService {
                 fileReferenceRepo.findAllByReferenceIdIn(fileReferenceIds),
                 mapper::imageReferenceToImageReferenceDAO);
         List<String> shortLivedUrls = imageReferences.stream()
-                .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName()))
+                .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName(), true))
                 .collect(Collectors.toList());
         return new DownloadImageResponse(shortLivedUrls);
     }
@@ -104,7 +104,7 @@ public class BucketService {
                 fileReferenceRepo.findAllByReferenceIdIn(imageReferenceIds),
                 mapper::imageReferenceToImageReferenceDAO);
         List<String> shortLivedUrls = imageReferences.stream()
-                .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName()))
+                .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName(), true))
                 .collect(Collectors.toList());
         return shortLivedUrls;
     }
@@ -113,7 +113,7 @@ public class BucketService {
         Optional<ImageReference> imageReference = fileReferenceRepo.findByReferenceId(imageReferenceId);
         if (imageReference.isPresent()) {
             ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(imageReference.get());
-            String shortLivedUrl = client.generateShortLivedUrl(imageReferenceDAO.getImageName());
+            String shortLivedUrl = client.generateShortLivedUrl(imageReferenceDAO.getImageName(), true);
             return shortLivedUrl;
         }
         return null;
@@ -143,12 +143,12 @@ public class BucketService {
 
     public String getInvoiceShortLivedLink(Long orderId, Long boutiqueId) {
         String fileLocation = invoiceDirectory + boutiqueId + "_" + orderId;
-        return client.generateShortLivedUrl(fileLocation);
+        return client.generateShortLivedUrl(fileLocation, true);
     }
 
     public String getItemDetailsShortLivedLink(Long orderItemId) {
         String fileLocation = itemDetailsDirectory + orderItemId;
-        return client.generateShortLivedUrl(fileLocation);
+        return client.generateShortLivedUrl(fileLocation, true);
     }
 
     private Pair<String, String> uploadPhoto(MultipartFile multipartFile, String uploadFileTypeOrdinal) throws IOException {
