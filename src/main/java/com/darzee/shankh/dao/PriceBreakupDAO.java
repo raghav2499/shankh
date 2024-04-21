@@ -19,7 +19,7 @@ public class PriceBreakupDAO {
     private OrderItemDAO orderItem;
 
     public PriceBreakupDAO(PriceBreakUpDetails priceBreakUpDetails, OrderItemDAO orderItem) {
-        this.component = priceBreakUpDetails.getComponent();;
+        this.component = priceBreakUpDetails.getComponent();
         this.value = priceBreakUpDetails.getValue();
         this.quantity = priceBreakUpDetails.getComponentQuantity();
         this.orderItem = orderItem;
@@ -28,6 +28,7 @@ public class PriceBreakupDAO {
     public Double getTotalBreakUpValue() {
         return this.getValue() * this.getQuantity();
     }
+
     public boolean isComponentStringUpdated(String value) {
         return value != null && !this.component.equals(value);
     }
@@ -35,10 +36,8 @@ public class PriceBreakupDAO {
     public boolean isValueUpdated(Double value) {
         return value != null && !this.value.equals(value);
     }
+
     public boolean isQuantityUpdated(Integer value) {
         return value != null && !this.quantity.equals(value);
     }
-
-
-
 }

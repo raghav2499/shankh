@@ -30,10 +30,7 @@ public class PriceBreakUpService {
     private PriceBreakUpRepo priceBreakUpRepo;
 
     public List<PriceBreakupDAO> savePriceBreakUp(List<PriceBreakupDAO> priceBreakupDAOList) {
-        priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(
-                priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList,
-                        new CycleAvoidingMappingContext())),
-                new CycleAvoidingMappingContext());
+        priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return priceBreakupDAOList;
 
     }
@@ -41,31 +38,33 @@ public class PriceBreakUpService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
     public List<PriceBreakupDAO> updatePriceBreakups(List<PriceBreakUpDetails> priceBreakupList, OrderItemDAO orderItem) {
         List<PriceBreakupDAO> priceBreakupDAOList = new ArrayList<>();
+
         for (PriceBreakUpDetails priceBreakUpDetail : priceBreakupList) {
+
             if (priceBreakUpDetail.getId() != null) {
                 Optional<PriceBreakup> priceBreakup = priceBreakUpRepo.findById(priceBreakUpDetail.getId());
+
                 if (priceBreakup.isPresent()) {
                     PriceBreakupDAO priceBreakupDAO = mapper.priceBreakupToPriceBreakupDAO(priceBreakup.get(), new CycleAvoidingMappingContext());
                     updatePriceBreakup(priceBreakupDAO, priceBreakUpDetail);
                     priceBreakupDAOList.add(priceBreakupDAO);
+
                 } else {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price Breakup ID is incorrect");
                 }
+
             } else {
                 PriceBreakupDAO priceBreakupDAO = new PriceBreakupDAO(priceBreakUpDetail, orderItem);
                 priceBreakupDAOList.add(priceBreakupDAO);
             }
         }
-        priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(
-                priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList,
-                        new CycleAvoidingMappingContext())),
-                new CycleAvoidingMappingContext());
-        return priceBreakupDAOList;
 
+        priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(
+                priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        return priceBreakupDAOList;
     }
 
-    public List<PriceBreakupDAO> generatePriceBreakupList(List<PriceBreakUpDetails> priceBreakUpDetails,
-                                                          OrderItemDAO orderItemDAO) {
+    public List<PriceBreakupDAO> generatePriceBreakupList(List<PriceBreakUpDetails> priceBreakUpDetails, OrderItemDAO orderItemDAO) {
         List<PriceBreakupDAO> priceBreakupDAOList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(priceBreakUpDetails)) {
             for (PriceBreakUpDetails priceBreakUpDetail : priceBreakUpDetails) {
@@ -76,16 +75,20 @@ public class PriceBreakUpService {
     }
 
     private void updatePriceBreakup(PriceBreakupDAO priceBreakupDAO, PriceBreakUpDetails updatedDetails) {
+
         if (priceBreakupDAO.isComponentStringUpdated(updatedDetails.getComponent())) {
             priceBreakupDAO.setComponent(updatedDetails.getComponent());
         }
+
         if (priceBreakupDAO.isValueUpdated(updatedDetails.getValue())) {
             priceBreakupDAO.setValue(updatedDetails.getValue());
         }
+
         if (priceBreakupDAO.isQuantityUpdated(updatedDetails.getComponentQuantity())) {
             priceBreakupDAO.setQuantity(updatedDetails.getComponentQuantity());
         }
-        if(Boolean.TRUE.equals(priceBreakupDAO.getIsDeleted())) {
+
+        if (Boolean.TRUE.equals(updatedDetails.getIsDeleted())) {
             priceBreakupDAO.setIsDeleted(Boolean.TRUE);
         }
     }

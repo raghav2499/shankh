@@ -19,7 +19,7 @@ public class StitchSummary {
     List<OrderStitchOptionResponse> orderStitchOptionList = new ArrayList<>();
 
     public StitchSummary(List<OrderStitchOptionDAO> orderStitchOptionDAOs) {
-        for(OrderStitchOptionDAO orderStitchOption : orderStitchOptionDAOs) {
+        for (OrderStitchOptionDAO orderStitchOption : orderStitchOptionDAOs) {
             orderStitchOptionList.add(new OrderStitchOptionResponse(orderStitchOption));
         }
     }

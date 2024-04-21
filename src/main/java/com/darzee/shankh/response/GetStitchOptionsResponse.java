@@ -21,7 +21,7 @@ public class GetStitchOptionsResponse {
         Map<OutfitSide, List<StitchOptionsDAO>> groupedByOutfitSide =
                 stitchOptions.stream().collect(Collectors.groupingBy(StitchOptionsDAO::getOutfitSide));
 
-        List<GroupedStitchOptionDetails> response =  groupedByOutfitSide.entrySet().stream().map(entry -> {
+        List<GroupedStitchOptionDetails> response = groupedByOutfitSide.entrySet().stream().map(entry -> {
             GroupedStitchOptionDetails groupedStitchOptionDetails = new GroupedStitchOptionDetails();
             groupedStitchOptionDetails.setSide(entry.getKey().getView());
             List<StitchOptionDetail> stitchOptionDetails = entry.getValue().stream().map(stitchOptionsDAO ->

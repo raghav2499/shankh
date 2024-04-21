@@ -28,7 +28,7 @@ public class OrderController {
     @CrossOrigin
     public ResponseEntity<OrderSummary> createOrder(@Validated(OrderCreationRequest.CreateOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
         OrderSummary response = orderOrderItemCommonService.createOrder(request);
-        return new ResponseEntity(response, HttpStatus.CREATED);
+        return new ResponseEntity<OrderSummary>(response, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,14 +43,13 @@ public class OrderController {
                                                      @RequestParam(name = "order_status_list", required = false, defaultValue = "1,2,3") String orderStatusList,
                                                      @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                      @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
-        return orderService.getOrder(boutiqueId, orderItemStatusList, orderStatusList,
-                priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill, paymentDue, countPerPage, pageCount);
+        return orderService.getOrder(boutiqueId, orderItemStatusList, orderStatusList, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill, paymentDue, countPerPage, pageCount);
     }
 
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity getOrderDetails(@PathVariable("id") Long boutiqueOrderId, 
+    public ResponseEntity getOrderDetails(@PathVariable("id") Long boutiqueOrderId,
                                           @RequestParam("boutique_id") Long boutiqueId) throws Exception {
         return orderService.getOrderDetails(boutiqueOrderId, boutiqueId);
     }

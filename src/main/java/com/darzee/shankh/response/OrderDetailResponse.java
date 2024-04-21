@@ -41,7 +41,7 @@ public class OrderDetailResponse {
         this.orderId = order.getBoutiqueOrderId();
         this.orderStatus = order.getOrderStatus().getDisplayString();
         this.orderItemDetails = new ArrayList<>();
-        for(Pair<OrderItemDAO, String> orderItemOutfitLinkPair : orderItemOutfitLinkPairList) {
+        for (Pair<OrderItemDAO, String> orderItemOutfitLinkPair : orderItemOutfitLinkPairList) {
             OrderItemDetails orderItemDetails = new OrderItemDetails(orderItemOutfitLinkPair.getFirst(),
                     orderItemOutfitLinkPair.getSecond());
             this.orderItemDetails.add(orderItemDetails);

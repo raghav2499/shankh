@@ -54,12 +54,10 @@ public class StitchOptionService {
         List<OrderStitchOptionDAO> orderStitchOptionDAOs = new ArrayList<>();
 
         for (StitchDetails stitchDetail : stitchDetails) {
-            OrderStitchOptionDAO orderStitchOptionDAO = new OrderStitchOptionDAO(stitchDetail.getStitchOptionId(),
-                    stitchDetail.getValues());
+            OrderStitchOptionDAO orderStitchOptionDAO = new OrderStitchOptionDAO(stitchDetail.getStitchOptionId(), stitchDetail.getValues());
             orderStitchOptionDAOs.add(orderStitchOptionDAO);
         }
-        orderStitchOptionDAOs = mapper.orderStitchOptionListToOrderStitchOptionDAOList(
-                orderStitchOptionsRepo.saveAll(mapper.orderStitchOptionDAOListToOrderStitchOptionList(orderStitchOptionDAOs)));
+        orderStitchOptionDAOs = mapper.orderStitchOptionListToOrderStitchOptionDAOList(orderStitchOptionsRepo.saveAll(mapper.orderStitchOptionDAOListToOrderStitchOptionList(orderStitchOptionDAOs)));
         return new StitchSummary(orderStitchOptionDAOs);
     }
 
@@ -67,30 +65,25 @@ public class StitchOptionService {
     public StitchSummary updateStitchOptions(Long orderItemId, CreateStitchOptionRequest updateStitchOptionRequest) {
         validateUpdateStitchOptionRequest(updateStitchOptionRequest);
         List<StitchDetails> stitchDetails = updateStitchOptionRequest.getStitchDetails();
-        List<OrderStitchOptionDAO> existingStitchOptions = mapper.orderStitchOptionListToOrderStitchOptionDAOList(
-                orderStitchOptionsRepo.findAllByOrderItemIdAndIsValid(orderItemId, Boolean.TRUE));
-        for(OrderStitchOptionDAO stitchOption : existingStitchOptions) {
+        List<OrderStitchOptionDAO> existingStitchOptions = mapper.orderStitchOptionListToOrderStitchOptionDAOList(orderStitchOptionsRepo.findAllByOrderItemIdAndIsValid(orderItemId, Boolean.TRUE));
+        for (OrderStitchOptionDAO stitchOption : existingStitchOptions) {
             stitchOption.setIsValid(Boolean.FALSE);
         }
         List<OrderStitchOptionDAO> newStitchOptions = new ArrayList<>();
         for (StitchDetails newStitchDetail : stitchDetails) {
-            OrderStitchOptionDAO orderStitchOptionDAO = new OrderStitchOptionDAO(newStitchDetail.getStitchOptionId(),
-                    newStitchDetail.getValues(), orderItemId);
+            OrderStitchOptionDAO orderStitchOptionDAO = new OrderStitchOptionDAO(newStitchDetail.getStitchOptionId(), newStitchDetail.getValues(), orderItemId);
             newStitchOptions.add(orderStitchOptionDAO);
         }
-        if(!CollectionUtils.isEmpty(existingStitchOptions)) {
+        if (!CollectionUtils.isEmpty(existingStitchOptions)) {
             orderStitchOptionsRepo.saveAll(mapper.orderStitchOptionDAOListToOrderStitchOptionList(existingStitchOptions));
         }
-        newStitchOptions = mapper.orderStitchOptionListToOrderStitchOptionDAOList(
-                orderStitchOptionsRepo.saveAll(mapper.orderStitchOptionDAOListToOrderStitchOptionList(newStitchOptions)));
+        newStitchOptions = mapper.orderStitchOptionListToOrderStitchOptionDAOList(orderStitchOptionsRepo.saveAll(mapper.orderStitchOptionDAOListToOrderStitchOptionList(newStitchOptions)));
         return new StitchSummary(newStitchOptions);
     }
 
     @Transactional
     public void addOrderItemId(List<Long> orderStitchOptionRef, Long orderItemId) {
-        List<OrderStitchOptionDAO> orderStitchOptionDAOs = mapper
-                .orderStitchOptionListToOrderStitchOptionDAOList(
-                        orderStitchOptionsRepo.findAllByIdIn(orderStitchOptionRef));
+        List<OrderStitchOptionDAO> orderStitchOptionDAOs = mapper.orderStitchOptionListToOrderStitchOptionDAOList(orderStitchOptionsRepo.findAllByIdIn(orderStitchOptionRef));
         for (OrderStitchOptionDAO orderStitchOption : orderStitchOptionDAOs) {
             orderStitchOption.setOrderItemId(orderItemId);
         }
@@ -98,9 +91,7 @@ public class StitchOptionService {
     }
 
     private void validateCreateStitchOptionRequest(CreateStitchOptionRequest request) {
-        List<Long> stitchOptionIdInRequest = request.getStitchDetails().stream()
-                .map(stitchDetails -> stitchDetails.getStitchOptionId())
-                .collect(Collectors.toList());
+        List<Long> stitchOptionIdInRequest = request.getStitchDetails().stream().map(stitchDetails -> stitchDetails.getStitchOptionId()).collect(Collectors.toList());
         List<StitchOptions> stitchOptions = stitchOptionsRepo.findAllByIdIn(stitchOptionIdInRequest);
         if (stitchOptions == null || stitchOptions.size() != request.getStitchDetails().size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some Stitch Option ID is invalid");
@@ -108,9 +99,7 @@ public class StitchOptionService {
     }
 
     private void validateUpdateStitchOptionRequest(CreateStitchOptionRequest request) {
-        List<Long> stitchOptionIdInRequest = request.getStitchDetails().stream()
-                .map(stitchDetails -> stitchDetails.getStitchOptionId())
-                .collect(Collectors.toList());
+        List<Long> stitchOptionIdInRequest = request.getStitchDetails().stream().map(stitchDetails -> stitchDetails.getStitchOptionId()).collect(Collectors.toList());
         List<StitchOptions> stitchOptions = stitchOptionsRepo.findAllByIdIn(stitchOptionIdInRequest);
         if (stitchOptions == null || stitchOptions.size() != request.getStitchDetails().size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some Stitch Option ID is invalid");
@@ -122,8 +111,7 @@ public class StitchOptionService {
         if (outfitType == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Outfit Id");
         }
-        List<StitchOptionsDAO> stitchOptions = mapper.stitchOptionListToStitchOptionDAOList(
-                stitchOptionsRepo.findAllByOutfitTypeAndIsValid(outfitType, Boolean.TRUE));
+        List<StitchOptionsDAO> stitchOptions = mapper.stitchOptionListToStitchOptionDAOList(stitchOptionsRepo.findAllByOutfitTypeAndIsValid(outfitType, Boolean.TRUE));
         GetStitchOptionsResponse stitchOptionsResponse = new GetStitchOptionsResponse(stitchOptions);
         return stitchOptionsResponse;
     }
@@ -135,17 +123,14 @@ public class StitchOptionService {
     }
 
     public Map<String, List<OrderStitchOptionDetail>> getOrderItemStitchOptions(Long orderItemId) {
-        List<OrderStitchOptions> orderStitchOptions =
-                orderStitchOptionsRepo.findAllByOrderItemIdAndIsValid(orderItemId, Boolean.TRUE);
+        List<OrderStitchOptions> orderStitchOptions = orderStitchOptionsRepo.findAllByOrderItemIdAndIsValid(orderItemId, Boolean.TRUE);
         List<OrderStitchOptionDetail> orderStitchOptionDetails = new ArrayList<>();
         List<OrderStitchOptionDAO> orderStitchOptionDAOs = mapper.orderStitchOptionListToOrderStitchOptionDAOList(orderStitchOptions);
         for (OrderStitchOptionDAO orderStitchOptionDAO : orderStitchOptionDAOs) {
             StitchOptionsDAO stitchOptionsDAO = mapper.stitchOptionsToDAO(stitchOptionsRepo.findById(orderStitchOptionDAO.getStitchOptionId()).get());
             orderStitchOptionDetails.add(new OrderStitchOptionDetail(orderStitchOptionDAO, stitchOptionsDAO));
         }
-        Map<String, List<OrderStitchOptionDetail>> groupedOrderStitchOptionDetail =
-                orderStitchOptionDetails.stream().collect(
-                        Collectors.groupingBy(OrderStitchOptionDetail::getOutfitSide));
+        Map<String, List<OrderStitchOptionDetail>> groupedOrderStitchOptionDetail = orderStitchOptionDetails.stream().collect(Collectors.groupingBy(OrderStitchOptionDetail::getOutfitSide));
         return groupedOrderStitchOptionDetail;
     }
 }

@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderCreationRequest {
+
     public interface CreateOrder {
     }
 
@@ -21,3 +22,4 @@ public class OrderCreationRequest {
     @NotNull(message = "order_details are mandatory for order creation", groups = {CreateOrder.class})
     private OrderDetails orderDetails;
 }
+

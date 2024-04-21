@@ -1,13 +1,8 @@
 package com.darzee.shankh.response;
 
-import java.util.List;
-
-import com.darzee.shankh.dao.PriceBreakupDAO;
-import com.darzee.shankh.entity.Order;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,21 +21,18 @@ public class InvoiceDetailResponse {
     String boutiqueName;
     String customerName;
     String recieveDateTime;
+    Integer paymentMode;
 
     OrderSummary orderSummary;
 
-    public InvoiceDetailResponse( String invoiceDateTime, String boutiqueName,
-            String customerName,
-            String recieveDateTime,
-            OrderSummary orderSummary
-
-    ) {
-
+    public InvoiceDetailResponse(String invoiceDateTime, String boutiqueName, String customerName,
+                                 String recieveDateTime, OrderSummary orderSummary, Integer paymentMode) {
         this.invoiceDateTime = invoiceDateTime;
         this.boutiqueName = boutiqueName;
         this.customerName = customerName;
         this.recieveDateTime = recieveDateTime;
         this.orderSummary = orderSummary;
+        this.paymentMode = paymentMode;
     }
 
 }

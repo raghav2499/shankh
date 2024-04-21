@@ -70,8 +70,7 @@ public class OrderOrderItemCommonService {
     @Autowired
     private OrderStitchOptionsRepo orderStitchOptionsRepo;
 
-    public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId,
-                                                                       OrderCreationRequest request) throws Exception {
+    public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
         OrderDAO orderDAO = orderService.confirmOrder(boutiqueOrderId, boutiqueId, request);
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
@@ -83,6 +82,7 @@ public class OrderOrderItemCommonService {
 
     @Transactional
     public OrderSummary createOrder(OrderCreationRequest orderCreationRequest) {
+
         OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
         OrderDAO orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(),
                 orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
@@ -96,10 +96,12 @@ public class OrderOrderItemCommonService {
         for (OrderItemDetailRequest itemDetailRequest : alreadySavedItems) {
             OrderItemDAO orderItemDAO = orderItemService.updateOrderItem(itemDetailRequest.getId(), itemDetailRequest);
             if (!CollectionUtils.isEmpty(itemDetailRequest.getPriceBreakup())) {
-                priceBreakUpService.updatePriceBreakups(itemDetailRequest.getPriceBreakup(), orderItemDAO);
+                List<PriceBreakupDAO> updatedPriceBreakupDAOList = priceBreakUpService.updatePriceBreakups(itemDetailRequest.getPriceBreakup(), orderItemDAO);
+                orderItemDAO.setPriceBreakup(updatedPriceBreakupDAOList);
             }
             savedItems.add(orderItemDAO);
         }
+
         List<OrderItemDAO> allItems = collateAllItems(allOrderItems, savedItems);
         orderDAO.setOrderItems(allItems);
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
@@ -115,37 +117,31 @@ public class OrderOrderItemCommonService {
         OrderDAO orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(), orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
         List<OrderItemDAO> orderItems = orderItemService.createOrderItems(orderDetails.getOrderItems(), orderDAO);
         OrderAmountDAO orderAmountDAO = orderService.setOrderAmountSpecificDetails(new OrderAmountDetails(), orderDAO);
-        orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(
-                orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
-                new CycleAvoidingMappingContext());
+        orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         if (orderDAO.getOrderAmount() == null) {
             orderDAO.setOrderAmount(orderAmountDAO);
-            orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO,
-                            new CycleAvoidingMappingContext())),
-                    new CycleAvoidingMappingContext());
+            orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         }
-        OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
-                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderItems);
+        OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderItems);
         return orderSummary;
     }
 
     public OrderSummary updateOrderItem(Long orderItemId, OrderItemDetailRequest orderItemDetails) throws Exception {
         OrderItemDAO updatedItem = orderItemService.updateOrderItem(orderItemId, orderItemDetails);
+
         if (!Collections.isEmpty(orderItemDetails.getPriceBreakup())) {
-            List<PriceBreakupDAO> updatedPriceBreakup =
-                    priceBreakUpService.updatePriceBreakups(orderItemDetails.getPriceBreakup(), updatedItem);
+            List<PriceBreakupDAO> updatedPriceBreakup = priceBreakUpService.updatePriceBreakups(orderItemDetails.getPriceBreakup(), updatedItem);
+
         }
         OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId());
+
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         orderService.generateInvoiceV2(orderDAO);
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
-        generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(),
-                orderDAO.getBoutique().getName(), orderNo);
-        OrderSummary orderItemSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
-                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
+        generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
+        OrderSummary orderItemSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         return orderItemSummary;
     }
-
 
     private List<OrderItemDAO> collateAllItems(List<OrderItemDAO> allItems, List<OrderItemDAO> updatedItems) {
         Map<Long, OrderItemDAO> allItemsMap = allItems.stream().collect(Collectors.toMap(OrderItemDAO::getId, orderItem -> orderItem));
@@ -165,8 +161,7 @@ public class OrderOrderItemCommonService {
         List<OrderItemDAO> orderItems = orderDAO.getOrderItems();
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
         for (OrderItemDAO orderItem : orderItems) {
-            generateItemDetailPdf(orderItem, orderDAO.getCustomer().getId(),
-                    orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
+            generateItemDetailPdf(orderItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
         }
     }
 
@@ -180,13 +175,11 @@ public class OrderOrderItemCommonService {
         List<InnerMeasurementDetails> innerMeasurementDetailsList = new ArrayList<>();
         if (measurementRevisions != null) {
             MeasurementRevisionsDAO revisionsDAO = mapper.measurementRevisionsToMeasurementRevisionDAO(measurementRevisions);
-            innerMeasurementDetailsList = measurementService.generateInnerMeasurementDetails(
-                    boutiqueId, orderItemDAO.getOutfitType(), revisionsDAO, true);
+            innerMeasurementDetailsList = measurementService.generateInnerMeasurementDetails(boutiqueId, orderItemDAO.getOutfitType(), revisionsDAO, true);
         }
         List<String> clothImageLinks = orderItemService.getClothImageLinks(orderItemDAO.getId());
 
-        File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions,
-                innerMeasurementDetailsList, clothImageLinks, orderItemDAO);
+        File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions, innerMeasurementDetailsList, clothImageLinks, orderItemDAO);
         String fileUploadUrl = bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
     }
 }

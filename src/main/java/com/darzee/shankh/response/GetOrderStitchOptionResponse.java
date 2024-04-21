@@ -17,7 +17,7 @@ public class GetOrderStitchOptionResponse {
 
     public GetOrderStitchOptionResponse(Map<String, List<OrderStitchOptionDetail>> orderStitchOptionDetailMap) {
         List<GroupedOrderStitchOptionDetail> groupedOrderStitchOptionDetails = new ArrayList<>();
-        for(Map.Entry<String, List<OrderStitchOptionDetail>> orderStitchOption : orderStitchOptionDetailMap.entrySet()) {
+        for (Map.Entry<String, List<OrderStitchOptionDetail>> orderStitchOption : orderStitchOptionDetailMap.entrySet()) {
             GroupedOrderStitchOptionDetail groupedOrderStitchOptionDetail =
                     new GroupedOrderStitchOptionDetail(orderStitchOption.getKey(), orderStitchOption.getValue());
             groupedOrderStitchOptionDetails.add(groupedOrderStitchOptionDetail);

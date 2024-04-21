@@ -12,7 +12,7 @@ public class GetBoutiqueLedgerDataResponse {
     private LedgerDashboardData overallLedgerDashboardData;
 
     public void setMonthlyLedgerDashboardData(Double amountRecieved, Double pendingAmount, Integer activeOrder, Integer closedOrder) {
-        this.monthlyLedgerDashboardData =  new LedgerDashboardData(amountRecieved, pendingAmount, activeOrder, closedOrder);
+        this.monthlyLedgerDashboardData = new LedgerDashboardData(amountRecieved, pendingAmount, activeOrder, closedOrder);
     }
 
     public void setOverallLedgerDashboardData(Double amountRecieved, Double pendingAmount, Integer activeOrder, Integer closedOrder) {

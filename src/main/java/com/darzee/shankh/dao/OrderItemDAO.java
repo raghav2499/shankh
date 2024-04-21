@@ -65,7 +65,8 @@ public class OrderItemDAO {
 
     public OrderItemDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, String specialInstructions,
                         OrderType orderType, OutfitType outfitType, String inspiration, Boolean isPriorityOrder,
-                        Integer quantity, String outfitAlias, MeasurementRevisionsDAO measurementRevision, OrderDAO orderDAO) {
+                        Integer quantity, String outfitAlias, MeasurementRevisionsDAO measurementRevision,
+                        OrderDAO orderDAO) {
         this.trialDate = trialDate;
         this.deliveryDate = deliveryDate;
         this.specialInstructions = specialInstructions;
@@ -100,7 +101,6 @@ public class OrderItemDAO {
         return value != null && !value.equals(this.getInspiration());
     }
 
-
     public boolean isPriorityUpdated(Boolean value) {
         return value != null && !value.equals(this.getIsPriorityOrder());
     }
@@ -111,8 +111,8 @@ public class OrderItemDAO {
 
     public boolean isMeasurementRevisionUpdated(Long value) {
         return (this.measurementRevision == null && value != null)
-                || (this.measurementRevision != null && value != null && !value.equals(
-                this.getMeasurementRevision().getId()));
+                || (this.measurementRevision != null && value != null
+                && !value.equals(this.getMeasurementRevision().getId()));
     }
 
     public boolean mandatoryFieldsPresent() {
@@ -154,4 +154,5 @@ public class OrderItemDAO {
         DateTimeFormatter deliveryDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm a");
         this.formattedDeliveryDate = this.deliveryDate.format(deliveryDateFormatter);
     }
+
 }

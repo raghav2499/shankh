@@ -19,7 +19,7 @@ public class OrderAmountDetails {
     private Double balanceDue;
 
     OrderAmountDetails(OrderAmountDAO orderAmountDAO) {
-        if(orderAmountDAO != null) {
+        if (orderAmountDAO != null) {
             this.totalAmount = orderAmountDAO.getTotalAmount();
             this.advanceReceived = orderAmountDAO.getAmountRecieved();
             this.balanceDue = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
