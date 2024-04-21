@@ -37,22 +37,9 @@ public class PriceBreakUpService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
     public List<PriceBreakupDAO> updatePriceBreakups(List<PriceBreakUpDetails> priceBreakupList, OrderItemDAO orderItem) {
-
-        if (priceBreakupList == null) {
-            throw new IllegalArgumentException("Price breakup list cannot be null");
-        }
-
-        if (orderItem == null) {
-            throw new IllegalArgumentException("Order item cannot be null");
-        }
-
         List<PriceBreakupDAO> priceBreakupDAOList = new ArrayList<>();
 
         for (PriceBreakUpDetails priceBreakUpDetail : priceBreakupList) {
-
-            if (priceBreakUpDetail == null) {
-                throw new IllegalArgumentException("Price breakup detail cannot be null");
-            }
 
             if (priceBreakUpDetail.getId() != null) {
                 Optional<PriceBreakup> priceBreakup = priceBreakUpRepo.findById(priceBreakUpDetail.getId());
@@ -72,13 +59,8 @@ public class PriceBreakUpService {
             }
         }
 
-        try {
-            priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to save price breakups", e);
-        }
-
+        priceBreakupDAOList = mapper.priceBreakUpListToPriceBreakUpDAOList(
+                priceBreakUpRepo.saveAll(mapper.priceBreakUpDAOListToPriceBreakUpList(priceBreakupDAOList, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         return priceBreakupDAOList;
     }
 

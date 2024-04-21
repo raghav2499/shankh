@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.Optional;
 
 @Data
 @Getter
@@ -26,10 +25,8 @@ public class InvoiceDetailResponse {
 
     OrderSummary orderSummary;
 
-    public InvoiceDetailResponse(String invoiceDateTime, String boutiqueName, String customerName, String recieveDateTime, OrderSummary orderSummary, Integer paymentMode
-
-    ) {
-
+    public InvoiceDetailResponse(String invoiceDateTime, String boutiqueName, String customerName,
+                                 String recieveDateTime, OrderSummary orderSummary, Integer paymentMode) {
         this.invoiceDateTime = invoiceDateTime;
         this.boutiqueName = boutiqueName;
         this.customerName = customerName;

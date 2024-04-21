@@ -51,7 +51,8 @@ public class OrderDAO {
 
     public List<OrderItemDAO> getNonDeletedItems() {
         if (!CollectionUtils.isEmpty(this.orderItems)) {
-            return this.orderItems.stream().filter(item -> !Boolean.TRUE.equals(item.getIsDeleted())).collect(Collectors.toList());
+            return this.orderItems.stream().filter(item -> !Boolean.TRUE.equals(item.getIsDeleted()))
+                    .collect(Collectors.toList());
         }
         return new ArrayList<>();
 
@@ -69,7 +70,9 @@ public class OrderDAO {
         if (Boolean.TRUE.equals(isDeleted)) {
             return priceBreakupSum;
         }
-        priceBreakupSum = getNonDeletedItems().stream().map(item -> item.getActivePriceBreakUpList()).flatMap(List::stream).mapToDouble(pb -> (pb.getValue() * pb.getQuantity())).sum();
+        priceBreakupSum = getNonDeletedItems().stream()
+                .map(item -> item.getActivePriceBreakUpList()).flatMap(List::stream)
+                .mapToDouble(pb -> (pb.getValue() * pb.getQuantity())).sum();
         return priceBreakupSum;
     }
 

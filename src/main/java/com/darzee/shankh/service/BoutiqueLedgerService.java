@@ -42,9 +42,12 @@ public class BoutiqueLedgerService {
         if (boutiqueLedger != null) {
             BoutiqueLedgerDAO boutiqueLedgerObject = mapper.boutiqueLedgerObjectToDAO(boutiqueLedger, new CycleAvoidingMappingContext());
             GetBoutiqueLedgerDataResponse response = new GetBoutiqueLedgerDataResponse();
-            response.setMonthlyLedgerDashboardData(boutiqueLedgerObject.getMonthlyAmountRecieved(), boutiqueLedgerObject.getMonthlyPendingAmount(), boutiqueLedgerObject.getMonthlyActiveOrders(), boutiqueLedgerObject.getMonthlyClosedOrders());
-            response.setOverallLedgerDashboardData(boutiqueLedgerObject.getTotalAmountRecieved(), boutiqueLedgerObject.getTotalPendingAmount(), boutiqueLedgerObject.getTotalActiveOrders(), boutiqueLedgerObject.getTotalClosedOrders());
-
+            response.setMonthlyLedgerDashboardData(boutiqueLedgerObject.getMonthlyAmountRecieved(),
+                    boutiqueLedgerObject.getMonthlyPendingAmount(), boutiqueLedgerObject.getMonthlyActiveOrders(),
+                    boutiqueLedgerObject.getMonthlyClosedOrders());
+            response.setOverallLedgerDashboardData(boutiqueLedgerObject.getTotalAmountRecieved(),
+                    boutiqueLedgerObject.getTotalPendingAmount(), boutiqueLedgerObject.getTotalActiveOrders(),
+                    boutiqueLedgerObject.getTotalClosedOrders());
             return new ResponseEntity(response, HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique Ledger for this id doesn't exist");
@@ -62,7 +65,9 @@ public class BoutiqueLedgerService {
      * b. - Amount Recieved -> Order Amount
      */
     @Transactional
-    public BoutiqueLedgerDAO updateBoutiqueLedgerAmountDetails(BoutiqueLedgerDAO boutiqueLedgerDAO, Long boutiqueId, Double deltaPendingAmount, Double deltaAmountRecieved) {
+    public BoutiqueLedgerDAO updateBoutiqueLedgerAmountDetails(BoutiqueLedgerDAO boutiqueLedgerDAO,
+                                                               Long boutiqueId, Double deltaPendingAmount,
+                                                               Double deltaAmountRecieved) {
         if (boutiqueLedgerDAO == null) {
             BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
             if (boutiqueLedger != null) {
@@ -97,7 +102,10 @@ public class BoutiqueLedgerService {
      * 2. Order delivered
      */
     @Transactional
-    public BoutiqueLedgerDAO handleBoutiqueLedgerOnOrderUpdation(BoutiqueLedgerDAO boutiqueLedgerDAO, Long boutiqueId, Integer activeOrderCountChange, Integer closedOrderCountChange) {
+    public BoutiqueLedgerDAO handleBoutiqueLedgerOnOrderUpdation(BoutiqueLedgerDAO boutiqueLedgerDAO,
+                                                                 Long boutiqueId,
+                                                                 Integer activeOrderCountChange,
+                                                                 Integer closedOrderCountChange) {
         if (boutiqueLedgerDAO == null) {
             BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
             if (boutiqueLedger != null) {
@@ -118,7 +126,9 @@ public class BoutiqueLedgerService {
     }
 
     @Transactional
-    public BoutiqueLedgerDAO handleBoutiqueLedgerOnOrderDeletion(BoutiqueLedgerDAO boutiqueLedgerDAO, Long boutiqueId, OrderDAO orderDAO) {
+    public BoutiqueLedgerDAO handleBoutiqueLedgerOnOrderDeletion(BoutiqueLedgerDAO boutiqueLedgerDAO,
+                                                                 Long boutiqueId,
+                                                                 OrderDAO orderDAO) {
         if (boutiqueLedgerDAO == null) {
             BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
             if (boutiqueLedger != null) {
