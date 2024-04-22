@@ -71,6 +71,7 @@ public class PriceBreakUpService {
                 priceBreakupDAOList.add(new PriceBreakupDAO(priceBreakUpDetail, orderItemDAO));
             }
         }
+        priceBreakupDAOList = savePriceBreakUp(priceBreakupDAOList);
         return priceBreakupDAOList;
     }
 
