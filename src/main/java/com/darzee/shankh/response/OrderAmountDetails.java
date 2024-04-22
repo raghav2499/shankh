@@ -21,7 +21,7 @@ public class OrderAmountDetails {
     OrderAmountDetails(OrderAmountDAO orderAmountDAO) {
         if (orderAmountDAO != null) {
             this.totalAmount = orderAmountDAO.getTotalAmount();
-            this.advanceReceived = orderAmountDAO.getAmountRecieved();
+            this.advanceReceived = (orderAmountDAO.getAmountRecieved() == 0) ? null : orderAmountDAO.getAmountRecieved();
             this.balanceDue = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
         }
     }

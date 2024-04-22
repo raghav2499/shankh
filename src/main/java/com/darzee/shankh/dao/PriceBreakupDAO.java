@@ -22,6 +22,7 @@ public class PriceBreakupDAO {
         this.component = priceBreakUpDetails.getComponent();
         this.value = priceBreakUpDetails.getValue();
         this.quantity = priceBreakUpDetails.getComponentQuantity();
+        this.isDeleted = priceBreakUpDetails.getIsDeleted();
         this.orderItem = orderItem;
     }
 

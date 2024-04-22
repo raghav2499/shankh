@@ -245,7 +245,10 @@ public class OrderService {
         if (request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived() != null) {
             Double advanceAmount = request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived();
             orderAmountDAO.setAmountRecieved(advanceAmount);
-            orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
+            orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(
+                    mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext());
+            orderDAO.setOrderAmount(orderAmountDAO);
             paymentService.recordPayment(advanceAmount, PaymentMode.CASH, Boolean.TRUE, orderDAO);
         }
 

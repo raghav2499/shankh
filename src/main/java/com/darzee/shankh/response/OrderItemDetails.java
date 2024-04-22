@@ -83,7 +83,7 @@ public class OrderItemDetails {
         this.outfitTypeIndex = orderItem.getOutfitType().getOrdinal();
         this.outfitTypeImageLink = outfitImageLink;
         this.trialDate = (orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null);
-        this.deliveryDate = orderItem.getDeliveryDate().toString();
+        this.deliveryDate = (orderItem.getDeliveryDate() != null ? orderItem.getDeliveryDate().toString() : null);
         this.type = orderItem.getOrderType().getDisplayName();
         this.itemQuantity = orderItem.getQuantity();
         this.inspiration = orderItem.getInspiration();
