@@ -197,7 +197,7 @@ public class OrderItemService {
         if (!Collections.isEmpty(updateItemDetail.getAudioReferenceIds())) {
             objectFilesService.invalidateExistingReferenceIds(FileEntityType.AUDIO.getEntityType(),
                     orderItemId);
-            objectFilesService.saveObjectFiles(updateItemDetail.getClothImageReferenceIds(),
+            objectFilesService.saveObjectFiles(updateItemDetail.getAudioReferenceIds(),
                     FileEntityType.AUDIO.getEntityType(), orderItemId);
         }
         orderItem = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItem, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());

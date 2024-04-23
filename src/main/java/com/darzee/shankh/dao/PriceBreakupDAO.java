@@ -12,8 +12,8 @@ public class PriceBreakupDAO {
 
     private Long id;
     private String component;
-    private Double value;
-    private Integer quantity;
+    private Double value = 0d;
+    private Integer quantity = 1;
 
     private Boolean isDeleted = Boolean.FALSE;
     private OrderItemDAO orderItem;

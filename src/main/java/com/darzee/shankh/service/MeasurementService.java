@@ -3,18 +3,12 @@ package com.darzee.shankh.service;
 import com.amazonaws.util.StringUtils;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.constants.Constants;
-import com.darzee.shankh.dao.CustomerDAO;
-import com.darzee.shankh.dao.MeasurementParamDAO;
-import com.darzee.shankh.dao.MeasurementRevisionsDAO;
-import com.darzee.shankh.dao.MeasurementsDAO;
+import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.BoutiqueMeasurement;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.MeasurementRevisions;
 import com.darzee.shankh.entity.OrderItem;
-import com.darzee.shankh.enums.FileEntityType;
-import com.darzee.shankh.enums.MeasurementScale;
-import com.darzee.shankh.enums.OutfitSide;
-import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.enums.*;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
@@ -91,6 +85,16 @@ public class MeasurementService {
                                                            String scale, Boolean nonEmptyValuesOnly) throws Exception {
 
         validateGetMeasurementRequestParams(customerId, measurementRevisionId, orderItemId, outfitTypeIndex, scale);
+        if(orderItemId != null) {
+            Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
+            if(orderItem.isPresent()) {
+                OrderType orderType = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext())
+                        .getOrderType();
+                if(OrderType.ALTERATION.equals(orderType)) {
+                    return new OverallMeasurementDetails();
+                }
+            }
+        }
 
         Long boutiqueId = customerRepo.findById(customerId).get().getBoutique().getId();
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitTypeIndex);

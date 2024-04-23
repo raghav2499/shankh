@@ -175,51 +175,11 @@ public class OrderService {
         for (OrderItemDAO item : order.getOrderItems()) {
             orderItemDetailsList.add(new OrderItemDetails(item, null));
         }
-        Integer paymentMode = null;
-        Optional<Payment> payment = paymentRepo.findTopByOrderIdOrderByIdDesc(order.getId());
-        if (payment.isPresent()) {
-            PaymentDAO paymentDAO = mapper.paymentToPaymentDAO(payment.get(), new CycleAvoidingMappingContext());
-            paymentMode = paymentDAO.getPaymentMode().getOrdinal();
-        }
+        Integer paymentMode = getOrderPaymentMode(order.getId());
         String message = "Details fetched succesfully";
         OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount, orderItemDetailsList, paymentMode, message);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-
-    // @Transactional
-    // public ResponseEntity updateOrder(Long orderId, UpdateOrderRequest request) {
-    // Optional<Order> optionalOrder = orderRepo.findById(orderId);
-    // if (optionalOrder.isPresent()) {
-    // OrderDAO order = mapper.orderObjectToDao(optionalOrder.get(), new
-    // CycleAvoidingMappingContext());
-    // OrderAmountDAO orderAmountDAO = order.getOrderAmount();
-    // UpdateOrderDetails orderDetails = request.getOrderDetails();
-    // UpdateOrderAmountDetails orderAmountDetails =
-    // request.getOrderAmountDetails();
-    // if (orderDetails != null) {
-    // order = updateOrderDetails(orderDetails, order);
-    // }
-    // if (orderAmountDetails != null) {
-    // orderAmountDAO = updateOrderAmountDetails(orderAmountDetails, orderAmountDAO,
-    // order,
-    // order.getBoutique().getId());
-    // }
-    // List<PriceBreakupDAO> priceBreakupDAOList =
-    // order.getNonDeletedItems().stream()
-    // .map(OrderItemDAO::getPriceBreakup).flatMap(List::stream).collect(Collectors.toList());
-    // postUpdateOrderValidation(orderAmountDAO.getTotalAmount(),
-    // priceBreakupDAOList);
-    // OrderSummary orderSummary = new OrderSummary(order.getId(),
-    // order.getInvoiceNo(),
-    // orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
-    // order.getNonDeletedItems());
-    // CreateOrderResponse response = new CreateOrderResponse("Order updated
-    // successfully", orderSummary);
-    // return new ResponseEntity(response, HttpStatus.OK);
-    // }
-    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order ID is
-    // invalid");
-    // }
 
     @Transactional
     public OrderDAO confirmOrder(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
@@ -242,14 +202,14 @@ public class OrderService {
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         orderItemService.acceptOrderItems(orderDAO.getNonDeletedItems());
 
-        if (request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived() != null) {
-            Double advanceAmount = request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived();
-            orderAmountDAO.setAmountRecieved(advanceAmount);
+        Double advanceRecieved = request.getOrderDetails().getOrderAmountDetails().getAdvanceReceived();
+        if (advanceRecieved != null && advanceRecieved > 0) {
+            orderAmountDAO.setAmountRecieved(advanceRecieved);
             orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(
                     mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
             orderDAO.setOrderAmount(orderAmountDAO);
-            paymentService.recordPayment(advanceAmount, PaymentMode.CASH, Boolean.TRUE, orderDAO);
+            paymentService.recordPayment(advanceRecieved, PaymentMode.CASH, Boolean.TRUE, orderDAO);
         }
 
         updateBoutiqueLedgerOnOrderConfirmation(orderAmountDAO, orderDAO);
@@ -368,12 +328,7 @@ public class OrderService {
             String recieveDateTime = orderDAO.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME);
             OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
 
-            PaymentDAO paymentDAO = paymentService.getPaymentDAOByOrderId(orderDAO.getId());
-            Integer paymentMode=null;
-
-            if (paymentDAO != null) {
-                paymentMode = paymentDAO.getPaymentMode().getOrdinal();
-            }
+            Integer paymentMode = getOrderPaymentMode(orderDAO.getId());
             InvoiceDetailResponse response = new InvoiceDetailResponse(invoiceDateTime, boutiqueName, customerName, recieveDateTime, summary, paymentMode);
 
             return new ResponseEntity(response, HttpStatus.OK);
@@ -399,18 +354,6 @@ public class OrderService {
         OrderDAO orderDAO = new OrderDAO(invoiceNo, boutiqueDAO, customerDAO);
         return orderDAO;
     }
-
-    // private void validatePriceBreakup(List<PriceBreakUpDetails> allPriceBreakups,
-    // Double totalAmount) {
-    // Double expectedTotalAmount = allPriceBreakups.stream()
-    // .mapToDouble(priceBreakUp -> priceBreakUp.getValue() *
-    // priceBreakUp.getComponentQuantity())
-    // .sum();
-    // if (!expectedTotalAmount.equals(totalAmount)) {
-    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Total amount
-    // calculated is incorrect");
-    // }
-    // }
 
     @Transactional
     public OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
@@ -485,6 +428,16 @@ public class OrderService {
         return orderRepo.countByBoutiqueId(boutiqueId) > 0;
     }
 
+    public Integer getOrderPaymentMode(Long orderId) {
+        Integer paymentMode = null;
+        Optional<Payment> payment = paymentRepo.findTopByOrderIdOrderByIdDesc(orderId);
+        if (payment.isPresent()) {
+            PaymentDAO paymentDAO = mapper.paymentToPaymentDAO(payment.get(), new CycleAvoidingMappingContext());
+            paymentMode = paymentDAO.getPaymentMode().getOrdinal();
+        }
+        return paymentMode;
+    }
+
     private Double calculateTotalOrderAmount(List<OrderItemDAO> orderItems) {
         List<PriceBreakupDAO> priceBreakups = orderItems.stream().map(item -> item.getActivePriceBreakUpList()).flatMap(List::stream).collect(Collectors.toList());
         Double totalAmount = 0d;
@@ -497,24 +450,6 @@ public class OrderService {
         }
         return totalAmount;
     }
-
-    // @Transactional
-    // private void resetOrderAmountForDeletedOrders(OrderDAO orderDAO, OrderStatus
-    // status) {
-    // OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-    // Double pendingOrderAmount = orderAmountDAO.getTotalAmount() -
-    // orderAmountDAO.getAmountRecieved();
-    // Double amountRecieved = orderAmountDAO.getAmountRecieved();
-    // orderAmountDAO.setAmountRecieved(0d);
-    // orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
-    // new CycleAvoidingMappingContext()));
-    // paymentService.recordPayment(-amountRecieved, PaymentMode.CASH,
-    // Boolean.FALSE, orderDAO);
-    // boutiqueLedgerService.handleBoutiqueLedgerForDeletedOrder(orderDAO.getBoutique().getId(),
-    // pendingOrderAmount,
-    // amountRecieved,
-    // status);
-    // }
 
     private String generateOrderInvoiceNo() {
         return RandomStringUtils.randomAlphanumeric(6);
