@@ -51,6 +51,6 @@ public class IndoWesternImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("indo_western.svg");
+        return s3Client.generateShortLivedUrlForOutfit("indo_western.jpg");
     }
 }

@@ -212,7 +212,7 @@ public class MeasurementService {
                     getMeasurementDetailsList(revisionsDAO.getMeasurementValue(), CM_TO_INCH_DIVIDING_FACTOR,
                             paramList, paramDetailMap, nonEmptyValuesOnly);
             String heading = outfitTypeService.getTopHeading();
-            String imageLink = s3Client.generateShortLivedUrlForMeasurement("top.svg");
+            String imageLink = s3Client.generateShortLivedUrlForMeasurement("top.jpg");
             innerMeasurementDetailsList.add(new InnerMeasurementDetails(heading, measurementDetails, imageLink));
         }
         if (boutiqueMeasurementParams.keySet().contains(OutfitSide.BOTTOM)) {
@@ -221,7 +221,7 @@ public class MeasurementService {
                     getMeasurementDetailsList(revisionsDAO.getMeasurementValue(), CM_TO_INCH_DIVIDING_FACTOR,
                             paramList, paramDetailMap, nonEmptyValuesOnly);
             String heading = outfitTypeService.getBottomHeading();
-            String imageLink = s3Client.generateShortLivedUrlForMeasurement("bottom.svg");
+            String imageLink = s3Client.generateShortLivedUrlForMeasurement("bottom.jpg");
             innerMeasurementDetailsList.add(new InnerMeasurementDetails(heading, measurementDetails, imageLink));
         }
         return innerMeasurementDetailsList;

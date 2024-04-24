@@ -60,6 +60,6 @@ public class LadiesSuitImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("womenssuit.svg");
+        return s3Client.generateShortLivedUrlForOutfit("womenssuit.jpg");
     }
 }

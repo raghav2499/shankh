@@ -60,6 +60,6 @@ public class SareeBlouseImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("saree+blouse.svg");
+        return s3Client.generateShortLivedUrlForOutfit("saree+blouse.jpg");
     }
 }

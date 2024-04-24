@@ -53,6 +53,6 @@ public class ShararaImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("sharara.svg");
+        return s3Client.generateShortLivedUrlForOutfit("sharara.jpg");
     }
 }

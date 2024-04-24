@@ -59,6 +59,6 @@ public class PantImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("pants.svg");
+        return s3Client.generateShortLivedUrlForOutfit("pants.jpg");
     }
 }

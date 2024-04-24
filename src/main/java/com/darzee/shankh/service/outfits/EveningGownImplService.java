@@ -57,6 +57,6 @@ public class EveningGownImplService implements OutfitTypeService {
 
     @Override
     public String getOutfitImageLink() {
-        return s3Client.generateShortLivedUrlForOutfit("nightgown.svg");
+        return s3Client.generateShortLivedUrlForOutfit("nightgown.jpg");
     }
 }
