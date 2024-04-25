@@ -17,7 +17,6 @@ import com.darzee.shankh.response.GetStitchOptionsResponse;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.response.StitchSummary;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -112,7 +111,7 @@ public class StitchOptionService {
         if (outfitType == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Outfit Id");
         }
-        List<StitchOptionsDAO> stitchOptions = mapper.stitchOptionListToStitchOptionDAOList(stitchOptionsRepo.findAllByOutfitTypeAndIsValid(outfitType, Boolean.TRUE, Sort.by("outfitSide")));
+        List<StitchOptionsDAO> stitchOptions = mapper.stitchOptionListToStitchOptionDAOList(stitchOptionsRepo.findAllByOutfitTypeAndIsValidOrderByOutfitType(outfitType, Boolean.TRUE));
         GetStitchOptionsResponse stitchOptionsResponse = new GetStitchOptionsResponse(stitchOptions);
         return stitchOptionsResponse;
     }
