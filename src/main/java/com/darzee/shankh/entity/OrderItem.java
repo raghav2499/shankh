@@ -61,6 +61,7 @@ public class OrderItem {
     private LocalDateTime updatedAt;
 
     @Column(name = "order_item_status")
+    @Enumerated(EnumType.ORDINAL)
     private OrderItemStatus orderItemStatus;
 
     @OneToOne

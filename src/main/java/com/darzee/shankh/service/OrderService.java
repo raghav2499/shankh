@@ -141,7 +141,9 @@ public class OrderService {
                                                      String deliveryDateTill, Boolean paymentDue,
                                                      Integer countPerPage, Integer pageCount) {
         validateGetOrderRequest(orderItemStatusList, orderStatusList);
-        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, null, orderStatusList, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill, null, paymentDue);
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList,
+                orderStatusList, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill,
+                null, paymentDue);
         String defaultOrderSortKey = "created_at";
         String defaultOrderSortOrder = "desc";
         Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, defaultOrderSortKey, defaultOrderSortOrder);
