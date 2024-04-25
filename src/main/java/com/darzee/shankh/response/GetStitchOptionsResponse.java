@@ -30,6 +30,13 @@ public class GetStitchOptionsResponse {
             return groupedStitchOptionDetails;
 
         }).collect(Collectors.toList());
+
+        if(response.size() > 1 && response.get(0).getSide().equals("Bottom") ){
+            GroupedStitchOptionDetails firstElement = response.get(0);
+            response.set(0, response.get(1));
+            response.set(1, firstElement); 
+        }
+
         this.response = response;
     }
 }
