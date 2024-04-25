@@ -224,7 +224,7 @@
                 <div class="top">
                     <div>
                         <button class="badge rounded-pill text-bg-primary">
-                            <img th:src="@{outfitImageLink}" alt="Icon" width="20" height="20"
+                            <img th:src="@{${outfitImageLink}}" alt="Icon" width="20" height="20"
                                 style="margin-right: 5px;"></img>
                             <span th:text="${outfitType}" style="margin-top: 100px;"></span>
                         </button>
@@ -244,8 +244,7 @@
                                             style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
 
                                             <div>
-                                               
-                                                <img th:src="@{row.imageLink}" width="60" height="70"
+                                                <img th:src="@{${detail.imageLink}}" width="60" height="70"
                                                     alt="No Image" style="float: left;margin-bottom: 10px;" />
                                                 <span class="span-outer" th:text="${detail.getTitle()}"></span>
                                                 <span class="span-inner" th:text="${detail.getValue()}"></span>
@@ -282,7 +281,7 @@
                 <div class="top">
                     <div>
                         <button class="badge rounded-pill text-bg-primary">
-                            <img th:src="@{outfitImageLink}" alt="Icon" width="20" height="20"
+                            <img th:src="@{${outfitImageLink}}" alt="Icon" width="20" height="20"
                                 style="margin-right: 5px;"></img>
                             <span th:text="${outfitType}" style="margin-top: 100px;"></span>
                         </button>
@@ -304,7 +303,7 @@
                                             style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
 
                                             <div>
-                                                <img th:src="@{row.imageLink}" width="60" height="70"
+                                                <img th:src="@{${detail.imageLink}}" width="60" height="70"
                                                     alt="No Image" style="float: left;margin-bottom: 10px;" />
                                                 <span class="span-outer" th:text="${detail.getTitle()}"></span>
                                                 <span class="span-inner" th:text="${detail.getValue()}"></span>
@@ -351,7 +350,7 @@
                                             style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
 
                                             <div>
-                                                <img th:src="@{row.imageLink}" width="60" height="70"
+                                                <img th:src="@{${detail.imageLink}}" width="60" height="70"
                                                     alt="No Image" style="float: left;margin-bottom: 10px;" />
                                                 <span class="span-outer" th:text="${detail.getTitle()}"></span>
                                                 <span class="span-inner" th:text="${detail.getValue()}"></span>

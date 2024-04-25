@@ -68,6 +68,12 @@ public class OrderSpecificationClause {
         };
     }
 
+    public static Specification<Order> findOrderByItemStatus(List<Integer> value) {
+        return (root, cq, cb) -> {
+            Join<Order, OrderItem> orderItemJoin = root.join("orderItems");
+            return orderItemJoin.get("orderItemStatus").in(value);
+        };
+    }
     public static Specification<Order> findNonDeletedOrders() {
         return (root, cq, cb) -> cb.or(
                 cb.notEqual(root.get("isDeleted"), true),
@@ -115,6 +121,8 @@ public class OrderSpecificationClause {
                 return findOrdersByDeliveryDateTill((LocalDateTime) value);
             case PAYMENT_DUE:
                 return findOrdersWithPaymentDue();
+            case ITEM_STATUS:
+                return findOrderByItemStatus((List<Integer>) value);
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We've not started grouping on " + filter);
         }
