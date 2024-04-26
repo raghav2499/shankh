@@ -30,6 +30,7 @@ public class GetStitchOptionsResponse {
             return groupedStitchOptionDetails;
 
         }).collect(Collectors.toList());
+
         this.response = response;
     }
 }

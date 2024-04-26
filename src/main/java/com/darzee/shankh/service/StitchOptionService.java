@@ -111,7 +111,7 @@ public class StitchOptionService {
         if (outfitType == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Outfit Id");
         }
-        List<StitchOptionsDAO> stitchOptions = mapper.stitchOptionListToStitchOptionDAOList(stitchOptionsRepo.findAllByOutfitTypeAndIsValid(outfitType, Boolean.TRUE));
+        List<StitchOptionsDAO> stitchOptions = mapper.stitchOptionListToStitchOptionDAOList(stitchOptionsRepo.findAllByOutfitTypeAndIsValidOrderByOutfitType(outfitType, Boolean.TRUE));
         GetStitchOptionsResponse stitchOptionsResponse = new GetStitchOptionsResponse(stitchOptions);
         return stitchOptionsResponse;
     }
