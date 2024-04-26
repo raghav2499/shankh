@@ -76,6 +76,7 @@ public class OrderItemController {
     @CrossOrigin
     public ResponseEntity<GetOrderItemResponse> getOrderItems(@RequestParam(name = "boutique_id", required = false) Long boutiqueId,
                                                               @RequestParam(name = "order_id", required = false) Long orderId,
+                                                              @RequestParam(name = "customer_id", required = false) Long customerId,
                                                               @RequestParam(name = "order_item_status_list", required = false, defaultValue = "1,2,3,4,5,6,7") String orderItemStatusList,
                                                               @RequestParam(name = "priority_orders_only", required = false) Boolean priorityOrdersOnly,
                                                               @RequestParam(name = "delivery_date_from", required = false) String deliveryDateFrom,
@@ -84,7 +85,7 @@ public class OrderItemController {
                                                               @RequestParam(name = "sort_order", required = false, defaultValue = "desc") String sortOrder,
                                                               @RequestParam(name = "count", required = false, defaultValue = "10") Integer countPerPage,
                                                               @RequestParam(name = "page_count", required = false, defaultValue = "1") Integer pageCount) {
-        return orderItemService.getOrderItemDetails(boutiqueId, orderId, orderItemStatusList,
+        return orderItemService.getOrderItemDetails(boutiqueId, orderId, customerId, orderItemStatusList,
                 priorityOrdersOnly, sortKey, sortOrder, countPerPage, pageCount, deliveryDateFrom, deliveryDateTill);
     }
 

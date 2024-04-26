@@ -1,6 +1,7 @@
 package com.darzee.shankh.repo;
 
 import com.darzee.shankh.entity.Boutique;
+import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.entity.OrderItem;
 import com.darzee.shankh.enums.OrderFilter;
@@ -25,6 +26,13 @@ public class OrderItemSpecificationClause {
         return (root, cq, cb) -> {
             Join<OrderItem, Boutique> boutique = root.join("order").join("boutique");
             return cb.equal(boutique.get("id"), boutiqueId);
+        };
+    }
+
+    public static Specification<OrderItem> findOrderItemByCustomerId(Long customerId) {
+        return (root, cq, cb) -> {
+            Join<OrderItem, Customer> customer = root.join("order").join("customer");
+            return cb.equal(customer.get("id"), customerId);
         };
     }
 
@@ -56,6 +64,7 @@ public class OrderItemSpecificationClause {
                 cb.notEqual(root.get("isDeleted"), true),
                 cb.isNull(root.get("isDeleted")));
     }
+
     private static Specification<OrderItem> getAppropriatePredicate(String key, Object value) {
         OrderFilter filter = OrderFilter.getFilter(key);
         if (filter == null) {
@@ -74,6 +83,8 @@ public class OrderItemSpecificationClause {
                 return findOrderItemsByDeliveryDateFrom((LocalDateTime) value);
             case DELIVERY_DATE_TILL:
                 return findOrderItemsByDeliveryDateTill((LocalDateTime) value);
+            case CUSTOMER_ID:
+                return findOrderItemByCustomerId((Long) value);
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We've not started grouping on " + filter);
         }

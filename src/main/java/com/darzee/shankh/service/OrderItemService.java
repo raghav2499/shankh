@@ -214,12 +214,12 @@ public class OrderItemService {
         return getOrderItemDetails(orderItemDAO);
     }
 
-    public ResponseEntity<GetOrderItemResponse> getOrderItemDetails(Long boutiqueId, Long orderId, String orderItemStatusList,
+    public ResponseEntity<GetOrderItemResponse> getOrderItemDetails(Long boutiqueId, Long orderId, Long customerId, String orderItemStatusList,
                                                                     Boolean priorityOrdersOnly, String sortKey,
                                                                     String sortOrder, Integer countPerPage, Integer pageCount, String deliveryDateFrom,
                                                                     String deliveryDateTill) {
         validateGetOrderItemRequest(boutiqueId, orderId);
-        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList, null, priorityOrdersOnly, null, deliveryDateFrom, deliveryDateTill, orderId, null);
+        Map<String, Object> filterMap = GetOrderDetailsRequest.getFilterMap(boutiqueId, orderItemStatusList, null, priorityOrdersOnly, customerId, deliveryDateFrom, deliveryDateTill, orderId, null);
         Map<String, Object> pagingCriteriaMap = GetOrderDetailsRequest.getPagingCriteria(countPerPage, pageCount, sortKey, sortOrder);
         Specification<OrderItem> orderItemSpecification = OrderItemSpecificationClause.getSpecificationBasedOnFilters(filterMap);
         Pageable pagingCriteria = filterOrderService.getPagingCriteria(pagingCriteriaMap);
