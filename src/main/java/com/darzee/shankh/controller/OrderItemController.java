@@ -34,7 +34,7 @@ public class OrderItemController {
     @CrossOrigin
     public ResponseEntity<CreateOrderResponse> createOrderItem(@Valid @RequestBody OrderCreationRequest request) {
         OrderSummary orderSummary = orderOrderItemCommonService.createOrderItem(request);
-        CreateOrderResponse createOrderResponse = new CreateOrderResponse("Order created successfully",
+        CreateOrderResponse createOrderResponse = new CreateOrderResponse("Item created successfully",
                 orderSummary);
         return new ResponseEntity<>(createOrderResponse, HttpStatus.CREATED);
     }
