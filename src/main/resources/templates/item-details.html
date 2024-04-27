@@ -237,8 +237,8 @@
                         <div class="size-chart">
                             <table>
                                 <tbody>
-                                    <tr th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 1}"
-                                        th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
+                                <th:block th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 1}">
+                                    <tr th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
                                         <td th:each="detail, detailStat: ${row}"
                                             th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}"
                                             style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
@@ -251,12 +251,13 @@
                                             </div>
                                         </td>
                                     </tr>
+                                </th:block>
                                 </tbody>
                             </table>
 
 
                         </div>
-                        <div th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 1}">
+                        <th:block th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 1}">
                             <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
                             <div th:each="stich_options : ${groupedStitchOptions.get(0)}" class="stich_options"
                                 style="display: flex; flex-wrap: wrap;width: 100%;">
@@ -267,7 +268,7 @@
                                 </div>
 
                             </div>
-                        </div>
+                        </th:block>
                         <div style="width: 100%; height: 0; clear: both;"></div>
                     </fieldset>
                 </div>
@@ -296,8 +297,8 @@
                         <div class="size-chart">
                             <table>
                                 <tbody>
-                                    <tr th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 1}"
-                                        th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
+                                    <th:block th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 1}">
+                                        <tr th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
                                         <td th:each="detail, detailStat: ${row}"
                                             th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}"
                                             style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
@@ -310,12 +311,13 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    </th:block>
                                 </tbody>
                             </table>
 
 
                         </div>
-                        <div th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 1}">
+                        <th:block th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 1}">
                             <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
                             <div th:each="stich_options : ${groupedStitchOptions.get(0)}" class="stich_options"
                                 style="display: flex; flex-wrap: wrap;width: 100%;">
@@ -328,7 +330,7 @@
                                 <div style="width: 100%; height: 0; clear: both;"></div>
 
                             </div>
-                        </div>
+                        </th:block>
                         <div style="width: 100%; height: 0; clear: both;"></div>
                     </fieldset>
                 </div>
@@ -343,8 +345,8 @@
                         <div class="size-chart">
                             <table>
                                 <tbody>
-                                    <tr th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 2}"
-                                        th:each="row, rowStat: ${measurementDetails.get(1).getMeasurementDetailsList()}">
+                                <th:block th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 2}">
+                                    <tr th:each="row, rowStat: ${measurementDetails.get(1).getMeasurementDetailsList()}">
                                         <td th:each="detail, detailStat: ${row}"
                                             th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}"
                                             style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
@@ -357,11 +359,12 @@
                                             </div>
                                         </td>
                                     </tr>
+                                </th:block>
                                 </tbody>
                             </table>
 
                         </div>
-                        <div th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 2}">
+                        <th:block th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 2}">
                             <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
                             <div th:each="stich_options : ${groupedStitchOptions.get(1)}" class="stich_options"
                                 style="display: flex; flex-wrap: wrap;width: 100%;">
@@ -374,7 +377,7 @@
                                 <div style="width: 100%; height: 0; clear: both;"></div>
 
                             </div>
-                        </div>
+                        </th:block>
                         <div style="width: 100%; height: 0; clear: both;"></div>
                     </fieldset>
                 </div>
