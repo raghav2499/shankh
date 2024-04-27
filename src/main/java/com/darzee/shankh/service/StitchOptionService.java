@@ -25,7 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -109,7 +108,10 @@ public class StitchOptionService {
 
     public GetStitchOptionsResponse getStitchOptions(Integer outfitId) {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitId);
-        List<StitchOptionsDAO> stitchOptions = mapper.stitchOptionListToStitchOptionDAOList(stitchOptionsRepo.findAllByOutfitTypeAndIsValidOrderById(outfitType, Boolean.TRUE));
+        if (outfitType == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Outfit Id");
+        }
+        List<StitchOptionsDAO> stitchOptions = mapper.stitchOptionListToStitchOptionDAOList(stitchOptionsRepo.findAllByOutfitTypeAndIsValidOrderByPriority(outfitType, Boolean.TRUE));
         GetStitchOptionsResponse stitchOptionsResponse = new GetStitchOptionsResponse(stitchOptions);
         return stitchOptionsResponse;
     }

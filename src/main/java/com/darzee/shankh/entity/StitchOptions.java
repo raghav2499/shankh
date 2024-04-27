@@ -46,4 +46,7 @@ public class StitchOptions {
 
     @Column(name = "is_valid")
     private Boolean isValid;
+
+    @Column(name = "priority")
+    private Long priority;
 }

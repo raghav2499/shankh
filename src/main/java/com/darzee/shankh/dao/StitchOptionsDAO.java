@@ -16,4 +16,5 @@ public class StitchOptionsDAO {
     private List<String> value;
     private OutfitSide outfitSide;
     private Boolean isValid;
+    private Long priority;
 }
