@@ -12,7 +12,7 @@ public interface StitchOptionsRepo extends JpaRepository<StitchOptions, Long> {
 
     List<StitchOptions> findAllByIdIn(List<Long> id);
 
-    List<StitchOptions> findAllByOutfitTypeAndIsValidOrderByOutfitType(OutfitType outfitType, Boolean isValid);
+    List<StitchOptions> findAllByOutfitTypeAndIsValidOrderById(OutfitType outfitType, Boolean isValid);
 
     Integer countByOutfitTypeAndIsValid(OutfitType outfitType, Boolean isValid);
 }
