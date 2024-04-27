@@ -38,7 +38,7 @@ public class PriceBreakupDAO {
     }
 
     public boolean isValueUpdated(Double value) {
-        return value != null && !this.value.equals(value);
+        return this.value == null ? value != null : !this.value.equals(value);
     }
 
     public boolean isQuantityUpdated(Integer value) {
