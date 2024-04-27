@@ -18,6 +18,7 @@ public class CreateCustomerRequest {
     @NotNull(message = "Customer's phone number is mandatory ")
     @Size(min=10, max=13, message = "Invalid phone number")
     private String phoneNumber;
+    private String countryCode;
     @NotNull(message = "Customer's name is mandatory")
     private String name;
     private Gender gender;

@@ -116,7 +116,7 @@ public class CustomerService {
                     new CycleAvoidingMappingContext());
             ImmutablePair<String, String> name = getCustomerNameFromRequest(request.getName());
 
-            CustomerDAO customerDAO = new CustomerDAO(request.getAge(), phoneNumber, name.getKey(),
+            CustomerDAO customerDAO = new CustomerDAO(request.getAge(), request.getCountryCode(), phoneNumber, name.getKey(),
                     name.getValue(), request.getGender(), boutiqueDAO);
             customerDAO = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customerDAO,
                             new CycleAvoidingMappingContext())),
