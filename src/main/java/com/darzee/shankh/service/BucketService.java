@@ -169,8 +169,9 @@ public class BucketService {
     }
 
     public Pair<String, String> uploadFile(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
+        File file = null;
         try {
-            File file = FileUtil.convertMultiPartToFile(multipartFile);
+            file = FileUtil.convertMultiPartToFile(multipartFile);
             String fileName = FileUtil.generateFileName(multipartFile);
             ImmutablePair<String, String> fileUploadResult = null;
             FileType fileType = FileType.getFileTypeFromOrdinal(uploadFileTypeOrdinal);
@@ -197,6 +198,9 @@ public class BucketService {
             file.delete();
             return fileUploadResult;
         } catch (Exception e) {
+            if (file != null) {
+                file.delete();
+            }
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception " + e.getMessage(), e);
         }
     }

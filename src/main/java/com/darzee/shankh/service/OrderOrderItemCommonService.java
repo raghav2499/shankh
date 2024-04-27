@@ -180,6 +180,6 @@ public class OrderOrderItemCommonService {
         List<String> clothImageLinks = orderItemService.getClothImageLinks(orderItemDAO.getId());
 
         File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions, innerMeasurementDetailsList, clothImageLinks, orderItemDAO);
-        String fileUploadUrl = bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
+        itemDetailPdf.delete();
     }
 }
