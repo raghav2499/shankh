@@ -170,6 +170,10 @@ public class CustomerService {
                 customer.setAge(request.getAge());
             }
 
+            if(customer.isCountryCodeUpdated(request.getCountryCode())) {
+                customer.setCountryCode(request.getCountryCode());
+            }
+
             if (isImageUpdated(customer.getId(), request.getCustomerImageReferenceId())) {
                 if (request.getCustomerImageReferenceId() != null) {
                     saveCustomerImages(customer, request.getCustomerImageReferenceId());

@@ -36,6 +36,10 @@ public class CustomerDAO {
         return (value != null && !value.equals(this.phoneNumber)) || (value == null && this.phoneNumber != null);
     }
 
+    public boolean isCountryCodeUpdated(String value) {
+        return (value != null && !value.equals(this.countryCode)) || (value == null && this.countryCode != null);
+    }
+
     public boolean isFirstNameUpdated(String value) {
         return (value != null && !value.equals(this.firstName)) || (value == null && this.firstName != null);
     }
