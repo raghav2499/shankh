@@ -7,7 +7,8 @@ public enum FileType {
 
     PORTFOLIO("1"),
     AUDIO("2"),
-    MEASUREMENT("3");
+    MEASUREMENT("3"),
+    DEFAULT("4");
 
     private String ordinal;
 
@@ -29,7 +30,15 @@ public enum FileType {
         return fileTypeOrdinalMap;
     }
 
+    /**
+     * We get file_type as null for default cases : boutique, customer, tailor photos
+     * @param ordinal
+     * @return
+     */
     public static FileType getFileTypeFromOrdinal(String ordinal) {
-        return getFileTypeEnumOrdinalMap().get(ordinal);
+        if(ordinal != null) {
+            return getFileTypeEnumOrdinalMap().get(ordinal);
+        }
+        return FileType.DEFAULT;
     }
 }

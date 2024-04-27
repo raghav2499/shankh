@@ -186,9 +186,11 @@ public class BucketService {
                 case MEASUREMENT:
                     //for measurement file
                     fileUploadResult = client.uploadMeasurementFile(file, fileName);
+                    break;
                 default:
                     // for image file
                     fileUploadResult = client.uploadFile(file, fileName);
+                    break;
             }
             ImageReferenceDAO imageReference = new ImageReferenceDAO(fileUploadResult.getKey(), fileName);
             fileReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
