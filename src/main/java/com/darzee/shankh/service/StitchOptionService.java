@@ -109,9 +109,6 @@ public class StitchOptionService {
 
     public GetStitchOptionsResponse getStitchOptions(Integer outfitId) {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitId);
-        if (outfitType == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Outfit Id");
-        }
         List<StitchOptionsDAO> stitchOptions = mapper.stitchOptionListToStitchOptionDAOList(stitchOptionsRepo.findAllByOutfitTypeAndIsValidOrderById(outfitType, Boolean.TRUE));
         GetStitchOptionsResponse stitchOptionsResponse = new GetStitchOptionsResponse(stitchOptions);
         return stitchOptionsResponse;
