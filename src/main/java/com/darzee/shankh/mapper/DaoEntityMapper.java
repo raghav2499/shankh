@@ -6,6 +6,7 @@ import com.darzee.shankh.response.TailorLoginResponse;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -27,7 +28,15 @@ public interface DaoEntityMapper {
 
     SampleImageReferenceDAO sampleImageRefToDAO(SampleImageReference sampleImageReference);
 
+    //we don't want to use the getter method here to populate boutiqueOrderId,
+    // because for cases where boutiqueOrderId is not present, it will add orderId as boutiqueOrderId
+    @Mapping(source = "orderDAO", target = "boutiqueOrderId", qualifiedByName = "getActualBoutiqueOrderId")
     Order orderaDaoToObject(OrderDAO orderDAO, @Context CycleAvoidingMappingContext context);
+
+    @Named("getActualBoutiqueOrderId")
+    default Long getActualBoutiqueOrderId(OrderDAO orderDAO) {
+        return orderDAO.getActualBoutiqueOrderId();
+    }
 
     CustomerDAO customerObjectToDao(Customer customer, @Context CycleAvoidingMappingContext context);
 

@@ -87,6 +87,10 @@ public class OrderDAO {
         return this.id;
     }
 
+    public Long getActualBoutiqueOrderId() {
+        return this.boutiqueOrderId;
+    }
+
     public String getInvoiceNo() {
         if (this.boutiqueOrderId != null) {
             return "INVC" + boutiqueOrderId;
