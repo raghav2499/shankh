@@ -94,7 +94,7 @@ public class AmazonClient {
     public List<String> generateShortLivedUrlForPortfolio(List<String> fileNames) {
         List<String> urlList = new ArrayList<>(fileNames.size());
         for (String fileName : fileNames) {
-            String url = generateShortLivedUrl(portfolioBucketName, fileName, true);
+            String url = generateShortLivedUrl(portfolioBucketName, fileName, false);
             urlList.add(url);
         }
         return urlList;
@@ -110,11 +110,11 @@ public class AmazonClient {
     }
 
     public String generateShortLivedUrlForAudio(String fileName) {
-        return generateShortLivedUrl(audioBucketName, fileName, true);
+        return generateShortLivedUrl(audioBucketName, fileName, false);
     }
 
     public String generateShortLivedUrlForPortfolio(String fileName) {
-        return generateShortLivedUrl(portfolioBucketName, fileName, true);
+        return generateShortLivedUrl(portfolioBucketName, fileName, false);
     }
 
     public String generateShortLivedUrlForMeasurement(String fileName) {

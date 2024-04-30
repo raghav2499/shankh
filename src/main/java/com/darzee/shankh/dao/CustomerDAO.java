@@ -52,12 +52,6 @@ public class CustomerDAO {
         return (value != null && !value.equals(this.age)) || (value == null && this.age != null);
     }
 
-    public String getPhoneNumber() {
-        String countryCode = Optional.ofNullable(this.getCountryCode()).orElse("");
-        String phoneNumber = Optional.ofNullable(this.phoneNumber).orElse("");
-        return countryCode + phoneNumber;
-    }
-
     public String constructName() {
         return (Optional.ofNullable(this.firstName).orElse("") + " " + Optional.ofNullable(this.lastName).orElse("")).trim();
     }

@@ -17,6 +17,8 @@ public class CustomerDetails {
 
     private String customerName;
     private Long customerId;
+
+    private String countryCode;
     private String phoneNumber;
 
     private Integer age;
@@ -29,11 +31,13 @@ public class CustomerDetails {
     private Double revenue;
 
     public CustomerDetails(String customerName,
+                           String countryCode,
                            String phoneNumber,
                            String profilePicLink,
                            Long customerId,
                            String gender) {
         this.customerName = customerName;
+        this.countryCode = countryCode;
         this.phoneNumber = phoneNumber;
         this.profilePicLink = profilePicLink;
         this.customerId = customerId;

@@ -3,6 +3,7 @@ package com.darzee.shankh.utils;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 public class TimeUtils {
 
@@ -28,5 +29,14 @@ public class TimeUtils {
                 .toLocalDateTime();
         return istDateTime;
 
+    }
+
+    public static String getISOFormatDateTime(LocalDateTime dateTime) {
+        if (dateTime != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            return dateTime.format(formatter);
+        } else {
+            return null;
+        }
     }
 }
