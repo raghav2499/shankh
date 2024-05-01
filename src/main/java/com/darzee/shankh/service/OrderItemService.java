@@ -156,6 +156,10 @@ public class OrderItemService {
 
         if (Boolean.TRUE.equals(updateItemDetail.getIsDeleted())) {
             orderItem.setIsDeleted(Boolean.TRUE);
+            Double itemPrice = orderItem.calculateItemPrice();
+            if(updateItemDetail.getAmountRefunded() != null && updateItemDetail.getAmountRefunded() > itemPrice) {
+                throw new RuntimeException("Amount refunded cannot exceed item price");
+            }
         }
 
         if (orderItem.isTrialDateUpdated(updateItemDetail.getTrialDate())) {

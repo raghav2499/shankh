@@ -2,6 +2,7 @@ package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.MeasurementRevisions;
+import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
@@ -133,7 +134,9 @@ public class OrderOrderItemCommonService {
             List<PriceBreakupDAO> updatedPriceBreakup = priceBreakUpService.updatePriceBreakups(orderItemDetails.getPriceBreakup(), updatedItem);
 
         }
-        OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId());
+        boolean shouldUpdateLedger = doesLedgerNeedUpdate(updatedItem, orderItemDetails);
+        OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId(),
+                orderItemDetails.getAmountRefunded(), shouldUpdateLedger);
 
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         orderService.generateInvoiceV2(orderDAO);
@@ -181,5 +184,13 @@ public class OrderOrderItemCommonService {
 
         File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions, innerMeasurementDetailsList, clothImageLinks, orderItemDAO);
         bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
+    }
+
+    /*
+    Ledger should not be updated when drafted items are deleted
+     */
+    private boolean doesLedgerNeedUpdate(OrderItemDAO orderItemDAO, OrderItemDetailRequest orderItemDetails) {
+        return !(OrderItemStatus.DRAFTED.equals(orderItemDAO.getOrderItemStatus())
+                && Boolean.TRUE.equals(orderItemDetails.getIsDeleted()));
     }
 }

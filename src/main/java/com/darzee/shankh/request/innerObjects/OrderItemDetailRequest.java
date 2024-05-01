@@ -33,4 +33,5 @@ public class OrderItemDetailRequest {
     private Long measurementRevisionId;
     private List<Long> stitchOptionReferences;
     private List<PriceBreakUpDetails> priceBreakup;
+    private Double amountRefunded;
 }

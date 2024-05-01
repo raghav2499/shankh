@@ -208,7 +208,7 @@ public class OrderService {
         if (advanceRecieved != null && advanceRecieved > 0) {
             orderAmountDAO.setAmountRecieved(advanceRecieved);
             orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(
-                    mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
+                            mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
             orderDAO.setOrderAmount(orderAmountDAO);
             paymentService.recordPayment(advanceRecieved, PaymentMode.CASH, Boolean.TRUE, orderDAO);
@@ -339,6 +339,7 @@ public class OrderService {
         }
 
     }
+
     private OrderDetailResponse getOrderDetails(OrderDAO orderDAO, List<OrderItemStatus> eligibleStatuses) throws Exception {
         String customerProfilePicLink = customerService.getCustomerProfilePicLink(orderDAO.getCustomer().getId());
         List<Pair<OrderItemDAO, String>> orderItemOutfitLinkPairList = new ArrayList<>();
@@ -378,9 +379,16 @@ public class OrderService {
         boutiqueLedgerService.updateCountOnOrderConfirmation(ledger, orderDAO.getBoutiqueId());
     }
 
-    // todo : move this logic to spring state machine
+    /**
+     * 1.Update order status if applicable
+     * a. Mark order as accepted, if all items are accepted
+     * b. Mark order as delovered if all items are delivered
+     * 2. Delete order if all items are deleted
+     * 3. Adjust order amount
+     * 4. Adjust boutique ledger amounts
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
-    public OrderDAO updateOrderPostItemUpdation(Long orderId) {
+    public OrderDAO updateOrderPostItemUpdation(Long orderId, Double refundAmount, Boolean shouldUpdateLedger) {
 
         OrderDAO orderDAO = mapper.orderObjectToDao(orderRepo.findById(orderId).get(), new CycleAvoidingMappingContext());
         BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(boutiqueLedgerRepo.findByBoutiqueId(orderDAO.getBoutiqueId()), new CycleAvoidingMappingContext());
@@ -392,20 +400,24 @@ public class OrderService {
             boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), 1, 0);
         }
         boolean allItemsDelivered = orderItems.stream().filter(item -> OrderItemStatus.DELIVERED.equals(item.getOrderItemStatus())).collect(Collectors.toList()).size() == orderItems.size();
-
         if (allItemsDelivered && !OrderStatus.DELIVERED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.DELIVERED);
             boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), 0, 1);
-
         }
+
+
         boolean allItemsDeleted = (orderItems.size() == 0);
         if (allItemsDeleted && !Boolean.TRUE.equals(orderDAO.getIsDeleted())) {
             orderDAO.setIsDeleted(Boolean.TRUE);
-            boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderDeletion(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), orderDAO);
+            if (shouldUpdateLedger) {
+                boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderDeletion(boutiqueLedgerDAO,
+                        orderDAO.getBoutiqueId(), orderDAO);
+            }
         }
+
+
         Double orderItemsPriceSum = orderItems.stream().mapToDouble(item -> item.calculateItemPrice()).sum();
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-
         Double orderAmountDelta = 0d;
         if (!orderAmountDAO.getTotalAmount().equals(orderItemsPriceSum)) {
             orderAmountDelta = orderItemsPriceSum - orderAmountDAO.getTotalAmount();
@@ -413,10 +425,22 @@ public class OrderService {
         }
         orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
         orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
-        if (orderAmountDelta != 0) {
-            Double deltaPendingAmount = orderAmountDelta;
-            boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), deltaPendingAmount, 0d);
+
+
+        if (Boolean.FALSE.equals(shouldUpdateLedger)) {
+            return orderDAO;
         }
+        Double deltaAmountRecieved = 0d;
+        if (orderAmountDelta != 0) {
+            if (refundAmount != null && refundAmount > -orderAmountDelta) {
+                throw new RuntimeException("Amount refund could not be greater than order amount change. " +
+                        "Order Amount changed by " + (-orderAmountDelta) + " and we cannot refund " + refundAmount);
+            }
+            deltaAmountRecieved = -refundAmount;
+        }
+        Double deltaPendingAmount = orderAmountDelta - deltaAmountRecieved;
+        boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), deltaPendingAmount,
+                deltaAmountRecieved);
         return orderDAO;
     }
 
