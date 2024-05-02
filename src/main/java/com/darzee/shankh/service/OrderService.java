@@ -432,11 +432,13 @@ public class OrderService {
         }
         Double deltaAmountRecieved = 0d;
         if (orderAmountDelta != 0) {
-            if (refundAmount != null && refundAmount > -orderAmountDelta) {
-                throw new RuntimeException("Amount refund could not be greater than order amount change. " +
-                        "Order Amount changed by " + (-orderAmountDelta) + " and we cannot refund " + refundAmount);
+            if (refundAmount != null ) {
+                if(refundAmount > -orderAmountDelta) {
+                    throw new RuntimeException("Amount refund could not be greater than order amount change. " +
+                            "Order Amount changed by " + (-orderAmountDelta) + " and we cannot refund " + refundAmount);
+                }
+                deltaAmountRecieved = -refundAmount;
             }
-            deltaAmountRecieved = -refundAmount;
         }
         Double deltaPendingAmount = orderAmountDelta - deltaAmountRecieved;
         boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), deltaPendingAmount,

@@ -47,6 +47,7 @@ public class CustomerDetails {
     public CustomerDetails(CustomerDAO customerDAO, String customerProfilePicLink) {
         if (customerDAO != null) {
             this.customerName = customerDAO.constructName();
+            this.countryCode = customerDAO.getCountryCode();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.profilePicLink = customerProfilePicLink;
             this.age = customerDAO.getAge();
@@ -58,6 +59,7 @@ public class CustomerDetails {
     public CustomerDetails(CustomerDAO customerDAO, String referenceId, String customerProfilePicLink, Double revenue) {
         if (customerDAO != null) {
             this.customerName = customerDAO.constructName();
+            this.countryCode = customerDAO.getCountryCode();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.referenceId = referenceId;
             this.profilePicLink = customerProfilePicLink;
@@ -71,6 +73,7 @@ public class CustomerDetails {
     public CustomerDetails(CustomerDAO customerDAO) {
         if (customerDAO != null) {
             this.customerName = customerDAO.constructName();
+            this.countryCode = customerDAO.getCountryCode();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.customerId = customerDAO.getId();
             this.age = customerDAO.getAge();
@@ -78,8 +81,9 @@ public class CustomerDetails {
         }
     }
 
-    public CustomerDetails(Long customerId, String phoneNumber) {
+    public CustomerDetails(Long customerId, String countryCode, String phoneNumber) {
         this.customerId = customerId;
+        this.countryCode = countryCode;
         this.phoneNumber = phoneNumber;
     }
 }
