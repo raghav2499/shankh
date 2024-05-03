@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <meta charset="UTF-8"/>
+<head>
+
+    <title>Order Invoice</title>
+    <style>
+        @font-face {
+            font-family: 'HindiFont';
+            src: url('hindi.ttf');
+        }
+        
+        @font-face {
+            font-family: 'PunjabiFont';
+            src: url('punjabi.ttf');
+        }
+        body {
+            font-family: 'HindiFont', 'PunjabiFont', sans-serif;
+            margin: 0;
+            padding: 0;
+
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .main-div-header {
+            margin-bottom: 20px;
+            overflow: hidden;
+            /* Clear float */
+        }
+
+        .main-div-header h1 {
+            margin-top: 6px;
+            color: #525252;
+            float: left;
+        }
+
+
+        .main-div-content {
+            margin-bottom: 20px;
+            overflow: hidden;
+            /* Clear float */
+        }
+
+        .main-div-content-left {
+            width: 45%;
+            /* Adjusted width */
+            float: left;
+
+        }
+
+        .main-div-content-right {
+            width: 55%;
+            /* Adjusted width */
+            float: left;
+
+        }
+
+        .order-summary {
+            background-color: #eef2ff;
+            padding: 20px;
+        }
+
+        .order-summary h5 {
+            margin-top: 0;
+        }
+
+        .gray-background {
+            background-color: #f1f1f1;
+            padding: 20px;
+
+        }
+
+        .invoice-details {
+            color: #525252;
+        }
+
+        .black {
+            color: black;
+        }
+
+        table th {
+            font-size: 12px;
+        }
+
+        table tr {
+            font-size: 14px;
+        }
+
+        .total,
+        .total1,
+        .balanceDue {
+            background-color: #eef2ff;
+            margin-top: 5px;
+            padding: 1px;
+            position: relative;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        #main-para {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+        }
+
+        #main-para1 {
+            width: 300px;
+            position: absolute;
+            top: 95px;
+            left: 20px;
+        }
+
+        #main-para3 {
+            position: absolute;
+            top: 156px;
+            left: 20px;
+        }
+
+        #main-para2 {
+            position: absolute;
+            top: 161px;
+            left: 20px;
+        }
+
+        .left-item {
+            margin-left: 20px;
+            color: #000;
+        }
+
+        .right-item {
+            margin-right: 20px;
+        }
+
+        .inv-date {
+            position: absolute;
+            top: 130px;
+            right: 60px;
+        }
+
+        .inv-number {
+            position: absolute;
+            top: 157px;
+            right: 60px;
+        }
+
+        #business_logo {
+            position: absolute;
+            top: 30px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            right: 70px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="main-div-header">
+            <div class="left" style="float: left;">
+                <h1 id="main-heading">Invoice</h1>
+                <p class="invoice-details" id="main-para" th:text="${businessName}">Cult Botique</p>
+                <p class="invoice-details" id="main-para1" th:text="${businessAddress}">
+                </p>
+                <span class="invoice-details" id="main-para3" th:if="${phonenumber != null}"
+                    th:text="${phonenumber}"></span>
+                <p class="invoice-details" id="main-para2" th:if="${gstnumber != null}">GST
+                    Number : <span th:text="${gstnumber}"></span></p>
+            </div>
+            <div class="right" style="float: right;">
+                <img th:src="@{https://picsum.photos/200/300}" id="business_logo" alt="No Image" />
+                <p class="invoice-details inv-date">Invoice Date: <span class="black"
+                        th:text="${orderUpdationDate}"></span></p>
+                <p class="invoice-details inv-number">Invoice Number: <span class="black" th:text="${invoiceNo}"></span>
+                </p>
+            </div>
+        </div>
+        <hr style="height: 1px; border: none; background-color: #000; margin-top: 130px;">
+        </hr>
+        <div class="main-div-content">
+            <div class="main-div-content-left">
+                <div class="customer-details">
+                    <p class="invoice-details">Customer Name: <span class="black" th:text="${customerName}"></span></p>
+                    <p class="invoice-details">Order Number: <span class="black" th:text="${orderId}"></span></p>
+                    <p class="invoice-details">Order Received Date: <span class="black"
+                            th:text="${orderCreationDate}"></span></p>
+                    <p class="invoice-details">Order Received Time: <span class="black"
+                            th:text="${orderCreationTime}"></span></p>
+                </div>
+
+                <!-- <div class="customer-details" style="margin-top: 50px;">
+                    <p class="invoice-details">Address: <span th:if="${address != null}" class="black"
+                            th:text="${address}"></span></p>
+                </div> -->
+            </div>
+            <div class="main-div-content-right">
+                <div class="order-summary">
+                    <h4>Order Summary</h4>
+                    <div th:each="item : ${orderItems}" class="order-summary-content">
+                        <h5 class="order-left" th:text="${item.outfitType.getDisplayString()}"></h5>
+                        <span class="order-right"
+                            style="float:right;font-size: 14px;margin-top: -40px;font-weight: bold;"
+                            th:text="'Rs ' + ${item.calculateItemPrice()}"></span>
+                        <p class="invoice-details" style="font-size: 14px;" th:each="pb : ${item.getPriceBreakup()}">
+
+                            <span class="order-right"
+                                th:text="${pb.component + ' ' + pb.quantity + ' x ' + pb.value + ' =  Rs ' + pb.getTotalBreakUpValue()}">
+
+                            </span>
+                        </p>
+
+                        <p class="invoice-details" style="font-size: 12px;">
+                            Exp. Delivery Date:
+                            <span class="order-right" th:text="${item.formattedDeliveryDate}"
+                                style="font-size: 12px;"></span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="total">
+                    <p class="invoice-details left-item" style="font-size: 14px;">Total Before Tax <span
+                            class="black right-item" style="float:right;font-size: 14px;"
+                            th:text="'Rs ' + ${totalAmount}"></span></p>
+                </div>
+                <div class="total" th:if="${gstamount != null}">
+                    <p class="invoice-details left-item" style="font-size: 14px;">GST (18%) <span
+                            class="black right-item" style="float:right;font-size: 14px;"
+                            th:text="'Rs ' + ${gstamount}"></span></p>
+                </div>
+                <div class="total">
+                    <p class="invoice-details left-item" style="font-size: 14px;">Total After Tax <span
+                            class="black right-item" style="float:right;font-size: 14px;"
+                            th:text="'Rs ' + ${totalAmount}"></span></p>
+
+                </div>
+                <div class="total1">
+                    <p class="invoice-details left-item" style="font-size: 14px;">Advance (if any) <span
+                            class="black right-item" style="float:right; font-size: 14px;"
+                            th:text="'Rs ' + ${amountPaid}"></span></p>
+                </div>
+                <div class="balanceDue">
+                    <p class="invoice-details left-item" style="font-size: 14px;">Balance Due <span id="balanceDue"
+                            class="black right-item" style="float:right; font-size: 14px;color:red"
+                            th:text="'Rs ' + ${balanceDue}"></span></p>
+                </div>
+            </div>
+        </div>
+        <hr style="height: 1px; border: none; background-color: #000;">
+        </hr>
+        <div class="gray-background">
+            <h2 class="invoice-details">Thank you for your business</h2>
+            <p>Terms and conditions</p>
+            <ul>
+                <li class="black">Once confirmed, any advance amount paid towards the order cannot be refunded.</li>
+                <li class="black">Goods once sold will not be taken back.</li>
+                <li class="black">We do not give a guarantee of colors. We advise dry cleaning only.</li>
+            </ul>
+        </div>
+    </div>
+    <input type="time" />
+</body>
+
+</html>
