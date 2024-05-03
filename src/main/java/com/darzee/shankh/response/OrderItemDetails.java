@@ -3,6 +3,7 @@ package com.darzee.shankh.response;
 import com.darzee.shankh.dao.CustomerDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
 import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.utils.TimeUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -54,8 +55,8 @@ public class OrderItemDetails {
         this.id = orderItem.getId();
         this.isPriorityOrder = Optional.ofNullable(orderItem.getIsPriorityOrder()).orElse(Boolean.FALSE);
         this.outfitType = outfitType.getDisplayString();
-        this.trialDate = (orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null);
-        this.deliveryDate = (orderItem.getDeliveryDate() != null ? orderItem.getDeliveryDate().toString() : null);
+        this.trialDate = (orderItem.getTrialDate() != null ? TimeUtils.getISOFormatDateTime(orderItem.getTrialDate()) : null);
+        this.deliveryDate = (orderItem.getDeliveryDate() != null ? TimeUtils.getISOFormatDateTime(orderItem.getDeliveryDate()) : null);
         this.itemQuantity = orderItem.getQuantity();
         this.outfitTypeIndex = outfitType.getOrdinal();
         this.outfitTypeImageLink = outfitTypeImgLink;
@@ -65,7 +66,6 @@ public class OrderItemDetails {
         this.orderId = orderItem.getOrder().getBoutiqueOrderId();
         this.itemPrice = orderItem.calculateItemPrice();
         this.outfitAlias = orderItem.getOutfitAlias();
-        this.deliveryDate = orderItem.getDeliveryDate() != null ? orderItem.getDeliveryDate().toString() : null;
         this.priceBreakupSummaryList = orderItem.getActivePriceBreakUpList().stream()
                 .map(priceBreakup -> new PriceBreakupSummary(priceBreakup)).collect(Collectors.toList());
     }
@@ -82,8 +82,8 @@ public class OrderItemDetails {
         this.outfitTypeName = orderItem.getOutfitType().getName();
         this.outfitTypeIndex = orderItem.getOutfitType().getOrdinal();
         this.outfitTypeImageLink = outfitImageLink;
-        this.trialDate = (orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null);
-        this.deliveryDate = (orderItem.getDeliveryDate() != null ? orderItem.getDeliveryDate().toString() : null);
+        this.trialDate = (orderItem.getTrialDate() != null ? TimeUtils.getISOFormatDateTime(orderItem.getTrialDate()) : null);
+        this.deliveryDate = (orderItem.getDeliveryDate() != null ? TimeUtils.getISOFormatDateTime(orderItem.getDeliveryDate()) : null);
         this.type = orderItem.getOrderType().getDisplayName();
         this.itemQuantity = orderItem.getQuantity();
         this.inspiration = orderItem.getInspiration();
@@ -91,13 +91,13 @@ public class OrderItemDetails {
         this.pieces = orderItem.getOutfitType().getPieces();
         this.measurementDetails = measurementDetails;
         this.orderItemStitchOptions = orderItemStitchOptions;
-        this.trialDate = (orderItem.getTrialDate() != null ? orderItem.getTrialDate().toString() : null);
         this.itemPrice = orderItem.calculateItemPrice();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
         this.outfitAlias = orderItem.getOutfitAlias();
         this.priceBreakupSummaryList = orderItem.getActivePriceBreakUpList().stream()
                 .map(priceBreakup -> new PriceBreakupSummary(priceBreakup)).collect(Collectors.toList());
         CustomerDAO customerDAO = orderItem.getOrder().getCustomer();
-        this.customerDetails = new CustomerDetails(customerDAO.getId(), customerDAO.getPhoneNumber());
+        this.customerDetails = new CustomerDetails(customerDAO.getId(), customerDAO.getCountryCode(),
+                customerDAO.getPhoneNumber());
     }
 }
