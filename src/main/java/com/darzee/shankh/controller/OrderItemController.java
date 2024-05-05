@@ -1,5 +1,6 @@
 package com.darzee.shankh.controller;
 
+import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.request.CreateStitchOptionRequest;
 import com.darzee.shankh.request.OrderCreationRequest;
@@ -40,7 +41,10 @@ public class OrderItemController {
         logMessage.append("Request URI: ").append(httpRequest.getRequestURI()).append("\n");
         logMessage.append("Request Parameters: ").append(httpRequest.getParameterMap()).append("\n");
         System.out.println("Entire Create Order Item Request:\n" + logMessage.toString());
-        OrderSummary orderSummary = orderOrderItemCommonService.createOrderItem(request);
+        OrderDAO orderDAO = orderOrderItemCommonService.createOrderItem(request);
+        OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
+                orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
+                orderDAO.getOrderItems());
         CreateOrderResponse createOrderResponse = new CreateOrderResponse("Item created successfully",
                 orderSummary);
         System.out.println("Create Order Item Response:\n" + createOrderResponse.toString());

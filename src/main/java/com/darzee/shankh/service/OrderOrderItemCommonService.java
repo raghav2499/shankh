@@ -113,7 +113,7 @@ public class OrderOrderItemCommonService {
     }
 
     @Transactional
-    public OrderSummary createOrderItem(OrderCreationRequest orderCreationRequest) {
+    public OrderDAO createOrderItem(OrderCreationRequest orderCreationRequest) {
         OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
         OrderDAO orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(), orderDetails.getBoutiqueId(), orderDetails.getCustomerId());
         List<OrderItemDAO> orderItems = orderItemService.createOrderItems(orderDetails.getOrderItems(), orderDAO);
@@ -123,8 +123,7 @@ public class OrderOrderItemCommonService {
             orderDAO.setOrderAmount(orderAmountDAO);
             orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         }
-        OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderItems);
-        return orderSummary;
+        return orderDAO;
     }
 
     public OrderSummary updateOrderItem(Long orderItemId, OrderItemDetailRequest orderItemDetails) throws Exception {
