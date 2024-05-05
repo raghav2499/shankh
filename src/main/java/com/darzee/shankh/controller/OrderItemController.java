@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -32,10 +33,17 @@ public class OrderItemController {
 
     @PostMapping(value = "/order_item/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<CreateOrderResponse> createOrderItem(@Valid @RequestBody OrderCreationRequest request) {
+    public ResponseEntity<CreateOrderResponse> createOrderItem(@Valid @RequestBody OrderCreationRequest request,
+                                                               HttpServletRequest httpRequest) {
+        StringBuilder logMessage = new StringBuilder();
+        logMessage.append("Request Method: ").append(httpRequest.getMethod()).append("\n");
+        logMessage.append("Request URI: ").append(httpRequest.getRequestURI()).append("\n");
+        logMessage.append("Request Parameters: ").append(httpRequest.getParameterMap()).append("\n");
+        System.out.println("Entire Create Order Item Request:\n" + logMessage.toString());
         OrderSummary orderSummary = orderOrderItemCommonService.createOrderItem(request);
         CreateOrderResponse createOrderResponse = new CreateOrderResponse("Item created successfully",
                 orderSummary);
+        System.out.println("Create Order Item Response:\n" + createOrderResponse.toString());
         return new ResponseEntity<>(createOrderResponse, HttpStatus.CREATED);
     }
 

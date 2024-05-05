@@ -280,7 +280,7 @@ public class OrderItemService {
                 continue;
             }
             ImageReferenceDAO clothImageReferences = mapper.imageReferenceToImageReferenceDAO(imageRef.get());
-            String url = s3Client.generateShortLivedUrl(clothImageReferences.getImageName(), true);
+            String url = s3Client.generateShortLivedUrl(clothImageReferences.getImageName(), false);
             FileDetail fileDetail = new FileDetail(clothImageRefId, url);
             fileDetails.add(fileDetail);
         }

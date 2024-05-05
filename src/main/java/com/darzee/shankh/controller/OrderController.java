@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 @RestController
 @RequestMapping(value = "/order")
@@ -59,15 +61,24 @@ public class OrderController {
     public ResponseEntity recievePayment(@PathVariable("id") Long boutiqueOrderId,
                                          @RequestParam("boutique_id") Long boutiqueId,
                                          @Validated @RequestBody RecievePaymentRequest request) throws Exception {
+
         return orderService.recieveOrderPayment(boutiqueOrderId, boutiqueId, request);
     }
 
     @PostMapping(value = "/{id}/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity confirmOrder(@PathVariable("id") Long boutiqueOrderId,
-                                       @RequestParam("boutique_id") Long boutiqueId,
-                                       @Validated(OrderCreationRequest.ConfirmOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
-        return orderOrderItemCommonService.confirmOrderAndGenerateInvoice(boutiqueOrderId, boutiqueId, request);
+                                       @RequestParam(value = "boutique_id", required = true) Long boutiqueId,
+                                       @Validated(OrderCreationRequest.ConfirmOrder.class) @RequestBody OrderCreationRequest request,
+                                       HttpServletRequest httpRequest) throws Exception {
+        StringBuilder logMessage = new StringBuilder();
+        logMessage.append("Request Method: ").append(httpRequest.getMethod()).append("\n");
+        logMessage.append("Request URI: ").append(httpRequest.getRequestURI()).append("\n");
+        logMessage.append("Request Parameters: ").append(httpRequest.getParameterMap()).append("\n");
+        System.out.println("Entire Confirm Order Request:\n" + logMessage.toString());
+        ResponseEntity response =  orderOrderItemCommonService.confirmOrderAndGenerateInvoice(boutiqueOrderId, boutiqueId, request);
+        System.out.println("Confirm order response :\n" + response.getBody().toString());
+        return response;
     }
 
     @GetMapping(value = "/{id}/invoice_detail", produces = MediaType.APPLICATION_JSON_VALUE)

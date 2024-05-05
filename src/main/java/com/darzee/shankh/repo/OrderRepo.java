@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
-    @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, DATE_TRUNC('week', ord.created_at) AS week " +
+    @Query(value = "SELECT SUM(distinct(ord_amt.total_amount)) AS totalAmount, DATE_TRUNC('week', ord.created_at) AS week " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.order_amount_id = ord_amt.id " +
             "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +
@@ -31,7 +31,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             @Param("endDate") LocalDate endDate);
 
 
-    @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, ord_ite.order_type AS orderType " +
+    @Query(value = "SELECT SUM(distinct(ord_amt.total_amount)) AS totalAmount, ord_ite.order_type AS orderType " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.order_amount_id = ord_amt.id " +
             "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +
@@ -48,7 +48,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query(value = "SELECT SUM(ord_amt.total_amount) AS totalAmount, ord.customer_id AS customerId " +
+    @Query(value = "SELECT SUM(distinct(ord_amt.total_amount)) AS totalAmount, ord.customer_id AS customerId " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.order_amount_id = ord_amt.id " +
             "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +

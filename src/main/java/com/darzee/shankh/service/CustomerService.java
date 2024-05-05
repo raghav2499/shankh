@@ -238,7 +238,7 @@ public class CustomerService {
         if (optionalImageReference.isPresent()) {
             ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(optionalImageReference.get());
             String fileName = imageReferenceDAO.getImageName();
-            return s3Client.generateShortLivedUrl(fileName, true);
+            return s3Client.generateShortLivedUrl(fileName, false);
         }
         return "";
     }
