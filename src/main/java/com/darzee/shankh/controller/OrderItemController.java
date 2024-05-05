@@ -44,7 +44,7 @@ public class OrderItemController {
         OrderDAO orderDAO = orderOrderItemCommonService.createOrderItem(request);
         OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
-                orderDAO.getOrderItems());
+                orderDAO.getNonDeletedItems());
         CreateOrderResponse createOrderResponse = new CreateOrderResponse("Item created successfully",
                 orderSummary);
         System.out.println("Create Order Item Response:\n" + createOrderResponse.toString());
