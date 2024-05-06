@@ -88,7 +88,7 @@ public class OrderOrderItemCommonService {
     }
 
     @Transactional
-    public OrderSummary createOrder(OrderCreationRequest orderCreationRequest) {
+    public OrderDAO createOrder(OrderCreationRequest orderCreationRequest) {
 
         OrderDetails orderDetails = orderCreationRequest.getOrderDetails();
         OrderDAO orderDAO = orderService.findOrCreateNewOrder(orderDetails.getOrderId(),
@@ -113,9 +113,8 @@ public class OrderOrderItemCommonService {
         orderDAO.setOrderItems(allItems);
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         orderAmountDAO = orderService.setOrderAmountSpecificDetails(orderDetails.getOrderAmountDetails(), orderDAO);
-        OrderSummary orderSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
-                orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
-        return orderSummary;
+        orderDAO.setOrderAmount(orderAmountDAO);
+        return orderDAO;
     }
 
     @Transactional

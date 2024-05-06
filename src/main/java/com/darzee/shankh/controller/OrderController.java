@@ -1,5 +1,6 @@
 package com.darzee.shankh.controller;
 
+import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.response.GetOrderResponse;
@@ -27,8 +28,12 @@ public class OrderController {
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<OrderSummary> createOrder(@Validated(OrderCreationRequest.CreateOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
-        OrderSummary response = orderOrderItemCommonService.createOrder(request);
-        return new ResponseEntity<OrderSummary>(response, HttpStatus.CREATED);
+        OrderDAO orderDAO = orderOrderItemCommonService.createOrder(request);
+        OrderDAO refreshedOrderOb = orderOrderItemCommonService.refresh(orderDAO.getId());//hot refreshed the order to load the properties that were generated in run time like boutique_order_id
+        OrderSummary orderSummary = new OrderSummary(refreshedOrderOb.getBoutiqueOrderId(), refreshedOrderOb.getInvoiceNo(),
+                orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
+                orderDAO.getNonDeletedItems());
+        return new ResponseEntity<OrderSummary>(orderSummary, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)

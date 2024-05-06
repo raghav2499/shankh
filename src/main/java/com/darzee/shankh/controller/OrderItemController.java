@@ -36,7 +36,7 @@ public class OrderItemController {
     public ResponseEntity<CreateOrderResponse> createOrderItem(@Valid @RequestBody OrderCreationRequest request) {
         OrderDAO orderDAO = orderOrderItemCommonService.createOrderItem(request);
         OrderDAO refreshedOrderOb = orderOrderItemCommonService.refresh(orderDAO.getId());//this hot reload is required to reload the values generated in run time like boutique_order_id, created_at
-        OrderSummary orderSummary = new OrderSummary(refreshedOrderOb.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
+        OrderSummary orderSummary = new OrderSummary(refreshedOrderOb.getBoutiqueOrderId(), refreshedOrderOb.getInvoiceNo(),
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
         CreateOrderResponse createOrderResponse = new CreateOrderResponse("Item created successfully",
