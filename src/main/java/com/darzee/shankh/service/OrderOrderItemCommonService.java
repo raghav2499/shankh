@@ -2,6 +2,7 @@ package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.MeasurementRevisions;
+import com.darzee.shankh.entity.Order;
 import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -15,6 +16,7 @@ import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.response.OrderSummary;
 import com.darzee.shankh.utils.pdfutils.PdfGenerator;
 import io.jsonwebtoken.lang.Collections;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.persistence.EntityManager;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +73,9 @@ public class OrderOrderItemCommonService {
 
     @Autowired
     private OrderStitchOptionsRepo orderStitchOptionsRepo;
+
+    @Autowired
+    private EntityManager entityManager;
 
     public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
         OrderDAO orderDAO = orderService.confirmOrder(boutiqueOrderId, boutiqueId, request);
@@ -124,6 +130,18 @@ public class OrderOrderItemCommonService {
             orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
         }
         return orderDAO;
+    }
+
+    @Transactional
+    public OrderDAO refresh(Long orderId) {
+        Order refreshedOrder = orderRepo.findById(orderId)
+                .map(order -> {
+                    Session session = entityManager.unwrap(Session.class);
+                    session.refresh(order); // Force refresh from database
+                    return order;
+                })
+                .orElse(null);
+        return mapper.orderObjectToDao(refreshedOrder, new CycleAvoidingMappingContext());
     }
 
     public OrderSummary updateOrderItem(Long orderItemId, OrderItemDetailRequest orderItemDetails) throws Exception {
