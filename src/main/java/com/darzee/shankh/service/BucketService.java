@@ -129,8 +129,8 @@ public class BucketService {
         return null;
     }
 
-    public String uploadInvoice(File file, Long orderId, Long boutiqueId) {
-        String fileName = boutiqueId + "_" + orderId;
+    public String uploadInvoice(File file, Long orderId) {
+        String fileName = "bill" + orderId;
         ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, invoiceDirectory + fileName);
         return fileUploadResult.getValue();
     }
@@ -142,7 +142,7 @@ public class BucketService {
     }
 
     public String getInvoiceShortLivedLink(Long orderId, Long boutiqueId) {
-        String fileLocation = invoiceDirectory + boutiqueId + "_" + orderId;
+        String fileLocation = invoiceDirectory + "bill" + orderId;
         return client.generateShortLivedUrl(fileLocation, false);
     }
 

@@ -44,9 +44,7 @@ public class OrderItemSpecificationClause {
     public static Specification<OrderItem> findOrderItemsByOrderId(Long value) {
         return (root, cq, cb) -> {
             Join<OrderItem, Order> order = root.join("order");
-            Predicate orderIdEquals = cb.equal(order.get("id"), value);
-            Predicate boutiqueOrderIdEquals = cb.equal(order.get("boutiqueOrderId"), value);
-            return cb.or(orderIdEquals, boutiqueOrderIdEquals);
+            return cb.equal(order.get("id"), value);
         };
     }
 

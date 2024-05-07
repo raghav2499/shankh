@@ -18,6 +18,7 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OrderSummary {
     private Long orderId;
+    private Long boutiqueOrderId;
 
     private String invoiceNo;
 
@@ -26,9 +27,11 @@ public class OrderSummary {
 
     private Double orderAdvanceRecieved;
 
-    public OrderSummary(Long orderId, String invoiceNo, Double totalOrderAmount, Double orderAdvanceRecieved,
+    public OrderSummary(Long orderId, Long boutiqueOrderId, String invoiceNo, Double totalOrderAmount,
+                        Double orderAdvanceRecieved,
                         List<OrderItemDAO> orderItemDAOs) {
         this.orderId = orderId;
+        this.boutiqueOrderId = boutiqueOrderId;
         this.invoiceNo = invoiceNo;
         this.totalOrderAmount = totalOrderAmount;
         this.orderAdvanceRecieved = orderAdvanceRecieved;

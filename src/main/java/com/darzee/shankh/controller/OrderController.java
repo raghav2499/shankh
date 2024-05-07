@@ -30,7 +30,8 @@ public class OrderController {
     public ResponseEntity<OrderSummary> createOrder(@Validated(OrderCreationRequest.CreateOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
         OrderDAO orderDAO = orderOrderItemCommonService.createOrder(request);
         OrderDAO refreshedOrderOb = orderOrderItemCommonService.refresh(orderDAO.getId());//hot refreshed the order to load the properties that were generated in run time like boutique_order_id
-        OrderSummary orderSummary = new OrderSummary(refreshedOrderOb.getBoutiqueOrderId(), refreshedOrderOb.getInvoiceNo(),
+        OrderSummary orderSummary = new OrderSummary(refreshedOrderOb.getId(), refreshedOrderOb.getBoutiqueOrderId(),
+                refreshedOrderOb.getInvoiceNo(),
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
         return new ResponseEntity<OrderSummary>(orderSummary, HttpStatus.CREATED);
@@ -54,33 +55,33 @@ public class OrderController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity getOrderDetails(@PathVariable("id") Long boutiqueOrderId,
+    public ResponseEntity getOrderDetails(@PathVariable("id") Long id,
                                           @RequestParam("boutique_id") Long boutiqueId) throws Exception {
-        return orderService.getOrderDetails(boutiqueOrderId, boutiqueId);
+        return orderService.getOrderDetails(id, boutiqueId);
     }
 
     @PostMapping(value = "/{id}/recieve_payment", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity recievePayment(@PathVariable("id") Long boutiqueOrderId,
+    public ResponseEntity recievePayment(@PathVariable("id") Long orderId,
                                          @RequestParam("boutique_id") Long boutiqueId,
                                          @Validated @RequestBody RecievePaymentRequest request) throws Exception {
 
-        return orderService.recieveOrderPayment(boutiqueOrderId, boutiqueId, request);
+        return orderService.recieveOrderPayment(orderId, boutiqueId, request);
     }
 
     @PostMapping(value = "/{id}/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity confirmOrder(@PathVariable("id") Long boutiqueOrderId,
+    public ResponseEntity confirmOrder(@PathVariable("id") Long orderId,
                                        @RequestParam(value = "boutique_id", required = true) Long boutiqueId,
                                        @Validated(OrderCreationRequest.ConfirmOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
-        ResponseEntity response =  orderOrderItemCommonService.confirmOrderAndGenerateInvoice(boutiqueOrderId, boutiqueId, request);
+        ResponseEntity response =  orderOrderItemCommonService.confirmOrderAndGenerateInvoice(orderId, boutiqueId, request);
         return response;
     }
 
     @GetMapping(value = "/{id}/invoice_detail", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity getInvoiceDetail(@PathVariable("id") Long boutiqueOrderId,
+    public ResponseEntity getInvoiceDetail(@PathVariable("id") Long orderId,
                                            @RequestParam("boutique_id") Long boutiqueId) {
-        return orderService.getInvoiceDetail(boutiqueOrderId, boutiqueId);
+        return orderService.getInvoiceDetail(orderId, boutiqueId);
     }
 }

@@ -23,6 +23,7 @@ import java.util.List;
 public class OrderDetailResponse {
 
     private Long orderId;
+    private Long boutiqueOrderId;
     private String orderStatus;
     private List<OrderItemDetails> orderItemDetails = new ArrayList<>();
     private OrderAmountDetails orderAmountDetails;
@@ -38,7 +39,8 @@ public class OrderDetailResponse {
         OrderAmountDAO orderAmountDAO = order.getOrderAmount();
         this.customerDetails = new CustomerDetails(customer, customerProfilePicLnk);
         this.orderAmountDetails = new OrderAmountDetails(orderAmountDAO);
-        this.orderId = order.getBoutiqueOrderId();
+        this.orderId = order.getId();
+        this.boutiqueOrderId = order.getBoutiqueOrderId();
         this.orderStatus = order.getOrderStatus().getDisplayString();
         this.orderItemDetails = new ArrayList<>();
         for (Pair<OrderItemDAO, String> orderItemOutfitLinkPair : orderItemOutfitLinkPairList) {
@@ -50,7 +52,8 @@ public class OrderDetailResponse {
 
     public OrderDetailResponse(CustomerDAO customer, OrderDAO order, OrderAmountDAO orderAmountDAO,
                                List<OrderItemDetails> orderItemDetails, Integer paymentMode, String message) {
-        this.orderId = order.getBoutiqueOrderId();
+        this.orderId = order.getId();
+        this.boutiqueOrderId = order.getBoutiqueOrderId();
         this.orderStatus = order.getOrderStatus().getDisplayString();
         this.orderAmountDetails = new OrderAmountDetails(orderAmountDAO);
         this.customerDetails = new CustomerDetails(customer);

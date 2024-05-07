@@ -77,10 +77,10 @@ public class OrderOrderItemCommonService {
     @Autowired
     private EntityManager entityManager;
 
-    public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
-        OrderDAO orderDAO = orderService.confirmOrder(boutiqueOrderId, boutiqueId, request);
+    public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long orderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
+        OrderDAO orderDAO = orderService.confirmOrder(orderId, boutiqueId, request);
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
-        OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
+        OrderSummary summary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         orderService.generateInvoiceV2(orderDAO);
         generateItemDetailPdfs(orderDAO);
@@ -158,7 +158,9 @@ public class OrderOrderItemCommonService {
         orderService.generateInvoiceV2(orderDAO);
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
         generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
-        OrderSummary orderItemSummary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
+        OrderSummary orderItemSummary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(),
+                orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
+                orderDAO.getNonDeletedItems());
         return orderItemSummary;
     }
 

@@ -184,14 +184,14 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDAO confirmOrder(Long boutiqueOrderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
+    public OrderDAO confirmOrder(Long orderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
 
-        OrderDAO orderDAO = findOrder(boutiqueOrderId, boutiqueId);
+        OrderDAO orderDAO = findOrder(orderId, boutiqueId);
 
         if (!orderDAO.validateMandatoryOrderFields()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Some mandatory fields in order are missing." + " Boutique ID and customer ID are mandatory fields");
         }
-        orderItemService.validateMandatoryOrderItemFields(orderDAO.getOrderItems());
+        orderItemService.validateMandatoryOrderItemFields(orderDAO.getNonDeletedItems());
 
         Double priceBreakupSum = orderDAO.getPriceBreakupSum();
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
@@ -296,7 +296,7 @@ public class OrderService {
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         BoutiqueDAO boutique = orderDAO.getBoutique();
         File bill = pdfGenerator.generateBill(customerName, customerDAO.getPhoneNumber(), orderDAO, orderAmountDAO, boutique);
-        String fileUploadUrl = bucketService.uploadInvoice(bill, orderDAO.getId(), boutique.getId());
+        String fileUploadUrl = bucketService.uploadInvoice(bill, orderDAO.getId());
         bill.delete();
         return fileUploadUrl;
     }
@@ -310,8 +310,8 @@ public class OrderService {
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
 
         File bill = pdfGenerator.generateBillV2(boutique, customerName, tailorDAO.getPhoneNumber(), orderDAO);
-        Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
-        String fileUploadUrl = bucketService.uploadInvoice(bill, orderNo, boutique.getId());
+        Long orderNo = orderDAO.getId();
+        String fileUploadUrl = bucketService.uploadInvoice(bill, orderNo);
         bill.delete();
         return fileUploadUrl;
     }
@@ -328,7 +328,9 @@ public class OrderService {
             String boutiqueName = orderDAO.getBoutique().getName();
             String customerName = orderDAO.getCustomer().constructName();
             String recieveDateTime = orderDAO.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME);
-            OrderSummary summary = new OrderSummary(orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
+            OrderSummary summary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(),
+                    orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
+                    orderDAO.getNonDeletedItems());
 
             Integer paymentMode = getOrderPaymentMode(orderDAO.getId());
             InvoiceDetailResponse response = new InvoiceDetailResponse(invoiceDateTime, boutiqueName, customerName, recieveDateTime, summary, paymentMode);
@@ -516,13 +518,10 @@ public class OrderService {
         }
     }
 
-    public OrderDAO findOrder(Long boutiqueOrderId, Long boutiqueId) throws Exception {
-        Optional<Order> order = orderRepo.findByBoutiqueOrderIdAndBoutiqueId(boutiqueOrderId, boutiqueId);
+    public OrderDAO findOrder(Long orderId, Long boutiqueId) throws Exception {
+        Optional<Order> order = orderRepo.findById(orderId);
         if (!order.isPresent()) {
-            order = orderRepo.findById(boutiqueOrderId);
-            if (!order.isPresent()) {
-                throw new Exception("Invalid order ID");
-            }
+            throw new Exception("Invalid order ID");
         }
         OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
         return orderDAO;

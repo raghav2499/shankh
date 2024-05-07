@@ -32,7 +32,7 @@ public class FileLinkService {
             case "invoice":
                 Long boutiqueId = request.getMetaData() != null ? request.getMetaData().getBoutiqueId() : null;
                 OrderDAO orderDAO = orderService.findOrder(request.getEntityId(), boutiqueId);
-                Long entityId = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
+                Long entityId = Optional.ofNullable(orderDAO.getId()).orElse(orderDAO.getId());
                 return bucketService.getInvoiceShortLivedLink(entityId, boutiqueId);
             case "item_details":
                 return bucketService.getItemDetailsShortLivedLink(request.getEntityId());
