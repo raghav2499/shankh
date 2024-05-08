@@ -526,6 +526,7 @@ public class OrderService {
         OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
         return orderDAO;
     }
+
     // generate invoice and upload pdf for all orders
     public void generateInvoiceAndUploadPdfForAllOrders() {
         List<Order> allOrders = orderRepo.findAll();
