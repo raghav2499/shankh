@@ -529,7 +529,7 @@ public class OrderService {
 
     // generate invoice and upload pdf for all orders
     public void generateInvoiceAndUploadPdfForAllOrders() {
-        List<Order> allOrders = orderRepo.findAll();
+        List<Order> allOrders = orderRepo.findByOrderStatusNot(OrderStatus.DRAFTED);
         if(!CollectionUtils.isEmpty(allOrders)) {
             for(Order order : allOrders) {
                 OrderDAO orderDAO = mapper.orderObjectToDao(order, new CycleAvoidingMappingContext());

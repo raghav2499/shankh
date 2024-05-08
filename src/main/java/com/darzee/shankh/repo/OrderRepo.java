@@ -1,6 +1,8 @@
 package com.darzee.shankh.repo;
 
 import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.enums.OrderStatus;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -92,4 +94,6 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
     Optional<Order> findByBoutiqueOrderIdAndBoutiqueId(Long boutiqueOrderId, Long boutiqueId);
 
     Integer countByBoutiqueId(Long boutiqueId);
+
+    List<Order> findByOrderStatusNot(OrderStatus orderStatus);
 }
