@@ -34,14 +34,14 @@ public class PriceBreakupDAO {
     }
 
     public boolean isComponentStringUpdated(String value) {
-        return value != null && !this.component.equals(value);
+        return value != null && !value.equals(this.component);
     }
 
     public boolean isValueUpdated(Double value) {
-        return this.value == null ? value != null : !this.value.equals(value);
+        return value != null && !value.equals(this.value);
     }
 
     public boolean isQuantityUpdated(Integer value) {
-        return value != null && !this.quantity.equals(value);
+        return value != null && !value.equals(this.quantity);
     }
 }

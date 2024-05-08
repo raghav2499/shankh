@@ -148,7 +148,6 @@ public class OrderOrderItemCommonService {
 
         if (!Collections.isEmpty(orderItemDetails.getPriceBreakup())) {
             List<PriceBreakupDAO> updatedPriceBreakup = priceBreakUpService.updatePriceBreakups(orderItemDetails.getPriceBreakup(), updatedItem);
-
         }
         boolean shouldUpdateLedger = doesLedgerNeedUpdate(updatedItem, orderItemDetails);
         OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId(),

@@ -396,12 +396,18 @@ public class OrderService {
         BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(boutiqueLedgerRepo.findByBoutiqueId(orderDAO.getBoutiqueId()), new CycleAvoidingMappingContext());
         List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems();
 
-        boolean allItemsAccepted = orderItems.stream().filter(item -> OrderItemStatus.ACCEPTED.equals(item.getOrderItemStatus())).collect(Collectors.toList()).size() == orderItems.size();
+        boolean allItemsAccepted = (orderItems.size() > 0 &&
+                orderItems.stream()
+                        .filter(item -> OrderItemStatus.ACCEPTED.equals(item.getOrderItemStatus()))
+                        .collect(Collectors.toList()).size() == orderItems.size());
         if (allItemsAccepted && !OrderStatus.ACCEPTED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.ACCEPTED);
             boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), 1, 0);
         }
-        boolean allItemsDelivered = orderItems.stream().filter(item -> OrderItemStatus.DELIVERED.equals(item.getOrderItemStatus())).collect(Collectors.toList()).size() == orderItems.size();
+        boolean allItemsDelivered = (orderItems.size() > 0
+                && orderItems.stream()
+                .filter(item -> OrderItemStatus.DELIVERED.equals(item.getOrderItemStatus()))
+                .collect(Collectors.toList()).size() == orderItems.size());
         if (allItemsDelivered && !OrderStatus.DELIVERED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.DELIVERED);
             boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), 0, 1);
