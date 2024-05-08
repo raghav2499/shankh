@@ -5,6 +5,7 @@ import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.response.GetOrderResponse;
 import com.darzee.shankh.response.OrderSummary;
+import com.darzee.shankh.response.OrderSummaryResponse;
 import com.darzee.shankh.service.OrderOrderItemCommonService;
 import com.darzee.shankh.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +28,17 @@ public class OrderController {
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<OrderSummary> createOrder(@Validated(OrderCreationRequest.CreateOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
+    public ResponseEntity<OrderSummaryResponse> createOrder(@Validated(OrderCreationRequest.CreateOrder.class) @RequestBody OrderCreationRequest request) throws Exception {
         OrderDAO orderDAO = orderOrderItemCommonService.createOrder(request);
         OrderDAO refreshedOrderOb = orderOrderItemCommonService.refresh(orderDAO.getId());//hot refreshed the order to load the properties that were generated in run time like boutique_order_id
         OrderSummary orderSummary = new OrderSummary(refreshedOrderOb.getId(), refreshedOrderOb.getBoutiqueOrderId(),
                 refreshedOrderOb.getInvoiceNo(),
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
-        return new ResponseEntity<OrderSummary>(orderSummary, HttpStatus.CREATED);
+        OrderSummaryResponse orderSummaryResponse = new OrderSummaryResponse();
+        orderSummaryResponse.setOrderSummary(orderSummary);
+        orderSummaryResponse.setMessage("Order successfully saved as draft");
+        return new ResponseEntity<OrderSummaryResponse>(orderSummaryResponse, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
