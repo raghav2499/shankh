@@ -390,9 +390,8 @@ public class OrderService {
      * 4. Adjust boutique ledger amounts
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
-    public OrderDAO updateOrderPostItemUpdation(Long orderId, Double refundAmount, Boolean shouldUpdateLedger) {
+    public OrderDAO updateOrderPostItemUpdation(OrderDAO orderDAO, Double refundAmount, Boolean shouldUpdateLedger) {
         refundAmount = Optional.ofNullable(refundAmount).orElse(0d);
-        OrderDAO orderDAO = mapper.orderObjectToDao(orderRepo.findById(orderId).get(), new CycleAvoidingMappingContext());
         BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(boutiqueLedgerRepo.findByBoutiqueId(orderDAO.getBoutiqueId()), new CycleAvoidingMappingContext());
         List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems();
 
@@ -433,7 +432,9 @@ public class OrderService {
             orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() - refundAmount);
         }
         orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
-        orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
+        orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
+                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        orderDAO.setOrderAmount(orderAmountDAO);
 
 
         if (Boolean.FALSE.equals(shouldUpdateLedger)) {

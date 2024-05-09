@@ -147,20 +147,30 @@ public class OrderOrderItemCommonService {
         OrderItemDAO updatedItem = orderItemService.updateOrderItem(orderItemId, orderItemDetails);
 
         if (!Collections.isEmpty(orderItemDetails.getPriceBreakup())) {
-            List<PriceBreakupDAO> updatedPriceBreakup = priceBreakUpService.updatePriceBreakups(orderItemDetails.getPriceBreakup(), updatedItem);
+            List<PriceBreakupDAO> updatedPriceBreakup = priceBreakUpService.updatePriceBreakups(orderItemDetails.getPriceBreakup(),
+                    updatedItem);
+            updatedItem.setPriceBreakup(updatedPriceBreakup);
         }
-        boolean shouldUpdateLedger = doesLedgerNeedUpdate(updatedItem, orderItemDetails);
-        OrderDAO orderDAO = orderService.updateOrderPostItemUpdation(updatedItem.getOrder().getId(),
-                orderItemDetails.getAmountRefunded(), shouldUpdateLedger);
 
-        OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
+        boolean shouldUpdateLedger = doesLedgerNeedUpdate(updatedItem, orderItemDetails);
+        OrderDAO orderDAO = updatedItem.getOrder();
+        updateItemsInOrder(updatedItem, orderDAO);
+        orderDAO = orderService.updateOrderPostItemUpdation(orderDAO, orderItemDetails.getAmountRefunded(), shouldUpdateLedger);
         orderService.generateInvoiceV2(orderDAO);
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
         generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
         OrderSummary orderItemSummary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(),
-                orderDAO.getInvoiceNo(), orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(),
+                orderDAO.getInvoiceNo(), orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
         return orderItemSummary;
+    }
+
+    private void updateItemsInOrder(OrderItemDAO updatedItem, OrderDAO orderDAO) {
+        List<OrderItemDAO> orderItems = orderDAO.getOrderItems();
+        orderItems.stream()
+                .filter(item -> item.getId().equals(updatedItem.getId()))
+                .findFirst()
+                .ifPresent(item -> orderItems.set(orderItems.indexOf(item), updatedItem));
     }
 
     private List<OrderItemDAO> collateAllItems(List<OrderItemDAO> allItems, List<OrderItemDAO> updatedItems) {
