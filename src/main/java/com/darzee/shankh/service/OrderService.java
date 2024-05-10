@@ -535,14 +535,4 @@ public class OrderService {
         return orderDAO;
     }
 
-    // generate invoice and upload pdf for all orders
-    public void generateInvoiceAndUploadPdfForAllOrders() {
-        List<Order> allOrders = orderRepo.findByOrderStatusNot(OrderStatus.DRAFTED);
-        if(!CollectionUtils.isEmpty(allOrders)) {
-            for(Order order : allOrders) {
-                OrderDAO orderDAO = mapper.orderObjectToDao(order, new CycleAvoidingMappingContext());
-                generateInvoiceV2(orderDAO);
-            } 
-        }
-    }
 }
