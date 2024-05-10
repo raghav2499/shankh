@@ -87,15 +87,4 @@ public class OrderController {
         return orderService.getInvoiceDetail(orderId, boutiqueId);
     }
 
-    @PostMapping(value ="/generate_invoice_for_all_orders", produces = MediaType.APPLICATION_JSON_VALUE)
-    @CrossOrigin
-    public ResponseEntity generateInvoiceForAllOrders() {
-        try{
-            orderService.generateInvoiceAndUploadPdfForAllOrders();
-        }catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity("Error in generating pdf for all orders",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity("Pdf generated Successfully for all orders",HttpStatus.OK);
-    }
 }
