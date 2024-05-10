@@ -39,6 +39,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -221,8 +222,9 @@ public class OrderService {
     }
 
     public SalesDashboard getWeekWiseSales(Long boutiqueId, int month, int year) {
-        LocalDate monthStart = LocalDate.of(year, month, 1);
-        LocalDate nextMonthStart = monthStart.plusMonths(1);
+        ZoneId clientZoneId = ZoneId.of("Asia/Kolkata");
+        LocalDateTime monthStart = TimeUtils.getTimeInDBTimeZone(LocalDateTime.of(year, month, 1, 0,0,0), clientZoneId);
+        LocalDateTime nextMonthStart = TimeUtils.getTimeInDBTimeZone(monthStart.plusMonths(1), clientZoneId);
         List<Object[]> orderAmountsOfMonth = orderRepo.getOrderAmountsBetweenTheDates(boutiqueId, monthStart,
                 nextMonthStart);
         TreeMap<LocalDate, Double> weekWiseCollatedAmounts = new TreeMap<>();
@@ -239,8 +241,9 @@ public class OrderService {
     }
 
     public List<OrderTypeDashboardData> getOrderTypeWiseSales(Long boutiqueId, int month, int year) {
-        LocalDate monthStart = LocalDate.of(year, month, 1);
-        LocalDate nextMonthStart = monthStart.plusMonths(1);
+        ZoneId clientZoneId = ZoneId.of("Asia/Kolkata");
+        LocalDateTime monthStart = TimeUtils.getTimeInDBTimeZone(LocalDateTime.of(year, month, 1, 0,0,0), clientZoneId);
+        LocalDateTime nextMonthStart = TimeUtils.getTimeInDBTimeZone(monthStart.plusMonths(1), clientZoneId);
         List<Object[]> orderDataBetweenTheDates = orderRepo.getOrderTypeBasedOrderAmountData(boutiqueId, monthStart, nextMonthStart);
         Map<OrderType, Double> orderTypeAmountMap = new HashMap<>(OrderType.values().length);
 
@@ -269,8 +272,9 @@ public class OrderService {
     }
 
     public List<TopCustomerData> getTopCustomerData(Long boutiqueId, int month, int year) {
-        LocalDate monthStart = LocalDate.of(year, month, 1);
-        LocalDate nextMonthStart = monthStart.plusMonths(1);
+        ZoneId clientZoneId = ZoneId.of("Asia/Kolkata");
+        LocalDateTime monthStart = TimeUtils.getTimeInDBTimeZone(LocalDateTime.of(year, month, 1, 0,0,0), clientZoneId);
+        LocalDateTime nextMonthStart = TimeUtils.getTimeInDBTimeZone(monthStart.plusMonths(1), clientZoneId);
         List<Object[]> topCustomerSalesDetails = orderRepo.getTopCustomersByTotalAmount(boutiqueId, monthStart, nextMonthStart);
         Map<Long, Double> customerTotalSales = topCustomerSalesDetails.stream()
                 .collect(Collectors.groupingBy(
@@ -480,8 +484,12 @@ public class OrderService {
     }
 
     public Pair getItemsCount(Long boutiqueId, LocalDateTime startTime, LocalDateTime endTime) {
-        Integer newItemsCount = orderRepo.getNewItemsCount(boutiqueId, startTime, endTime);
-        Integer closedItemsCount = orderRepo.getCompletedItemsCount(boutiqueId, startTime, endTime);
+        ZoneId defaultClientZoneId = ZoneId.of("Asia/Kolkata");
+        LocalDateTime dbStartTime = TimeUtils.getTimeInDBTimeZone(startTime, defaultClientZoneId);
+        LocalDateTime dbEndTime = TimeUtils.getTimeInDBTimeZone(endTime, defaultClientZoneId);
+
+        Integer newItemsCount = orderRepo.getNewItemsCount(boutiqueId, dbStartTime, dbEndTime);
+        Integer closedItemsCount = orderRepo.getCompletedItemsCount(boutiqueId, dbStartTime, dbEndTime);
         return Pair.of(newItemsCount, closedItemsCount);
     }
 
