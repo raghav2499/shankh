@@ -390,18 +390,23 @@ public class OrderService {
      * 4. Adjust boutique ledger amounts
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
-    public OrderDAO updateOrderPostItemUpdation(Long orderId, Double refundAmount, Boolean shouldUpdateLedger) {
+    public OrderDAO updateOrderPostItemUpdation(OrderDAO orderDAO, Double refundAmount, Boolean shouldUpdateLedger) {
         refundAmount = Optional.ofNullable(refundAmount).orElse(0d);
-        OrderDAO orderDAO = mapper.orderObjectToDao(orderRepo.findById(orderId).get(), new CycleAvoidingMappingContext());
         BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(boutiqueLedgerRepo.findByBoutiqueId(orderDAO.getBoutiqueId()), new CycleAvoidingMappingContext());
         List<OrderItemDAO> orderItems = orderDAO.getNonDeletedItems();
 
-        boolean allItemsAccepted = orderItems.stream().filter(item -> OrderItemStatus.ACCEPTED.equals(item.getOrderItemStatus())).collect(Collectors.toList()).size() == orderItems.size();
+        boolean allItemsAccepted = (orderItems.size() > 0 &&
+                orderItems.stream()
+                        .filter(item -> OrderItemStatus.ACCEPTED.equals(item.getOrderItemStatus()))
+                        .collect(Collectors.toList()).size() == orderItems.size());
         if (allItemsAccepted && !OrderStatus.ACCEPTED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.ACCEPTED);
             boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), 1, 0);
         }
-        boolean allItemsDelivered = orderItems.stream().filter(item -> OrderItemStatus.DELIVERED.equals(item.getOrderItemStatus())).collect(Collectors.toList()).size() == orderItems.size();
+        boolean allItemsDelivered = (orderItems.size() > 0
+                && orderItems.stream()
+                .filter(item -> OrderItemStatus.DELIVERED.equals(item.getOrderItemStatus()))
+                .collect(Collectors.toList()).size() == orderItems.size());
         if (allItemsDelivered && !OrderStatus.DELIVERED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.DELIVERED);
             boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), 0, 1);
@@ -427,7 +432,9 @@ public class OrderService {
             orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() - refundAmount);
         }
         orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
-        orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
+        orderAmountDAO = mapper.orderAmountObjectToOrderAmountDao(orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO,
+                new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+        orderDAO.setOrderAmount(orderAmountDAO);
 
 
         if (Boolean.FALSE.equals(shouldUpdateLedger)) {
