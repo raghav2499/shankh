@@ -2,7 +2,10 @@ package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.*;
-import com.darzee.shankh.entity.*;
+import com.darzee.shankh.entity.Boutique;
+import com.darzee.shankh.entity.Customer;
+import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.entity.Payment;
 import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.enums.OrderType;
@@ -222,7 +225,7 @@ public class OrderService {
         LocalDate nextMonthStart = monthStart.plusMonths(1);
         List<Object[]> orderAmountsOfMonth = orderRepo.getOrderAmountsBetweenTheDates(boutiqueId, monthStart,
                 nextMonthStart);
-        Map<LocalDate, Double> weekWiseCollatedAmounts = new HashMap<>();
+        TreeMap<LocalDate, Double> weekWiseCollatedAmounts = new TreeMap<>();
         for (Object[] orderAmountDetail : orderAmountsOfMonth) {
             LocalDate key = getWeekStartDate((Timestamp) orderAmountDetail[2]);
             Double currentValue = weekWiseCollatedAmounts.getOrDefault(key, 0d);
@@ -269,10 +272,18 @@ public class OrderService {
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate nextMonthStart = monthStart.plusMonths(1);
         List<Object[]> topCustomerSalesDetails = orderRepo.getTopCustomersByTotalAmount(boutiqueId, monthStart, nextMonthStart);
+        Map<Long, Double> customerTotalSales = topCustomerSalesDetails.stream()
+                .collect(Collectors.groupingBy(
+                        obj -> ((BigInteger) obj[2]).longValue(), // Group by customer ID (Object[2])
+                        Collectors.summingDouble(obj -> (Double) obj[1]) // Sum the amounts (Object[1])
+                ));
+        Map<Long, Double> topCustomers = customerTotalSales.entrySet().stream().sorted(Map.Entry.<Long, Double>comparingByValue().reversed())
+                .limit(2).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
         List<TopCustomerData> topCustomerDataList = new ArrayList<>(2);
-        for (Object[] customerSalesDetails : topCustomerSalesDetails) {
-            Long customerId = ((BigInteger) customerSalesDetails[1]).longValue();
-            Double salesByCustomer = (Double) customerSalesDetails[0];
+        for (Map.Entry<Long, Double> topCustomer : topCustomers.entrySet()) {
+            Long customerId = topCustomer.getKey();
+            Double salesByCustomer = topCustomer.getValue();
             CustomerDetails customerDetails = customerService.getCustomerDetails(customerId);
             TopCustomerData topCustomerData = new TopCustomerData(customerDetails.getCustomerId(), customerDetails.getCustomerName(), customerDetails.getPhoneNumber(), salesByCustomer, customerService.getCustomerProfilePicLink(customerId));
             topCustomerDataList.add(topCustomerData);

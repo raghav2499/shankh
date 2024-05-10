@@ -64,7 +64,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query(value = "SELECT SUM(distinct(ord_amt.total_amount)) AS totalAmount, ord.customer_id AS customerId " +
+    @Query(value = "SELECT DISTINCT ord_amt.id, ord_amt.total_amount, ord.customer_id AS customerId " +
             "FROM orders ord " +
             "INNER JOIN order_amount ord_amt ON ord.order_amount_id = ord_amt.id " +
             "INNER JOIN order_item ord_ite ON ord.id = ord_ite.order_id " +
@@ -74,10 +74,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             "AND ord.is_deleted != true " +
             "AND (ord_ite.is_deleted != true or ord_ite.is_deleted is null) " +
             "AND (ord.is_deleted != true or ord.is_deleted is null) " +
-            "AND ord_ite.order_item_status != 6 " +
-            "GROUP BY ord.customer_id " +
-            "ORDER BY totalAmount DESC " +
-            "LIMIT 2", nativeQuery = true)
+            "AND ord_ite.order_item_status != 6 ", nativeQuery = true)
     List<Object[]> getTopCustomersByTotalAmount(
             @Param("boutiqueId") Long boutiqueId,
             @Param("startDate") LocalDate startDate,
