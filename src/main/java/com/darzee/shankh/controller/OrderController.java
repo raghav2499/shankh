@@ -35,10 +35,8 @@ public class OrderController {
                 refreshedOrderOb.getInvoiceNo(),
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
-        OrderSummaryResponse orderSummaryResponse = new OrderSummaryResponse();
-        orderSummaryResponse.setOrderSummary(orderSummary);
-        orderSummaryResponse.setMessage("Order successfully saved as draft");
-        return new ResponseEntity<OrderSummaryResponse>(orderSummaryResponse, HttpStatus.CREATED);
+        OrderSummaryResponse orderSummaryResponse = new OrderSummaryResponse(orderSummary,"Order successfully saved as draft");
+        return new ResponseEntity<>(orderSummaryResponse, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
