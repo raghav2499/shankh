@@ -251,6 +251,18 @@ public interface DaoEntityMapper {
         return stitchOptionsDAOS;
     }
 
+    default List<OrderAmountDAO> orderAmountListToOrderAmountDAOList(List<OrderAmount> orderAmounts, CycleAvoidingMappingContext context) {
+        if(CollectionUtils.isEmpty(orderAmounts)) {
+            return Collections.emptyList();
+        }
+        List<OrderAmountDAO> orderAmountDAOS = new ArrayList<>();
+        for(OrderAmount orderAmount : orderAmounts) {
+            OrderAmountDAO orderAmountDAO = orderAmountObjectToOrderAmountDao(orderAmount, context);
+            orderAmountDAOS.add(orderAmountDAO);
+        }
+        return orderAmountDAOS;
+    }
+
     default List<OrderStitchOptions> orderStitchOptionDAOListToOrderStitchOptionList(List<OrderStitchOptionDAO> orderStitchOptionsDAOs) {
         if(CollectionUtils.isEmpty(orderStitchOptionsDAOs)) {
             return Collections.emptyList();

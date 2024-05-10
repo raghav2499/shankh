@@ -22,4 +22,11 @@ public class OrderAmount extends GenericEntity{
 
     @Column(name = "amount_recieved")
     private Double amountRecieved;
+
+//    @Column(name = "created_at", columnDefinition = "timestamp")
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "updated_at", columnDefinition = "timestamp")
+//    private LocalDateTime updatedAt;
+
 }

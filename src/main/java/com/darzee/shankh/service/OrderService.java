@@ -2,10 +2,7 @@ package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.*;
-import com.darzee.shankh.entity.Boutique;
-import com.darzee.shankh.entity.Customer;
-import com.darzee.shankh.entity.Order;
-import com.darzee.shankh.entity.Payment;
+import com.darzee.shankh.entity.*;
 import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.enums.OrderType;
@@ -18,6 +15,7 @@ import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.utils.TimeUtils;
 import com.darzee.shankh.utils.pdfutils.PdfGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +33,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -174,7 +173,7 @@ public class OrderService {
         OrderAmountDAO orderAmount = order.getOrderAmount();
         CustomerDAO customer = order.getCustomer();
         List<OrderItemDetails> orderItemDetailsList = new ArrayList<>();
-        for (OrderItemDAO item : order.getOrderItems()) {
+        for (OrderItemDAO item : order.getNonDeletedItems()) {
             orderItemDetailsList.add(new OrderItemDetails(item, null));
         }
         Integer paymentMode = getOrderPaymentMode(order.getId());
@@ -221,8 +220,17 @@ public class OrderService {
     public SalesDashboard getWeekWiseSales(Long boutiqueId, int month, int year) {
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate nextMonthStart = monthStart.plusMonths(1);
-        List<Object[]> weekwiseSalesData = orderRepo.getTotalAmountByWeek(boutiqueId, monthStart, nextMonthStart);
-        List<WeekwiseSalesSplit> weeklySalesAmount = weekwiseSalesData.stream().map(weeklySalesData -> new WeekwiseSalesSplit((Double) weeklySalesData[0], (Date) weeklySalesData[1])).collect(Collectors.toList());
+        List<Object[]> orderAmountsOfMonth = orderRepo.getOrderAmountsBetweenTheDates(boutiqueId, monthStart,
+                nextMonthStart);
+        Map<LocalDate, Double> weekWiseCollatedAmounts = new HashMap<>();
+        for (Object[] orderAmountDetail : orderAmountsOfMonth) {
+            LocalDate key = getWeekStartDate((Timestamp) orderAmountDetail[2]);
+            Double currentValue = weekWiseCollatedAmounts.getOrDefault(key, 0d);
+            weekWiseCollatedAmounts.put(key, currentValue + (Double) orderAmountDetail[1]);
+        }
+        List<WeekwiseSalesSplit> weeklySalesAmount = weekWiseCollatedAmounts.entrySet().stream()
+                .map(weeklySalesData -> new WeekwiseSalesSplit(weeklySalesData.getValue(), weeklySalesData.getKey()))
+                .collect(Collectors.toList());
         populateSalesIfRequired(weeklySalesAmount);
         return new SalesDashboard(weeklySalesAmount);
     }
@@ -230,15 +238,19 @@ public class OrderService {
     public List<OrderTypeDashboardData> getOrderTypeWiseSales(Long boutiqueId, int month, int year) {
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate nextMonthStart = monthStart.plusMonths(1);
-        List<Object[]> orderTypeWiseSalesData = orderRepo.getTotalAmountByOrderType(boutiqueId, monthStart, nextMonthStart);
+        List<Object[]> orderDataBetweenTheDates = orderRepo.getOrderTypeBasedOrderAmountData(boutiqueId, monthStart, nextMonthStart);
         Map<OrderType, Double> orderTypeAmountMap = new HashMap<>(OrderType.values().length);
-        for (Object[] orderTypeSales : orderTypeWiseSalesData) {
-            Integer orderTypeDbOrdinal = (Integer) orderTypeSales[1];
+
+        //order amount data grouped by order type
+        for (Object[] orderTypeSales : orderDataBetweenTheDates) {
+            Integer orderTypeDbOrdinal = (Integer) orderTypeSales[2];
             if (orderTypeDbOrdinal == null) {
                 continue;
             }
             OrderType orderType = OrderType.values()[orderTypeDbOrdinal];
-            orderTypeAmountMap.put(orderType, (Double) orderTypeSales[0]);
+            Double value = (Double) orderTypeSales[1];
+            Double updatedValue = orderTypeAmountMap.getOrDefault(orderType, 0d) + value;
+            orderTypeAmountMap.put(orderType, updatedValue);
         }
         List<OrderTypeDashboardData> orderTypeDashboardData = new ArrayList<>();
         for (OrderType orderType : OrderType.values()) {
@@ -533,6 +545,14 @@ public class OrderService {
         }
         OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
         return orderDAO;
+    }
+
+    private LocalDate getWeekStartDate(Timestamp inputDateTime) {
+        LocalDate inputDate = inputDateTime.toLocalDateTime().toLocalDate();
+        LocalDate monthStartDate = inputDate.withDayOfMonth(1);
+        LocalDate nextSundayDate = TimeUtils.getNextSunday(inputDate);
+        LocalDate previousMonday = nextSundayDate.minusDays(6);
+        return monthStartDate.isAfter(previousMonday) ? monthStartDate : previousMonday;
     }
 
 }
