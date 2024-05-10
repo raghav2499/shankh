@@ -86,5 +86,4 @@ public class OrderController {
                                            @RequestParam("boutique_id") Long boutiqueId) {
         return orderService.getInvoiceDetail(orderId, boutiqueId);
     }
-
 }
