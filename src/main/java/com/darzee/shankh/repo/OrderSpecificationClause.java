@@ -1,8 +1,6 @@
 package com.darzee.shankh.repo;
 
-import com.darzee.shankh.entity.Boutique;
-import com.darzee.shankh.entity.Customer;
-import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.entity.*;
 import com.darzee.shankh.enums.OrderFilter;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -17,7 +15,14 @@ import java.util.Map;
 
 public class OrderSpecificationClause {
 
-    public static Specification<Order> findOrderByStatuses(List<Integer> statusList) {
+    public static Specification<Order> findOrderByItemStatuses(List<Integer> statusList) {
+        return (root, cq, cb) -> {
+            Join<Order, OrderItem> orderItem = root.join("orderItems");
+            return orderItem.get("orderItemStatus").in(statusList);
+        };
+    }
+
+    public static Specification<Order> findOrderByOrderStatuses(List<Integer> statusList) {
         return (root, cq, cb) -> root.get("orderStatus").in(statusList);
     }
 
@@ -29,7 +34,10 @@ public class OrderSpecificationClause {
     }
 
     public static Specification<Order> findPriorityOrders(Boolean fetchPriorityOrders) {
-        return (root, cq, cb) -> cb.equal(root.get("isPriorityOrder"), fetchPriorityOrders);
+        return (root, cq, cb) -> {
+            Join<Order, OrderItem> orderItem = root.join("orderItems");
+            return cb.equal(orderItem.get("isPriorityOrder"), fetchPriorityOrders);
+        };
     }
 
     public static Specification<Order> findCustomerOrders(Long customerId) {
@@ -40,15 +48,36 @@ public class OrderSpecificationClause {
     }
 
     public static Specification<Order> findOrdersByDeliveryDateFrom(LocalDateTime deliveryDateFrom) {
-        return (root, cq, cb) -> cb.greaterThanOrEqualTo(root.get("deliveryDate"), deliveryDateFrom);
+        return (root, cq, cb) -> {
+            Join<Order, OrderItem> orderItem = root.join("orderItems");
+            return cb.greaterThanOrEqualTo(orderItem.get("deliveryDate"), deliveryDateFrom);
+        };
     }
 
     public static Specification<Order> findOrdersByDeliveryDateTill(LocalDateTime deliveryDateTill) {
-        return (root, cq, cb) -> cb.lessThanOrEqualTo(root.get("deliveryDate"), deliveryDateTill);
+        return (root, cq, cb) -> {
+            Join<Order, OrderItem> orderItem = root.join("orderItems");
+            return cb.lessThanOrEqualTo(orderItem.get("deliveryDate"), deliveryDateTill);
+        };
     }
 
+    public static Specification<Order> findOrdersWithPaymentDue() {
+        return (root, cq, cb) -> {
+            Join<Order, OrderAmount> orderAmount = root.join("orderAmount");
+            return cb.lessThan(orderAmount.get("amountRecieved"), orderAmount.get("totalAmount"));
+        };
+    }
+
+    public static Specification<Order> findOrderByItemStatus(List<Integer> value) {
+        return (root, cq, cb) -> {
+            Join<Order, OrderItem> orderItemJoin = root.join("orderItems");
+            return orderItemJoin.get("orderItemStatus").in(value);
+        };
+    }
     public static Specification<Order> findNonDeletedOrders() {
-        return (root, cq, cb) -> cb.equal(root.get("isDeleted"), false);
+        return (root, cq, cb) -> cb.or(
+                cb.notEqual(root.get("isDeleted"), true),
+                cb.isNull(root.get("isDeleted")));
     }
 
     public static Specification<Order> getSpecificationBasedOnFilters(Map<String, Object> paramsMap) {
@@ -64,6 +93,7 @@ public class OrderSpecificationClause {
             });
             Specification<Order> defaultSpecification = findNonDeletedOrders();
             predicateList.add(defaultSpecification.toPredicate(root, cq, cb));
+            cq.distinct(true);
             return cb.and(predicateList.toArray(new Predicate[0]));
         };
     }
@@ -77,8 +107,8 @@ public class OrderSpecificationClause {
         }
 
         switch (filter) {
-            case STATUS:
-                return findOrderByStatuses((List<Integer>) value);
+            case ORDER_STATUS:
+                return findOrderByOrderStatuses((List<Integer>) value);
             case BOUTIQUE_ID:
                 return findOrderByBoutiqueId((Long) value);
             case PRIORITY_ORDERS_ONLY:
@@ -89,6 +119,10 @@ public class OrderSpecificationClause {
                 return findOrdersByDeliveryDateFrom((LocalDateTime) value);
             case DELIVERY_DATE_TILL:
                 return findOrdersByDeliveryDateTill((LocalDateTime) value);
+            case PAYMENT_DUE:
+                return findOrdersWithPaymentDue();
+            case ITEM_STATUS:
+                return findOrderByItemStatus((List<Integer>) value);
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We've not started grouping on " + filter);
         }

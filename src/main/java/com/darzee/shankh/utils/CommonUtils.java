@@ -3,7 +3,6 @@ package com.darzee.shankh.utils;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -23,10 +22,6 @@ public class CommonUtils {
             return "";
         }
         return df.format(value);
-    }
-
-    public static String constructName(String firstName, String lastName) {
-        return (Optional.ofNullable(firstName).orElse("") + " " + Optional.ofNullable(lastName).orElse("")).trim();
     }
 
     public static String sanitisePhoneNumber(String phoneNumber) {

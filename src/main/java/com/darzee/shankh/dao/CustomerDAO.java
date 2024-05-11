@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -20,10 +20,11 @@ public class CustomerDAO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private BoutiqueDAO boutique;
-    private List<OrderDAO> orders;
 
-    public CustomerDAO(Integer age, String phoneNumber, String firstName, String lastName, Gender gender, BoutiqueDAO boutiqueDAO) {
+    public CustomerDAO(Integer age, String countryCode, String phoneNumber, String firstName, String lastName,
+                       Gender gender, BoutiqueDAO boutiqueDAO) {
         this.age = age;
+        this.countryCode = countryCode;
         this.phoneNumber = phoneNumber;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -33,6 +34,10 @@ public class CustomerDAO {
 
     public boolean isPhoneNumberUpdated(String value) {
         return (value != null && !value.equals(this.phoneNumber)) || (value == null && this.phoneNumber != null);
+    }
+
+    public boolean isCountryCodeUpdated(String value) {
+        return (value != null && !value.equals(this.countryCode)) || (value == null && this.countryCode != null);
     }
 
     public boolean isFirstNameUpdated(String value) {
@@ -45,6 +50,10 @@ public class CustomerDAO {
 
     public boolean isAgeUpdated(Integer value) {
         return (value != null && !value.equals(this.age)) || (value == null && this.age != null);
+    }
+
+    public String constructName() {
+        return (Optional.ofNullable(this.firstName).orElse("") + " " + Optional.ofNullable(this.lastName).orElse("")).trim();
     }
 
 }

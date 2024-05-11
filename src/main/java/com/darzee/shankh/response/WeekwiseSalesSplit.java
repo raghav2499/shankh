@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Data
@@ -15,8 +17,10 @@ public class WeekwiseSalesSplit {
     Date weekStartDate;
     Double totalSales;
 
-    public WeekwiseSalesSplit(Double totalSales, Date weekStartDate) {
-        this.weekStartDate = weekStartDate;
+    public WeekwiseSalesSplit(Double totalSales, LocalDate weekStartDate) {
+        if(weekStartDate != null) {
+            this.weekStartDate = Date.from(weekStartDate.atStartOfDay(ZoneId.of("UTC")).toInstant());
+        }
         this.totalSales = totalSales;
     }
 }

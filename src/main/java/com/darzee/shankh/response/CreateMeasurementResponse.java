@@ -16,4 +16,6 @@ public class CreateMeasurementResponse {
     private String message;
     private Long customerId;
     private Long measurementId;
+    private Long measurementRevisionId;
+
 }

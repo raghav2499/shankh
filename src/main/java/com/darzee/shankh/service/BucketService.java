@@ -3,13 +3,14 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.entity.ImageReference;
+import com.darzee.shankh.enums.FileType;
 import com.darzee.shankh.enums.UploadFileType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.ImageReferenceRepo;
+import com.darzee.shankh.repo.FileReferenceRepo;
 import com.darzee.shankh.request.DownloadImageRequest;
 import com.darzee.shankh.response.DownloadImageResponse;
-import com.darzee.shankh.response.UploadImageResponse;
-import com.darzee.shankh.response.UploadMultipleImageResponse;
+import com.darzee.shankh.response.FileDetail;
+import com.darzee.shankh.response.UploadMultipleFileResponse;
 import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.s3utils.FileUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -36,7 +37,7 @@ public class BucketService {
     private AmazonClient client;
 
     @Autowired
-    private ImageReferenceRepo imageReferenceRepo;
+    private FileReferenceRepo fileReferenceRepo;
 
     @Autowired
     private DaoEntityMapper mapper;
@@ -44,63 +45,82 @@ public class BucketService {
     @Value("invoice/")
     private String invoiceDirectory;
 
-    public UploadImageResponse uploadSingleImage(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
-        try {
-            Pair<String, String> fileUploadResult = uploadPhoto(multipartFile, uploadFileTypeOrdinal);
-            return new UploadImageResponse(fileUploadResult.getKey(), fileUploadResult.getValue());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
-        }
-    }
+    @Value("items/")
+    private String itemDetailsDirectory;
 
-    public ResponseEntity<UploadMultipleImageResponse> uploadMultipleImages(List<MultipartFile> files, String uploadFileType) {
-        List<UploadImageResponse> uploadImageResultList = new ArrayList<>();
+//    public FileDetail uploadSingleImage(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
+//        try {
+//            Pair<String, String> fileUploadResult = uploadPhoto(multipartFile, uploadFileTypeOrdinal);
+//            return new FileDetail(fileUploadResult.getKey(), fileUploadResult.getValue());
+//        } catch (Exception e) {
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
+//        }
+//    }
+
+//    public ResponseEntity<UploadMultipleFileResponse> uploadMultipleImages(List<MultipartFile> files, String uploadFileType) {
+//        List<FileDetail> uploadImageResultList = new ArrayList<>();
+//        try {
+//            for (MultipartFile file : files) {
+//                Pair<String, String> fileUploadResult = uploadPhoto(file, uploadFileType);
+//                uploadImageResultList.add(new FileDetail(fileUploadResult.getKey(), fileUploadResult.getValue()));
+//            }
+//            UploadMultipleFileResponse response = new UploadMultipleFileResponse(uploadImageResultList);
+//            return new ResponseEntity<>(response, HttpStatus.OK);
+//        } catch (Exception e) {
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
+//        }
+//
+//    }
+
+    //for audio file
+    //check for data type, confirm!
+    public ResponseEntity<UploadMultipleFileResponse> uploadMultipleFiles(List<MultipartFile> files, String uploadFileType) {
+        List<FileDetail> uploadImageResultList = new ArrayList<>();
         try {
             for (MultipartFile file : files) {
-                Pair<String, String> fileUploadResult = uploadPhoto(file, uploadFileType);
-                uploadImageResultList.add(new UploadImageResponse(fileUploadResult.getKey(), fileUploadResult.getValue()));
+                Pair<String, String> fileUploadResult = uploadFile(file, uploadFileType);
+                uploadImageResultList.add(new FileDetail(fileUploadResult.getKey(), fileUploadResult.getValue()));
             }
-            UploadMultipleImageResponse response = new UploadMultipleImageResponse(uploadImageResultList);
+            UploadMultipleFileResponse response = new UploadMultipleFileResponse(uploadImageResultList);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed wtith exception {}", e);
         }
-
     }
 
     public DownloadImageResponse getFileUrls(DownloadImageRequest request) {
         List<String> fileReferenceIds = request.getFileReferenceIds();
         List<ImageReferenceDAO> imageReferences = CommonUtils.mapList(
-                imageReferenceRepo.findAllByReferenceIdIn(fileReferenceIds),
+                fileReferenceRepo.findAllByReferenceIdIn(fileReferenceIds),
                 mapper::imageReferenceToImageReferenceDAO);
         List<String> shortLivedUrls = imageReferences.stream()
-                .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName()))
+                .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName(), false))
                 .collect(Collectors.toList());
         return new DownloadImageResponse(shortLivedUrls);
     }
 
     public List<String> getShortLivedUrls(List<String> imageReferenceIds) {
         List<ImageReferenceDAO> imageReferences = CommonUtils.mapList(
-                imageReferenceRepo.findAllByReferenceIdIn(imageReferenceIds),
+                fileReferenceRepo.findAllByReferenceIdIn(imageReferenceIds),
                 mapper::imageReferenceToImageReferenceDAO);
         List<String> shortLivedUrls = imageReferences.stream()
-                .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName()))
+                .map(imageReference -> client.generateShortLivedUrl(imageReference.getImageName(), false))
                 .collect(Collectors.toList());
         return shortLivedUrls;
     }
 
     public String getShortLivedUrl(String imageReferenceId) {
-        Optional<ImageReference> imageReference = imageReferenceRepo.findByReferenceId(imageReferenceId);
+        Optional<ImageReference> imageReference = fileReferenceRepo.findByReferenceId(imageReferenceId);
         if (imageReference.isPresent()) {
             ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(imageReference.get());
-            String shortLivedUrl = client.generateShortLivedUrl(imageReferenceDAO.getImageName());
+            String shortLivedUrl = client.generateShortLivedUrl(imageReferenceDAO.getImageName(), false);
             return shortLivedUrl;
         }
         return null;
     }
 
     public String getPortfolioImageShortLivedUrl(String imageReferenceId) {
-        Optional<ImageReference> imageReference = imageReferenceRepo.findByReferenceId(imageReferenceId);
+        Optional<ImageReference> imageReference = fileReferenceRepo.findByReferenceId(imageReferenceId);
         if (imageReference.isPresent()) {
             ImageReferenceDAO imageReferenceDAO = mapper.imageReferenceToImageReferenceDAO(imageReference.get());
             String shortLivedUrl = client.generateShortLivedUrlForPortfolio(imageReferenceDAO.getImageName());
@@ -115,9 +135,20 @@ public class BucketService {
         return fileUploadResult.getValue();
     }
 
-    public String getInvoiceShortLivedLink(Long orderId) {
+    public String uploadItemDetailsPDF(File file, Long orderItemId) {
+        String fileName = String.valueOf(orderItemId);
+        ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, itemDetailsDirectory + fileName);
+        return fileUploadResult.getValue();
+    }
+
+    public String getInvoiceShortLivedLink(Long orderId, Long boutiqueId) {
         String fileLocation = invoiceDirectory + "bill" + orderId;
-        return client.generateShortLivedUrl(fileLocation);
+        return client.generateShortLivedUrl(fileLocation, false);
+    }
+
+    public String getItemDetailsShortLivedLink(Long orderItemId) {
+        String fileLocation = itemDetailsDirectory + orderItemId;
+        return client.generateShortLivedUrl(fileLocation, false);
     }
 
     private Pair<String, String> uploadPhoto(MultipartFile multipartFile, String uploadFileTypeOrdinal) throws IOException {
@@ -132,8 +163,47 @@ public class BucketService {
         }
         ImageReferenceDAO imageReference = new ImageReferenceDAO(fileUploadResult.getKey(),
                 fileName);
-        imageReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
+        fileReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
         file.delete();
         return fileUploadResult;
     }
+
+    public Pair<String, String> uploadFile(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
+        File file = null;
+        try {
+            file = FileUtil.convertMultiPartToFile(multipartFile);
+            String fileName = FileUtil.generateFileName(multipartFile);
+            ImmutablePair<String, String> fileUploadResult = null;
+            FileType fileType = FileType.getFileTypeFromOrdinal(uploadFileTypeOrdinal);
+            switch (fileType) {
+                case PORTFOLIO:
+                    // for portfolio file
+                    fileUploadResult = client.uploadPortfolioFile(file, fileName);
+                    break;
+                case AUDIO:
+                    // for audio file
+                    fileUploadResult = client.uploadAudioFile(file, fileName);
+                    break;
+                case MEASUREMENT:
+                    //for measurement file
+                    fileUploadResult = client.uploadMeasurementFile(file, fileName);
+                    break;
+                default:
+                    // for image file
+                    fileUploadResult = client.uploadFile(file, fileName);
+                    break;
+            }
+            ImageReferenceDAO imageReference = new ImageReferenceDAO(fileUploadResult.getKey(), fileName);
+            fileReferenceRepo.save(mapper.imageReferenceDAOToImageReference(imageReference));
+            file.delete();
+            return fileUploadResult;
+        } catch (Exception e) {
+            if (file != null) {
+                file.delete();
+            }
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception " + e.getMessage(), e);
+        }
+    }
+
+
 }

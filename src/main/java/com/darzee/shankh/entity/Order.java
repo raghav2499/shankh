@@ -1,16 +1,11 @@
 package com.darzee.shankh.entity;
 
 import com.darzee.shankh.enums.OrderStatus;
-import com.darzee.shankh.enums.OrderType;
-import com.darzee.shankh.enums.OutfitType;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "orders")
@@ -28,42 +23,20 @@ public class Order {
     @Column(name = "invoice_no", nullable = false)
     private String invoiceNo;
 
-    @Column(name = "trial_date")
-    private LocalDateTime trialDate;
-
-    @Column(name = "delivery_date")
-    private LocalDateTime deliveryDate;
-
-    @Column(name = "special_instructions")
-    private String specialInstructions;
-
-    @Column(name = "order_type")
-    @Enumerated(EnumType.ORDINAL)
-    private OrderType orderType;
-
-    @Column(name = "outfit_type")
-    @Enumerated(EnumType.ORDINAL)
-    private OutfitType OutfitType;
-
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = Boolean.FALSE;
-
-    @Column(name = "inspiration")
-    private String inspiration;
-
     @Column(name = "order_status")
     @Enumerated(EnumType.ORDINAL)
-    private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;
+    private OrderStatus orderStatus = OrderStatus.DRAFTED;
 
-    @Column(name = "is_priority_order")
-    private Boolean isPriorityOrder = Boolean.FALSE;
+    @Column(name = "boutique_order_id")
+    private Long boutiqueOrderId;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
     @Column(name = "created_at")
-    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @ManyToOne
@@ -79,6 +52,5 @@ public class Order {
     private Customer customer;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
-    private List<Payment> payment = new ArrayList<>();
-
+    private List<OrderItem> orderItems;
 }

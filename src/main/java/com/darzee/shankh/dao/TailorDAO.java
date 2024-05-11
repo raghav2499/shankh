@@ -49,7 +49,7 @@ public class TailorDAO {
     }
 
     public boolean isLanguageUpdated(Integer value) {
-        return value != null && !this.language.equals(value);
+        return value != null && !value.equals(this.language);
     }
 
 }

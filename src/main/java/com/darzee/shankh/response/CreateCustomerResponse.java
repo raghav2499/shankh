@@ -14,12 +14,13 @@ public class CreateCustomerResponse extends CustomerDetails {
     public String message;
 
     public CreateCustomerResponse(String customerName,
+                                  String countryCode,
                                   String phoneNumber,
                                   String profilePicLink,
                                   Long customerId,
                                   String gender,
                                   String message) {
-        super(customerName, phoneNumber, profilePicLink, customerId, gender);
+        super(customerName, countryCode, phoneNumber, profilePicLink, customerId, gender);
         this.message = message;
     }
 }

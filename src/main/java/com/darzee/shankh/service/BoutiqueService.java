@@ -1,14 +1,19 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.BoutiqueDAO;
+import com.darzee.shankh.dao.BoutiqueMeasurementDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Boutique;
+import com.darzee.shankh.entity.BoutiqueMeasurement;
 import com.darzee.shankh.enums.BoutiqueType;
-import com.darzee.shankh.enums.ImageEntityType;
+import com.darzee.shankh.enums.FileEntityType;
 import com.darzee.shankh.enums.Language;
+import com.darzee.shankh.enums.OutfitSide;
+import com.darzee.shankh.enums.OutfitType;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueLedgerRepo;
+import com.darzee.shankh.repo.BoutiqueMeasurementRepo;
 import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.repo.OrderRepo;
 import com.darzee.shankh.repo.TailorRepo;
@@ -23,15 +28,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class BoutiqueService {
 
     @Autowired
-    private ObjectImagesService objectImagesService;
+    private ObjectFilesService objectFilesService;
 
     @Autowired
     private BoutiqueLedgerService boutiqueLedgerService;
@@ -40,7 +49,7 @@ public class BoutiqueService {
     private BucketService bucketService;
 
     @Autowired
-    private BoutiqueTailorService boutiqueTailorService;
+    private BoutiqueTailorCommonService boutiqueTailorService;
 
     @Autowired
     private BoutiqueRepo boutiqueRepo;
@@ -50,6 +59,9 @@ public class BoutiqueService {
 
     @Autowired
     private TailorRepo tailorRepo;
+
+    @Autowired
+    private BoutiqueMeasurementRepo boutiqueMeasurementRepo;
 
     @Autowired
     private OrderRepo orderRepo;
@@ -81,7 +93,7 @@ public class BoutiqueService {
                 boutiqueDAO.setTailorCount(request.getTailorCount());
             }
 
-            if(!Collections.isEmpty(request.getBoutiqueImageReferenceId())) {
+            if (!Collections.isEmpty(request.getBoutiqueImageReferenceId())) {
                 saveBoutiqueReferences(request.getBoutiqueImageReferenceId(), boutiqueDAO);
             }
 
@@ -90,7 +102,7 @@ public class BoutiqueService {
             }
 
             boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
-                            new CycleAvoidingMappingContext())),
+                    new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
 
             response = generateBoutiqueDetailResponse(boutiqueDAO, adminTailor);
@@ -112,7 +124,7 @@ public class BoutiqueService {
     }
 
     private List<String> getBoutiqueImagesReferenceIds(Long boutiqueId) {
-        List<String> boutiqueImages = objectImagesService.getBoutiqueImageReferenceId(boutiqueId);
+        List<String> boutiqueImages = objectFilesService.getBoutiqueImageReferenceId(boutiqueId);
         if (Collections.isEmpty(boutiqueImages)) {
             return new ArrayList<>();
         }
@@ -120,15 +132,16 @@ public class BoutiqueService {
     }
 
     private void saveBoutiqueReferences(List<String> imageReferences, BoutiqueDAO boutique) {
-        objectImagesService.invalidateExistingReferenceIds(ImageEntityType.BOUTIQUE.getEntityType(), boutique.getId());
-        objectImagesService.saveObjectImages(imageReferences,
-                ImageEntityType.BOUTIQUE.getEntityType(),
+        objectFilesService.invalidateExistingReferenceIds(FileEntityType.BOUTIQUE.getEntityType(), boutique.getId());
+        objectFilesService.saveObjectFiles(imageReferences,
+                FileEntityType.BOUTIQUE.getEntityType(),
                 boutique.getId());
     }
 
     private GetBoutiqueDetailsResponse generateBoutiqueDetailResponse(BoutiqueDAO boutiqueDAO, TailorDAO tailorDAO) {
         List<String> shopImageReferenceIds = getBoutiqueImagesReferenceIds(boutiqueDAO.getId());
-        String adminTailorImageReferenceId = objectImagesService.getTailorImageReferenceId(boutiqueDAO.getAdminTailor().getId());
+        String adminTailorImageReferenceId = objectFilesService
+                .getTailorImageReferenceId(boutiqueDAO.getAdminTailor().getId());
 
         List<String> shopImageUrls = new ArrayList<>();
         String adminTailorImageUrl = null;
@@ -152,19 +165,79 @@ public class BoutiqueService {
         if (tailorDAO.isPhoneNumberUpdated(request.getPhoneNumber())) {
             tailorDAO.setPhoneNumber(request.getPhoneNumber());
         }
-        if(tailorDAO.isLanguageUpdated(request.getLanguage())) {
+        if (tailorDAO.isLanguageUpdated(request.getLanguage())) {
             Language updatedLanguage = Language.getOrdinalEnumMap().get(request.getLanguage());
             tailorDAO.setLanguage(updatedLanguage);
         }
-        if(request.getTailorProfilePicReferenceId() != null) {
+        if (request.getTailorProfilePicReferenceId() != null) {
             boutiqueTailorService.saveTailorImageReference(request.getTailorProfilePicReferenceId(), tailorDAO.getId());
         }
         TailorDAO updatedTailor = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
-                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
 
         return updatedTailor;
     }
 
+    public ResponseEntity createOrUpdateMeasurementParams(Long boutiqueId, Integer outfitType, Integer outfitSide,
+            List<Map<String, Object>> measurementPramList) {
+
+        // Validate boutiqueId and outfit type...
+        Optional<Boutique> boutique = boutiqueRepo.findById(boutiqueId);
+        if (boutique.isPresent()) {
+            // creat a new list of measurement params
+            List<String> measurementParams = new ArrayList<>();
+
+            // iterate over the list of measurement params and add them to the new list
+            for (Map<String, Object> measurementParam : measurementPramList) {
+                Object paramNameObject = measurementParam.get("name");
+                if (paramNameObject == null) {
+                    return ResponseEntity.badRequest().body("Measurement param name is missing");
+                }
+                String paramName = (String) paramNameObject;
+                measurementParams.add(paramName);
+            }
+
+            // get the outfit type from the ordinal
+            OutfitType outfitTypeEnum = OutfitType.getOutfitOrdinalEnumMap().get(outfitType);
+
+            // if the outfit type is null, return a bad request
+            if (outfitTypeEnum == null) {
+                return ResponseEntity.badRequest().body("Invalid outfit type");
+            }
+
+            // get outfit side from the ordinal
+            OutfitSide outfitSideEnum = OutfitSide.getEnumByOrdinal(outfitSide);
+
+            if (outfitSideEnum == null) {
+                return ResponseEntity.badRequest().body("Invalid outfit side");
+            }
+
+            // create a new BoutiqueMeasurement with the boutiqueId, outfitType and
+            // outfitSide
+
+            BoutiqueMeasurement boutiqueMeasurement = boutiqueMeasurementRepo
+                    .findUniqueByBoutiqueIdOutfitTypeOutfitSide(boutiqueId, outfitTypeEnum, outfitSideEnum);
+
+            if (boutiqueMeasurement == null) {
+                boutiqueMeasurement = new BoutiqueMeasurement();
+                boutiqueMeasurement.setBoutiqueId(boutiqueId);
+                boutiqueMeasurement.setOutfitType(outfitTypeEnum);
+                boutiqueMeasurement.setOutfitSide(outfitSideEnum);
+                boutiqueMeasurement.setCreatedAt(LocalDateTime.now());
+            }
+
+            boutiqueMeasurement.setParam(measurementParams);
+
+            boutiqueMeasurementRepo.save(boutiqueMeasurement);
+
+           
+
+            return new ResponseEntity<>(boutiqueMeasurement, HttpStatus.OK);
+
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique id");
+
+    }
 
 }

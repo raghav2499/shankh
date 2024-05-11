@@ -9,17 +9,15 @@ import java.util.Map;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum OrderStatus {
 
-    @JsonProperty("stiching_not_started")
-    STITCHING_NOT_STARTED("stiching_not_started", 1, "Stitching not started"),
-    @JsonProperty("stitching_in_progress")
-    STITCHING_IN_PROGRESS("stitching_in_progress", 2, "Stitching in progress"),
-    @JsonProperty("order_ready_for_trial")
-    ORDER_READY_FOR_TRIAL("order_ready_for_trial", 3, "Ready for Trial"),
-    @JsonProperty("order_completed")
-    ORDER_COMPLETED("order_completed", 4, "Order Completed"),
+    @JsonProperty("drafted")
+    DRAFTED("drafted", 1, "Drafted"),
 
-    @JsonProperty("order_delivered")
-    ORDER_DELIVERED("order_delivered", 5, "Order Delivered");
+    @JsonProperty("accepted")
+    ACCEPTED("accepted", 2, "Accepted"),
+
+    @JsonProperty("delivered")
+    DELIVERED("delivered", 3, "Delivered");
+
     private String orderStatus;
 
     private Integer ordinal;
@@ -31,24 +29,19 @@ public enum OrderStatus {
         this.displayString = displayString;
     }
 
-    public String getName() {
-        return this.orderStatus;
+    public String getDisplayString() {
+        return displayString;
     }
 
     public Integer getOrdinal() {
-        return this.ordinal;
-    }
-    public String getDisplayString() {
-        return this.displayString;
+        return ordinal;
     }
 
-    public static Map<Integer, OrderStatus> getOrderTypeEnumOrdinalMap() {
-        Map<Integer, OrderStatus> orderOrdinalEnumMap = new HashMap<>();
-        orderOrdinalEnumMap.put(STITCHING_NOT_STARTED.ordinal, STITCHING_NOT_STARTED);
-        orderOrdinalEnumMap.put(STITCHING_IN_PROGRESS.ordinal, STITCHING_IN_PROGRESS);
-        orderOrdinalEnumMap.put(ORDER_READY_FOR_TRIAL.ordinal, ORDER_READY_FOR_TRIAL);
-        orderOrdinalEnumMap.put(ORDER_COMPLETED.ordinal, ORDER_COMPLETED);
-        orderOrdinalEnumMap.put(ORDER_DELIVERED.ordinal, ORDER_DELIVERED);
-        return orderOrdinalEnumMap;
+    public static Map<Integer, OrderStatus> getOrderStatusEnumOrdinalMap() {
+        Map<Integer, OrderStatus> orderStatusEnumOrdinalMap = new HashMap<>();
+        for(OrderStatus status : OrderStatus.values()) {
+            orderStatusEnumOrdinalMap.put(status.getOrdinal(), status);
+        }
+        return orderStatusEnumOrdinalMap;
     }
 }

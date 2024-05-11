@@ -6,13 +6,16 @@ import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,8 +41,8 @@ public class DashboardService {
         Long boutiqueId = Long.parseLong(boutiqueIdString);
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(boutiqueId);
         BoutiqueDAO boutiqueDAO = null;
-        if(optionalBoutique.isPresent()) {
-             boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(), new CycleAvoidingMappingContext());
+        if (optionalBoutique.isPresent()) {
+            boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(), new CycleAvoidingMappingContext());
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique Id");
         }
@@ -66,8 +69,10 @@ public class DashboardService {
         List<TopCustomerData> topCustomerData = orderService.getTopCustomerData(boutiqueId, month, year);
         SalesDashboard weekwiseSalesSplit = orderService.getWeekWiseSales(boutiqueId, month, year);
         List<OrderTypeDashboardData> orderTypeSalesSplit = orderService.getOrderTypeWiseSales(boutiqueId, month, year);
+
         Integer activeSinceMonth = startMonth;
         Integer activeSinceYear = startYear;
+        Boolean isActive = orderService.checkIfBoutiqueIsActive(boutiqueId);
 
         String successMessage = "Reporting data fetched successfully";
         BoutiqueReportResponse response = new BoutiqueReportResponse(ledgerDashboardData,
@@ -77,7 +82,26 @@ public class DashboardService {
                 orderTypeSalesSplit,
                 activeSinceMonth,
                 activeSinceYear,
+                isActive,
                 successMessage);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity<GetItemsCountResponse> getItemsCount(String boutiqueIdString) {
+        Long boutiqueId = Long.valueOf(boutiqueIdString);
+        LocalDateTime endTime = TimeUtils.convertISTToUTC(LocalDateTime.now().plusDays(1).withHour(0).withMinute(0)
+                .withSecond(0).withNano(0));
+        LocalDateTime dailyStartTime = TimeUtils.convertISTToUTC(LocalDateTime.now().withHour(0).withMinute(0)
+                .withSecond(0).withNano(0));
+        LocalDateTime weekStartTime = TimeUtils.convertISTToUTC(TimeUtils.getWeekStartDateTime(endTime));
+        LocalDateTime overallStartTime = TimeUtils.convertISTToUTC(LocalDateTime.now().minusYears(10));
+        Pair<Integer, Integer> daily = orderService.getItemsCount(boutiqueId, dailyStartTime, endTime);
+        Pair<Integer, Integer> weekly = orderService.getItemsCount(boutiqueId, weekStartTime, endTime);
+        Pair<Integer, Integer> overall = orderService.getItemsCount(boutiqueId, overallStartTime, endTime);
+        ItemsCount dailyItemsCount = new ItemsCount(daily);
+        ItemsCount weeklyItemsCount = new ItemsCount(weekly);
+        ItemsCount overallItemsCount = new ItemsCount(overall);
+        GetItemsCountResponse response = new GetItemsCountResponse(dailyItemsCount, weeklyItemsCount, overallItemsCount);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
