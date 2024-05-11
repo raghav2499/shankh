@@ -1,9 +1,8 @@
 package com.darzee.shankh.utils;
 
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 
 public class TimeUtils {
 
@@ -38,5 +37,15 @@ public class TimeUtils {
         } else {
             return null;
         }
+    }
+
+    public static LocalDate getNextSunday(LocalDate inputDate) {
+        return inputDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+    }
+
+    public static LocalDateTime getTimeInDBTimeZone(LocalDateTime inputTime, ZoneId clientZone) {
+        ZoneId targetZone = ZoneId.of("UTC");
+        ZonedDateTime clientZonedDateTime = ZonedDateTime.of(inputTime, clientZone);
+        return clientZonedDateTime.withZoneSameInstant(targetZone).toLocalDateTime();
     }
 }
