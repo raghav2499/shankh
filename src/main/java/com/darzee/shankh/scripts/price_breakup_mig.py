@@ -2,9 +2,9 @@ import psycopg2
 from psycopg2.extras import execute_values
 from datetime import datetime
 
-DB_HOST = 'ec2-13-233-164-214.ap-south-1.compute.amazonaws.com'
+DB_HOST = 'ec2-15-206-72-30.ap-south-1.compute.amazonaws.com'
 DB_PORT = '5432'
-DB_NAME = 'darzee_stage'
+DB_NAME = 'darzee_prod'
 DB_USER = 'postgres'
 DB_PASSWORD = '0nDsUUY7pMyNCgMnvipI'
 
@@ -29,25 +29,26 @@ order_amount_rows = cursor.fetchall()
 # Define the INSERT query for inserting data into the price_breakup table
 insert_query = """
     INSERT INTO price_breakup (
-        component, value, quantity, order_item_id, is_deleted
-    ) VALUES %s
+        id, component, value, quantity, order_item_id, is_deleted
+    ) VALUES %s RETURNING id
 """
 
 # Process the rows and prepare the data for bulk insertion
 price_breakup_data = []
-for row in order_amount_rows:
+for i, row in enumerate(order_amount_rows, 1):
     # Fetch order_item_id for the corresponding order
     order_id = row[2]
-    order_item_id_query = f"SELECT id FROM order_item WHERE order_id = {order_id}"
+    order_item_id_query = f"SELECT id FROM order_item WHERE order_id = {order_id} ORDER BY id"
     cursor.execute(order_item_id_query)
     order_item_id = cursor.fetchone()[0]
 
     # Prepare data for price_breakup
-    data = ('Stitching Cost', row[1], 1, order_item_id, False)
+    data = (i, 'Stitching Cost', row[1], 1, order_item_id, False)  # Starting from 1 and auto-incrementing
     price_breakup_data.append(data)
 
-# Execute the INSERT query with bulk insertion
+# Execute the INSERT query with bulk insertion and retrieve the generated IDs
 execute_values(cursor, insert_query, price_breakup_data)
+price_breakup_ids = cursor.fetchall()
 
 # Commit the changes
 conn.commit()
@@ -55,3 +56,6 @@ conn.commit()
 # Close the cursor and connection
 cursor.close()
 conn.close()
+
+# Display the generated IDs
+print("Generated Price Breakup IDs:", price_breakup_ids)
