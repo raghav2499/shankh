@@ -229,7 +229,7 @@ public class OrderService {
                 nextMonthStart);
         TreeMap<LocalDate, Double> weekWiseCollatedAmounts = new TreeMap<>();
         for (Object[] orderAmountDetail : orderAmountsOfMonth) {
-            LocalDate key = getWeekStartDate((Timestamp) orderAmountDetail[2]);
+            LocalDate key = TimeUtils.getWeekStartDate((Timestamp) orderAmountDetail[2]);
             Double currentValue = weekWiseCollatedAmounts.getOrDefault(key, 0d);
             weekWiseCollatedAmounts.put(key, currentValue + (Double) orderAmountDetail[1]);
         }
@@ -484,12 +484,8 @@ public class OrderService {
     }
 
     public Pair getItemsCount(Long boutiqueId, LocalDateTime startTime, LocalDateTime endTime) {
-        ZoneId defaultClientZoneId = ZoneId.of("Asia/Kolkata");
-        LocalDateTime dbStartTime = TimeUtils.getTimeInDBTimeZone(startTime, defaultClientZoneId);
-        LocalDateTime dbEndTime = TimeUtils.getTimeInDBTimeZone(endTime, defaultClientZoneId);
-
-        Integer newItemsCount = orderRepo.getNewItemsCount(boutiqueId, dbStartTime, dbEndTime);
-        Integer closedItemsCount = orderRepo.getCompletedItemsCount(boutiqueId, dbStartTime, dbEndTime);
+        Integer newItemsCount = orderRepo.getNewItemsCount(boutiqueId, startTime, endTime);
+        Integer closedItemsCount = orderRepo.getCompletedItemsCount(boutiqueId, startTime, endTime);
         return Pair.of(newItemsCount, closedItemsCount);
     }
 
@@ -534,16 +530,6 @@ public class OrderService {
             weekwiseSales.add(new WeekwiseSalesSplit(0d, null));
         }
     }
-
-    // private List<OrderItemSummary> generateOrderItemSummaries(List<OrderItemDAO>
-    // orderItemDAOList) {
-    // List<OrderItemSummary> orderItemSummaryList = new ArrayList<>();
-    // for (OrderItemDAO item : orderItemDAOList) {
-    // orderItemSummaryList.add(new OrderItemSummary(item));
-    // }
-    // return orderItemSummaryList;
-    // }
-
     private void postUpdateOrderValidation(Double totalOrderAmount, List<PriceBreakupDAO> allItemsPriceBreakup) {
         Double itemsPriceBreakupSum = allItemsPriceBreakup.stream().mapToDouble(PriceBreakupDAO::getValue).sum();
         if (!itemsPriceBreakupSum.equals(totalOrderAmount)) {
@@ -564,14 +550,6 @@ public class OrderService {
         }
         OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
         return orderDAO;
-    }
-
-    private LocalDate getWeekStartDate(Timestamp inputDateTime) {
-        LocalDate inputDate = inputDateTime.toLocalDateTime().toLocalDate();
-        LocalDate monthStartDate = inputDate.withDayOfMonth(1);
-        LocalDate nextSundayDate = TimeUtils.getNextSunday(inputDate);
-        LocalDate previousMonday = nextSundayDate.minusDays(6);
-        return monthStartDate.isAfter(previousMonday) ? monthStartDate : previousMonday;
     }
 
 }

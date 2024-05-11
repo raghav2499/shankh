@@ -1,18 +1,11 @@
 package com.darzee.shankh.utils;
 
+import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 
 public class TimeUtils {
-
-    public static LocalDateTime getWeekStartTime(LocalDateTime time) {
-        LocalDateTime localTime = time;
-        while (localTime.getDayOfWeek() != DayOfWeek.SUNDAY) {
-            localTime = localTime.minusDays(1);
-        }
-        return localTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
-    }
 
     public static LocalDateTime convertISTToUTC(LocalDateTime istLocalDateTime) {
         ZoneId istZoneId = ZoneId.of("Asia/Kolkata");
@@ -47,5 +40,18 @@ public class TimeUtils {
         ZoneId targetZone = ZoneId.of("UTC");
         ZonedDateTime clientZonedDateTime = ZonedDateTime.of(inputTime, clientZone);
         return clientZonedDateTime.withZoneSameInstant(targetZone).toLocalDateTime();
+    }
+
+    public static LocalDate getWeekStartDate(Timestamp inputDateTime) {
+        LocalDate inputDate = inputDateTime.toLocalDateTime().toLocalDate();
+        LocalDate monthStartDate = inputDate.withDayOfMonth(1);
+        LocalDate nextSundayDate = TimeUtils.getNextSunday(inputDate);
+        LocalDate previousMonday = nextSundayDate.minusDays(6);
+        return monthStartDate.isAfter(previousMonday) ? monthStartDate : previousMonday;
+    }
+
+    public static LocalDateTime getWeekStartDateTime(LocalDateTime inputTime) {
+        LocalDate weekStartDate = getWeekStartDate(Timestamp.valueOf(inputTime));
+        return weekStartDate.atStartOfDay();
     }
 }
