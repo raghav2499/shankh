@@ -7,6 +7,7 @@ target/
 # Ignore log files
 *.log
 /logs/
+*.gz
 
 ### STS ###
 .apt_generated
