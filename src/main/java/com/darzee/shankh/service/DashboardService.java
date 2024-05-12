@@ -87,13 +87,13 @@ public class DashboardService {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    public ResponseEntity getItemsCount(String boutiqueIdString) {
+    public ResponseEntity<GetItemsCountResponse> getItemsCount(String boutiqueIdString) {
         Long boutiqueId = Long.valueOf(boutiqueIdString);
         LocalDateTime endTime = TimeUtils.convertISTToUTC(LocalDateTime.now().plusDays(1).withHour(0).withMinute(0)
                 .withSecond(0).withNano(0));
         LocalDateTime dailyStartTime = TimeUtils.convertISTToUTC(LocalDateTime.now().withHour(0).withMinute(0)
                 .withSecond(0).withNano(0));
-        LocalDateTime weekStartTime = TimeUtils.convertISTToUTC(TimeUtils.getWeekStartTime(endTime));
+        LocalDateTime weekStartTime = TimeUtils.convertISTToUTC(TimeUtils.getWeekStartDateTime(endTime));
         LocalDateTime overallStartTime = TimeUtils.convertISTToUTC(LocalDateTime.now().minusYears(10));
         Pair<Integer, Integer> daily = orderService.getItemsCount(boutiqueId, dailyStartTime, endTime);
         Pair<Integer, Integer> weekly = orderService.getItemsCount(boutiqueId, weekStartTime, endTime);

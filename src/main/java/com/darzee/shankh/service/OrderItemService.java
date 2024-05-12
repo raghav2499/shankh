@@ -196,6 +196,9 @@ public class OrderItemService {
                     orderItemId);
             objectFilesService.saveObjectFiles(updateItemDetail.getClothImageReferenceIds(),
                     FileEntityType.ORDER_ITEM.getEntityType(), orderItemId);
+        } else {
+            objectFilesService.invalidateExistingReferenceIds(FileEntityType.ORDER_ITEM.getEntityType(),
+                    orderItemId);
         }
 
         if (!Collections.isEmpty(updateItemDetail.getAudioReferenceIds())) {
@@ -203,6 +206,9 @@ public class OrderItemService {
                     orderItemId);
             objectFilesService.saveObjectFiles(updateItemDetail.getAudioReferenceIds(),
                     FileEntityType.AUDIO.getEntityType(), orderItemId);
+        } else {
+            objectFilesService.invalidateExistingReferenceIds(FileEntityType.AUDIO.getEntityType(),
+                    orderItemId);
         }
         orderItem = mapper.orderItemToOrderItemDAO(orderItemRepo.save(mapper.orderItemDAOToOrderItem(orderItem, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
 
