@@ -7,8 +7,9 @@
             </PatternLayout>
             <Policies>
                 <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="50 MB"/>
             </Policies>
-            <DefaultRolloverStrategy>
+            <DefaultRolloverStrategy max="10">
                 <Delete basePath="logs" maxDepth="2">
                     <IfFileName glob="*/app-*.log.gz" />
                     <IfLastModified age="30d" /> 
