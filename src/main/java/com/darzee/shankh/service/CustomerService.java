@@ -98,46 +98,36 @@ public class CustomerService {
     }
 
     public ResponseEntity createCustomer(CreateCustomerRequest request) {
-        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(request.getBoutiqueId());
         CreateCustomerResponse response = new CreateCustomerResponse();
-        if (optionalBoutique.isPresent()) {
-            String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
-            Optional<Customer> existingCustomer = customerRepo.findByBoutiqueIdAndPhoneNumber(optionalBoutique.get().getId(), phoneNumber);
-            if (existingCustomer.isPresent()) {
-                CustomerDAO customerDAO = mapper.customerObjectToDao(existingCustomer.get(), new CycleAvoidingMappingContext());
-                String customerName = customerDAO.constructName();
-                String gender = customerDAO.getGender() != null ? customerDAO.getGender().getString() : null;
-                response = new CreateCustomerResponse(customerName, customerDAO.getCountryCode(), customerDAO.getPhoneNumber(),
-                        "", customerDAO.getId(), gender, "Customer already registered");
-                return new ResponseEntity(response, HttpStatus.OK);
-            }
-
-            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(),
-                    new CycleAvoidingMappingContext());
-            ImmutablePair<String, String> name = getCustomerNameFromRequest(request.getName());
-
-            CustomerDAO customerDAO = new CustomerDAO(request.getAge(), request.getCountryCode(), phoneNumber, name.getKey(),
-                    name.getValue(), request.getGender(), boutiqueDAO);
-            customerDAO = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customerDAO,
-                            new CycleAvoidingMappingContext())),
-                    new CycleAvoidingMappingContext());
-
-            if (request.getCustomerImageReferenceId() != null) {
-                saveCustomerImages(customerDAO, request.getCustomerImageReferenceId());
-            }
-
-            customerDAO = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customerDAO,
-                            new CycleAvoidingMappingContext())),
-                    new CycleAvoidingMappingContext());
-
-            String customerName = customerDAO.constructName();
-            String gender = customerDAO.getGender() != null ? customerDAO.getGender().getString() : null;
-            response = new CreateCustomerResponse(customerName, customerDAO.getCountryCode(), customerDAO.getPhoneNumber(),
-                    "", customerDAO.getId(), gender, "Customer created successfully");
-            return new ResponseEntity(response, HttpStatus.CREATED);
+        BoutiqueDAO boutiqueDAO = validateCreateCustomerRequest(request.getBoutiqueId());
+        String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
+        CustomerDAO existingCustomer = checkAndGetExistingCustomer(boutiqueDAO.getId(), phoneNumber);
+        if (existingCustomer != null) {
+            String customerName = existingCustomer.constructName();
+            String gender = existingCustomer.getGender() != null ? existingCustomer.getGender().getString() : null;
+            response = new CreateCustomerResponse(customerName, existingCustomer.getCountryCode(), existingCustomer.getPhoneNumber(),
+                    "", existingCustomer.getId(), gender, "Customer already registered");
+            return new ResponseEntity(response, HttpStatus.OK);
         }
-        response.setMessage("This boutique is not enrolled with us");
-        return new ResponseEntity(response, HttpStatus.OK);
+        ImmutablePair<String, String> name = getCustomerNameFromRequest(request.getName());
+        CustomerDAO customerDAO = new CustomerDAO(request.getAge(), request.getCountryCode(), phoneNumber, name.getKey(),
+                name.getValue(), request.getGender(), boutiqueDAO);
+        customerDAO = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customerDAO,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
+
+        if (request.getCustomerImageReferenceId() != null) {
+            saveCustomerImages(customerDAO, request.getCustomerImageReferenceId());
+        }
+        customerDAO = mapper.customerObjectToDao(customerRepo.save(mapper.customerDaoToObject(customerDAO,
+                        new CycleAvoidingMappingContext())),
+                new CycleAvoidingMappingContext());
+
+        String customerName = customerDAO.constructName();
+        String gender = customerDAO.getGender() != null ? customerDAO.getGender().getString() : null;
+        response = new CreateCustomerResponse(customerName, customerDAO.getCountryCode(), customerDAO.getPhoneNumber(),
+                "", customerDAO.getId(), gender, "Customer created successfully");
+        return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
     public ResponseEntity updateCustomer(Long customerId, UpdateCustomerRequest request) {
@@ -170,7 +160,7 @@ public class CustomerService {
                 customer.setAge(request.getAge());
             }
 
-            if(customer.isCountryCodeUpdated(request.getCountryCode())) {
+            if (customer.isCountryCodeUpdated(request.getCountryCode())) {
                 customer.setCountryCode(request.getCountryCode());
             }
 
@@ -205,7 +195,7 @@ public class CustomerService {
         return "";
     }
 
-        public String getCustomerProfilePicRefId(Long customerId) {
+    public String getCustomerProfilePicRefId(Long customerId) {
         String customerImageReferenceId = objectFilesService.getCustomerImageReferenceId(customerId);
         return Optional.ofNullable(customerImageReferenceId).orElse("");
     }
@@ -266,9 +256,25 @@ public class CustomerService {
     }
 
     private boolean isImageUpdated(Long customerId, String referenceId) {
-      String existingImageReferenceId  =  objectFilesService.getCustomerImageReferenceId(customerId);
-      return existingImageReferenceId != referenceId;
+        String existingImageReferenceId = objectFilesService.getCustomerImageReferenceId(customerId);
+        return existingImageReferenceId != referenceId;
     }
 
+    private BoutiqueDAO validateCreateCustomerRequest(Long boutiqueId) {
+        Optional<Boutique> boutique = boutiqueRepo.findById(boutiqueId);
+        if (!boutique.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This boutique is not enrolled with us");
+        }
+        return mapper.boutiqueObjectToDao(boutique.get(), new CycleAvoidingMappingContext());
+    }
 
+    private CustomerDAO checkAndGetExistingCustomer(Long boutiqueId, String phoneNumber) {
+        if (phoneNumber != null) {
+            Optional<Customer> customer = customerRepo.findByBoutiqueIdAndPhoneNumber(boutiqueId, phoneNumber);
+            if (customer.isPresent()) {
+                return mapper.customerObjectToDao(customer.get(), new CycleAvoidingMappingContext());
+            }
+        }
+        return null;
+    }
 }
