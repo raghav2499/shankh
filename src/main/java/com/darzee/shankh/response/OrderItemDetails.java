@@ -79,6 +79,7 @@ public class OrderItemDetails {
         this.clothImageFileDetails = clothImageFileDetail;
         this.audioFileDetails = audioFileDetail;
         this.id = orderItem.getId();
+        this.boutiqueOrderId = orderItem.getOrder().getBoutiqueOrderId();
         this.isPriorityOrder = Optional.ofNullable(orderItem.getIsPriorityOrder()).orElse(Boolean.FALSE);
         this.outfitType = orderItem.getOutfitType().getDisplayString();
         this.outfitTypeName = orderItem.getOutfitType().getName();
