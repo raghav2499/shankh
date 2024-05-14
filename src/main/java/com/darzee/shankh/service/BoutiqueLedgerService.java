@@ -176,12 +176,15 @@ public class BoutiqueLedgerService {
         LedgerDashboardData ledgerDashboardData = null;
         LocalDate currentDate = LocalDate.now();
         if (currentDate.getMonthValue() == month && currentDate.getYear() == year) {
-            ledgerDashboardData = new LedgerDashboardData(boutiqueLedgerDAO.getMonthlyAmountRecieved(), boutiqueLedgerDAO.getMonthlyPendingAmount(), boutiqueLedgerDAO.getMonthlyActiveOrders(), boutiqueLedgerDAO.getMonthlyClosedOrders());
+            ledgerDashboardData = new LedgerDashboardData(boutiqueLedgerDAO.getMonthlyAmountRecieved(),
+                    boutiqueLedgerDAO.getTotalPendingAmount(), boutiqueLedgerDAO.getTotalActiveOrders(),
+                    boutiqueLedgerDAO.getMonthlyClosedOrders());
         } else {
             Optional<BoutiqueLedgerSnapshot> ledgerSnapshot = snapshotRepo.findByBoutiqueIdAndMonthAndYear(boutiqueId, month, year);
             if (ledgerSnapshot.isPresent()) {
                 BoutiqueLedgerSnapshotDAO ledgerSnapshotDAO = mapper.boutiqueLedgerSnapshotToSnapshotDAO(ledgerSnapshot.get());
-                ledgerDashboardData = new LedgerDashboardData(ledgerSnapshotDAO);
+                ledgerDashboardData = new LedgerDashboardData(ledgerSnapshotDAO, boutiqueLedgerDAO.getTotalPendingAmount(),
+                        boutiqueLedgerDAO.getTotalActiveOrders());
             }
         }
         return ledgerDashboardData;

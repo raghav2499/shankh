@@ -233,10 +233,13 @@ public class OrderService {
             Double currentValue = weekWiseCollatedAmounts.getOrDefault(key, 0d);
             weekWiseCollatedAmounts.put(key, currentValue + (Double) orderAmountDetail[1]);
         }
-        List<WeekwiseSalesSplit> weeklySalesAmount = weekWiseCollatedAmounts.entrySet().stream()
-                .map(weeklySalesData -> new WeekwiseSalesSplit(weeklySalesData.getValue(), weeklySalesData.getKey()))
-                .collect(Collectors.toList());
-        populateSalesIfRequired(weeklySalesAmount);
+        List<WeekwiseSalesSplit> weeklySalesAmount = new ArrayList<>();
+        LocalDate dayInAWeek = LocalDate.of(year, month, 1);
+        for(int weekCount = 0; weekCount < 5; weekCount++) {
+            LocalDate weekStartDate = TimeUtils.getWeekStartDate(dayInAWeek);
+            weeklySalesAmount.add(new WeekwiseSalesSplit(weekWiseCollatedAmounts.getOrDefault(weekStartDate, 0d), weekStartDate));
+            dayInAWeek = dayInAWeek.plusDays(7);
+        }
         return new SalesDashboard(weeklySalesAmount);
     }
 
@@ -436,7 +439,7 @@ public class OrderService {
                 .collect(Collectors.toList()).size() == orderItems.size());
         if (allItemsDelivered && !OrderStatus.DELIVERED.equals(orderDAO.getOrderStatus())) {
             orderDAO.setOrderStatus(OrderStatus.DELIVERED);
-            boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), 0, 1);
+            boutiqueLedgerDAO = boutiqueLedgerService.handleBoutiqueLedgerOnOrderUpdation(boutiqueLedgerDAO, orderDAO.getBoutiqueId(), -1, 1);
         }
 
 
