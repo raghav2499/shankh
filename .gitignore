@@ -4,7 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-application.log
+# Ignore log files
+*.log
+/logs/
 *.gz
 
 ### STS ###
