@@ -2,9 +2,9 @@ import psycopg2
 from psycopg2.extras import execute_values
 from datetime import datetime
 
-DB_HOST = 'ec2-13-233-164-214.ap-south-1.compute.amazonaws.com'
+DB_HOST = 'ec2-15-206-72-30.ap-south-1.compute.amazonaws.com'
 DB_PORT = '5432'
-DB_NAME = 'darzee_stage'
+DB_NAME = 'darzee_prod'
 DB_USER = 'postgres'
 DB_PASSWORD = '0nDsUUY7pMyNCgMnvipI'
 

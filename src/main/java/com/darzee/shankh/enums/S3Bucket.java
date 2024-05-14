@@ -11,6 +11,7 @@ public enum S3Bucket {
     DARZEE_BACKEND_STATIC_STAGE("darzee.backend.static.stage", "us-east-1"),
     DARZEE_PORTFOLIO_PROD("darzee.portfolio.prod", "us-east-1"),
     DARZEE_PORTFOLIO_STAGE("darzee.portfolio.stage", "us-east-1"),
+    DARZEE_BACKEND_AUDIO("darzee.backend.audio", "us-east-1"),
     DARZEE_BACKEND_AUDIO_STAGE("darzee.backend.audio.stage", "us-east-1");
 
     public static Map<String, String> bucketRegionMap = getBucketRegionMap();

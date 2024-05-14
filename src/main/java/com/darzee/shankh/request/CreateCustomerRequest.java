@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 public class CreateCustomerRequest {
     private Integer age;
 
-    @NotNull(message = "Customer's phone number is mandatory ")
+//    @NotNull(message = "Customer's phone number is mandatory ")
     @Size(min=10, max=13, message = "Invalid phone number")
     private String phoneNumber;
     private String countryCode;
