@@ -84,12 +84,4 @@ public class OrderController {
                                            @RequestParam("boutique_id") Long boutiqueId) {
         return orderService.getInvoiceDetail(orderId, boutiqueId);
     }
-
-    //to get the invoice details of an order by order id and boutique id
-    @GetMapping(value = "/{id}/invoice_details", produces = MediaType.APPLICATION_JSON_VALUE)
-    @CrossOrigin
-    public ResponseEntity getInvoiceDetails(@PathVariable("id") Long orderId,
-                                            @RequestParam(name = "boutique_id") Long boutiqueId) {
-        return orderService.getOrderInvoiceDetails(orderId, boutiqueId);
-    }
 }
