@@ -7,7 +7,7 @@ import java.util.Map;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum PaymentMode {
-    CASH("cash", 1),
+    CASH("Cash", 1),
     BANK_TRANSFER("Bank Transfer", 2),
     CARD_SWIPE("Card Swipe", 3),
     UPI("UPI", 4),
@@ -30,5 +30,9 @@ public enum PaymentMode {
         paymentOrdinalEnumMap.put(UPI.ordinal, UPI);
         paymentOrdinalEnumMap.put(OTHER.ordinal, OTHER);
         return paymentOrdinalEnumMap;
+    }
+
+    public Integer getOrdinal() {
+        return ordinal;
     }
 }

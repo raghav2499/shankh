@@ -1,17 +1,20 @@
 package com.darzee.shankh.dao;
 
 import com.darzee.shankh.enums.OrderStatus;
-import com.darzee.shankh.enums.OrderType;
-import com.darzee.shankh.enums.OutfitType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -20,62 +23,82 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderDAO {
     private Long id;
-
     private String invoiceNo;
-    private LocalDateTime trialDate;
-    private LocalDateTime deliveryDate;
-    private OutfitType outfitType;
+    private OrderStatus orderStatus = OrderStatus.DRAFTED;
+
+    private Boolean isDeleted = Boolean.FALSE;
+    private BoutiqueDAO boutique;
+    private OrderAmountDAO orderAmount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Boolean isPriorityOrder = Boolean.FALSE;
-    private OrderStatus orderStatus = OrderStatus.STITCHING_NOT_STARTED;
-    private OrderType orderType;
-    private String specialInstructions;
-    private Boolean isDeleted = Boolean.FALSE;
-    private String inspiration;
-    private BoutiqueDAO boutique;
+    private Long boutiqueOrderId;
     private CustomerDAO customer;
-    private OrderAmountDAO orderAmount;
-    private List<PaymentDAO> payment;
+    private List<OrderItemDAO> orderItems;
 
-    public OrderDAO(LocalDateTime trialDate, LocalDateTime deliveryDate, OutfitType outfitType,
-                    String specialInstructions, String inspiration, OrderType orderType, Boolean isPriorityOrder,
-                    String invoiceNo, BoutiqueDAO boutiqueDAO, CustomerDAO customerDAO) {
+    public OrderDAO(String invoiceNo, BoutiqueDAO boutique, CustomerDAO customer) {
         this.invoiceNo = invoiceNo;
-        this.trialDate = trialDate;
-        this.deliveryDate = deliveryDate;
-        this.outfitType = outfitType;
-        this.specialInstructions = specialInstructions;
-        this.orderType = orderType;
-        this.isPriorityOrder = isPriorityOrder;
-        this.inspiration = inspiration;
-        this.boutique = boutiqueDAO;
-        this.customer = customerDAO;
+        this.boutique = boutique;
+        this.customer = customer;
     }
 
-    public boolean isTrialDateUpdated(LocalDateTime value) {
-        return value != null && !value.equals(this.getTrialDate());
+    public Map<Long, OrderItemDAO> getOrderItemDAOMap() {
+        Map<Long, OrderItemDAO> orderItemDAOMap = new HashMap<>();
+        for (OrderItemDAO orderItem : orderItems) {
+            orderItemDAOMap.put(orderItem.getId(), orderItem);
+        }
+        return orderItemDAOMap;
     }
 
-    public boolean isDeliveryDateUpdated(LocalDateTime value) {
-        return value != null && !value.equals(this.getDeliveryDate());
+    public List<OrderItemDAO> getNonDeletedItems() {
+        if (!CollectionUtils.isEmpty(this.orderItems)) {
+            return this.orderItems.stream().filter(item -> !Boolean.TRUE.equals(item.getIsDeleted()))
+                    .collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+
     }
 
-    public boolean areSpecialInstructionsUpdated(String value) {
-        return value != null && !value.equals(this.getSpecialInstructions());
+    public boolean validateMandatoryOrderFields() {
+        if (this.boutique != null && this.customer != null) {
+            return true;
+        }
+        return false;
     }
 
-    public boolean isInspirationUpdated(String value) {
-        return value != null && !value.equals(this.getInspiration());
+    public Double getPriceBreakupSum() {
+        Double priceBreakupSum = 0d;
+        if (Boolean.TRUE.equals(isDeleted)) {
+            return priceBreakupSum;
+        }
+        priceBreakupSum = getNonDeletedItems().stream()
+                .map(item -> item.getActivePriceBreakUpList()).flatMap(List::stream)
+                .mapToDouble(pb -> (pb.getValue() * pb.getQuantity())).sum();
+        return priceBreakupSum;
     }
 
-
-    public boolean isPriorityUpdated(Boolean value) {
-        return value != null && !value.equals(this.getIsPriorityOrder());
+    /**
+     * Return boutiqueOrderId as orderId whenever interacting with client
+     * @return
+     */
+    public Long getBoutiqueOrderId() {
+        if (this.boutiqueOrderId != null) {
+            return this.boutiqueOrderId;
+        }
+        return this.id;
     }
 
-    public boolean isOrderStatusUpdated(Integer value) {
-        return value != null && !value.equals(this.getOrderStatus().getOrdinal());
+    public Long getActualBoutiqueOrderId() {
+        return this.boutiqueOrderId;
     }
 
+    public String getInvoiceNo() {
+        if (this.boutiqueOrderId != null) {
+            return "INVC" + boutiqueOrderId;
+        }
+        return this.invoiceNo;
+    }
+
+    public Long getBoutiqueId() {
+        return this.boutique.getId();
+    }
 }

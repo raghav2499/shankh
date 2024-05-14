@@ -1,7 +1,6 @@
 package com.darzee.shankh.response;
 
 import com.darzee.shankh.dao.CustomerDAO;
-import com.darzee.shankh.utils.CommonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -18,6 +17,8 @@ public class CustomerDetails {
 
     private String customerName;
     private Long customerId;
+
+    private String countryCode;
     private String phoneNumber;
 
     private Integer age;
@@ -30,11 +31,13 @@ public class CustomerDetails {
     private Double revenue;
 
     public CustomerDetails(String customerName,
+                           String countryCode,
                            String phoneNumber,
                            String profilePicLink,
                            Long customerId,
                            String gender) {
         this.customerName = customerName;
+        this.countryCode = countryCode;
         this.phoneNumber = phoneNumber;
         this.profilePicLink = profilePicLink;
         this.customerId = customerId;
@@ -42,8 +45,9 @@ public class CustomerDetails {
     }
 
     public CustomerDetails(CustomerDAO customerDAO, String customerProfilePicLink) {
-        if(customerDAO != null) {
-            this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+        if (customerDAO != null) {
+            this.customerName = customerDAO.constructName();
+            this.countryCode = customerDAO.getCountryCode();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.profilePicLink = customerProfilePicLink;
             this.age = customerDAO.getAge();
@@ -53,8 +57,9 @@ public class CustomerDetails {
     }
 
     public CustomerDetails(CustomerDAO customerDAO, String referenceId, String customerProfilePicLink, Double revenue) {
-        if(customerDAO != null) {
-            this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+        if (customerDAO != null) {
+            this.customerName = customerDAO.constructName();
+            this.countryCode = customerDAO.getCountryCode();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.referenceId = referenceId;
             this.profilePicLink = customerProfilePicLink;
@@ -66,12 +71,19 @@ public class CustomerDetails {
     }
 
     public CustomerDetails(CustomerDAO customerDAO) {
-        if(customerDAO != null) {
-            this.customerName = CommonUtils.constructName(customerDAO.getFirstName(), customerDAO.getLastName());
+        if (customerDAO != null) {
+            this.customerName = customerDAO.constructName();
+            this.countryCode = customerDAO.getCountryCode();
             this.phoneNumber = customerDAO.getPhoneNumber();
             this.customerId = customerDAO.getId();
             this.age = customerDAO.getAge();
             this.gender = customerDAO.getGender().getString();
         }
+    }
+
+    public CustomerDetails(Long customerId, String countryCode, String phoneNumber) {
+        this.customerId = customerId;
+        this.countryCode = countryCode;
+        this.phoneNumber = phoneNumber;
     }
 }

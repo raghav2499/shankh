@@ -16,6 +16,7 @@ public class UpdateCustomerRequest {
 
     @Size(min=10, max=13, message = "Invalid phone number")
     private String phoneNumber;
+    private String countryCode;
 
     private String name;
 

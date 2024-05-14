@@ -1,6 +1,6 @@
 package com.darzee.shankh.controller;
 
-import com.darzee.shankh.request.MeasurementDetails;
+import com.darzee.shankh.request.MeasurementDetailsRequest;
 import com.darzee.shankh.service.MeasurementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,25 +18,29 @@ public class MeasurementController {
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity getMeasurementDetails(@RequestParam("customer_id") Long customerId,
-                                                @RequestParam("outfit_type") Integer outfitTypeIndex,
+    public ResponseEntity getMeasurementDetails(@RequestParam(value = "customer_id", required = false) Long customerId,
+                                                @RequestParam(value = "outfit_type", required = false) Integer outfitTypeIndex,
+                                                @RequestParam(value = "order_item_id", required = false) Long orderItemId,
+                                                @RequestParam(value = "measurement_revision_id", required = false) Long measurementRevisionId,
                                                 @RequestParam(value = "scale", defaultValue = "inch") String scale,
                                                 @RequestParam(value = "non_empty_values_only", required = false)
-                                                    Boolean nonEmptyValuesOnly)
+                                                Boolean nonEmptyValuesOnly)
             throws Exception {
-        return measurementService.getMeasurementDetails(customerId, outfitTypeIndex, scale, nonEmptyValuesOnly);
+        return measurementService.getMeasurementDetailsResponse(customerId, measurementRevisionId,
+                orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
     }
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity saveMeasurementDetails(@RequestBody @Valid MeasurementDetails measurementDetails) throws Exception {
-        return measurementService.setMeasurementDetails(measurementDetails);
+    public ResponseEntity saveMeasurementDetails(@RequestBody @Valid MeasurementDetailsRequest measurementDetailsRequest) throws Exception {
+        return measurementService.saveMeasurementDetails(measurementDetailsRequest);
     }
 
     @GetMapping(value = "/revisions", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity getMeasurementRevisions(@RequestParam("customer_id") Long customerId,
-                                                  @RequestParam("outfit_type") Integer outfitTypeIndex) {
-        return measurementService.getMeasurementRevisions(customerId, outfitTypeIndex);
+                                                  @RequestParam("outfit_type") Integer outfitTypeIndex,
+                                                  @RequestParam(value = "scale", defaultValue = "inch") String scale) {
+        return measurementService.getMeasurementRevisions(customerId, outfitTypeIndex, scale);
     }
-
 }

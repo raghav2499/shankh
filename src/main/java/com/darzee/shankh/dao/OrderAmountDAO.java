@@ -11,21 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class OrderAmountDAO {
     private Long id;
-    private Double totalAmount;
-    private Double amountRecieved;
-    private OrderDAO order;
-
-    public OrderAmountDAO(Double totalAmount, Double amountRecieved, OrderDAO orderDAO) {
-        this.totalAmount = totalAmount;
-        this.amountRecieved = amountRecieved;
-        this.order = orderDAO;
-    }
-
-    public double getStichingCost (){
-        return totalAmount - amountRecieved;
-    }
-
-    public double getMaterialCost (){
-        return amountRecieved;
-    }
+    private Double totalAmount = 0d;
+    private Double amountRecieved = 0d;
+//    private LocalDateTime createdAt;
+//    private LocalDateTime updatedAt;
 }

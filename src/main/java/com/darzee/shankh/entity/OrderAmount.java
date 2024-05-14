@@ -23,7 +23,10 @@ public class OrderAmount extends GenericEntity{
     @Column(name = "amount_recieved")
     private Double amountRecieved;
 
-    @OneToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+//    @Column(name = "created_at", columnDefinition = "timestamp")
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "updated_at", columnDefinition = "timestamp")
+//    private LocalDateTime updatedAt;
+
 }

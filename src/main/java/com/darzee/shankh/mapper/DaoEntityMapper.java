@@ -6,8 +6,11 @@ import com.darzee.shankh.response.TailorLoginResponse;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -25,7 +28,15 @@ public interface DaoEntityMapper {
 
     SampleImageReferenceDAO sampleImageRefToDAO(SampleImageReference sampleImageReference);
 
+    //we don't want to use the getter method here to populate boutiqueOrderId,
+    // because for cases where boutiqueOrderId is not present, it will add orderId as boutiqueOrderId
+    @Mapping(source = "orderDAO", target = "boutiqueOrderId", qualifiedByName = "getActualBoutiqueOrderId")
     Order orderaDaoToObject(OrderDAO orderDAO, @Context CycleAvoidingMappingContext context);
+
+    @Named("getActualBoutiqueOrderId")
+    default Long getActualBoutiqueOrderId(OrderDAO orderDAO) {
+        return orderDAO.getActualBoutiqueOrderId();
+    }
 
     CustomerDAO customerObjectToDao(Customer customer, @Context CycleAvoidingMappingContext context);
 
@@ -35,14 +46,18 @@ public interface DaoEntityMapper {
 
     BoutiqueLedger boutiqueLedgerDAOToObject(BoutiqueLedgerDAO boutiqueLedgerDAO, @Context CycleAvoidingMappingContext context);
 
-    ObjectImages objectImageDAOToObjectImage(ObjectImagesDAO objectImages);
+    ObjectFiles objectImageDAOToObjectImage(ObjectFilesDAO objectImages);
+
+    OrderItemDAO orderItemToOrderItemDAO(OrderItem orderItem, @Context CycleAvoidingMappingContext context);
+
+    OrderItem orderItemDAOToOrderItem(OrderItemDAO orderItemDAO, @Context CycleAvoidingMappingContext context);
 
     @Mapping(source = "tailorDAO.id", target = "tailorId")
     @Mapping(source = "tailorDAO.name", target = "tailorName")
     @Mapping(source = "tailorDAO.boutique.id", target = "boutiqueId")
     TailorLoginResponse tailorDAOToLoginResponse(TailorDAO tailorDAO, String token);
 
-    ObjectImages boutiqueImagesImagesDAOToBoutiqueImages(ObjectImagesDAO ObjectImagesDAO);
+    ObjectFiles boutiqueImagesImagesDAOToBoutiqueImages(ObjectFilesDAO ObjectFilesDAO);
 
     ImageReferenceDAO imageReferenceToImageReferenceDAO(ImageReference imageReference);
 
@@ -52,7 +67,7 @@ public interface DaoEntityMapper {
 
     OrderAmount orderAmountDaoToOrderAmountObject(OrderAmountDAO orderAmount, @Context CycleAvoidingMappingContext context);
 
-    ObjectImagesDAO objectImagesToObjectImagesDAO(ObjectImages objectImages);
+    ObjectFilesDAO objectImagesToObjectImagesDAO(ObjectFiles objectImages);
 
     Payment paymentDAOToPayment(PaymentDAO paymentDAO, @Context CycleAvoidingMappingContext context);
 
@@ -61,19 +76,46 @@ public interface DaoEntityMapper {
     BoutiqueLedgerSnapshot boutiqueLedgerSnapshotDAOToSnapshot(BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotDAO);
 
     BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotToSnapshotDAO(BoutiqueLedgerSnapshot boutiqueLedgerSnapshotDAO);
+
     Portfolio portfolioDAOToPortfolio(PortfolioDAO portfolioDAO, @Context CycleAvoidingMappingContext context);
+
     PortfolioDAO portfolioToPortfolioDAO(Portfolio portfolio, @Context CycleAvoidingMappingContext context);
+
     PortfolioOutfits portfolioOutfitsDAOToPortfolioOutfits(PortfolioOutfitsDAO portfolioOutfitsDAO, @Context CycleAvoidingMappingContext context);
+
     PortfolioOutfitsDAO portfolioOutfitsToPortfolioOutfitsDAO(PortfolioOutfits portfolioOutfits, @Context CycleAvoidingMappingContext context);
 
     DeviceInfoDAO deviceInfoToDAO(DeviceInfo deviceInfo);
+
     DeviceInfo deviceInfoDAOToDeviceInfo(DeviceInfoDAO deviceInfoDAO);
+
     MeasurementsDAO measurementsToMeasurementDAO(Measurements measurements, @Context CycleAvoidingMappingContext context);
 
+    StitchOptionsDAO stitchOptionsToDAO(StitchOptions stitchOptions);
+    OrderStitchOptions orderStitchOptionsDAOToOrderStitchOption(OrderStitchOptionDAO stitchOptionsDAO);
+    OrderStitchOptionDAO orderStitchOptionsToOrderStitchOptionDAO(OrderStitchOptions stitchOption);
+
     Measurements measurementsDAOToMeasurement(MeasurementsDAO measurements, @Context CycleAvoidingMappingContext context);
+
+    OrderStitchOptions createStitchOptionDaoToObject(OrderStitchOptionDAO orderStitchOptionDAO);
+
+
+    MeasurementRevisions measurementRevisionsDAOToMeasurementRevision(MeasurementRevisionsDAO measurementRevisionsDAO);
+
+    MeasurementRevisionsDAO measurementRevisionsToMeasurementRevisionDAO(MeasurementRevisions measurementRevision);
+
+    PriceBreakup priceBreakupDAOToPriceBreakup(PriceBreakupDAO priceBreakupDAO, @Context CycleAvoidingMappingContext context);
+
+    PriceBreakupDAO priceBreakupToPriceBreakupDAO(PriceBreakup priceBreakup, @Context CycleAvoidingMappingContext context);
+
+    BoutiqueMeasurementDAO boutiqueMeasurementToDAO(BoutiqueMeasurement boutiqueMeasurement);
+
+    BoutiqueMeasurement boutiqueMeasurementDAOToObject(BoutiqueMeasurementDAO boutiqueMeasurementDAO);
+
+    MeasurementParamDAO measurementParamToDAO(MeasurementParam measurementParam);
     default List<OrderDAO> orderObjectListToDAOList(List<Order> orderList, @Context CycleAvoidingMappingContext context) {
         if (orderList == null) {
-            return null;
+            return new ArrayList<>();
         }
         List<OrderDAO> orderDAOList = new ArrayList<>();
         for (Order order : orderList) {
@@ -121,7 +163,7 @@ public interface DaoEntityMapper {
     }
 
     default List<PortfolioOutfitsDAO> portfolioObjectListToDAOList(List<PortfolioOutfits> portfolioOutfits,
-                                                          @Context CycleAvoidingMappingContext context) {
+                                                                   @Context CycleAvoidingMappingContext context) {
         if (portfolioOutfits == null) {
             return null;
         }
@@ -145,10 +187,128 @@ public interface DaoEntityMapper {
         return measurementRevisionsDAOs;
     }
 
-    MeasurementRevisions measurementRevisionsDAOToMeasurementRevision(MeasurementRevisionsDAO measurementRevisionsDAO);
+    default List<PriceBreakup> priceBreakUpDAOListToPriceBreakUpList(List<PriceBreakupDAO> priceBreakupDAOList,
+                                                                     @Context CycleAvoidingMappingContext context) {
+        if (priceBreakupDAOList == null) {
+            return null;
+        }
+        List<PriceBreakup> priceBreakups = new ArrayList<>();
+        for (PriceBreakupDAO priceBreakupDAO : priceBreakupDAOList) {
+            PriceBreakup priceBreakup = priceBreakupDAOToPriceBreakup(priceBreakupDAO, context);
+            priceBreakups.add(priceBreakup);
+        }
+        return priceBreakups;
+    }
 
-    MeasurementRevisionsDAO measurementRevisionsToMeasurementRevisionDAO(MeasurementRevisions measurementRevision);
+    default List<PriceBreakupDAO> priceBreakUpListToPriceBreakUpDAOList(List<PriceBreakup> priceBreakupList,
+                                                                        @Context CycleAvoidingMappingContext context) {
+        if (priceBreakupList == null) {
+            return null;
+        }
+        List<PriceBreakupDAO> priceBreakups = new ArrayList<>();
+        for (PriceBreakup priceBreakup : priceBreakupList) {
+            PriceBreakupDAO priceBreakupDAO = priceBreakupToPriceBreakupDAO(priceBreakup, context);
+            priceBreakups.add(priceBreakupDAO);
+        }
+        return priceBreakups;
+    }
 
+    default List<OrderItemDAO> orderItemListToOrderItemDAOList(List<OrderItem> orderItems,
+                                                               @Context CycleAvoidingMappingContext context) {
+        if (orderItems == null) {
+            return null;
+        }
+        List<OrderItemDAO> orderItemDAOList = new ArrayList<>();
+        for (OrderItem orderItem : orderItems) {
+            OrderItemDAO orderItemDAO = orderItemToOrderItemDAO(orderItem, context);
+            orderItemDAOList.add(orderItemDAO);
+        }
+        return orderItemDAOList;
+    }
 
+    default List<OrderItem> orderItemDAOListToOrderItemList(List<OrderItemDAO> orderItemDAOList,
+                                                            @Context CycleAvoidingMappingContext context) {
+        if (orderItemDAOList == null) {
+            return null;
+        }
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (OrderItemDAO orderItemDAO : orderItemDAOList) {
+            OrderItem orderItem = orderItemDAOToOrderItem(orderItemDAO, context);
+            orderItems.add(orderItem);
+        }
+        return orderItems;
+    }
+
+    default List<StitchOptionsDAO> stitchOptionListToStitchOptionDAOList(List<StitchOptions> stitchOptions) {
+        if(CollectionUtils.isEmpty(stitchOptions)) {
+            return Collections.emptyList();
+        }
+        List<StitchOptionsDAO> stitchOptionsDAOS = new ArrayList<>();
+        for(StitchOptions stitchOption : stitchOptions) {
+            StitchOptionsDAO stitchOptionsDAO = stitchOptionsToDAO(stitchOption);
+            stitchOptionsDAOS.add(stitchOptionsDAO);
+        }
+        return stitchOptionsDAOS;
+    }
+
+    default List<OrderAmountDAO> orderAmountListToOrderAmountDAOList(List<OrderAmount> orderAmounts, CycleAvoidingMappingContext context) {
+        if(CollectionUtils.isEmpty(orderAmounts)) {
+            return Collections.emptyList();
+        }
+        List<OrderAmountDAO> orderAmountDAOS = new ArrayList<>();
+        for(OrderAmount orderAmount : orderAmounts) {
+            OrderAmountDAO orderAmountDAO = orderAmountObjectToOrderAmountDao(orderAmount, context);
+            orderAmountDAOS.add(orderAmountDAO);
+        }
+        return orderAmountDAOS;
+    }
+
+    default List<OrderStitchOptions> orderStitchOptionDAOListToOrderStitchOptionList(List<OrderStitchOptionDAO> orderStitchOptionsDAOs) {
+        if(CollectionUtils.isEmpty(orderStitchOptionsDAOs)) {
+            return Collections.emptyList();
+        }
+        List<OrderStitchOptions> orderStitchOptions = new ArrayList<>();
+        for(OrderStitchOptionDAO orderStitchOptionDAO : orderStitchOptionsDAOs) {
+            OrderStitchOptions orderStitchOption = orderStitchOptionsDAOToOrderStitchOption(orderStitchOptionDAO);
+            orderStitchOptions.add(orderStitchOption);
+        }
+        return orderStitchOptions;
+    }
+
+    default List<OrderStitchOptionDAO> orderStitchOptionListToOrderStitchOptionDAOList(List<OrderStitchOptions> orderStitchOptions) {
+        if(CollectionUtils.isEmpty(orderStitchOptions)) {
+            return Collections.emptyList();
+        }
+        List<OrderStitchOptionDAO> orderStitchOptionDAOs = new ArrayList<>();
+        for(OrderStitchOptions orderStitchOption : orderStitchOptions) {
+            OrderStitchOptionDAO orderStitchOptionDAO = orderStitchOptionsToOrderStitchOptionDAO(orderStitchOption);
+            orderStitchOptionDAOs.add(orderStitchOptionDAO);
+        }
+        return orderStitchOptionDAOs;
+    }
+
+    default List<PaymentDAO> paymentToPaymentDAOList(List<Payment> payments, @Context CycleAvoidingMappingContext context) {
+        if(CollectionUtils.isEmpty(payments)) {
+            return Collections.emptyList();
+        }
+        List<PaymentDAO> paymentDAOs = new ArrayList<>();
+        for(Payment payment : payments) {
+            PaymentDAO paymentDAO = paymentToPaymentDAO(payment, context);
+            paymentDAOs.add(paymentDAO);
+        }
+        return paymentDAOs;
+    }
+
+    default List<MeasurementParamDAO> measurementParamToDAOList(List<MeasurementParam> measurementParams) {
+        if(CollectionUtils.isEmpty(measurementParams)) {
+            return Collections.emptyList();
+        }
+        List<MeasurementParamDAO> measurementParamDAOS = new ArrayList<>();
+        for(MeasurementParam measurementParam : measurementParams) {
+            MeasurementParamDAO measurementParamDAO = measurementParamToDAO(measurementParam);
+            measurementParamDAOS.add(measurementParamDAO);
+        }
+        return measurementParamDAOS;
+    }
 
 }

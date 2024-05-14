@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <title>Item Details</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 20px;
+            box-sizing: border-box;
+        }
+
+        .main-div-header {
+            margin-bottom: 20px;
+            overflow: hidden;
+            /* Clear float */
+        }
+
+        .main-div-header h1 {
+            margin-top: 6px;
+            color: #525252;
+            float: left;
+        }
+
+
+        .main-div-content {
+            margin-bottom: 20px;
+            overflow: hidden;
+            /* Clear float */
+        }
+
+        .main-div-content-left {
+            width: 45%;
+            /* Adjusted width */
+            float: left;
+
+        }
+
+        .main-div-content-right {
+            width: 55%;
+            /* Adjusted width */
+            float: left;
+
+        }
+
+        .order-summary {
+            background-color: #eef2ff;
+            padding: 20px;
+        }
+
+        .order-summary h5 {
+            margin-top: 0;
+        }
+
+        .gray-background {
+            background-color: #f1f1f1;
+            padding: 20px;
+
+        }
+
+        .invoice-details {
+            color: #525252;
+        }
+
+        .black {
+            color: black;
+        }
+
+
+
+        .total,
+        .total1,
+        .balanceDue {
+            background-color: #eef2ff;
+            margin-top: 5px;
+            padding: 1px;
+            position: relative;
+            font-size: 14px;
+        }
+
+        #main-para {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+        }
+
+
+
+        .invoice {
+            color: #525252;
+        }
+
+        .black {
+            color: black;
+        }
+
+        .btn-sm {
+            border-radius: 8px;
+        }
+
+
+        table {
+
+            width: 100% !important;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+
+
+        table th {
+            font-size: 14px;
+            padding: 10px;
+            border: 1.5px solid #DEDEDF;
+            font-weight: 700;
+        }
+
+
+        .span-outer {
+            float: left;
+            font-weight: bold;
+            margin-top: 16px;
+            margin-left: 14px;
+        }
+
+        .span-inner {
+            float: right;
+            font-weight: bold;
+            margin-top: 16px;
+            margin-right: 14px;
+        }
+
+        /* table th img {
+            height: 54px;
+            width: 69px;
+            float: left;
+            box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.15);
+            vertical-align: middle;
+        } */
+
+        .text-bg-primary {
+            width: auto;
+            background-color: #007bff;
+            /* Primary color */
+            color: white;
+            margin-top: 15px;
+            margin-bottom: 15px;
+
+            /* Text color */
+            padding: 12px 10px;
+            /* Adjust padding as needed */
+            border-radius: 10px;
+            /* Adjust border radius to make it more rounded */
+        }
+
+        /* .image-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+
+        .image-col {
+            flex: 0 0 20%;
+            
+            max-width: 20%;
+            padding-right: 15px;
+            padding-left: 15px;
+        } */
+
+        .new-row {
+            display: block;
+            width: 100%;
+        }
+
+        .card {
+            display: block;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+            border-radius: 0.25rem;
+            background-color: #fff;
+        }
+
+        .image_div {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="main-div-header">
+            <div class="left" style="float: left;">
+                <h1 id="main-heading">Item Details</h1>
+                <p class="invoice-details" id="main-para" th:text="${businessName}"></p>
+            </div>
+            <div class="right" style="float: right;">
+                <p class="invoice-details">Order Number: <span class="black" th:text="${orderNo}"></span></p>
+                <p class="invoice-details">Finish By: <span class="black" th:text="${invoiceNo}"></span></p>
+            </div>
+        </div>
+        <hr style="height: 1px; border: none; background-color: #000;">
+        </hr>
+        <div class="main-div-content">
+
+            <!--If only one item is present starts-->
+
+            <th:block th:if="${outfitPieces == 1}">
+
+                <div class="top">
+                    <div>
+                        <button class="badge rounded-pill text-bg-primary">
+                            <img th:src="@{${outfitImageLink}}" alt="Icon" width="20" height="20"
+                                style="margin-right: 5px;"></img>
+                            <span th:text="${outfitType}" style="margin-top: 100px;"></span>
+                        </button>
+                    </div>
+                    <p class="invoice mt-4">Measurements</p>
+
+                    <fieldset class="clother_measurements_div"
+                        style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
+
+                        <div class="size-chart">
+                            <table>
+                                <tbody>
+                                <th:block th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 1}">
+                                    <tr th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
+                                        <td th:each="detail, detailStat: ${row}"
+                                            th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}"
+                                            style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
+
+                                            <div>
+                                                <img th:src="@{${detail.imageLink}}" width="60" height="70"
+                                                    alt="No Image" style="float: left;margin-bottom: 10px;" />
+                                                <span class="span-outer" th:text="${detail.getTitle()}"></span>
+                                                <span class="span-inner" th:text="${detail.getValue()}"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                        <th:block th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 1}">
+                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
+                            <div th:each="stich_options : ${groupedStitchOptions.get(0)}" class="stich_options"
+                                style="display: flex; flex-wrap: wrap;width: 100%;">
+
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+                                <div th:if="${stich_options.getLabel() != null and stich_options.getValue() != null}">
+                                    <span th:text="${stich_options.getLabel()}" style="color:#525252;"></span>: <span th:text="${stich_options.getValue()}"></span>
+                                </div>
+
+                            </div>
+                        </th:block>
+                        <div style="width: 100%; height: 0; clear: both;"></div>
+                    </fieldset>
+                </div>
+            </th:block>
+
+            <!--If only one item is present ends-->
+
+
+            <!--If more than one item is present starts -->
+            <th:block th:if="${outfitPieces > 1}">
+                <div class="top">
+                    <div>
+                        <button class="badge rounded-pill text-bg-primary">
+                            <img th:src="@{${outfitImageLink}}" alt="Icon" width="20" height="20"
+                                style="margin-right: 5px;"></img>
+                            <span th:text="${outfitType}" style="margin-top: 100px;"></span>
+                        </button>
+                    </div>
+                    <p class="invoice mt-4">Measurements</p>
+
+                    <fieldset class="clother_measurements_div"
+                        style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
+                        <legend
+                            style="padding: 0 10px; border: 1px solid #DEDEDF; border-radius: 5px; background-color: #FFFFFF; color: #333333;">
+                            Top</legend>
+                        <div class="size-chart">
+                            <table>
+                                <tbody>
+                                    <th:block th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 1}">
+                                        <tr th:each="row, rowStat: ${measurementDetails.get(0).getMeasurementDetailsList()}">
+                                        <td th:each="detail, detailStat: ${row}"
+                                            th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}"
+                                            style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
+
+                                            <div>
+                                                <img th:src="@{${detail.imageLink}}" width="60" height="70"
+                                                    alt="No Image" style="float: left;margin-bottom: 10px;" />
+                                                <span class="span-outer" th:text="${detail.getTitle()}"></span>
+                                                <span class="span-inner" th:text="${detail.getValue()}"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </th:block>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                        <th:block th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 1}">
+                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
+                            <div th:each="stich_options : ${groupedStitchOptions.get(0)}" class="stich_options"
+                                style="display: flex; flex-wrap: wrap;width: 100%;">
+
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+                                <div th:if="${stich_options.getLabel() != null and stich_options.getValue() != null}">
+                                    <span th:text="${stich_options.getLabel()}" style="color:#525252;"></span>: <span th:text="${stich_options.getValue()}"></span>
+                                </div>
+
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+
+                            </div>
+                        </th:block>
+                        <div style="width: 100%; height: 0; clear: both;"></div>
+                    </fieldset>
+                </div>
+
+                <!-- Bottom Starts -->
+                <div class="bottom" style="margin-top: 30px;">
+                    <fieldset class="clother_measurements_div"
+                        style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
+                        <legend
+                            style="padding: 0 10px; border: 1px solid #DEDEDF; border-radius: 5px; background-color: #FFFFFF; color: #333333;">
+                            Bottom</legend>
+                        <div class="size-chart">
+                            <table>
+                                <tbody>
+                                <th:block th:if="${measurementDetails != null and #lists.size(measurementDetails) >= 2}">
+                                    <tr th:each="row, rowStat: ${measurementDetails.get(1).getMeasurementDetailsList()}">
+                                        <td th:each="detail, detailStat: ${row}"
+                                            th:classappend="${detailStat.index % 3 == 0 ? 'new-row' : ''}"
+                                            style="height: 20vh; font-size: 14px;padding-bottom: 70px;border: 1.5px solid #DEDEDF;font-weight: bold;">
+
+                                            <div>
+                                                <img th:src="@{${detail.imageLink}}" width="60" height="70"
+                                                    alt="No Image" style="float: left;margin-bottom: 10px;" />
+                                                <span class="span-outer" th:text="${detail.getTitle()}"></span>
+                                                <span class="span-inner" th:text="${detail.getValue()}"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <th:block th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 2}">
+                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
+                            <div th:each="stich_options : ${groupedStitchOptions.get(1)}" class="stich_options"
+                                style="display: flex; flex-wrap: wrap;width: 100%;">
+
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+                                <div th:if="${stich_options.getLabel() != null and stich_options.getValue() != null}">
+                                    <span th:text="${stich_options.getLabel()}" style="color:#525252;"></span>: <span th:text="${stich_options.getValue()}"></span>
+                                </div>
+
+                                <div style="width: 100%; height: 0; clear: both;"></div>
+
+                            </div>
+                        </th:block>
+                        <div style="width: 100%; height: 0; clear: both;"></div>
+                    </fieldset>
+                </div>
+            </th:block>
+
+            <!--If more than one item is present ends -->
+        </div>
+
+        <div class="special-instructions" th:if="${not #lists.isEmpty(specialInstructions)}">
+            <p class="invoice">Special Instructions</p>
+            <p class="black" th:text="${specialInstructions}"></p>
+        </div>
+
+        <div class="Inspiration" th:if="${not #lists.isEmpty(inspiration)}">
+            <p class="invoice">Inspiration</p>
+            <a th:href="${inspiration}" target="_blank" rel="noopener noreferrer">Link to Inspiration</a>
+        </div>
+
+
+        <div class="image_div" th:if="${not #lists.isEmpty(clothImages)}">
+            <p class="invoice">Cloth Images</p>
+            <div class="image-row">
+                <!-- Iterate over each image -->
+                <div class="image-col" th:each="image : ${clothImages}">
+                    <div class="card" style="display: inline-block; width: 25%;">
+                        <img th:src="${image}" width="100%" height="150px" class="card-img-top" alt="Image"></img>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

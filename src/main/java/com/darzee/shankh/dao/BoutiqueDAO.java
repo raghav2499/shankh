@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.bouncycastle.jcajce.provider.asymmetric.ec.GMSignatureSpi.sha256WithSM2;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,4 +39,5 @@ public class BoutiqueDAO {
     public boolean isTailorCountUpdated(Integer value) {
         return value != null && value != this.tailorCount;
     }
+
 }

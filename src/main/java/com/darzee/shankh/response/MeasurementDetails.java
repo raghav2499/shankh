@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MeasurementDetails {
-    private String imageLink;
+    public String imageLink;
     private String title;
     private String value;
     private String index;
+    private String name;
 }
