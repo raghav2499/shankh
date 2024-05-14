@@ -50,6 +50,13 @@ public class TimeUtils {
         return monthStartDate.isAfter(previousMonday) ? monthStartDate : previousMonday;
     }
 
+    public static LocalDate getWeekStartDate(LocalDate inputDate) {
+        LocalDate monthStartDate = inputDate.withDayOfMonth(1);
+        LocalDate nextSundayDate = TimeUtils.getNextSunday(inputDate);
+        LocalDate previousMonday = nextSundayDate.minusDays(6);
+        return monthStartDate.isAfter(previousMonday) ? monthStartDate : previousMonday;
+    }
+
     public static LocalDateTime getWeekStartDateTime(LocalDateTime inputTime) {
         LocalDate weekStartDate = getWeekStartDate(Timestamp.valueOf(inputTime));
         return weekStartDate.atStartOfDay();
