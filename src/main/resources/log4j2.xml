@@ -7,7 +7,7 @@
             </PatternLayout>
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="50 KB"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="5">
                 <Delete basePath="logs" maxDepth="2">
