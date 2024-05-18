@@ -21,6 +21,10 @@ public class TailorSignUpRequest {
     @Size(min=10, max=10, message = "Invalid phone number")
     private String phoneNumber;
 
+    @NotNull(message = "Country code is mandatory for app sign up")
+    @Size(min=1, max=3, message = "Invalid country code")
+    private String countryCode;
+
     private Integer language;
 
     @JsonProperty("profile_pic_url")//todo : rename this variable to profile_pic_reference_id

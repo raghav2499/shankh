@@ -5,6 +5,8 @@ import com.darzee.shankh.entity.Tailor;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.TailorRepo;
+import com.darzee.shankh.utils.CommonUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -34,15 +37,19 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Tailor> optionalTailor = tailorRepo.findByPhoneNumber(username);
+        Map<String,String> parts = CommonUtils.splitUsername(username);
+        String countryCode = parts.get("countryCode");
+        String phoneNumber = parts.get("phoneNumber");
+        
+        Optional<Tailor> optionalTailor = tailorRepo.findByCountryCodeAndPhoneNumber(countryCode, phoneNumber);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if (optionalTailor.isPresent()) {
             TailorDAO tailorDAO = mapper.tailorObjectToDao(optionalTailor.get(), new CycleAvoidingMappingContext());
-            return new User(tailorDAO.getPhoneNumber(),
+            return new User(tailorDAO.getPhoneNumber()+tailorDAO.getCountryCode(),
                     encoder.encode(""),
                     new ArrayList<>());
         } else {
-            throw new UsernameNotFoundException("No valid tailor found with phone number : " + username);
+            throw new UsernameNotFoundException("No valid tailor found with phone number : " +countryCode + phoneNumber);   
         }
     }
 }

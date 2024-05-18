@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface TailorRepo extends JpaRepository<Tailor, Long>{
     Optional<Tailor> findByPhoneNumber(String phoneNumber);
 
+    Optional<Tailor> findByCountryCodeAndPhoneNumber(String countryCode, String phoneNumber);
+
     @Query(value = "SELECT name FROM tailor where id = :tailorId", nativeQuery = true)
     String findNameById(@Param("tailorId") Long tailorId);
 }

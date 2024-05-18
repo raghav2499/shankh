@@ -2,7 +2,9 @@ package com.darzee.shankh.utils;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -43,5 +45,17 @@ public class CommonUtils {
             return result;
         }
         return result;
+    }
+
+    public static Map<String, String> splitUsername(String username) {
+    String[] parts = username.split("\\+"); // assuming the country code is prefixed with '+'
+    String phoneNumber = parts[0];
+    String countryCode = "+" + parts[1];
+
+    Map<String, String> result = new HashMap<>();
+    result.put("phoneNumber", phoneNumber);
+    result.put("countryCode", countryCode);
+
+    return result;
     }
 }
