@@ -70,7 +70,8 @@ public class TailorService {
         boolean isAdminSignupRequest = request.getBoutiqueDetails().getBoutiqueReferenceId() == null ? true : false;
         BoutiqueDAO boutiqueDAO = null;
         String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
-        if (isTailorAlreadySignedUp(phoneNumber)) {
+        String countryCode = request.getCountryCode();
+        if (isTailorAlreadySignedUp(phoneNumber,countryCode)) {
             TailorLoginResponse tailorLoginResponse = new TailorLoginResponse("User already exists. Please login");
             return new ResponseEntity(tailorLoginResponse, HttpStatus.OK);
         }
@@ -91,7 +92,10 @@ public class TailorService {
                 role,
                 language,
                 phoneNumber,
-                boutiqueDAO);
+                boutiqueDAO,
+                countryCode
+                );
+        
         tailorDAO = mapper.tailorObjectToDao(tailorRepo.save(mapper.tailorDaoToObject(tailorDAO,
                         new CycleAvoidingMappingContext())),
                 new CycleAvoidingMappingContext());
@@ -122,18 +126,19 @@ public class TailorService {
      */
     public ResponseEntity tailorLogin(TailorLoginRequest request) {
         String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
+        String countryCode = request.getCountryCode();
         try {
             //todo : check how and where it checks to authenticate the request
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(phoneNumber,
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(phoneNumber+countryCode,
                     ""));
         } catch (AuthenticationException e) {
             TailorLoginResponse response = new TailorLoginResponse("No user found");
             return new ResponseEntity(response, HttpStatus.OK);
         }
-        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(phoneNumber);
+        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(phoneNumber+countryCode);
 
         String loginToken = tokenManager.generateJwtToken(userDetails);
-        TailorDAO tailorDAO = mapper.tailorObjectToDao(tailorRepo.findByPhoneNumber(userDetails.getUsername()).get(),
+        TailorDAO tailorDAO = mapper.tailorObjectToDao(tailorRepo.findByCountryCodeAndPhoneNumber(countryCode,phoneNumber).get(),
                 new CycleAvoidingMappingContext());
 
         TailorLoginResponse response = mapper.tailorDAOToLoginResponse(tailorDAO, loginToken);
@@ -150,8 +155,8 @@ public class TailorService {
         return new ResponseEntity("No profile found", HttpStatus.OK);
     }
 
-    private Boolean isTailorAlreadySignedUp(String phoneNumber) {
-        Optional<Tailor> tailor = tailorRepo.findByPhoneNumber(phoneNumber);
+    private Boolean isTailorAlreadySignedUp(String phoneNumber,String countryCode) {
+        Optional<Tailor> tailor = tailorRepo.findByCountryCodeAndPhoneNumber(countryCode,phoneNumber);
         if (tailor.isPresent()) {
             return true;
         }

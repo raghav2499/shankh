@@ -17,4 +17,8 @@ public class TailorLoginRequest {
     @NotNull
     @Size(min=10, max=13, message = "Invalid phone number")
     private String phoneNumber;
+
+    @NotNull(message = "Country code is mandatory for app login")
+    @Size(min=1, max=3, message = "Invalid country code")
+    private String countryCode;
 }

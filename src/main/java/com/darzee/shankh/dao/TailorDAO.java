@@ -20,15 +20,17 @@ public class TailorDAO {
     private Language language;
     private TailorRole role;
     private String phoneNumber;
+    private String countryCode;
     private BoutiqueDAO boutique;
     private PortfolioDAO portfolio;
 
-    public TailorDAO(String name, TailorRole role, Language language, String phoneNumber, BoutiqueDAO boutique) {
+    public TailorDAO(String name, TailorRole role, Language language, String phoneNumber, BoutiqueDAO boutique,String countryCode) {
         this.name = name;
         this.role = role;
         this.language = language;
         this.boutique = boutique;
         this.phoneNumber = phoneNumber;
+        this.countryCode = countryCode;
     }
 
     public TailorDAO(String name, TailorRole role, Language language, String phoneNumber,
