@@ -62,7 +62,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
             @Param("endDate") LocalDateTime endDate);
 
     @Query(value = "SELECT COUNT(oi.id) FROM OrderItem oi INNER JOIN oi.order o " +
-            "WHERE o.boutique.id = :boutiqueId AND o.orderStatus = 1 " +
+            "WHERE o.boutique.id = :boutiqueId AND o.orderStatus in (1,2) " +
             "AND (oi.isDeleted != true or oi.isDeleted is null) " +
             "AND (o.isDeleted != true or o.isDeleted is null) " +
             "AND oi.createdAt >= :startDate AND oi.createdAt < :endDate")
@@ -71,7 +71,7 @@ public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationE
                              @Param("endDate") LocalDateTime endDate);
 
     @Query(value = "SELECT COUNT(oi.id) FROM OrderItem oi INNER JOIN oi.order o " +
-            "WHERE o.boutique.id = :boutiqueId AND o.orderStatus = 2 " +
+            "WHERE o.boutique.id = :boutiqueId AND oi.orderItemStatus = 4 " +
             "AND (oi.isDeleted != true or oi.isDeleted is null) " +
             "AND (o.isDeleted != true or o.isDeleted is null) " +
             "AND oi.updatedAt >= :startDate " +
