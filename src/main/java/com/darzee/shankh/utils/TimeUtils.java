@@ -15,6 +15,15 @@ public class TimeUtils {
 
     }
 
+
+    public static LocalDateTime convertSystemTimeZoneToUTC(LocalDateTime istLocalDateTime) {
+        ZoneId systemZoneId = ZoneId.systemDefault();
+        LocalDateTime utcDateTime = istLocalDateTime.atZone(systemZoneId).withZoneSameInstant(ZoneId.of("UTC"))
+                .toLocalDateTime();
+        return utcDateTime;
+
+    }
+
     public static LocalDateTime convertUTCToIST(LocalDateTime utcLocalDateTime) {
         ZoneId utcZoneId = ZoneId.of("UTC");
         LocalDateTime istDateTime = utcLocalDateTime.atZone(utcZoneId).withZoneSameInstant(ZoneId.of("Asia/Kolkata"))
