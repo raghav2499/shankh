@@ -1,11 +1,16 @@
 package com.darzee.shankh.utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 
 public class TimeUtils {
+
+    protected static final Logger logger = LogManager.getLogger();
 
     public static LocalDateTime convertISTToUTC(LocalDateTime istLocalDateTime) {
         ZoneId istZoneId = ZoneId.of("Asia/Kolkata");
@@ -18,6 +23,7 @@ public class TimeUtils {
 
     public static LocalDateTime convertSystemTimeZoneToUTC(LocalDateTime istLocalDateTime) {
         ZoneId systemZoneId = ZoneId.systemDefault();
+        logger.info("System zone is " + systemZoneId);
         LocalDateTime utcDateTime = istLocalDateTime.atZone(systemZoneId).withZoneSameInstant(ZoneId.of("UTC"))
                 .toLocalDateTime();
         return utcDateTime;
