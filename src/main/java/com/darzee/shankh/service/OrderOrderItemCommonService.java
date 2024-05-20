@@ -208,8 +208,10 @@ public class OrderOrderItemCommonService {
             innerMeasurementDetailsList = measurementService.generateInnerMeasurementDetails(boutiqueId, orderItemDAO.getOutfitType(), revisionsDAO, true);
         }
         List<String> clothImageLinks = orderItemService.getClothImageLinks(orderItemDAO.getId());
+        List<String> audioInstructionLinks = orderItemService.getAudioInstructionLinks(orderItemDAO.getId());
 
-        File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions, innerMeasurementDetailsList, clothImageLinks, orderItemDAO);
+        File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions,
+                innerMeasurementDetailsList, clothImageLinks, audioInstructionLinks, orderItemDAO);
         bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
     }
 
