@@ -80,6 +80,9 @@ public class OrderItemService {
     @Autowired
     private PriceBreakUpRepo priceBrekupRepo;
 
+    @Autowired
+    private LocalisationService localisationService;
+
     @Transactional
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
         Map<String, Long> clothRefOrderItemIdMap = new HashMap<>();
@@ -218,10 +221,19 @@ public class OrderItemService {
     public OrderItemDetails getOrderItemDetails(Long orderItemId) throws Exception {
         Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
         if (!orderItem.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect order item id");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,localisationService.translate("Incorrect order item id") );
         }
         OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
-        return getOrderItemDetails(orderItemDAO);
+        OrderItemDetails orderItemDetails = getOrderItemDetails(orderItemDAO);
+        orderItemDetails.setOutfitType(localisationService.translate(orderItemDetails.getOutfitType()));
+        orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> 
+        {
+innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));
+    innerMeasurementDetails.getMeasurementDetailsList().forEach(measurementDetails -> {
+        measurementDetails.setTitle(localisationService.translate(measurementDetails.getTitle()));
+        });
+}        );
+        return orderItemDetails;
     }
 
     public ResponseEntity<GetOrderItemResponse> getOrderItemDetails(Long boutiqueId, Long orderId, Long customerId, String orderItemStatusList,
@@ -238,7 +250,28 @@ public class OrderItemService {
         List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems, new CycleAvoidingMappingContext());
         List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream().map(orderItem -> {
             try {
-                return new OrderItemDetails(orderItem, outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
+
+                OrderItemDetails newOrderItemDetails = new OrderItemDetails(orderItem, outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
+                newOrderItemDetails.setOutfitType(localisationService.translate(newOrderItemDetails.getOutfitType()));
+                newOrderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
+                    innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));
+                    innerMeasurementDetails.getMeasurementDetailsList().forEach(measurementDetails -> {
+                        measurementDetails.setTitle(localisationService.translate(measurementDetails.getTitle()));
+                    });   
+                });
+                newOrderItemDetails.getOrderItemStitchOptions().forEach(
+                    (key,stitchOptionDetails)->{
+                        stitchOptionDetails.forEach(
+                            stictchOptionDetail->{
+                                stictchOptionDetail.setLabel(localisationService.translate(stictchOptionDetail.getLabel()));
+                                stictchOptionDetail.setValue(localisationService.translate(stictchOptionDetail.getValue()));;  
+                            }
+                            
+                        );
+                    }
+                );
+                return newOrderItemDetails;
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
