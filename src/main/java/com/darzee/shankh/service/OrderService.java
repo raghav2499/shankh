@@ -392,6 +392,7 @@ public class OrderService {
 
     @Transactional
     public OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
+        validateOrderAmountAtCreation(orderAmountDetails);
         Double amountRecieved = 0d;
         if (orderAmountDetails != null && orderAmountDetails.getAdvanceReceived() != null) {
             amountRecieved = orderAmountDetails.getAdvanceReceived();
@@ -553,6 +554,14 @@ public class OrderService {
         }
         OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
         return orderDAO;
+    }
+
+    private void validateOrderAmountAtCreation(OrderAmountDetails orderAmountDetails) {
+        if(orderAmountDetails.getAdvanceReceived() != null
+                && orderAmountDetails.getAdvanceReceived() > orderAmountDetails.getTotalAmount()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Advance Received could not be greater than Total Order Amount");
+        }
     }
 
 }

@@ -146,6 +146,7 @@ public class PdfGenerator {
                                 Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions,
                                 List<InnerMeasurementDetails> measurementDetails,
                                 List<String> clothImages,
+                                List<String> audioInstructionLinks,
                                 OrderItemDAO orderItem) throws Exception {
         Context context = new Context();
         String outfitType = orderItem.getOutfitType().getDisplayString();
@@ -173,8 +174,7 @@ public class PdfGenerator {
         context.setVariable("specialInstructions", specialInstructions);
         context.setVariable("inspiration", inspiration);
         context.setVariable("clothImages", clothImages);
-
-        // Process the HTML template with the Thymeleaf template engine
+        context.setVariable("audioInstructions", audioInstructionLinks);        // Process the HTML template with the Thymeleaf template engine
         String processedHtml = templateEngine.process("item-details", context);
 
         // Generate PDF from the processed HTML

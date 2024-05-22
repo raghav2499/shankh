@@ -1,22 +1,13 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.BoutiqueDAO;
-import com.darzee.shankh.dao.BoutiqueMeasurementDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.BoutiqueMeasurement;
-import com.darzee.shankh.enums.BoutiqueType;
-import com.darzee.shankh.enums.FileEntityType;
-import com.darzee.shankh.enums.Language;
-import com.darzee.shankh.enums.OutfitSide;
-import com.darzee.shankh.enums.OutfitType;
+import com.darzee.shankh.enums.*;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
-import com.darzee.shankh.repo.BoutiqueLedgerRepo;
-import com.darzee.shankh.repo.BoutiqueMeasurementRepo;
-import com.darzee.shankh.repo.BoutiqueRepo;
-import com.darzee.shankh.repo.OrderRepo;
-import com.darzee.shankh.repo.TailorRepo;
+import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.UpdateBoutiqueDetails;
 import com.darzee.shankh.request.UpdateTailorRequest;
 import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
@@ -28,10 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
