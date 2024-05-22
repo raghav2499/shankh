@@ -95,8 +95,6 @@ public class DashboardService {
         Long boutiqueId = Long.valueOf(boutiqueIdString);
         LocalDateTime endTime = TimeUtils.convertSystemTimeZoneToUTC(LocalDateTime.now().plusDays(1).withHour(0).withMinute(0)
                 .withSecond(0).withNano(0));
-        logger.info("input time is " + LocalDateTime.now().plusDays(1).withHour(0).withMinute(0)
-                .withSecond(0).withNano(0) + " and output is " + endTime);
         LocalDateTime dailyStartTime = TimeUtils.convertSystemTimeZoneToUTC(LocalDateTime.now().withHour(0).withMinute(0)
                 .withSecond(0).withNano(0));
         LocalDateTime weekStartTime = TimeUtils.convertSystemTimeZoneToUTC(TimeUtils.getWeekStartDateTime(endTime));

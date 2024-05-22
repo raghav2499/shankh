@@ -23,7 +23,6 @@ public class TimeUtils {
 
     public static LocalDateTime convertSystemTimeZoneToUTC(LocalDateTime istLocalDateTime) {
         ZoneId systemZoneId = ZoneId.systemDefault();
-        logger.info("System zone is " + systemZoneId);
         LocalDateTime utcDateTime = istLocalDateTime.atZone(systemZoneId).withZoneSameInstant(ZoneId.of("UTC"))
                 .toLocalDateTime();
         return utcDateTime;
