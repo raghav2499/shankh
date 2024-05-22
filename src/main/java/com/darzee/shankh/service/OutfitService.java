@@ -26,6 +26,9 @@ public class OutfitService {
     @Autowired
     private StitchOptionsRepo stitchOptionsRepo;
 
+    @Autowired
+    private LocalisationService localisationService;
+
     public ResponseEntity getOutfitDetails(String gender) throws Exception {
         List<OutfitType> outfitTypes = getOutfitTypes(gender);
         List<OutfitDetails> outfitDetailsList = new ArrayList<>(outfitTypes.size());
@@ -34,6 +37,7 @@ public class OutfitService {
             OutfitDetails outfitDetails = outfitTypeService.getOutfitDetails();
             boolean stitchOptionsExist = (stitchOptionsRepo.countByOutfitTypeAndIsValid(outfitType, Boolean.TRUE) > 0);
             outfitDetails.setStitchOptionsExist(stitchOptionsExist);
+        outfitDetails.setOutfitName(localisationService.translate(outfitDetails.getOutfitDetailsTitle()));
             outfitDetailsList.add(outfitDetails);
         }
         return new ResponseEntity(outfitDetailsList, HttpStatus.OK);
@@ -77,4 +81,6 @@ public class OutfitService {
         String subOutfitString = outfitTypeService.getSubOutfitMap().get(subOutfitIdx);
         return subOutfitString;
     }
+
+
 }
