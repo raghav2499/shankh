@@ -6,6 +6,7 @@ import com.darzee.shankh.request.CreateStitchOptionRequest;
 import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.LocalisationService;
 import com.darzee.shankh.service.OrderItemService;
 import com.darzee.shankh.service.OrderOrderItemCommonService;
 import com.darzee.shankh.service.StitchOptionService;
@@ -30,6 +31,8 @@ public class OrderItemController {
     private StitchOptionService stitchOptionService;
     @Autowired
     private OrderItemRepo orderItemRepo;
+    @Autowired
+    private LocalisationService localisationService;
 
     @PostMapping(value = "/order_item/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
@@ -40,7 +43,12 @@ public class OrderItemController {
                 refreshedOrderOb.getInvoiceNo(),
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
-        CreateOrderResponse createOrderResponse = new CreateOrderResponse("Item created successfully",
+        orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
+            orderItemSummary.setOutfitType(localisationService.translate(orderItemSummary.getOutfitType()));
+            orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
+        });
+        
+        CreateOrderResponse createOrderResponse = new CreateOrderResponse(localisationService.translate("Item created successfully") ,
                 orderSummary);
         return new ResponseEntity<>(createOrderResponse, HttpStatus.CREATED);
     }
@@ -50,6 +58,11 @@ public class OrderItemController {
     public ResponseEntity<OrderSummary> updateOrderItem(@PathVariable("id") Long orderItemId,
                                                         @Valid @RequestBody OrderItemDetailRequest orderItemDetails) throws Exception {
         OrderSummary orderSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
+        orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
+            orderItemSummary.setOutfitType(localisationService.translate(orderItemSummary.getOutfitType()));
+            orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
+        });
+
         return new ResponseEntity<>(orderSummary, HttpStatus.OK);
     }
 
@@ -73,7 +86,7 @@ public class OrderItemController {
     public ResponseEntity<CreateStitchResponse> updateStitchOptions(@PathVariable("id") Long orderItemId,
                                                                     @Valid @RequestBody CreateStitchOptionRequest request) {
         StitchSummary stitchSummary = stitchOptionService.updateStitchOptions(orderItemId, request);
-        CreateStitchResponse createStitchResponse = new CreateStitchResponse("Stitch options created successfully",
+        CreateStitchResponse createStitchResponse = new CreateStitchResponse(localisationService.translate("Stitch options created successfully"),
                 stitchSummary);
         return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);
     }
