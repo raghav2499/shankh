@@ -46,6 +46,9 @@ public class StitchOptionService {
     @Autowired
     private OrderRepo orderRepo;
 
+    @Autowired
+    private LocalisationService localisationService;
+
     @Transactional
     public StitchSummary createStitchOptions(CreateStitchOptionRequest createStitchOptionRequest) {
 
@@ -117,8 +120,16 @@ public class StitchOptionService {
     }
 
     public ResponseEntity getOrderItemStitchOptionsResponse(Long orderItemId) {
-        Map<String, List<OrderStitchOptionDetail>> groupedOrderStitchOptionDetail = getOrderItemStitchOptions(orderItemId);
+        Map<String, List<OrderStitchOptionDetail>> groupedOrderStitchOptionDetail = getOrderItemStitchOptions(orderItemId);    
         GetOrderStitchOptionResponse response = new GetOrderStitchOptionResponse(groupedOrderStitchOptionDetail);
+        response.getResponse().forEach(
+                groupedOrderStitchOptionDetail1 -> groupedOrderStitchOptionDetail1.getStitchOptions().forEach(
+                        stitchOption-> {
+                stitchOption.setLabel(localisationService.translate(stitchOption.getLabel()));
+                stitchOption.setValue(localisationService.translate(stitchOption.getValue())); 
+                        }
+                ) 
+        );
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
