@@ -72,6 +72,9 @@ public class MeasurementService {
     @Autowired
     private BoutiqueRepo boutiqueRepo;
 
+    @Autowired 
+    private LocalisationService localisationService;
+
     public ResponseEntity getMeasurementDetailsResponse(Long customerId, Long measurementRevisionId,
                                                         Long orderItemId, Integer outfitTypeIndex,
                                                         String scale, Boolean nonEmptyValuesOnly) throws Exception {
@@ -211,7 +214,7 @@ public class MeasurementService {
             List<MeasurementDetails> measurementDetails =
                     getMeasurementDetailsList(revisionsDAO.getMeasurementValue(), CM_TO_INCH_DIVIDING_FACTOR,
                             paramList, paramDetailMap, nonEmptyValuesOnly);
-            String heading = outfitTypeService.getTopHeading();
+            String heading =localisationService.translate(outfitTypeService.getTopHeading());
             String imageLink = s3Client.generateShortLivedUrlForMeasurement("top.jpg");
             innerMeasurementDetailsList.add(new InnerMeasurementDetails(heading, measurementDetails, imageLink));
         }
@@ -347,7 +350,7 @@ public class MeasurementService {
             MeasurementParamDAO measurementParam = getMeasurementParams(paramDetailMap, param);
             String imageLink = s3Client.generateShortLivedUrlForMeasurement(measurementParam.getFileName());
             MeasurementDetails measurementDetails = new MeasurementDetails(imageLink,
-                    measurementParam.getDisplayName(), value, String.valueOf(idx), measurementParam.getName());
+                   localisationService.translate( measurementParam.getDisplayName()), value, String.valueOf(idx), measurementParam.getName());
             idx++;
             measurementDetailsList.add(measurementDetails);
         }
