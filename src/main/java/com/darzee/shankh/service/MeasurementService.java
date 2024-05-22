@@ -79,7 +79,13 @@ public class MeasurementService {
                                                         Long orderItemId, Integer outfitTypeIndex,
                                                         String scale, Boolean nonEmptyValuesOnly) throws Exception {
         OverallMeasurementDetails measurementDetails = getMeasurementDetails(customerId, measurementRevisionId, orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
-        measurementDetails.setMessage(getMeasurementDetailsMessage(measurementDetails));
+
+        measurementDetails.getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
+            innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));
+            innerMeasurementDetails.getMeasurementDetailsList().forEach(measurementDetail -> {
+measurementDetail.setValue(localisationService.translate(measurementDetail.getValue()));           measurementDetail.setTitle(localisationService.translate(measurementDetail.getTitle()));
+            });
+        });   measurementDetails.setMessage(localisationService.translate(getMeasurementDetailsMessage(measurementDetails)));
         return new ResponseEntity(measurementDetails, HttpStatus.OK);
     }
 
