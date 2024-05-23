@@ -188,9 +188,8 @@ public class OrderService {
 
     @Transactional
     public OrderDAO confirmOrder(Long orderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
-
         OrderDAO orderDAO = findOrder(orderId, boutiqueId);
-
+        validateOrderAmountInRequest(request.getOrderDetails().getOrderAmountDetails());
         if (!orderDAO.validateMandatoryOrderFields()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Some mandatory fields in order are missing." + " Boutique ID and customer ID are mandatory fields");
         }
@@ -223,7 +222,7 @@ public class OrderService {
 
     public SalesDashboard getWeekWiseSales(Long boutiqueId, int month, int year) {
         ZoneId clientZoneId = ZoneId.of("Asia/Kolkata");
-        LocalDateTime monthStart = TimeUtils.getTimeInDBTimeZone(LocalDateTime.of(year, month, 1, 0,0,0), clientZoneId);
+        LocalDateTime monthStart = TimeUtils.getTimeInDBTimeZone(LocalDateTime.of(year, month, 1, 0, 0, 0), clientZoneId);
         LocalDateTime nextMonthStart = TimeUtils.getTimeInDBTimeZone(monthStart.plusMonths(1), clientZoneId);
         List<Object[]> orderAmountsOfMonth = orderRepo.getOrderAmountsBetweenTheDates(boutiqueId, monthStart,
                 nextMonthStart);
@@ -235,7 +234,7 @@ public class OrderService {
         }
         List<WeekwiseSalesSplit> weeklySalesAmount = new ArrayList<>();
         LocalDate dayInAWeek = LocalDate.of(year, month, 1);
-        for(int weekCount = 0; weekCount < 5; weekCount++) {
+        for (int weekCount = 0; weekCount < 5; weekCount++) {
             LocalDate weekStartDate = TimeUtils.getWeekStartDate(dayInAWeek);
             weeklySalesAmount.add(new WeekwiseSalesSplit(weekWiseCollatedAmounts.getOrDefault(weekStartDate, 0d), weekStartDate));
             dayInAWeek = dayInAWeek.plusDays(7);
@@ -245,7 +244,7 @@ public class OrderService {
 
     public List<OrderTypeDashboardData> getOrderTypeWiseSales(Long boutiqueId, int month, int year) {
         ZoneId clientZoneId = ZoneId.of("Asia/Kolkata");
-        LocalDateTime monthStart = TimeUtils.getTimeInDBTimeZone(LocalDateTime.of(year, month, 1, 0,0,0), clientZoneId);
+        LocalDateTime monthStart = TimeUtils.getTimeInDBTimeZone(LocalDateTime.of(year, month, 1, 0, 0, 0), clientZoneId);
         LocalDateTime nextMonthStart = TimeUtils.getTimeInDBTimeZone(monthStart.plusMonths(1), clientZoneId);
         List<Object[]> orderDataBetweenTheDates = orderRepo.getOrderTypeBasedOrderAmountData(boutiqueId, monthStart, nextMonthStart);
         Map<OrderType, Double> orderTypeAmountMap = new HashMap<>(OrderType.values().length);
@@ -276,7 +275,7 @@ public class OrderService {
 
     public List<TopCustomerData> getTopCustomerData(Long boutiqueId, int month, int year) {
         ZoneId clientZoneId = ZoneId.of("Asia/Kolkata");
-        LocalDateTime monthStart = TimeUtils.getTimeInDBTimeZone(LocalDateTime.of(year, month, 1, 0,0,0), clientZoneId);
+        LocalDateTime monthStart = TimeUtils.getTimeInDBTimeZone(LocalDateTime.of(year, month, 1, 0, 0, 0), clientZoneId);
         LocalDateTime nextMonthStart = TimeUtils.getTimeInDBTimeZone(monthStart.plusMonths(1), clientZoneId);
         List<Object[]> topCustomerSalesDetails = orderRepo.getTopCustomersByTotalAmount(boutiqueId, monthStart, nextMonthStart);
         Map<Long, Double> customerTotalSales = topCustomerSalesDetails.stream()
@@ -392,7 +391,7 @@ public class OrderService {
 
     @Transactional
     public OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
-        validateOrderAmountAtCreation(orderAmountDetails);
+        validateOrderAmountInRequest(orderAmountDetails);
         Double amountRecieved = 0d;
         if (orderAmountDetails != null && orderAmountDetails.getAdvanceReceived() != null) {
             amountRecieved = orderAmountDetails.getAdvanceReceived();
@@ -460,6 +459,9 @@ public class OrderService {
         if (!orderAmountDAO.getTotalAmount().equals(orderItemsPriceSum)) {
             orderAmountDelta = orderItemsPriceSum - orderAmountDAO.getTotalAmount();
             orderAmountDAO.setTotalAmount(orderItemsPriceSum);
+            if (refundAmount > orderAmountDAO.getAmountRecieved()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Refund cannot be greater than advance received");
+            }
             orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() - refundAmount);
         }
         orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext()));
@@ -534,6 +536,7 @@ public class OrderService {
             weekwiseSales.add(new WeekwiseSalesSplit(0d, null));
         }
     }
+
     private void postUpdateOrderValidation(Double totalOrderAmount, List<PriceBreakupDAO> allItemsPriceBreakup) {
         Double itemsPriceBreakupSum = allItemsPriceBreakup.stream().mapToDouble(PriceBreakupDAO::getValue).sum();
         if (!itemsPriceBreakupSum.equals(totalOrderAmount)) {
@@ -556,8 +559,8 @@ public class OrderService {
         return orderDAO;
     }
 
-    private void validateOrderAmountAtCreation(OrderAmountDetails orderAmountDetails) {
-        if(orderAmountDetails.getAdvanceReceived() != null
+    private void validateOrderAmountInRequest(OrderAmountDetails orderAmountDetails) {
+        if (orderAmountDetails.getAdvanceReceived() != null
                 && orderAmountDetails.getAdvanceReceived() > orderAmountDetails.getTotalAmount()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Advance Received could not be greater than Total Order Amount");
