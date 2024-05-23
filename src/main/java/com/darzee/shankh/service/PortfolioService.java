@@ -580,4 +580,8 @@ public class PortfolioService {
         return portfolioRepo.findAllOrderByOutfitsDesc();
     }
 
+    public List<Portfolio> getPortfoliosSortedByCreatedDate(){
+        return portfolioRepo.findAllByOrderByCreatedAtDesc();
+    }
+
 }
