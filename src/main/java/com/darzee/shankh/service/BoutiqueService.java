@@ -171,13 +171,9 @@ public class BoutiqueService {
     public ResponseEntity createOrUpdateMeasurementParams(Long boutiqueId, Integer outfitType, Integer outfitSide,
             List<Map<String, Object>> measurementPramList) {
 
-        // Validate boutiqueId and outfit type...
         Optional<Boutique> boutique = boutiqueRepo.findById(boutiqueId);
         if (boutique.isPresent()) {
-            // creat a new list of measurement params
             List<String> measurementParams = new ArrayList<>();
-
-            // iterate over the list of measurement params and add them to the new list
             for (Map<String, Object> measurementParam : measurementPramList) {
                 Object paramNameObject = measurementParam.get("name");
                 if (paramNameObject == null) {
@@ -187,23 +183,8 @@ public class BoutiqueService {
                 measurementParams.add(paramName);
             }
 
-            // get the outfit type from the ordinal
             OutfitType outfitTypeEnum = OutfitType.getOutfitOrdinalEnumMap().get(outfitType);
-
-            // if the outfit type is null, return a bad request
-            if (outfitTypeEnum == null) {
-                return ResponseEntity.badRequest().body("Invalid outfit type");
-            }
-
-            // get outfit side from the ordinal
             OutfitSide outfitSideEnum = OutfitSide.getEnumByOrdinal(outfitSide);
-
-            if (outfitSideEnum == null) {
-                return ResponseEntity.badRequest().body("Invalid outfit side");
-            }
-
-            // create a new BoutiqueMeasurement with the boutiqueId, outfitType and
-            // outfitSide
 
             BoutiqueMeasurement boutiqueMeasurement = boutiqueMeasurementRepo
                     .findUniqueByBoutiqueIdOutfitTypeOutfitSide(boutiqueId, outfitTypeEnum, outfitSideEnum);
@@ -217,11 +198,7 @@ public class BoutiqueService {
             }
 
             boutiqueMeasurement.setParam(measurementParams);
-
             boutiqueMeasurementRepo.save(boutiqueMeasurement);
-
-           
-
             return new ResponseEntity<>(boutiqueMeasurement, HttpStatus.OK);
 
         }

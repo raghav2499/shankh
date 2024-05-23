@@ -1,6 +1,7 @@
 package com.darzee.shankh.controller;
 
 import com.darzee.shankh.repo.BoutiqueRepo;
+import com.darzee.shankh.request.MeasurementParamsRequest;
 import com.darzee.shankh.request.UpdateBoutiqueDetails;
 import com.darzee.shankh.service.BoutiqueLedgerService;
 import com.darzee.shankh.service.BoutiqueService;
@@ -73,33 +74,10 @@ public class BoutiqueController {
     @PostMapping(value = "/{boutiqueId}/measurement_params", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity createOrUpdateMeasurementParams(@PathVariable("boutiqueId") Long boutiqueId,
-            @RequestParam("outfitType") Integer outfitType,
-            @RequestParam("outfitSide") Integer outfitSide,
-            @RequestBody List<Map<String, Object>> request) {
-        if (boutiqueId == null) {
-            return ResponseEntity.badRequest().body("Boutique id is missing");
-        }
-        if (outfitType == null) {
-            return ResponseEntity.badRequest().body("Outfit type is missing");
-        }
-        if (outfitSide == null) {
-            return ResponseEntity.badRequest().body("Outfit side is missing");
-        }
-        if (request == null || request.isEmpty()) {
-            return ResponseEntity.badRequest().body("Request body is empty");
-        }
-        if (outfitType < 0 || outfitType > 15) {
-            return ResponseEntity.badRequest().body("Invalid outfit type");
-        }
-        if (outfitSide < 0 || outfitSide > 2) {
-            return ResponseEntity.badRequest().body("Invalid outfit side");
-        }
-        if (request.isEmpty()) {
-            return ResponseEntity.badRequest().body("Measurement params list is empty");
-        }
-
-        return boutiqueService.createOrUpdateMeasurementParams(boutiqueId, outfitType + 1,
-                outfitSide, request);
+            @Valid @RequestBody MeasurementParamsRequest measurementParamsRequest) {
+      
+        return boutiqueService.createOrUpdateMeasurementParams(boutiqueId, measurementParamsRequest.getOutfitType()+1,
+                measurementParamsRequest.getOutfitSide(), measurementParamsRequest.getMeasurementPramList());
     }
 
 }
