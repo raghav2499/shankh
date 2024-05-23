@@ -47,33 +47,6 @@ public class BucketService {
 
     @Value("items/")
     private String itemDetailsDirectory;
-
-//    public FileDetail uploadSingleImage(MultipartFile multipartFile, String uploadFileTypeOrdinal) {
-//        try {
-//            Pair<String, String> fileUploadResult = uploadPhoto(multipartFile, uploadFileTypeOrdinal);
-//            return new FileDetail(fileUploadResult.getKey(), fileUploadResult.getValue());
-//        } catch (Exception e) {
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
-//        }
-//    }
-
-//    public ResponseEntity<UploadMultipleFileResponse> uploadMultipleImages(List<MultipartFile> files, String uploadFileType) {
-//        List<FileDetail> uploadImageResultList = new ArrayList<>();
-//        try {
-//            for (MultipartFile file : files) {
-//                Pair<String, String> fileUploadResult = uploadPhoto(file, uploadFileType);
-//                uploadImageResultList.add(new FileDetail(fileUploadResult.getKey(), fileUploadResult.getValue()));
-//            }
-//            UploadMultipleFileResponse response = new UploadMultipleFileResponse(uploadImageResultList);
-//            return new ResponseEntity<>(response, HttpStatus.OK);
-//        } catch (Exception e) {
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception {}", e);
-//        }
-//
-//    }
-
-    //for audio file
-    //check for data type, confirm!
     public ResponseEntity<UploadMultipleFileResponse> uploadMultipleFiles(List<MultipartFile> files, String uploadFileType) {
         List<FileDetail> uploadImageResultList = new ArrayList<>();
         try {
