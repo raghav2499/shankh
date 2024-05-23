@@ -188,9 +188,8 @@ public class OrderService {
 
     @Transactional
     public OrderDAO confirmOrder(Long orderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
-
         OrderDAO orderDAO = findOrder(orderId, boutiqueId);
-
+        validateOrderAmountInRequest(request.getOrderDetails().getOrderAmountDetails());
         if (!orderDAO.validateMandatoryOrderFields()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Some mandatory fields in order are missing." + " Boutique ID and customer ID are mandatory fields");
         }
@@ -392,7 +391,7 @@ public class OrderService {
 
     @Transactional
     public OrderAmountDAO setOrderAmountSpecificDetails(OrderAmountDetails orderAmountDetails, OrderDAO orderDAO) {
-        validateOrderAmountAtCreation(orderAmountDetails);
+        validateOrderAmountInRequest(orderAmountDetails);
         Double amountRecieved = 0d;
         if (orderAmountDetails != null && orderAmountDetails.getAdvanceReceived() != null) {
             amountRecieved = orderAmountDetails.getAdvanceReceived();
@@ -556,7 +555,7 @@ public class OrderService {
         return orderDAO;
     }
 
-    private void validateOrderAmountAtCreation(OrderAmountDetails orderAmountDetails) {
+    private void validateOrderAmountInRequest(OrderAmountDetails orderAmountDetails) {
         if(orderAmountDetails.getAdvanceReceived() != null
                 && orderAmountDetails.getAdvanceReceived() > orderAmountDetails.getTotalAmount()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
