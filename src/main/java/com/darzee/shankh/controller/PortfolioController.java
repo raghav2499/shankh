@@ -1,14 +1,18 @@
 package com.darzee.shankh.controller;
 
+import com.darzee.shankh.entity.Portfolio;
 import com.darzee.shankh.request.CreatePortfolioOutfitRequest;
 import com.darzee.shankh.request.CreatePortfolioRequest;
 import com.darzee.shankh.request.UpdatePortfolioRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.PortfolioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -88,4 +92,10 @@ public class PortfolioController {
     public ResponseEntity<GetPortfolioColorResponse> getPortfolioColors() {
         return portfolioService.getColors();
     }
+
+    @GetMapping("/portfolios/sortedByOutfits")
+    public ResponseEntity<List<Portfolio>> getPortfoliosSortedByOutfits() {
+    List<Portfolio> portfolios = portfolioService.getPortfoliosSortedByOutfits();
+    return new ResponseEntity<>(portfolios, HttpStatus.OK);
+}
 }

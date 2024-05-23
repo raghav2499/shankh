@@ -576,4 +576,8 @@ public class PortfolioService {
         return baseUrl + "/" + username;
     }
 
+    public List<Portfolio> getPortfoliosSortedByOutfits() {
+        return portfolioRepo.findAllOrderByOutfitsDesc();
+    }
+
 }
