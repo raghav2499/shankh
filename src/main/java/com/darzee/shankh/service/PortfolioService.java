@@ -21,6 +21,8 @@ import com.darzee.shankh.utils.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -215,6 +217,7 @@ public class PortfolioService {
         }
     }
 
+    @CacheEvict(value = "topPortfolios", allEntries = true)
     public ResponseEntity<CreatePortfolioOutfitResponse> createPortfolioOutfits(CreatePortfolioOutfitRequest request,
                                                                                 Long portfolioId) throws Exception {
         CreatePortfolioOutfitResponse response = new CreatePortfolioOutfitResponse();
@@ -576,6 +579,8 @@ public class PortfolioService {
         return baseUrl + "/" + username;
     }
 
+    
+    @Cacheable(value="topPortfolios")
     public List<GetPortfolioDetailsResponse> getPortfoliosSortedByOutfits() {
         List<GetPortfolioDetailsResponse> responseList = new ArrayList<>();
         List<Portfolio> portfolios = portfolioRepo.findAllWithOutfitsOrderByOutfitsDesc();

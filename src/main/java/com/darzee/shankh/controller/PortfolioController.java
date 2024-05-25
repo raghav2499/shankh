@@ -6,7 +6,11 @@ import com.darzee.shankh.request.CreatePortfolioRequest;
 import com.darzee.shankh.request.UpdatePortfolioRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.PortfolioService;
+
+import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -94,13 +98,15 @@ public class PortfolioController {
     }
 
     @GetMapping(value="/portfolios/top_portfolios", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetHomePortfolioResponse> getPortfoliosSortedByOutfits() {
+    @CrossOrigin
+    public ResponseEntity<GetHomePortfolioResponse> getTopPortfolios() {
     List<GetPortfolioDetailsResponse> portfolios = portfolioService.getPortfoliosSortedByOutfits();
     GetHomePortfolioResponse response = new GetHomePortfolioResponse(portfolios);
     return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping(value="/portfolios/latest_portfolios", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity<List<Portfolio>> getPortfoliosSortedByCreatedDate() {
         List<Portfolio> portfolios = portfolioService.getPortfoliosSortedByCreatedDate();
         return new ResponseEntity<>(portfolios, HttpStatus.OK);
