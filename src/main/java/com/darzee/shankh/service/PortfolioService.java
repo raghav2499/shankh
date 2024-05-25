@@ -576,8 +576,40 @@ public class PortfolioService {
         return baseUrl + "/" + username;
     }
 
-    public List<Portfolio> getPortfoliosSortedByOutfits() {
-        return portfolioRepo.findAllOrderByOutfitsDesc();
+    public List<GetPortfolioDetailsResponse> getPortfoliosSortedByOutfits() {
+        List<GetPortfolioDetailsResponse> responseList = new ArrayList<>();
+        List<Portfolio> portfolios = portfolioRepo.findAllWithOutfitsOrderByOutfitsDesc();
+
+        if(!portfolios.isEmpty()) {
+
+            for(Portfolio portfolio : portfolios) {
+                PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio,
+                        new CycleAvoidingMappingContext());
+                Long tailorId = portfolioDAO.getTailor().getId();
+                String tailorName = tailorRepo.findNameById(tailorId);
+                String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
+                String tailorImageReferenceId = objectFilesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
+                String portfolioCoverReference = objectFilesService.getProfileCoverReference(portfolioDAO.getId());
+                String tailorImageReferenceUrl = null;
+                String portfolioCoverImageUrl = null;
+                if (tailorImageReferenceId != null) {
+                    tailorImageReferenceUrl = bucketService.getShortLivedUrl(tailorImageReferenceId);
+                }
+                if (portfolioCoverReference != null) {
+                    portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
+                }
+                String successMessage = "Portfolio details fetched successfully";
+               GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse(successMessage, tailorName,
+                        boutiqueName, portfolioDAO.getId(), portfolioDAO.getSocialMedia(), portfolioDAO.getAboutDetails(),
+                        portfolioDAO.getUsername(), portfolioDAO.getUsernameUpdatesCounts(), tailorImageReferenceUrl,
+                        portfolioCoverImageUrl, tailorImageReferenceId, portfolioCoverReference);
+               responseList.add(response);
+                    
+    
+        }
+    }
+        return responseList;
+
     }
 
     public List<Portfolio> getPortfoliosSortedByCreatedDate(){

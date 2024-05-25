@@ -93,13 +93,14 @@ public class PortfolioController {
         return portfolioService.getColors();
     }
 
-    @GetMapping(value="/portfolios/sortedByOutfits", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Portfolio>> getPortfoliosSortedByOutfits() {
-    List<Portfolio> portfolios = portfolioService.getPortfoliosSortedByOutfits();
-    return new ResponseEntity<>(portfolios, HttpStatus.OK);
+    @GetMapping(value="/portfolios/top_portfolios", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetHomePortfolioResponse> getPortfoliosSortedByOutfits() {
+    List<GetPortfolioDetailsResponse> portfolios = portfolioService.getPortfoliosSortedByOutfits();
+    GetHomePortfolioResponse response = new GetHomePortfolioResponse(portfolios);
+    return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping(value="/portfolios/sortedByCreatedDate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value="/portfolios/latest_portfolios", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Portfolio>> getPortfoliosSortedByCreatedDate() {
         List<Portfolio> portfolios = portfolioService.getPortfoliosSortedByCreatedDate();
         return new ResponseEntity<>(portfolios, HttpStatus.OK);
