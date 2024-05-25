@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 
-@EnableCaching
+
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, KafkaAutoConfiguration.class,
 		KafkaMetricsAutoConfiguration.class})
 public class ShankhApplication implements CommandLineRunner {
