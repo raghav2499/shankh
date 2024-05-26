@@ -6,8 +6,6 @@ import org.springframework.boot.actuate.autoconfigure.metrics.KafkaMetricsAutoCo
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
-import org.springframework.cache.annotation.EnableCaching;
-
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, KafkaAutoConfiguration.class,
 		KafkaMetricsAutoConfiguration.class})
