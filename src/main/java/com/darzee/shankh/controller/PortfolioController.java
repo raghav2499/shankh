@@ -107,8 +107,9 @@ public class PortfolioController {
 
     @GetMapping(value="/portfolios/latest_portfolios", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<List<Portfolio>> getPortfoliosSortedByCreatedDate() {
-        List<Portfolio> portfolios = portfolioService.getPortfoliosSortedByCreatedDate();
-        return new ResponseEntity<>(portfolios, HttpStatus.OK);
+    public ResponseEntity<GetHomePortfolioResponse> getPortfoliosSortedByCreatedDate() {
+        List<GetPortfolioDetailsResponse> portfolios = portfolioService.getPortfoliosSortedByCreatedDate();
+        GetHomePortfolioResponse response = new GetHomePortfolioResponse(portfolios);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

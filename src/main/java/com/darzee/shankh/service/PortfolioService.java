@@ -617,8 +617,40 @@ public class PortfolioService {
 
     }
 
-    public List<Portfolio> getPortfoliosSortedByCreatedDate(){
-        return portfolioRepo.findAllByOrderByCreatedAtDesc();
+    public List<GetPortfolioDetailsResponse> getPortfoliosSortedByCreatedDate(){
+        List<Portfolio> portfolios = portfolioRepo.findAllByOrderByCreatedAtDesc();
+
+        List<GetPortfolioDetailsResponse> responseList = new ArrayList<>();
+
+        if(!portfolios.isEmpty()) {
+
+            for(Portfolio portfolio : portfolios) {
+                PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio,
+                        new CycleAvoidingMappingContext());
+                        Long tailorId = portfolioDAO.getTailor().getId();
+                        String tailorName = tailorRepo.findNameById(tailorId);
+                        String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
+                        String tailorImageReferenceId =      objectFilesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
+                        String portfolioCoverReference = objectFilesService.getProfileCoverReference(portfolioDAO.getId());
+                        String tailorImageReferenceUrl = null;
+                        String portfolioCoverImageUrl = null;
+                        if (tailorImageReferenceId != null) {
+                            tailorImageReferenceUrl = bucketService.getShortLivedUrl(tailorImageReferenceId);
+                        }
+                        if (portfolioCoverReference != null) {
+                            portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
+                        }
+                        String successMessage = "Portfolio details fetched successfully";
+                       GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse(successMessage, tailorName,
+                                boutiqueName, portfolioDAO.getId(), portfolioDAO.getSocialMedia(), portfolioDAO.getAboutDetails(),
+                                portfolioDAO.getUsername(), portfolioDAO.getUsernameUpdatesCounts(), tailorImageReferenceUrl,
+                                portfolioCoverImageUrl, tailorImageReferenceId, portfolioCoverReference);
+                responseList.add(response);
+            }
+        }
+
+        return responseList;
+
     }
 
 }
