@@ -16,5 +16,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetHomePortfolioResponse {
-    private List<GetPortfolioDetailsResponse> portfolios;
+    private List<HomePortfolio> portfolios;
 }

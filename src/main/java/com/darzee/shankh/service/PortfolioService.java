@@ -581,8 +581,8 @@ public class PortfolioService {
 
     
     @Cacheable(value="topPortfolios")
-    public List<GetPortfolioDetailsResponse> getPortfoliosSortedByOutfits() {
-        List<GetPortfolioDetailsResponse> responseList = new ArrayList<>();
+    public List<HomePortfolio> getPortfoliosSortedByOutfits() {
+        List<HomePortfolio> responseList = new ArrayList<>();
         List<Portfolio> portfolios = portfolioRepo.findAllWithOutfitsOrderByOutfitsDesc();
 
         if(!portfolios.isEmpty()) {
@@ -595,6 +595,7 @@ public class PortfolioService {
                 String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
                 String tailorImageReferenceId = objectFilesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
                 String portfolioCoverReference = objectFilesService.getProfileCoverReference(portfolioDAO.getId());
+                String portfolioAbout = portfolioDAO.getAboutDetails();
                 String tailorImageReferenceUrl = null;
                 String portfolioCoverImageUrl = null;
                 if (tailorImageReferenceId != null) {
@@ -603,11 +604,7 @@ public class PortfolioService {
                 if (portfolioCoverReference != null) {
                     portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
                 }
-                String successMessage = "Portfolio details fetched successfully";
-               GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse(successMessage, tailorName,
-                        boutiqueName, portfolioDAO.getId(), portfolioDAO.getSocialMedia(), portfolioDAO.getAboutDetails(),
-                        portfolioDAO.getUsername(), portfolioDAO.getUsernameUpdatesCounts(), tailorImageReferenceUrl,
-                        portfolioCoverImageUrl, tailorImageReferenceId, portfolioCoverReference);
+               HomePortfolio response = new  HomePortfolio(tailorName, boutiqueName, tailorId, portfolioAbout, tailorName, tailorImageReferenceUrl, portfolioCoverImageUrl);
                responseList.add(response);
                     
     
@@ -617,10 +614,10 @@ public class PortfolioService {
 
     }
 
-    public List<GetPortfolioDetailsResponse> getPortfoliosSortedByCreatedDate(){
+    public List<HomePortfolio> getPortfoliosSortedByCreatedDate(){
         List<Portfolio> portfolios = portfolioRepo.findAllByOrderByCreatedAtDesc();
 
-        List<GetPortfolioDetailsResponse> responseList = new ArrayList<>();
+        List<HomePortfolio> responseList = new ArrayList<>();
 
         if(!portfolios.isEmpty()) {
 
@@ -630,6 +627,7 @@ public class PortfolioService {
                         Long tailorId = portfolioDAO.getTailor().getId();
                         String tailorName = tailorRepo.findNameById(tailorId);
                         String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
+                        String portfolioAbout = portfolioDAO.getAboutDetails();
                         String tailorImageReferenceId =      objectFilesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
                         String portfolioCoverReference = objectFilesService.getProfileCoverReference(portfolioDAO.getId());
                         String tailorImageReferenceUrl = null;
@@ -640,11 +638,8 @@ public class PortfolioService {
                         if (portfolioCoverReference != null) {
                             portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
                         }
-                        String successMessage = "Portfolio details fetched successfully";
-                       GetPortfolioDetailsResponse response = new GetPortfolioDetailsResponse(successMessage, tailorName,
-                                boutiqueName, portfolioDAO.getId(), portfolioDAO.getSocialMedia(), portfolioDAO.getAboutDetails(),
-                                portfolioDAO.getUsername(), portfolioDAO.getUsernameUpdatesCounts(), tailorImageReferenceUrl,
-                                portfolioCoverImageUrl, tailorImageReferenceId, portfolioCoverReference);
+                        HomePortfolio response = new HomePortfolio(tailorName, boutiqueName, tailorId, portfolioAbout, tailorName, tailorImageReferenceUrl, portfolioCoverImageUrl);
+
                 responseList.add(response);
             }
         }
