@@ -77,11 +77,17 @@ public class OrderOrderItemCommonService {
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private LocalisationService localisationService;
+
     public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long orderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
         OrderDAO orderDAO = orderService.confirmOrder(orderId, boutiqueId, request);
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         OrderSummary summary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
+        summary.getOrderItemSummaryList().forEach(orderItemSummary -> {                     orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
+            
+        });
         orderService.generateInvoiceV2(orderDAO);
         generateItemDetailPdfs(orderDAO);
         return new ResponseEntity<>(summary, HttpStatus.OK);

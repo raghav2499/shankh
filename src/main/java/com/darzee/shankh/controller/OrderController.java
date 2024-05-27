@@ -5,6 +5,7 @@ import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.response.GetOrderResponse;
 import com.darzee.shankh.response.OrderSummary;
+import com.darzee.shankh.service.LocalisationService;
 import com.darzee.shankh.service.OrderOrderItemCommonService;
 import com.darzee.shankh.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class OrderController {
     private OrderService orderService;
 
     @Autowired
+    private LocalisationService localisationService;
+
+    @Autowired
     private OrderOrderItemCommonService orderOrderItemCommonService;
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,6 +38,9 @@ public class OrderController {
                 refreshedOrderOb.getInvoiceNo(),
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
+        orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
+            orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
+        });
         return new ResponseEntity<OrderSummary>(orderSummary, HttpStatus.CREATED);
     }
 

@@ -105,6 +105,9 @@ public class OrderService {
     @Autowired
     private PaymentRepo paymentRepo;
 
+    @Autowired 
+    private LocalisationService localisationService;
+
     @Transactional
     public OrderDAO findOrCreateNewOrder(Long orderId, Long boutiqueId, Long customerId) {
         OrderDAO orderDAO = null;
@@ -135,7 +138,7 @@ public class OrderService {
             orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
             return orderDAO;
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid customer id or boutique id");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, localisationService.translate("Invalid customer id or boutique id"));
     }
 
     public ResponseEntity<GetOrderResponse> getOrder(Long boutiqueId, String orderItemStatusList,
@@ -169,6 +172,19 @@ public class OrderService {
             }
         }).collect(Collectors.toList());
         GetOrderResponse response = new GetOrderResponse(orderDetailsList, totalRecordsCount);
+        response.setMessage(localisationService.translate(response.getMessage()));
+        response.getData().forEach(orderDetailResponse -> {
+            orderDetailResponse.setMessage(localisationService.translate(orderDetailResponse.getMessage()));
+            orderDetailResponse.getOrderItemDetails().forEach(orderItemDetails -> {
+                orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
+                 orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
+                List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
+                orderStitchOptionDetails.forEach(orderStitchOptionDetail -> {
+                    orderStitchOptionDetail.setLabel(localisationService.translate(orderStitchOptionDetail.getLabel()));                 orderStitchOptionDetail.setValue(localisationService.translate(orderStitchOptionDetail.getValue()));
+                });
+            });
+            });
+        });
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -182,7 +198,23 @@ public class OrderService {
         }
         Integer paymentMode = getOrderPaymentMode(order.getId());
         String message = "Details fetched succesfully";
-        OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount, orderItemDetailsList, paymentMode, message);
+        OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount, orderItemDetailsList, paymentMode,localisationService.translate(message));
+        response.getOrderItemDetails().forEach(orderItemDetails -> {
+            orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));         orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
+                List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
+                orderStitchOptionDetails.forEach(orderStitchOptionDetail -> {
+                    orderStitchOptionDetail.setLabel(localisationService.translate(orderStitchOptionDetail.getLabel()));                 orderStitchOptionDetail.setValue(localisationService.translate(orderStitchOptionDetail.getValue()));
+                });
+            });
+            
+            orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
+                innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));
+                innerMeasurementDetails.getMeasurementDetailsList().forEach(measurementDetails -> {
+                    measurementDetails.setTitle(localisationService.translate(measurementDetails.getTitle()));
+                });
+            });
+        });
+
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -192,7 +224,7 @@ public class OrderService {
         OrderDAO orderDAO = findOrder(orderId, boutiqueId);
 
         if (!orderDAO.validateMandatoryOrderFields()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Some mandatory fields in order are missing." + " Boutique ID and customer ID are mandatory fields");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,localisationService.translate("Some mandatory fields in order are missing.")  + localisationService.translate(" Boutique ID and customer ID are mandatory fields"));
         }
         orderItemService.validateMandatoryOrderItemFields(orderDAO.getNonDeletedItems());
 
@@ -201,7 +233,7 @@ public class OrderService {
         Double totalOrderAmount = orderAmountDAO.getTotalAmount();
 
         if (!priceBreakupSum.equals(totalOrderAmount)) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Items' Price Breakups are not summing up to total amount. " + "Total amount " + totalOrderAmount + " and price break up sum " + priceBreakupSum);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,localisationService.translate("Items' Price Breakups are not summing up to total amount. ")  +localisationService.translate( "Total amount ") + totalOrderAmount + localisationService.translate(" and price break up sum " )+ priceBreakupSum);
         }
         orderDAO.setOrderStatus(OrderStatus.ACCEPTED);
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
@@ -305,7 +337,7 @@ public class OrderService {
         Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
         Double amountRecieved = request.getAmount();
         if (amountRecieved > pendingAmount) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount recieved is greater than pending order amount. Amount Received : " + amountRecieved + " Pending Amount : " + pendingAmount);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,localisationService.translate("Amount recieved is greater than pending order amount. Amount Received : ")  + amountRecieved +localisationService.translate(" Pending Amount : ")  + pendingAmount);
         }
         orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() + amountRecieved);
         orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
@@ -316,7 +348,7 @@ public class OrderService {
         PaymentMode paymentMode = PaymentMode.getPaymentTypeEnumOrdinalMap().get(request.getPaymentMode());
         paymentService.recordPayment(amountRecieved, paymentMode, Boolean.FALSE, orderDAO);
         generateInvoiceV2(orderDAO);
-        RecievePaymentResponse response = new RecievePaymentResponse(message, orderId, pendingAmountLeft);
+        RecievePaymentResponse response = new RecievePaymentResponse(localisationService.translate(message), orderId, pendingAmountLeft);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -350,7 +382,7 @@ public class OrderService {
         try {
             OrderDAO orderDAO = findOrder(orderId, boutiqueId);
             if (orderDAO == null) {
-                return new ResponseEntity("Order not found", HttpStatus.NOT_FOUND);
+                return new ResponseEntity(localisationService.translate("Order not found"), HttpStatus.NOT_FOUND);
             }
 
             OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
@@ -365,9 +397,11 @@ public class OrderService {
             Integer paymentMode = getOrderPaymentMode(orderDAO.getId());
             InvoiceDetailResponse response = new InvoiceDetailResponse(invoiceDateTime, boutiqueName, customerName, recieveDateTime, summary, paymentMode);
 
+            response.getOrderSummary().getOrderItemSummaryList().forEach(orderItemSummary -> {                       orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
+            });
             return new ResponseEntity(response, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(localisationService.translate("Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }

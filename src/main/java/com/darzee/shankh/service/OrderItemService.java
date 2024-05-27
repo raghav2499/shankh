@@ -225,14 +225,7 @@ public class OrderItemService {
         }
         OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
         OrderItemDetails orderItemDetails = getOrderItemDetails(orderItemDAO);
-        orderItemDetails.setOutfitType(localisationService.translate(orderItemDetails.getOutfitType()));
-        orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> 
-        {
-innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));
-    innerMeasurementDetails.getMeasurementDetailsList().forEach(measurementDetails -> {
-        measurementDetails.setTitle(localisationService.translate(measurementDetails.getTitle()));
-        });
-}        );
+        orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
         return orderItemDetails;
     }
 
@@ -252,8 +245,7 @@ innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(inner
             try {
 
                 OrderItemDetails newOrderItemDetails = new OrderItemDetails(orderItem, outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
-                newOrderItemDetails.setOutfitType(localisationService.translate(newOrderItemDetails.getOutfitType()));
-                newOrderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
+                newOrderItemDetails.setOutfitAlias(localisationService.translate(newOrderItemDetails.getOutfitAlias()));               newOrderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
                     innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));
                     innerMeasurementDetails.getMeasurementDetailsList().forEach(measurementDetails -> {
                         measurementDetails.setTitle(localisationService.translate(measurementDetails.getTitle()));

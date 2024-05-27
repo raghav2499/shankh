@@ -44,8 +44,7 @@ public class OrderItemController {
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
         orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
-            orderItemSummary.setOutfitType(localisationService.translate(orderItemSummary.getOutfitType()));
-            orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
+    orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
         });
         
         CreateOrderResponse createOrderResponse = new CreateOrderResponse(localisationService.translate("Item created successfully") ,
@@ -59,8 +58,7 @@ public class OrderItemController {
                                                         @Valid @RequestBody OrderItemDetailRequest orderItemDetails) throws Exception {
         OrderSummary orderSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
         orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
-            orderItemSummary.setOutfitType(localisationService.translate(orderItemSummary.getOutfitType()));
-            orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
+    orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
         });
 
         return new ResponseEntity<>(orderSummary, HttpStatus.OK);
@@ -76,7 +74,7 @@ public class OrderItemController {
     @CrossOrigin
     public ResponseEntity<CreateStitchResponse> createStitchOptions(@Valid @RequestBody CreateStitchOptionRequest request) {
         StitchSummary stitchSummary = stitchOptionService.createStitchOptions(request);
-        CreateStitchResponse createStitchResponse = new CreateStitchResponse("Stitch options created successfully",
+        CreateStitchResponse createStitchResponse = new CreateStitchResponse(localisationService.translate("Stitch options created successfully"),
                 stitchSummary);
         return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);
     }

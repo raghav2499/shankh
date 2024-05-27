@@ -79,13 +79,7 @@ public class MeasurementService {
                                                         Long orderItemId, Integer outfitTypeIndex,
                                                         String scale, Boolean nonEmptyValuesOnly) throws Exception {
         OverallMeasurementDetails measurementDetails = getMeasurementDetails(customerId, measurementRevisionId, orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
-
-        measurementDetails.getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
-            innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));
-            innerMeasurementDetails.getMeasurementDetailsList().forEach(measurementDetail -> {
-measurementDetail.setValue(localisationService.translate(measurementDetail.getValue()));           measurementDetail.setTitle(localisationService.translate(measurementDetail.getTitle()));
-            });
-        });   measurementDetails.setMessage(localisationService.translate(getMeasurementDetailsMessage(measurementDetails)));
+         measurementDetails.setMessage(localisationService.translate(getMeasurementDetailsMessage(measurementDetails)));
         return new ResponseEntity(measurementDetails, HttpStatus.OK);
     }
 
@@ -163,7 +157,7 @@ measurementDetail.setValue(localisationService.translate(measurementDetail.getVa
             }
             return measurementsDAO;
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer id is invalid");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, localisationService.translate("Customer id is invalid") );
     }
 
     public ResponseEntity<GetMeasurementRevisionsResponse> getMeasurementRevisions(Long customerId,
@@ -238,28 +232,28 @@ measurementDetail.setValue(localisationService.translate(measurementDetail.getVa
 
     private String getMeasurementDetailsMessage(OverallMeasurementDetails measurementDetails) {
         String message = (!CollectionUtils.isEmpty(measurementDetails.getInnerMeasurementDetails()))
-                ? "Measurement details fetched sucessfully"
-                : "Measurement details not found";
+                ? localisationService.translate("Measurement details fetched sucessfully")
+                :  localisationService.translate("Measurement details not found");
         return message;
     }
 
     private void validateGetMeasurementRequestParams(Long customerId, Long measurementRevisionId,
                                                      Long orderItemId, Integer outfitTypeIndex, String scale) {
         if (orderItemId == null && measurementRevisionId == null && (customerId == null || outfitTypeIndex == null)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either send measurement rev id/ order item id" +
-                    " or (outfit type and customer id)");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, localisationService.translate("Either send measurement rev id/ order item id") +
+                    localisationService.translate(" or (outfit type and customer id)"));
         }
         if (outfitTypeIndex != null && !OutfitType.getOutfitOrdinalEnumMap().containsKey(outfitTypeIndex)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Outfit Type not supported");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,localisationService.translate("Outfit Type not supported"));
         }
         if (scale != null && !MeasurementScale.getEnumMap().containsKey(scale)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Measurement Scale");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, localisationService.translate("Invalid Measurement Scale"));
         }
     }
 
     private CreateMeasurementResponse generateCreateMeasurementResponse(MeasurementsDAO measurementDAO, Long customerId) {
         String successMessage = "Measurement details saved successfully";
-        CreateMeasurementResponse response = new CreateMeasurementResponse(successMessage,
+        CreateMeasurementResponse response = new CreateMeasurementResponse(localisationService.translate(successMessage),
                 customerId, measurementDAO.getId(), measurementDAO.getMeasurementRevision().getId());
         return response;
     }
