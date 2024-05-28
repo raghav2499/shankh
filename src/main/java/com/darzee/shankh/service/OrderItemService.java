@@ -243,14 +243,17 @@ public class OrderItemService {
         List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems, new CycleAvoidingMappingContext());
         List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream().map(orderItem -> {
             try {
-
                 OrderItemDetails newOrderItemDetails = new OrderItemDetails(orderItem, outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
-                newOrderItemDetails.setOutfitAlias(localisationService.translate(newOrderItemDetails.getOutfitAlias()));               newOrderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
+                newOrderItemDetails.setOutfitAlias(localisationService.translate(newOrderItemDetails.getOutfitAlias()));
+             if(newOrderItemDetails.getMeasurementDetails()!=null){
+                newOrderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
                     innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));
                     innerMeasurementDetails.getMeasurementDetailsList().forEach(measurementDetails -> {
                         measurementDetails.setTitle(localisationService.translate(measurementDetails.getTitle()));
                     });   
                 });
+             }  
+             if(newOrderItemDetails.getOrderItemStitchOptions()!=null){
                 newOrderItemDetails.getOrderItemStitchOptions().forEach(
                     (key,stitchOptionDetails)->{
                         stitchOptionDetails.forEach(
@@ -258,10 +261,10 @@ public class OrderItemService {
                                 stictchOptionDetail.setLabel(localisationService.translate(stictchOptionDetail.getLabel()));
                                 stictchOptionDetail.setValue(localisationService.translate(stictchOptionDetail.getValue()));;  
                             }
-                            
                         );
                     }
-                );
+                ); 
+             } 
                 return newOrderItemDetails;
 
             } catch (Exception e) {

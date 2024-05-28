@@ -173,18 +173,38 @@ public class OrderService {
         }).collect(Collectors.toList());
         GetOrderResponse response = new GetOrderResponse(orderDetailsList, totalRecordsCount);
         response.setMessage(localisationService.translate(response.getMessage()));
-        response.getData().forEach(orderDetailResponse -> {
-            orderDetailResponse.setMessage(localisationService.translate(orderDetailResponse.getMessage()));
-            orderDetailResponse.getOrderItemDetails().forEach(orderItemDetails -> {
-                orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
-                 orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
-                List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
-                orderStitchOptionDetails.forEach(orderStitchOptionDetail -> {
-                    orderStitchOptionDetail.setLabel(localisationService.translate(orderStitchOptionDetail.getLabel()));                 orderStitchOptionDetail.setValue(localisationService.translate(orderStitchOptionDetail.getValue()));
-                });
-            });
-            });
-        });
+        if(response.getData()!=null){
+            response.getData().forEach(orderDetailResponse -> {
+                //            orderDetailResponse.setMessage(localisationService.translate(orderDetailResponse.getMessage()));
+                            if(orderDetailResponse.getOrderItemDetails()!=null){
+                                orderDetailResponse.getOrderItemDetails().forEach(orderItemDetails -> {
+                                    if(orderItemDetails.getOutfitAlias()!=null) {
+                                        orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
+                                    }
+                                });
+                            }
+                            orderDetailResponse.getOrderItemDetails().forEach(orderItemDetails -> {
+                                if(orderItemDetails.getOrderItemStitchOptions()!=null){
+                                    orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
+                                                List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
+                                                orderStitchOptionDetails.forEach(orderStitchOptionDetail -> {
+                                                    orderStitchOptionDetail.setLabel(localisationService.translate(orderStitchOptionDetail.getLabel()));                 orderStitchOptionDetail.setValue(localisationService.translate(orderStitchOptionDetail.getValue()));
+                                                });
+                                            }
+                                    );
+                                }
+                               if(orderItemDetails.getMeasurementDetails()!=null&&orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()!=null) {
+                                   orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(measurementDetails -> {
+                                       measurementDetails.setOutfitTypeHeading(localisationService.translate(measurementDetails.getOutfitTypeHeading()));
+                                       measurementDetails.getMeasurementDetailsList().forEach(innerMeasurementDetails -> {
+                                           innerMeasurementDetails.setTitle(localisationService.translate(innerMeasurementDetails.getTitle()));
+                                       });
+                                   });
+                               }
+                            });
+                        });
+        }
+        
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -200,19 +220,24 @@ public class OrderService {
         String message = "Details fetched succesfully";
         OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount, orderItemDetailsList, paymentMode,localisationService.translate(message));
         response.getOrderItemDetails().forEach(orderItemDetails -> {
-            orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));         orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
-                List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
-                orderStitchOptionDetails.forEach(orderStitchOptionDetail -> {
-                    orderStitchOptionDetail.setLabel(localisationService.translate(orderStitchOptionDetail.getLabel()));                 orderStitchOptionDetail.setValue(localisationService.translate(orderStitchOptionDetail.getValue()));
+            orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
+            if(orderItemDetails.getOrderItemStitchOptions()!=null){
+                orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
+                            List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
+                            orderStitchOptionDetails.forEach(orderStitchOptionDetail -> {
+                                orderStitchOptionDetail.setLabel(localisationService.translate(orderStitchOptionDetail.getLabel()));                 orderStitchOptionDetail.setValue(localisationService.translate(orderStitchOptionDetail.getValue()));
+                            });
+                        }
+                );
+            }
+            if(orderItemDetails.getMeasurementDetails()!=null&&orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()!=null) {
+                orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(measurementDetails -> {
+                    measurementDetails.setOutfitTypeHeading(localisationService.translate(measurementDetails.getOutfitTypeHeading()));
+                    measurementDetails.getMeasurementDetailsList().forEach(innerMeasurementDetails -> {
+                        innerMeasurementDetails.setTitle(localisationService.translate(innerMeasurementDetails.getTitle()));
+                    });
                 });
-            });
-            
-            orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
-                innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));
-                innerMeasurementDetails.getMeasurementDetailsList().forEach(measurementDetails -> {
-                    measurementDetails.setTitle(localisationService.translate(measurementDetails.getTitle()));
-                });
-            });
+            }
         });
 
         return new ResponseEntity(response, HttpStatus.OK);
