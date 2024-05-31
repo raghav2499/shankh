@@ -23,6 +23,8 @@ target/
 *.iml
 *.ipr
 
+darzee-be75c-firebase-adminsdk-zd24s-72270a0045.json
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
