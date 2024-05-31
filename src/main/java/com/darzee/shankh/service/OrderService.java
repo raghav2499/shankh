@@ -179,7 +179,7 @@ public class OrderService {
                             if(orderDetailResponse.getOrderItemDetails()!=null){
                                 orderDetailResponse.getOrderItemDetails().forEach(orderItemDetails -> {
                                     if(orderItemDetails.getOutfitAlias()!=null) {
-                                        orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
+                                        // orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
                                     }
                                 });
                             }
@@ -220,7 +220,7 @@ public class OrderService {
         String message = "Details fetched succesfully";
         OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount, orderItemDetailsList, paymentMode,localisationService.translate(message));
         response.getOrderItemDetails().forEach(orderItemDetails -> {
-            orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
+            // orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
             if(orderItemDetails.getOrderItemStitchOptions()!=null){
                 orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
                             List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
@@ -421,9 +421,6 @@ public class OrderService {
 
             Integer paymentMode = getOrderPaymentMode(orderDAO.getId());
             InvoiceDetailResponse response = new InvoiceDetailResponse(invoiceDateTime, boutiqueName, customerName, recieveDateTime, summary, paymentMode);
-
-            response.getOrderSummary().getOrderItemSummaryList().forEach(orderItemSummary -> {                       orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
-            });
             return new ResponseEntity(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(localisationService.translate("Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);

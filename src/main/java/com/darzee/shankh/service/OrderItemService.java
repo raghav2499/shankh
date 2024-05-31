@@ -225,7 +225,6 @@ public class OrderItemService {
         }
         OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
         OrderItemDetails orderItemDetails = getOrderItemDetails(orderItemDAO);
-        orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
         return orderItemDetails;
     }
 
@@ -244,7 +243,7 @@ public class OrderItemService {
         List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream().map(orderItem -> {
             try {
                 OrderItemDetails newOrderItemDetails = new OrderItemDetails(orderItem, outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
-                newOrderItemDetails.setOutfitAlias(localisationService.translate(newOrderItemDetails.getOutfitAlias()));
+                // newOrderItemDetails.setOutfitAlias(localisationService.translate(newOrderItemDetails.getOutfitAlias()));
              if(newOrderItemDetails.getMeasurementDetails()!=null){
                 newOrderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
                     innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));

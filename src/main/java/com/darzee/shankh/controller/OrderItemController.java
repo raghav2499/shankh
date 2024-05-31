@@ -43,10 +43,6 @@ public class OrderItemController {
                 refreshedOrderOb.getInvoiceNo(),
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
-        orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
-    orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
-        });
-        
         CreateOrderResponse createOrderResponse = new CreateOrderResponse(localisationService.translate("Item created successfully") ,
                 orderSummary);
         return new ResponseEntity<>(createOrderResponse, HttpStatus.CREATED);
@@ -57,9 +53,9 @@ public class OrderItemController {
     public ResponseEntity<OrderSummary> updateOrderItem(@PathVariable("id") Long orderItemId,
                                                         @Valid @RequestBody OrderItemDetailRequest orderItemDetails) throws Exception {
         OrderSummary orderSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
-        orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
-    orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
-        });
+    //     orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
+    // orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
+    //     });
 
         return new ResponseEntity<>(orderSummary, HttpStatus.OK);
     }
