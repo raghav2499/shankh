@@ -209,8 +209,8 @@
                 <p class="invoice-details" id="main-para" th:text="${businessName}"></p>
             </div>
             <div class="right" style="float: right;">
-                <p class="invoice-details">Order Number: <span class="black" th:text="${orderNo}"></span></p>
-                <p class="invoice-details">Finish By: <span class="black" th:text="${invoiceNo}"></span></p>
+                <p class="invoice-details">ଅର୍ଡର ନମ୍ବର: <span class="black" th:text="${orderNo}"></span></p>
+                <p class="invoice-details">ଶେଷ କରିବା ସମୟ: <span class="black" th:text="${invoiceNo}"></span></p>
             </div>
         </div>
         <hr style="height: 1px; border: none; background-color: #000;">
@@ -258,7 +258,7 @@
 
                         </div>
                         <th:block th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 1}">
-                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
+                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">ସିଲାଇ ବିକଳ୍ପ</p>
                             <div th:each="stich_options : ${groupedStitchOptions.get(0)}" class="stich_options"
                                 style="display: flex; flex-wrap: wrap;width: 100%;">
 
@@ -387,12 +387,12 @@
         </div>
 
         <div class="special-instructions" th:if="${not #lists.isEmpty(specialInstructions)}">
-            <p class="invoice">Special Instructions</p>
+            <p class="invoice">ବିଶେଷ ନିର୍ଦେଶ</p>
             <p class="black" th:text="${specialInstructions}"></p>
         </div>
 
 <!--        <div class="audio_div" th:if="${not #lists.isEmpty(audioInstructions)}">-->
-<!--            <p class="invoice">Audio Instructions</p>-->
+<!--            <p class="invoice">ଅଡିଓ ନିର୍ଦ୍ଦେଶାବଳୀ</p>-->
 <!--            <div class="audio-row">-->
 <!--                <div class="audio-col" th:each="audio : ${audioInstructions}">-->
 <!--                    <audio th:attr="controls='true'">-->
@@ -404,13 +404,13 @@
 <!--        </div>-->
 
         <div class="Inspiration" th:if="${not #lists.isEmpty(inspiration)}">
-            <p class="invoice">Inspiration</p>
+            <p class="invoice">ତୁମର ପ୍ରେରଣା </p>
             <a th:href="${inspiration}" target="_blank" rel="noopener noreferrer">Link to Inspiration</a>
         </div>
 
 
         <div class="image_div" th:if="${not #lists.isEmpty(clothImages)}">
-            <p class="invoice">Cloth Images</p>
+            <p class="invoice">କପଡ଼।ର ଛବି</p>
             <div class="image-row">
                 <!-- Iterate over each image -->
                 <div class="image-col" th:each="image : ${clothImages}">
