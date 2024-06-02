@@ -158,7 +158,10 @@ public class BoutiqueLedgerService {
             Integer month = previousMonthDate.getMonthValue();
             Integer year = previousMonthDate.getYear();
 
-            BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotDAO = new BoutiqueLedgerSnapshotDAO(boutiqueLedgerDAO.getMonthlyPendingAmount(), boutiqueLedgerDAO.getMonthlyAmountRecieved(), boutiqueLedgerDAO.getMonthlyActiveOrders(), boutiqueId, month, year);
+            BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotDAO = new BoutiqueLedgerSnapshotDAO(boutiqueLedgerDAO.getMonthlyPendingAmount(),
+                    boutiqueLedgerDAO.getMonthlyAmountRecieved(), boutiqueLedgerDAO.getMonthlyActiveOrders(),
+                    boutiqueLedgerDAO.getMonthlyClosedOrders(),
+                    boutiqueId, month, year);
             boutiqueLedgerDAO.resetMonthlyDetailsInLedger();
             snapshotRepo.save(mapper.boutiqueLedgerSnapshotDAOToSnapshot(boutiqueLedgerSnapshotDAO));
             repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));
