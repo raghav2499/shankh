@@ -4,6 +4,7 @@ import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.enums.FileType;
+import com.darzee.shankh.enums.Language;
 import com.darzee.shankh.enums.UploadFileType;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.FileReferenceRepo;
@@ -108,9 +109,13 @@ public class BucketService {
         return fileUploadResult.getValue();
     }
 
-    public String uploadItemDetailsPDF(File file, Long orderItemId) {
+    public String uploadItemDetailsPDF(File file, Long orderItemId, Language language) {
+        if(language == null) {
+            language = Language.ENGLISH;
+        }
         String fileName = String.valueOf(orderItemId);
-        ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, itemDetailsDirectory + fileName);
+        ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, itemDetailsDirectory +
+                fileName + "-" + language.getNotation());
         return fileUploadResult.getValue();
     }
 
@@ -119,7 +124,7 @@ public class BucketService {
         return client.generateShortLivedUrl(fileLocation, false);
     }
 
-    public String getItemDetailsShortLivedLink(Long orderItemId) {
+    public String getItemDetailsShortLivedLink(Long orderItemId, Language language) {
         String fileLocation = itemDetailsDirectory + orderItemId;
         return client.generateShortLivedUrl(fileLocation, false);
     }

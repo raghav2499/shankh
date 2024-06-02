@@ -3,6 +3,7 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.MeasurementRevisions;
 import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.enums.Language;
 import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -158,7 +159,7 @@ public class OrderOrderItemCommonService {
         orderDAO = orderService.updateOrderPostItemUpdation(orderDAO, orderItemDetails.getAmountRefunded(), shouldUpdateLedger);
         orderService.generateInvoiceV2(orderDAO);
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
-        generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
+//        generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
         OrderSummary orderItemSummary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(),
                 orderDAO.getInvoiceNo(), orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
@@ -191,12 +192,12 @@ public class OrderOrderItemCommonService {
         List<OrderItemDAO> orderItems = orderDAO.getOrderItems();
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
         for (OrderItemDAO orderItem : orderItems) {
-            generateItemDetailPdf(orderItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
+//            generateItemDetailPdf(orderItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
         }
     }
 
     public void generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId, String boutiqueName,
-                                      Long orderNo) throws Exception {
+                                      Long orderNo, Language language) throws Exception {
         Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions =
                 stitchOptionService.getOrderItemStitchOptions(orderItemDAO.getId());
         MeasurementRevisions measurementRevisions =
@@ -212,7 +213,7 @@ public class OrderOrderItemCommonService {
 
         File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions,
                 innerMeasurementDetailsList, clothImageLinks, audioInstructionLinks, orderItemDAO);
-        bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
+        bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId(), language);
     }
 
     /*

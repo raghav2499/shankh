@@ -49,7 +49,7 @@ public class StitchOptionService {
     @Transactional
     public StitchSummary createStitchOptions(CreateStitchOptionRequest createStitchOptionRequest) {
 
-        validateCreateStitchOptionRequest(createStitchOptionRequest);
+        validateStitchOptionRequest(createStitchOptionRequest);
         List<StitchDetails> stitchDetails = createStitchOptionRequest.getStitchDetails();
         List<OrderStitchOptionDAO> orderStitchOptionDAOs = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class StitchOptionService {
 
     @Transactional
     public StitchSummary updateStitchOptions(Long orderItemId, CreateStitchOptionRequest updateStitchOptionRequest) {
-        validateUpdateStitchOptionRequest(updateStitchOptionRequest);
+        validateStitchOptionRequest(updateStitchOptionRequest);
         List<StitchDetails> stitchDetails = updateStitchOptionRequest.getStitchDetails();
         List<OrderStitchOptionDAO> existingStitchOptions = mapper.orderStitchOptionListToOrderStitchOptionDAOList(orderStitchOptionsRepo.findAllByOrderItemIdAndIsValid(orderItemId, Boolean.TRUE));
         for (OrderStitchOptionDAO stitchOption : existingStitchOptions) {
@@ -90,19 +90,16 @@ public class StitchOptionService {
         orderStitchOptionsRepo.saveAll(mapper.orderStitchOptionDAOListToOrderStitchOptionList(orderStitchOptionDAOs));
     }
 
-    private void validateCreateStitchOptionRequest(CreateStitchOptionRequest request) {
+    private void validateStitchOptionRequest(CreateStitchOptionRequest request) {
         List<Long> stitchOptionIdInRequest = request.getStitchDetails().stream().map(stitchDetails -> stitchDetails.getStitchOptionId()).collect(Collectors.toList());
         List<StitchOptions> stitchOptions = stitchOptionsRepo.findAllByIdIn(stitchOptionIdInRequest);
         if (stitchOptions == null || stitchOptions.size() != request.getStitchDetails().size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some Stitch Option ID is invalid");
         }
-    }
-
-    private void validateUpdateStitchOptionRequest(CreateStitchOptionRequest request) {
-        List<Long> stitchOptionIdInRequest = request.getStitchDetails().stream().map(stitchDetails -> stitchDetails.getStitchOptionId()).collect(Collectors.toList());
-        List<StitchOptions> stitchOptions = stitchOptionsRepo.findAllByIdIn(stitchOptionIdInRequest);
-        if (stitchOptions == null || stitchOptions.size() != request.getStitchDetails().size()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some Stitch Option ID is invalid");
+        for(StitchDetails stitchDetail : request.getStitchDetails()) {
+            if(CollectionUtils.isEmpty(stitchDetail.getValues())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Stitch option value");
+            }
         }
     }
 

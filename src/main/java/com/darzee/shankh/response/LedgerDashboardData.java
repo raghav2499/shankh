@@ -19,5 +19,6 @@ public class LedgerDashboardData {
         this.amountRecieved = ledgerSnapshot.getAmountRecieved();
         this.pendingAmount = pendingAmount;
         this.activeOrderCount = activeOrderCount;
+        this.closedOrderCount = ledgerSnapshot.getClosedOrderCount();
     }
 }
