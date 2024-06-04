@@ -25,6 +25,9 @@ public class BoutiqueLedgerSnapshot {
     @Column(name = "active_order_count", nullable = false)
     private Integer activeOrderCount;
 
+    @Column(name = "closed_order_count", nullable = false)
+    private Integer closedOrderCount;
+
     @Column(name = "boutique_id", nullable = false)
     private Long boutiqueId;
 
