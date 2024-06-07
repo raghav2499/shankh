@@ -391,6 +391,18 @@
             <p class="black" th:text="${specialInstructions}"></p>
         </div>
 
+        <div class="audio_div" th:if="${not #lists.isEmpty(audioInstructions)}">
+            <p class="invoice">Audio Instructions</p>
+            <div class="audio-row">
+                <div class="audio-col" th:each="audio : ${audioInstructions}">
+                    <audio th:attr="controls='true'">
+                        <source th:src="@{${audioInstructions}}" type="audio/mpeg" />
+                        <p>Your browser does not support the audio element. You can <a th:href="@{${audioInstructions}}" target="_blank">listen to the audio here</a>.</p>
+                    </audio>
+                </div>
+            </div>
+        </div>
+
 <!--        <div class="audio_div" th:if="${not #lists.isEmpty(audioInstructions)}">-->
 <!--            <p class="invoice">Audio Instructions</p>-->
 <!--            <div class="audio-row">-->
