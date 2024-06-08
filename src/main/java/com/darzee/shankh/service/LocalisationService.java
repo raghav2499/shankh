@@ -15,7 +15,7 @@ public class LocalisationService {
     }
 
     public String translate(String englishText) {
-        if(englishText == null) return null;
+        if (englishText == null) return null;
         String key = englishText.toLowerCase().replace(" ", ".");
         Locale locale = LocaleContextHolder.getLocale();
         return messageSource.getMessage(key, null, "No translation found for :" + englishText, locale);

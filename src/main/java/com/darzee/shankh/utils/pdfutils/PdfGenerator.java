@@ -10,6 +10,8 @@ import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.service.OutfitTypeObjectService;
 import com.darzee.shankh.service.OutfitTypeService;
+import com.darzee.shankh.service.translator.MeasurementDetailsTranslator;
+import com.darzee.shankh.service.translator.OrderStitchOptionsTranslator;
 import com.darzee.shankh.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,6 +33,12 @@ public class PdfGenerator {
     @Autowired
     private OutfitTypeObjectService outfitTypeObjectService;
 
+    @Autowired
+    private OrderStitchOptionsTranslator orderStitchOptionsTranslator;
+
+    @Autowired
+    private MeasurementDetailsTranslator measurementDetailsTranslator;
+
     private final TemplateEngine templateEngine;
 
     @Autowired
@@ -48,9 +56,7 @@ public class PdfGenerator {
         Set<String> resolvablePatterns = new HashSet<>();
 //        resolvablePatterns.add("bill_template");
         resolvablePatterns.add("bill_template_v2");
-        for(Language language : Language.values()) {
-            resolvablePatterns.add(getItemDetailsFileName(language));
-        }
+        resolvablePatterns.add("item-details");
         templateResolver.setResolvablePatterns(resolvablePatterns);
         templateResolver.setCheckExistence(true);
         templateEngine.setTemplateResolver(templateResolver);
@@ -160,11 +166,14 @@ public class PdfGenerator {
         String inspiration = Optional.ofNullable(orderItem.getInspiration()).orElse("");
         List<List<OrderStitchOptionDetail>> groupedStitchOptionList = new ArrayList<>();
         if (groupedStitchOptions.containsKey(OutfitSide.TOP.getView())) {
-            groupedStitchOptionList.add(groupedStitchOptions.get(OutfitSide.TOP.getView()));
+            groupedStitchOptionList.add(
+                    orderStitchOptionsTranslator.translate(groupedStitchOptions.get(OutfitSide.TOP.getView())));
         }
         if (groupedStitchOptions.containsKey(OutfitSide.BOTTOM.getView())) {
-            groupedStitchOptionList.add(groupedStitchOptions.get(OutfitSide.BOTTOM.getView()));
+            groupedStitchOptionList.add(
+                    orderStitchOptionsTranslator.translate(groupedStitchOptions.get(OutfitSide.BOTTOM.getView())));
         }
+        measurementDetails = measurementDetailsTranslator.translate(measurementDetails);
 
         // Create a JavaScript object and set the dynamic data
         context.setVariable("businessName", boutiqueName);
@@ -177,8 +186,8 @@ public class PdfGenerator {
         context.setVariable("specialInstructions", specialInstructions);
         context.setVariable("inspiration", inspiration);
         context.setVariable("clothImages", clothImages);
-        context.setVariable("audioInstructions", audioInstructionLinks);        // Process the HTML template with the Thymeleaf template engine
-        String processedHtml = templateEngine.process(getItemDetailsFileName(language), context);
+        context.setVariable("audioInstructions", audioInstructionLinks);
+        String processedHtml = templateEngine.process("item-details", context);
 
         // Generate PDF from the processed HTML
         ITextRenderer renderer = new ITextRenderer();
@@ -191,38 +200,5 @@ public class PdfGenerator {
         }
 
         return outputFile;
-    }
-
-    private String getItemDetailsFileName(Language language) {
-        switch (language) {
-            case ENGLISH:
-                return "item-details";
-            case HINDI:
-                return "item-details-hi";
-            case PUNJABI:
-                return "item-details-pa";
-            case GUJARATI:
-                return "item-details-pa";
-            case MARATHI:
-                return "item-details-mr";
-            case TELUGU:
-                return "item-details-te";
-            case BENGALI:
-                return "item-details-bn";
-            case KANNADA:
-                return "item-details-kn";
-            case MALYALAM:
-                return "item-details-ml";
-            case ODIA:
-                return "item-details-or";
-            case ASSAMESE:
-                return "item-details-as";
-            case TAMIL:
-                return "item-details-ta";
-            case URDU:
-                return "item-details-ur";
-            default:
-                return "item-details";
-        }
     }
 }
