@@ -85,9 +85,6 @@ public class OrderOrderItemCommonService {
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         OrderSummary summary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
-        // summary.getOrderItemSummaryList().forEach(orderItemSummary -> {                     orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
-            
-        // });
         orderService.generateInvoiceV2(orderDAO);
         generateItemDetailPdfs(orderDAO);
         return new ResponseEntity<>(summary, HttpStatus.OK);

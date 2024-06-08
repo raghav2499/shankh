@@ -225,7 +225,7 @@ public class OrderItemService {
         }
         OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
         OrderItemDetails orderItemDetails = getOrderItemDetails(orderItemDAO);
-        // orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
+        
         return orderItemDetails;
     }
 

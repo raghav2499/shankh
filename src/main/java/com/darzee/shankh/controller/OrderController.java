@@ -38,9 +38,6 @@ public class OrderController {
                 refreshedOrderOb.getInvoiceNo(),
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
-        // orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
-        //     orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
-        // });
         return new ResponseEntity<OrderSummary>(orderSummary, HttpStatus.CREATED);
     }
 
