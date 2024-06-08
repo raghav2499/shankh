@@ -52,10 +52,7 @@ public class OrderItemController {
     public ResponseEntity<OrderSummary> updateOrderItem(@PathVariable("id") Long orderItemId,
                                                         @Valid @RequestBody OrderItemDetailRequest orderItemDetails) throws Exception {
         OrderSummary orderSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
-    //     orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
-    // orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
-    //     });
-
+        
         return new ResponseEntity<>(orderSummary, HttpStatus.OK);
     }
 
