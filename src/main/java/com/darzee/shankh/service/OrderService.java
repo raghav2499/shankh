@@ -421,7 +421,6 @@ public class OrderService {
 
             Integer paymentMode = getOrderPaymentMode(orderDAO.getId());
             InvoiceDetailResponse response = new InvoiceDetailResponse(invoiceDateTime, boutiqueName, customerName, recieveDateTime, summary, paymentMode);
-
             return new ResponseEntity(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(localisationService.translate("Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);

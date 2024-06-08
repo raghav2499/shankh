@@ -224,8 +224,7 @@ public class OrderItemService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,localisationService.translate("Incorrect order item id") );
         }
         OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
-        OrderItemDetails orderItemDetails = getOrderItemDetails(orderItemDAO);
-        
+        OrderItemDetails orderItemDetails = getOrderItemDetails(orderItemDAO);        
         return orderItemDetails;
     }
 

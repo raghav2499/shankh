@@ -42,8 +42,7 @@ public class OrderItemController {
         OrderSummary orderSummary = new OrderSummary(refreshedOrderOb.getId(), refreshedOrderOb.getBoutiqueOrderId(),
                 refreshedOrderOb.getInvoiceNo(),
                 orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
-                orderDAO.getNonDeletedItems());
-                
+                orderDAO.getNonDeletedItems());                
         CreateOrderResponse createOrderResponse = new CreateOrderResponse(localisationService.translate("Item created successfully") ,
                 orderSummary);
         return new ResponseEntity<>(createOrderResponse, HttpStatus.CREATED);
