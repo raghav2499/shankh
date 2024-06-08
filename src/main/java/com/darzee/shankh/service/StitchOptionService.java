@@ -1,5 +1,6 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.constants.ErrorMessages;
 import com.darzee.shankh.dao.OrderStitchOptionDAO;
 import com.darzee.shankh.dao.StitchOptionsDAO;
 import com.darzee.shankh.entity.OrderStitchOptions;
@@ -16,9 +17,14 @@ import com.darzee.shankh.response.GetOrderStitchOptionResponse;
 import com.darzee.shankh.response.GetStitchOptionsResponse;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.response.StitchSummary;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
+import com.darzee.shankh.service.translator.OrderStitchOptionsTranslator;
+import com.darzee.shankh.service.translator.StitchOptionResponseTranslator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.support.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -47,7 +53,13 @@ public class StitchOptionService {
     private OrderRepo orderRepo;
 
     @Autowired
-    private LocalisationService localisationService;
+    private StitchOptionResponseTranslator stitchOptionResponseTranslator;
+
+    @Autowired
+    private OrderStitchOptionsTranslator orderStitchOptionsTranslator;
+
+    @Autowired
+    private ErrorMessageTranslator errorMessageTranslator;
 
     @Transactional
     public StitchSummary createStitchOptions(CreateStitchOptionRequest createStitchOptionRequest) {
@@ -97,7 +109,8 @@ public class StitchOptionService {
         List<Long> stitchOptionIdInRequest = request.getStitchDetails().stream().map(stitchDetails -> stitchDetails.getStitchOptionId()).collect(Collectors.toList());
         List<StitchOptions> stitchOptions = stitchOptionsRepo.findAllByIdIn(stitchOptionIdInRequest);
         if (stitchOptions == null || stitchOptions.size() != request.getStitchDetails().size()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some Stitch Option ID is invalid");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
     }
 
@@ -105,47 +118,27 @@ public class StitchOptionService {
         List<Long> stitchOptionIdInRequest = request.getStitchDetails().stream().map(stitchDetails -> stitchDetails.getStitchOptionId()).collect(Collectors.toList());
         List<StitchOptions> stitchOptions = stitchOptionsRepo.findAllByIdIn(stitchOptionIdInRequest);
         if (stitchOptions == null || stitchOptions.size() != request.getStitchDetails().size()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Some Stitch Option ID is invalid");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,errorMessage );
         }
     }
 
     public GetStitchOptionsResponse getStitchOptions(Integer outfitId) {
         OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(outfitId);
         if (outfitType == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Outfit Id");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_OUTFIT_ID);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
         List<StitchOptionsDAO> stitchOptions =  mapper.stitchOptionListToStitchOptionDAOList(stitchOptionsRepo.findAllByOutfitTypeAndIsValidOrderByPriority(outfitType, Boolean.TRUE));
-        GetStitchOptionsResponse stitchOptionsResponse = new GetStitchOptionsResponse(stitchOptions);
-        stitchOptionsResponse.getResponse().forEach(groupedStitchOptionDetails -> {
-            if (groupedStitchOptionDetails != null && groupedStitchOptionDetails.getStitchOptions() != null) {
-                groupedStitchOptionDetails.getStitchOptions().forEach(stitchOption -> {
-                    if (stitchOption != null) {
-                        stitchOption.setLabel(localisationService.translate(stitchOption.getLabel()));
-                        if (stitchOption.getOptions() != null) {
-                            stitchOption.getOptions().forEach(option -> {
-                                if (option != null) {
-                                    option.setLabel(localisationService.translate(option.getLabel()));
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-        });
+        GetStitchOptionsResponse stitchOptionsResponse = new GetStitchOptionsResponse(stitchOptions);                        
+        stitchOptionsResponse = stitchOptionResponseTranslator.getTranslatedStitchOptionDetailList(stitchOptionsResponse);
         return stitchOptionsResponse;
     }
 
     public ResponseEntity getOrderItemStitchOptionsResponse(Long orderItemId) {
         Map<String, List<OrderStitchOptionDetail>> groupedOrderStitchOptionDetail = getOrderItemStitchOptions(orderItemId);    
         GetOrderStitchOptionResponse response = new GetOrderStitchOptionResponse(groupedOrderStitchOptionDetail);
-        response.getResponse().forEach(
-                groupedOrderStitchOptionDetail1 -> groupedOrderStitchOptionDetail1.getStitchOptions().forEach(
-                        stitchOption-> {
-                stitchOption.setLabel(localisationService.translate(stitchOption.getLabel()));
-                stitchOption.setValue(localisationService.translate(stitchOption.getValue())); 
-                        }
-                ) 
-        );
+        response = orderStitchOptionsTranslator.translateGetOrderStitchOptionResponse(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

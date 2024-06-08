@@ -1,5 +1,7 @@
 package com.darzee.shankh.controller;
 
+import com.amazonaws.services.dynamodbv2.xspec.S;
+import com.darzee.shankh.constants.SuccesssMessages;
 import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.repo.OrderItemRepo;
 import com.darzee.shankh.request.CreateStitchOptionRequest;
@@ -10,6 +12,9 @@ import com.darzee.shankh.service.LocalisationService;
 import com.darzee.shankh.service.OrderItemService;
 import com.darzee.shankh.service.OrderOrderItemCommonService;
 import com.darzee.shankh.service.StitchOptionService;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
+import com.darzee.shankh.service.translator.SuccessMessageTranslator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,8 +36,14 @@ public class OrderItemController {
     private StitchOptionService stitchOptionService;
     @Autowired
     private OrderItemRepo orderItemRepo;
+    // @Autowired
+    // private LocalisationService localisationService;
+
     @Autowired
-    private LocalisationService localisationService;
+    private SuccessMessageTranslator successMessageTranslator;
+
+    @Autowired
+    private ErrorMessageTranslator errorMessageTranslator;
 
     @PostMapping(value = "/order_item/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
@@ -41,8 +52,9 @@ public class OrderItemController {
         OrderDAO refreshedOrderOb = orderOrderItemCommonService.refresh(orderDAO.getId());//this hot reload is required to reload the values generated in run time like boutique_order_id, created_at
         OrderSummary orderSummary = new OrderSummary(refreshedOrderOb.getId(), refreshedOrderOb.getBoutiqueOrderId(),
                 refreshedOrderOb.getInvoiceNo(),
-                orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),             orderDAO.getNonDeletedItems());                
-        CreateOrderResponse createOrderResponse = new CreateOrderResponse(localisationService.translate("Item created successfully") ,
+                orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),             orderDAO.getNonDeletedItems());  
+                String successMessage = successMessageTranslator.getTranslatedMessage(SuccesssMessages.ITEM_CREATE_SUCCESS);              
+        CreateOrderResponse createOrderResponse = new CreateOrderResponse(successMessage ,
                 orderSummary);
         return new ResponseEntity<>(createOrderResponse, HttpStatus.CREATED);
     }
@@ -66,7 +78,8 @@ public class OrderItemController {
     @CrossOrigin
     public ResponseEntity<CreateStitchResponse> createStitchOptions(@Valid @RequestBody CreateStitchOptionRequest request) {
         StitchSummary stitchSummary = stitchOptionService.createStitchOptions(request);
-        CreateStitchResponse createStitchResponse = new CreateStitchResponse(localisationService.translate("Stitch options created successfully"),
+        String successMessage = successMessageTranslator.getTranslatedMessage(SuccesssMessages.STITCH_OPTIONS_CREATE_SUCCESS);
+        CreateStitchResponse createStitchResponse = new CreateStitchResponse(successMessage,
                 stitchSummary);
         return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);
     }
@@ -76,7 +89,8 @@ public class OrderItemController {
     public ResponseEntity<CreateStitchResponse> updateStitchOptions(@PathVariable("id") Long orderItemId,
                                                                     @Valid @RequestBody CreateStitchOptionRequest request) {
         StitchSummary stitchSummary = stitchOptionService.updateStitchOptions(orderItemId, request);
-        CreateStitchResponse createStitchResponse = new CreateStitchResponse(localisationService.translate("Stitch options created successfully"),
+        String successMessage = successMessageTranslator.getTranslatedMessage(SuccesssMessages.STITCH_OPTIONS_CREATE_SUCCESS);
+        CreateStitchResponse createStitchResponse = new CreateStitchResponse(successMessage,
                 stitchSummary);
         return new ResponseEntity<>(createStitchResponse, HttpStatus.CREATED);
     }

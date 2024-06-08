@@ -1,6 +1,7 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
+import com.darzee.shankh.constants.ErrorMessages;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.OrderItem;
@@ -13,13 +14,17 @@ import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
 import com.darzee.shankh.service.translator.OrderItemDetailsTranslator;
+import com.darzee.shankh.service.translator.SuccessMessageTranslator;
+
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.support.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -82,10 +87,13 @@ public class OrderItemService {
     private OrderRepo orderRepo;
 
     @Autowired
-    private PriceBreakUpRepo priceBrekupRepo;
+    private PriceBreakUpRepo priceBrekupRepo; 
 
     @Autowired
-    private LocalisationService localisationService;
+    private SuccessMessageTranslator successMessageTranslator;
+
+    @Autowired
+    private ErrorMessageTranslator errorMessageTranslator;
 
     @Transactional
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
@@ -96,7 +104,8 @@ public class OrderItemService {
         for (OrderItemDetailRequest itemDetail : orderItemDetails) {
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
             if (outfitType == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid outfit type " + itemDetail.getOutfitType());
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_OUTFIT_TYPE_ERROR)+itemDetail.getOutfitType();
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
 
             MeasurementRevisionsDAO measurementRevisionsDAO = null;
@@ -151,7 +160,8 @@ public class OrderItemService {
         if (orderItemOb.isPresent()) {
             orderItem = mapper.orderItemToOrderItemDAO(orderItemOb.get(), new CycleAvoidingMappingContext());
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item ID is invalid");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ID_ERROR);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
 
         if (orderItem.isStatusUpdated(updateItemDetail.getItemStatus())) {
@@ -225,7 +235,8 @@ public class OrderItemService {
     public OrderItemDetails getOrderItemDetails(Long orderItemId) throws Exception {
         Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
         if (!orderItem.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,localisationService.translate("Incorrect order item id") );
+            String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ITEM_ID_ERROR);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
         OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
         
@@ -332,7 +343,8 @@ public class OrderItemService {
 
     private void validateGetOrderItemRequest(Long boutiqueId, Long orderId) {
         if (boutiqueId == null && orderId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either Order ID or Boutique ID is mandatory");
+            final String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ID_ERROR);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
     }
 

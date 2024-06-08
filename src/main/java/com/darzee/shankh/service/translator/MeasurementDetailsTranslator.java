@@ -1,6 +1,7 @@
 package com.darzee.shankh.service.translator;
 
 import com.darzee.shankh.response.InnerMeasurementDetails;
+import com.darzee.shankh.response.MeasurementDetails;
 import com.darzee.shankh.service.LocalisationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,4 +23,19 @@ public class MeasurementDetailsTranslator {
         }
         return measurementDetails;
     }
+
+    public List<MeasurementDetails> translateMeasurementDetailsList(List<MeasurementDetails> measurementDetails) {
+       for(MeasurementDetails measurementDetail : measurementDetails) {
+        measurementDetail.setTitle(localisationService.translate(measurementDetail.getTitle()));
+       }
+        return measurementDetails;
+    }
+
+    public List<InnerMeasurementDetails> translateInnerMeasurementDetailsList(List<InnerMeasurementDetails> measurementDetails) {
+        for(InnerMeasurementDetails measurementDetail : measurementDetails) {
+            measurementDetail.setOutfitTypeHeading(localisationService.translate(measurementDetail.getOutfitTypeHeading()));
+        }
+        return measurementDetails;
+    }
+    
 }

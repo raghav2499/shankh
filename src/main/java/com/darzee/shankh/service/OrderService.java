@@ -1,6 +1,8 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
+import com.darzee.shankh.constants.ErrorMessages;
+import com.darzee.shankh.constants.SuccesssMessages;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
@@ -18,6 +20,9 @@ import com.darzee.shankh.request.OrderCreationRequest;
 import com.darzee.shankh.request.RecievePaymentRequest;
 import com.darzee.shankh.request.innerObjects.OrderAmountDetails;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
+import com.darzee.shankh.service.translator.GetOrderResponseTranslator;
+import com.darzee.shankh.service.translator.SuccessMessageTranslator;
 import com.darzee.shankh.utils.TimeUtils;
 import com.darzee.shankh.utils.pdfutils.PdfGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -105,8 +110,14 @@ public class OrderService {
     @Autowired
     private PaymentRepo paymentRepo;
 
-    @Autowired 
-    private LocalisationService localisationService;
+    @Autowired
+    private SuccessMessageTranslator successMessageTranslator;
+
+    @Autowired
+    private ErrorMessageTranslator errorMessageTranslator;
+
+    @Autowired
+    private GetOrderResponseTranslator getOrderResponseTranslator;
 
     @Transactional
     public OrderDAO findOrCreateNewOrder(Long orderId, Long boutiqueId, Long customerId) {
@@ -138,7 +149,8 @@ public class OrderService {
             orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
             return orderDAO;
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, localisationService.translate("Invalid customer id or boutique id"));
+        String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_ERROR);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     public ResponseEntity<GetOrderResponse> getOrder(Long boutiqueId, String orderItemStatusList,
@@ -172,39 +184,7 @@ public class OrderService {
             }
         }).collect(Collectors.toList());
         GetOrderResponse response = new GetOrderResponse(orderDetailsList, totalRecordsCount);
-        response.setMessage(localisationService.translate(response.getMessage()));
-        if(response.getData()!=null){
-            response.getData().forEach(orderDetailResponse -> {
-                //            orderDetailResponse.setMessage(localisationService.translate(orderDetailResponse.getMessage()));
-                            if(orderDetailResponse.getOrderItemDetails()!=null){
-                                orderDetailResponse.getOrderItemDetails().forEach(orderItemDetails -> {
-                                    if(orderItemDetails.getOutfitAlias()!=null) {
-                                        // orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
-                                    }
-                                });
-                            }
-                            orderDetailResponse.getOrderItemDetails().forEach(orderItemDetails -> {
-                                if(orderItemDetails.getOrderItemStitchOptions()!=null){
-                                    orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
-                                                List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
-                                                orderStitchOptionDetails.forEach(orderStitchOptionDetail -> {
-                                                    orderStitchOptionDetail.setLabel(localisationService.translate(orderStitchOptionDetail.getLabel()));                 orderStitchOptionDetail.setValue(localisationService.translate(orderStitchOptionDetail.getValue()));
-                                                });
-                                            }
-                                    );
-                                }
-                               if(orderItemDetails.getMeasurementDetails()!=null&&orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()!=null) {
-                                   orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(measurementDetails -> {
-                                       measurementDetails.setOutfitTypeHeading(localisationService.translate(measurementDetails.getOutfitTypeHeading()));
-                                       measurementDetails.getMeasurementDetailsList().forEach(innerMeasurementDetails -> {
-                                           innerMeasurementDetails.setTitle(localisationService.translate(innerMeasurementDetails.getTitle()));
-                                       });
-                                   });
-                               }
-                            });
-                        });
-        }
-        
+        response =getOrderResponseTranslator.getTranslatedOrderDetailList(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -217,28 +197,9 @@ public class OrderService {
             orderItemDetailsList.add(new OrderItemDetails(item, null));
         }
         Integer paymentMode = getOrderPaymentMode(order.getId());
-        String message = "Details fetched succesfully";
-        OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount, orderItemDetailsList, paymentMode,localisationService.translate(message));
-        response.getOrderItemDetails().forEach(orderItemDetails -> {
-            // orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
-            if(orderItemDetails.getOrderItemStitchOptions()!=null){
-                orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
-                            List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
-                            orderStitchOptionDetails.forEach(orderStitchOptionDetail -> {
-                                orderStitchOptionDetail.setLabel(localisationService.translate(orderStitchOptionDetail.getLabel()));                 orderStitchOptionDetail.setValue(localisationService.translate(orderStitchOptionDetail.getValue()));
-                            });
-                        }
-                );
-            }
-            if(orderItemDetails.getMeasurementDetails()!=null&&orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()!=null) {
-                orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(measurementDetails -> {
-                    measurementDetails.setOutfitTypeHeading(localisationService.translate(measurementDetails.getOutfitTypeHeading()));
-                    measurementDetails.getMeasurementDetailsList().forEach(innerMeasurementDetails -> {
-                        innerMeasurementDetails.setTitle(localisationService.translate(innerMeasurementDetails.getTitle()));
-                    });
-                });
-            }
-        });
+        String message = successMessageTranslator.getTranslatedMessage(SuccesssMessages.DETAILS_FETCH_SUCCESS);
+        OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount, orderItemDetailsList, paymentMode,message);
+        
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -248,7 +209,8 @@ public class OrderService {
         OrderDAO orderDAO = findOrder(orderId, boutiqueId);
         validateOrderAmountInRequest(request.getOrderDetails().getOrderAmountDetails());
         if (!orderDAO.validateMandatoryOrderFields()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,localisationService.translate("Some mandatory fields in order are missing.")  + localisationService.translate(" Boutique ID and customer ID are mandatory fields"));
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.MANDATORY_FIELDS_MISSING)+errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_AND_CUSTOMER_ID);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,errorMessage);
         }
         orderItemService.validateMandatoryOrderItemFields(orderDAO.getNonDeletedItems());
 
@@ -257,7 +219,8 @@ public class OrderService {
         Double totalOrderAmount = orderAmountDAO.getTotalAmount();
 
         if (!priceBreakupSum.equals(totalOrderAmount)) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,localisationService.translate("Items' Price Breakups are not summing up to total amount. ")  +localisationService.translate( "Total amount ") + totalOrderAmount + localisationService.translate(" and price break up sum " )+ priceBreakupSum);
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_PRICE_BREAKUP)+totalOrderAmount+errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_PRICE_BREAKUP_SUM)+priceBreakupSum;
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,errorMessage);
         }
         orderDAO.setOrderStatus(OrderStatus.ACCEPTED);
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
@@ -361,18 +324,19 @@ public class OrderService {
         Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
         Double amountRecieved = request.getAmount();
         if (amountRecieved > pendingAmount) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,localisationService.translate("Amount recieved is greater than pending order amount. Amount Received : ")  + amountRecieved +localisationService.translate(" Pending Amount : ")  + pendingAmount);
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_AMOUNT_RECEIVED)+amountRecieved+errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_PENDING_AMOUNT_RECEIVED)+pendingAmount;    
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,errorMessage);
         }
         orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() + amountRecieved);
         orderAmountRepo.save(mapper.orderAmountDaoToOrderAmountObject(orderAmountDAO, new CycleAvoidingMappingContext()));
 
         boutiqueLedgerService.updateBoutiqueLedgerAmountDetails(null, orderDAO.getBoutiqueId(), -amountRecieved, amountRecieved);
-        String message = "Order payment recorded successfully";
+        String message = successMessageTranslator.getTranslatedMessage(SuccesssMessages.ORDER_PAYMENT_SUCCESS);
         Double pendingAmountLeft = pendingAmount - amountRecieved;
         PaymentMode paymentMode = PaymentMode.getPaymentTypeEnumOrdinalMap().get(request.getPaymentMode());
         paymentService.recordPayment(amountRecieved, paymentMode, Boolean.FALSE, orderDAO);
         generateInvoiceV2(orderDAO);
-        RecievePaymentResponse response = new RecievePaymentResponse(localisationService.translate(message), orderId, pendingAmountLeft);
+        RecievePaymentResponse response = new RecievePaymentResponse(message, orderId, pendingAmountLeft);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -406,7 +370,8 @@ public class OrderService {
         try {
             OrderDAO orderDAO = findOrder(orderId, boutiqueId);
             if (orderDAO == null) {
-                return new ResponseEntity(localisationService.translate("Order not found"), HttpStatus.NOT_FOUND);
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.ORDER_NOT_FOUND);
+                return new ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST);
             }
 
             OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
@@ -422,7 +387,8 @@ public class OrderService {
             InvoiceDetailResponse response = new InvoiceDetailResponse(invoiceDateTime, boutiqueName, customerName, recieveDateTime, summary, paymentMode);
             return new ResponseEntity(response, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity(localisationService.translate("Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -516,7 +482,8 @@ public class OrderService {
             orderAmountDelta = orderItemsPriceSum - orderAmountDAO.getTotalAmount();
             orderAmountDAO.setTotalAmount(orderItemsPriceSum);
             if (refundAmount > orderAmountDAO.getAmountRecieved()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Refund cannot be greater than advance received");
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.REFUND_GREATER_THAN_ADVANCE);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
             orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() - refundAmount);
         }
@@ -533,8 +500,8 @@ public class OrderService {
         if (orderAmountDelta != 0) {
             if (refundAmount > 0) {
                 if (refundAmount > -orderAmountDelta) {
-                    throw new RuntimeException("Amount refund could not be greater than order amount change. " +
-                            "Order Amount changed by " + (-orderAmountDelta) + " and we cannot refund " + refundAmount);
+                    String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.REFUND_GREATER_THAN_ORDER_CHANGE)+ errorMessageTranslator.getTranslatedMessage(ErrorMessages.ORDER_AMOUNT_CHANGED )+(-orderAmountDelta)+errorMessageTranslator.getTranslatedMessage(ErrorMessages.REFUND_NOT_ALLOWED)+refundAmount;
+                    throw new RuntimeException(errorMessage);
                 }
                 deltaAmountRecieved = -refundAmount;
             }
@@ -596,20 +563,23 @@ public class OrderService {
     private void postUpdateOrderValidation(Double totalOrderAmount, List<PriceBreakupDAO> allItemsPriceBreakup) {
         Double itemsPriceBreakupSum = allItemsPriceBreakup.stream().mapToDouble(PriceBreakupDAO::getValue).sum();
         if (!itemsPriceBreakupSum.equals(totalOrderAmount)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either price break up or total order amount is incorrect");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_PRICE_BREAKUP_OR_TOTAL_ORDER_AMOUNT);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
     }
 
     private void validateGetOrderRequest(String orderStatusList, String orderItemStatusList) {
         if (orderStatusList == null && orderItemStatusList == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either order status or item status is necessary to get orders");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_STATUS_AND_ORDER_ITEM_STATUS);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
     }
 
     public OrderDAO findOrder(Long orderId, Long boutiqueId) throws Exception {
         Optional<Order> order = orderRepo.findById(orderId);
         if (!order.isPresent()) {
-            throw new Exception("Invalid order ID");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER);
+            throw new Exception(errorMessage);
         }
         OrderDAO orderDAO = mapper.orderObjectToDao(order.get(), new CycleAvoidingMappingContext());
         return orderDAO;
@@ -618,8 +588,9 @@ public class OrderService {
     private void validateOrderAmountInRequest(OrderAmountDetails orderAmountDetails) {
         if (orderAmountDetails.getAdvanceReceived() != null
                 && orderAmountDetails.getAdvanceReceived() > orderAmountDetails.getTotalAmount()) {
+                    String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ADVANCE_RECEIVED);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Advance Received could not be greater than Total Order Amount");
+                    errorMessage);
         }
     }
 

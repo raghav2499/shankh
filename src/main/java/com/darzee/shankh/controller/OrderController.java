@@ -24,9 +24,6 @@ public class OrderController {
     private OrderService orderService;
 
     @Autowired
-    private LocalisationService localisationService;
-
-    @Autowired
     private OrderOrderItemCommonService orderOrderItemCommonService;
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)

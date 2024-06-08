@@ -1,5 +1,6 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.constants.ErrorMessages;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.MeasurementRevisions;
 import com.darzee.shankh.entity.Order;
@@ -16,6 +17,7 @@ import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.response.OrderSummary;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
 import com.darzee.shankh.utils.pdfutils.PdfGenerator;
 import io.jsonwebtoken.lang.Collections;
 import org.hibernate.Session;
@@ -81,7 +83,8 @@ public class OrderOrderItemCommonService {
     private EntityManager entityManager;
 
     @Autowired
-    private LocalisationService localisationService;
+    private ErrorMessageTranslator errorMessageTranslator;
+    
 
     public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long orderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
         OrderDAO orderDAO = orderService.confirmOrder(orderId, boutiqueId, request);
@@ -204,10 +207,12 @@ public class OrderOrderItemCommonService {
                         orderDAO.getBoutique().getName(), orderNo, language);
                 return url;
             } catch(Exception e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error occurred while generating item PDF");
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.ITEM_PDF_GENERATION_ERROR);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
             }
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Order Item Id");
+        String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ITEM_ID_ERROR);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     public String generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId, String boutiqueName,

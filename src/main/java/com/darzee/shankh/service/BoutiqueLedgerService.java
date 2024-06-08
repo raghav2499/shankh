@@ -1,5 +1,7 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.constants.ErrorMessages;
+import com.darzee.shankh.constants.SuccesssMessages;
 import com.darzee.shankh.dao.BoutiqueLedgerDAO;
 import com.darzee.shankh.dao.BoutiqueLedgerSnapshotDAO;
 import com.darzee.shankh.dao.OrderDAO;
@@ -11,6 +13,9 @@ import com.darzee.shankh.repo.BoutiqueLedgerRepo;
 import com.darzee.shankh.repo.BoutiqueLedgerSnapshotRepo;
 import com.darzee.shankh.response.GetBoutiqueLedgerDataResponse;
 import com.darzee.shankh.response.LedgerDashboardData;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
+import com.darzee.shankh.service.translator.SuccessMessageTranslator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +41,12 @@ public class BoutiqueLedgerService {
     @Autowired
     private DaoEntityMapper mapper;
 
+    @Autowired
+    private ErrorMessageTranslator errorMessageTranslator;
+
+    @Autowired
+    private SuccessMessageTranslator successMessageTranslator;
+
     public ResponseEntity getLedgerData(String boutiqueIdString) {
         Long boutiqueId = Long.parseLong(boutiqueIdString);
         BoutiqueLedger boutiqueLedger = repo.findByBoutiqueId(boutiqueId);
@@ -50,7 +61,8 @@ public class BoutiqueLedgerService {
                     boutiqueLedgerObject.getTotalClosedOrders());
             return new ResponseEntity(response, HttpStatus.OK);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique Ledger for this id doesn't exist");
+        String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.BOUTIQUE_LEDGER_NOT_FOUND_ERROR);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     /*
@@ -73,7 +85,8 @@ public class BoutiqueLedgerService {
             if (boutiqueLedger != null) {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.BOUTIQUE_LEDGER_NOT_EXIST_ERROR_MSG + boutiqueId)+boutiqueId;
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
         }
         boutiqueLedgerDAO.addOrderAmountToBoutiqueLedger(deltaPendingAmount, deltaAmountRecieved);
@@ -88,7 +101,8 @@ public class BoutiqueLedgerService {
             if (boutiqueLedger != null) {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.BOUTIQUE_LEDGER_NOT_EXIST_ERROR_MSG + boutiqueId)+boutiqueId;
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
         }
         boutiqueLedgerDAO.incrementActiveOrderCount(1);
@@ -111,7 +125,9 @@ public class BoutiqueLedgerService {
             if (boutiqueLedger != null) {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
+                
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.BOUTIQUE_LEDGER_NOT_EXIST_ERROR_MSG + boutiqueId)+boutiqueId;
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
         }
 
@@ -134,7 +150,8 @@ public class BoutiqueLedgerService {
             if (boutiqueLedger != null) {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Boutique ledger doesn't exist for boutique " + boutiqueId);
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.BOUTIQUE_LEDGER_NOT_EXIST_ERROR_MSG + boutiqueId)+boutiqueId;
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
         }
         if (ACTIVE_ORDER_STATUS_LIST.contains(orderDAO.getOrderStatus())) {
@@ -165,15 +182,18 @@ public class BoutiqueLedgerService {
             boutiqueLedgerDAO.resetMonthlyDetailsInLedger();
             snapshotRepo.save(mapper.boutiqueLedgerSnapshotDAOToSnapshot(boutiqueLedgerSnapshotDAO));
             repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));
-            return new ResponseEntity("Boutique data reset successfully", HttpStatus.OK);
+            String successMessage = successMessageTranslator.getTranslatedMessage(SuccesssMessages.BOUTIQUE_DATA_RESET_SUCCESS);
+            return new ResponseEntity(successMessage, HttpStatus.OK);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ledger doesn't exist for boutique " + boutiqueIdString);
+        String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.BOUTIQUE_LEDGER_NOT_EXIST_ERROR_MSG + boutiqueIdString);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     public LedgerDashboardData getLedgerDashboardDetails(Long boutiqueId, int month, int year) {
         BoutiqueLedgerDAO boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
         if (boutiqueLedgerDAO == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique id");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_ERROR + boutiqueId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
 
         LedgerDashboardData ledgerDashboardData = null;

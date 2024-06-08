@@ -6,6 +6,8 @@ import com.darzee.shankh.repo.StitchOptionsRepo;
 import com.darzee.shankh.response.OutfitDetails;
 import com.darzee.shankh.response.PortfolioSubOutfit;
 import com.darzee.shankh.response.SubOutfitTypeDetailResponse;
+import com.darzee.shankh.service.translator.OutfitTranslator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ public class OutfitService {
     private StitchOptionsRepo stitchOptionsRepo;
 
     @Autowired
-    private LocalisationService localisationService;
+    private OutfitTranslator outfitTranslator;
 
     public ResponseEntity getOutfitDetails(String gender) throws Exception {
         List<OutfitType> outfitTypes = getOutfitTypes(gender);
@@ -37,9 +39,10 @@ public class OutfitService {
             OutfitDetails outfitDetails = outfitTypeService.getOutfitDetails();
             boolean stitchOptionsExist = (stitchOptionsRepo.countByOutfitTypeAndIsValid(outfitType, Boolean.TRUE) > 0);
             outfitDetails.setStitchOptionsExist(stitchOptionsExist);
-        outfitDetails.setOutfitName(localisationService.translate(outfitDetails.getOutfitDetailsTitle()));
             outfitDetailsList.add(outfitDetails);
         }
+
+        outfitDetailsList =outfitTranslator.getTranslatedOutfitDetailsList(outfitDetailsList) ;
         return new ResponseEntity(outfitDetailsList, HttpStatus.OK);
     }
 
