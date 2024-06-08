@@ -3,6 +3,8 @@ package com.darzee.shankh.service;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.MeasurementRevisions;
 import com.darzee.shankh.entity.Order;
+import com.darzee.shankh.entity.OrderItem;
+import com.darzee.shankh.enums.Language;
 import com.darzee.shankh.enums.OrderItemStatus;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
@@ -23,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.EntityManager;
 import java.io.File;
@@ -83,7 +86,7 @@ public class OrderOrderItemCommonService {
         OrderSummary summary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         orderService.generateInvoiceV2(orderDAO);
-        generateItemDetailPdfs(orderDAO);
+//        generateItemDetailPdfs(orderDAO);
         return new ResponseEntity<>(summary, HttpStatus.OK);
     }
 
@@ -158,7 +161,7 @@ public class OrderOrderItemCommonService {
         orderDAO = orderService.updateOrderPostItemUpdation(orderDAO, orderItemDetails.getAmountRefunded(), shouldUpdateLedger);
         orderService.generateInvoiceV2(orderDAO);
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
-        generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
+//        generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
         OrderSummary orderItemSummary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(),
                 orderDAO.getInvoiceNo(), orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
@@ -187,16 +190,25 @@ public class OrderOrderItemCommonService {
         return updatedItemsList;
     }
 
-    public void generateItemDetailPdfs(OrderDAO orderDAO) throws Exception {
-        List<OrderItemDAO> orderItems = orderDAO.getOrderItems();
-        Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
-        for (OrderItemDAO orderItem : orderItems) {
-            generateItemDetailPdf(orderItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
+    public String getItemDetailPdfLink(Long orderItemId, Language language) {
+        Optional<OrderItem> item = orderItemRepo.findById(orderItemId);
+        if(item.isPresent()) {
+            OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(item.get(), new CycleAvoidingMappingContext());
+            OrderDAO orderDAO = orderItemDAO.getOrder();
+            Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
+            try {
+                String url = generateItemDetailPdf(orderItemDAO, orderDAO.getCustomerId(), orderDAO.getBoutiqueId(),
+                        orderDAO.getBoutique().getName(), orderNo, language);
+                return url;
+            } catch(Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error occurred while generating item PDF");
+            }
         }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Order Item Id");
     }
 
-    public void generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId, String boutiqueName,
-                                      Long orderNo) throws Exception {
+    public String generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId, String boutiqueName,
+                                      Long orderNo, Language language) throws Exception {
         Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions =
                 stitchOptionService.getOrderItemStitchOptions(orderItemDAO.getId());
         MeasurementRevisions measurementRevisions =
@@ -211,8 +223,9 @@ public class OrderOrderItemCommonService {
         List<String> audioInstructionLinks = orderItemService.getAudioInstructionLinks(orderItemDAO.getId()).stream().filter(link->link.endsWith(".mp3")).collect(Collectors.toList());
 
         File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions,
-                innerMeasurementDetailsList, clothImageLinks, audioInstructionLinks, orderItemDAO);
-        bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
+                innerMeasurementDetailsList, clothImageLinks, audioInstructionLinks, orderItemDAO, language);
+        String url = bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId(), language);
+        return url;
     }
 
     /*

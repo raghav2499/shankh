@@ -30,9 +30,6 @@ import static com.darzee.shankh.constants.Constants.CM_TO_INCH_DIVIDING_FACTOR;
 public class MeasurementService {
 
     @Autowired
-    private BucketService bucketService;
-
-    @Autowired
     private ObjectFilesService objectFilesService;
 
     @Autowired
