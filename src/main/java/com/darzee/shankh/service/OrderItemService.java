@@ -13,6 +13,7 @@ import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.translator.OrderItemDetailsTranslator;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,9 @@ public class OrderItemService {
 
     @Autowired
     private StitchOptionService stitchOptionService;
+
+    @Autowired
+    private OrderItemDetailsTranslator orderItemDetailsTranslator;
 
     @Autowired
     private BoutiqueLedgerService ledgerService;
@@ -242,29 +246,9 @@ public class OrderItemService {
         List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems, new CycleAvoidingMappingContext());
         List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream().map(orderItem -> {
             try {
-                OrderItemDetails newOrderItemDetails = new OrderItemDetails(orderItem, outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
-                // newOrderItemDetails.setOutfitAlias(localisationService.translate(newOrderItemDetails.getOutfitAlias()));
-             if(newOrderItemDetails.getMeasurementDetails()!=null){
-                newOrderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(innerMeasurementDetails -> {
-                    innerMeasurementDetails.setOutfitTypeHeading(localisationService.translate(innerMeasurementDetails.getOutfitTypeHeading()));
-                    innerMeasurementDetails.getMeasurementDetailsList().forEach(measurementDetails -> {
-                        measurementDetails.setTitle(localisationService.translate(measurementDetails.getTitle()));
-                    });   
-                });
-             }  
-             if(newOrderItemDetails.getOrderItemStitchOptions()!=null){
-                newOrderItemDetails.getOrderItemStitchOptions().forEach(
-                    (key,stitchOptionDetails)->{
-                        stitchOptionDetails.forEach(
-                            stictchOptionDetail->{
-                                stictchOptionDetail.setLabel(localisationService.translate(stictchOptionDetail.getLabel()));
-                                stictchOptionDetail.setValue(localisationService.translate(stictchOptionDetail.getValue()));;  
-                            }
-                        );
-                    }
-                ); 
-             } 
-                return newOrderItemDetails;
+                OrderItemDetails newOrderItemDetails = new OrderItemDetails(orderItem,
+                        outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
+                return orderItemDetailsTranslator.translate(newOrderItemDetails);
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
