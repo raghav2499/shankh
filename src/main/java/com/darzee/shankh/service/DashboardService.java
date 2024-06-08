@@ -7,6 +7,8 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.BoutiqueRepo;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.utils.TimeUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -36,6 +38,8 @@ public class DashboardService {
 
     @Autowired
     private BoutiqueRepo boutiqueRepo;
+
+    protected static final Logger logger = LogManager.getLogger();
 
     public ResponseEntity getReportData(String boutiqueIdString, Integer month, Integer year) {
         Long boutiqueId = Long.parseLong(boutiqueIdString);
@@ -89,12 +93,12 @@ public class DashboardService {
 
     public ResponseEntity<GetItemsCountResponse> getItemsCount(String boutiqueIdString) {
         Long boutiqueId = Long.valueOf(boutiqueIdString);
-        LocalDateTime endTime = TimeUtils.convertISTToUTC(LocalDateTime.now().plusDays(1).withHour(0).withMinute(0)
+        LocalDateTime endTime = TimeUtils.convertSystemTimeZoneToUTC(LocalDateTime.now().plusDays(1).withHour(0).withMinute(0)
                 .withSecond(0).withNano(0));
-        LocalDateTime dailyStartTime = TimeUtils.convertISTToUTC(LocalDateTime.now().withHour(0).withMinute(0)
+        LocalDateTime dailyStartTime = TimeUtils.convertSystemTimeZoneToUTC(LocalDateTime.now().withHour(0).withMinute(0)
                 .withSecond(0).withNano(0));
-        LocalDateTime weekStartTime = TimeUtils.convertISTToUTC(TimeUtils.getWeekStartDateTime(endTime));
-        LocalDateTime overallStartTime = TimeUtils.convertISTToUTC(LocalDateTime.now().minusYears(10));
+        LocalDateTime weekStartTime = TimeUtils.convertSystemTimeZoneToUTC(TimeUtils.getWeekStartDateTime(endTime));
+        LocalDateTime overallStartTime = TimeUtils.convertSystemTimeZoneToUTC(LocalDateTime.now().minusYears(10));
         Pair<Integer, Integer> daily = orderService.getItemsCount(boutiqueId, dailyStartTime, endTime);
         Pair<Integer, Integer> weekly = orderService.getItemsCount(boutiqueId, weekStartTime, endTime);
         Pair<Integer, Integer> overall = orderService.getItemsCount(boutiqueId, overallStartTime, endTime);

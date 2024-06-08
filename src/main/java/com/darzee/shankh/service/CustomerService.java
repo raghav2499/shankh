@@ -6,6 +6,7 @@ import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.enums.FileEntityType;
+import com.darzee.shankh.enums.OrderStatus;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
@@ -204,7 +205,8 @@ public class CustomerService {
         Double sum = 0d;
         List<OrderDAO> orders = mapper.orderObjectListToDAOList(orderRepo.findAllByCustomerId(customerDAO.getId()),
                 new CycleAvoidingMappingContext());
-        sum = orders.stream().filter(order -> !Boolean.TRUE.equals(order.getIsDeleted()))
+        sum = orders.stream().filter(order -> !Boolean.TRUE.equals(order.getIsDeleted())
+                        && !OrderStatus.DRAFTED.equals(order.getOrderStatus()))
                 .map(order -> order.getOrderAmount())
                 .mapToDouble(OrderAmountDAO::getTotalAmount)
                 .sum();

@@ -283,8 +283,7 @@ public class OrderItemService {
         List<String> clothImagesReferenceIds = objectFilesService.getClothReferenceIds(orderItem.getId());
         List<FileDetail> clothImageFileDetails = getClothImageDetails(clothImagesReferenceIds);
 
-        List<String> audioReferenceIds = objectFilesService.getAudioReferenceIds(orderItem.getId());
-        List<FileDetail> audioFileDetails = getAudioDetails(audioReferenceIds);
+        List<FileDetail> audioFileDetails = getAudioFileDetails(orderItem.getId());
 
         Long customerId = orderItem.getOrder().getCustomer().getId();
         OverallMeasurementDetails overallMeasurementDetails = measurementService.getMeasurementDetails(customerId, null, orderItem.getId(), outfitType.getOrdinal(), null, true);
@@ -293,6 +292,17 @@ public class OrderItemService {
 
         OrderItemDetails orderItemDetails = new OrderItemDetails(clothImageFileDetails, audioFileDetails, overallMeasurementDetails, orderItemStitchOptions, outfitImageLink, orderItem);
         return orderItemDetails;
+    }
+
+    public List<FileDetail> getAudioFileDetails(Long orderItemId) {
+        List<String> audioReferenceIds = objectFilesService.getAudioReferenceIds(orderItemId);
+        List<FileDetail> audioFileDetails = getAudioDetails(audioReferenceIds);
+        return audioFileDetails;
+    }
+
+    public List<String> getAudioInstructionLinks(Long orderItemId) {
+        List<FileDetail> audioFiles = getAudioFileDetails(orderItemId);
+        return audioFiles.stream().map(fileDetail -> fileDetail.getShortLivedUrl()).collect(Collectors.toList());
     }
 
     public List<String> getClothImageLinks(Long orderItemId) {
