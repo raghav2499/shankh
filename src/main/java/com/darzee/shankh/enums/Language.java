@@ -60,6 +60,14 @@ public enum Language {
         return languageOrdinalEnumMap;
     }
 
+    public static Map<String, Language> getNotationEnumMap() {
+        Map<String, Language> languageNotationEnumMap = new HashMap<>();
+        for (Language lang : Language.values()) {
+            languageNotationEnumMap.put(lang.notation, lang);
+        }
+        return languageNotationEnumMap;
+    }
+
     public Integer getOrdinal() {
         return this.ordinal;
     }

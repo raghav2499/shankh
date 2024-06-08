@@ -4,6 +4,7 @@ import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
+import com.darzee.shankh.enums.Language;
 import com.darzee.shankh.enums.OutfitSide;
 import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
@@ -47,7 +48,9 @@ public class PdfGenerator {
         Set<String> resolvablePatterns = new HashSet<>();
 //        resolvablePatterns.add("bill_template");
         resolvablePatterns.add("bill_template_v2");
-        resolvablePatterns.add("item-details");
+        for(Language language : Language.values()) {
+            resolvablePatterns.add(getItemDetailsFileName(language));
+        }
         templateResolver.setResolvablePatterns(resolvablePatterns);
         templateResolver.setCheckExistence(true);
         templateEngine.setTemplateResolver(templateResolver);
@@ -147,7 +150,7 @@ public class PdfGenerator {
                                 List<InnerMeasurementDetails> measurementDetails,
                                 List<String> clothImages,
                                 List<String> audioInstructionLinks,
-                                OrderItemDAO orderItem) throws Exception {
+                                OrderItemDAO orderItem, Language language) throws Exception {
         Context context = new Context();
         String outfitType = orderItem.getOutfitType().getDisplayString();
         Integer outfitPieces = orderItem.getOutfitType().getPieces();
@@ -175,7 +178,7 @@ public class PdfGenerator {
         context.setVariable("inspiration", inspiration);
         context.setVariable("clothImages", clothImages);
         context.setVariable("audioInstructions", audioInstructionLinks);        // Process the HTML template with the Thymeleaf template engine
-        String processedHtml = templateEngine.process("item-details", context);
+        String processedHtml = templateEngine.process(getItemDetailsFileName(language), context);
 
         // Generate PDF from the processed HTML
         ITextRenderer renderer = new ITextRenderer();
@@ -188,5 +191,38 @@ public class PdfGenerator {
         }
 
         return outputFile;
+    }
+
+    private String getItemDetailsFileName(Language language) {
+        switch (language) {
+            case ENGLISH:
+                return "item-details";
+            case HINDI:
+                return "item-details-hi";
+            case PUNJABI:
+                return "item-details-pa";
+            case GUJARATI:
+                return "item-details-pa";
+            case MARATHI:
+                return "item-details-mr";
+            case TELUGU:
+                return "item-details-te";
+            case BENGALI:
+                return "item-details-bn";
+            case KANNADA:
+                return "item-details-kn";
+            case MALYALAM:
+                return "item-details-ml";
+            case ODIA:
+                return "item-details-or";
+            case ASSAMESE:
+                return "item-details-as";
+            case TAMIL:
+                return "item-details-ta";
+            case URDU:
+                return "item-details-ur";
+            default:
+                return "item-details";
+        }
     }
 }

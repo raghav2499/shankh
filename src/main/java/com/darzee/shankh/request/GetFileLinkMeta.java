@@ -8,4 +8,5 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GetFileLinkMeta {
     private Long boutiqueId;
+    private String language;
 }
