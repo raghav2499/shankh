@@ -41,8 +41,7 @@ public class OrderItemController {
         OrderDAO refreshedOrderOb = orderOrderItemCommonService.refresh(orderDAO.getId());//this hot reload is required to reload the values generated in run time like boutique_order_id, created_at
         OrderSummary orderSummary = new OrderSummary(refreshedOrderOb.getId(), refreshedOrderOb.getBoutiqueOrderId(),
                 refreshedOrderOb.getInvoiceNo(),
-                orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
-                orderDAO.getNonDeletedItems());
+                orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),             orderDAO.getNonDeletedItems());                
         CreateOrderResponse createOrderResponse = new CreateOrderResponse(localisationService.translate("Item created successfully") ,
                 orderSummary);
         return new ResponseEntity<>(createOrderResponse, HttpStatus.CREATED);
@@ -53,9 +52,6 @@ public class OrderItemController {
     public ResponseEntity<OrderSummary> updateOrderItem(@PathVariable("id") Long orderItemId,
                                                         @Valid @RequestBody OrderItemDetailRequest orderItemDetails) throws Exception {
         OrderSummary orderSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
-    //     orderSummary.getOrderItemSummaryList().forEach(orderItemSummary -> {
-    // orderItemSummary.setOutfitAlias(localisationService.translate(orderItemSummary.getOutfitAlias()));
-    //     });
 
         return new ResponseEntity<>(orderSummary, HttpStatus.OK);
     }

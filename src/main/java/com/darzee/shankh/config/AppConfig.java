@@ -3,6 +3,7 @@ package com.darzee.shankh.config;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,23 +19,38 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 @Configuration
 public class AppConfig implements WebMvcConfigurer {
 
+    public enum Language {
+        ENGLISH("en"),
+        HINDI("hi"),
+        PUNJABI("pa"),
+        GUJARATI("gu"),
+        MARATHI("mr"),
+        TELUGU("te"),
+        BENGALI("bn"),
+        KANNADA("kn"),
+        MALAYALAM("ml"),
+        ORIYA("or"),
+        ASSAMESE("as"),
+        TAMIL("ta"),
+        URDU("ur");
+
+        private final String code;
+
+        Language(String code) {
+        this.code = code;
+        }
+
+        public String getCode() {
+        return code;
+        }
+    }
+
     @Bean
     public LocaleResolver localeResolver() {
-        List<Locale> supportedLocales = Arrays.asList(
-                new Locale("en"),
-                new Locale("hi"),
-                new Locale("pa"),
-                new Locale("gu"),
-                new Locale("mr"),
-                new Locale("te"),
-                new Locale("bn"),
-                new Locale("kn"),
-                new Locale("ml"),
-                new Locale("or"),
-                new Locale("as"),
-                new Locale("ta"),
-                new Locale("ur")
-        );
+        
+        List<Locale> supportedLocales = Arrays.stream(Language.values())
+            .map(language -> new Locale(language.getCode()))
+            .collect(Collectors.toList());
         Locale.setDefault(supportedLocales.get(0));
         return new AcceptHeaderLocaleResolver(){
              @Override
