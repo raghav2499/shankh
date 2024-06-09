@@ -16,40 +16,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
+import com.darzee.shankh.enums.Language;
+
 @Configuration
 public class AppConfig implements WebMvcConfigurer {
-
-    public enum Language {
-        ENGLISH("en"),
-        HINDI("hi"),
-        PUNJABI("pa"),
-        GUJARATI("gu"),
-        MARATHI("mr"),
-        TELUGU("te"),
-        BENGALI("bn"),
-        KANNADA("kn"),
-        MALAYALAM("ml"),
-        ORIYA("or"),
-        ASSAMESE("as"),
-        TAMIL("ta"),
-        URDU("ur");
-
-        private final String code;
-
-        Language(String code) {
-        this.code = code;
-        }
-
-        public String getCode() {
-        return code;
-        }
-    }
 
     @Bean
     public LocaleResolver localeResolver() {
         
         List<Locale> supportedLocales = Arrays.stream(Language.values())
-            .map(language -> new Locale(language.getCode()))
+            .map(language -> new Locale(language.getNotation()))
             .collect(Collectors.toList());
         Locale.setDefault(supportedLocales.get(0));
         return new AcceptHeaderLocaleResolver(){
