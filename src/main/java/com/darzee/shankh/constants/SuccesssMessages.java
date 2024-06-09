@@ -1,6 +1,5 @@
 package com.darzee.shankh.constants;
 
-import com.darzee.shankh.entity.Order;
 
 public class SuccesssMessages {
 
@@ -20,4 +19,6 @@ public class SuccesssMessages {
     public static String REPORTING_DATA_FETCH_SUCCESS="Reporting data fetched successfully";
     public static String DETAILS_FETCH_SUCCESS ="Details fetched succesfully";
     public static String ORDER_PAYMENT_SUCCESS = "Order payment recorded successfully";
+
+    public static String CUSTOMER_ALREADY_REGISTERED_MSG="Customer already registered";
 }
