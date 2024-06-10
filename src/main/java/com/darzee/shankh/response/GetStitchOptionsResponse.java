@@ -24,7 +24,8 @@ public class GetStitchOptionsResponse {
         List<GroupedStitchOptionDetails> response = new ArrayList<>();
         if(groupedByOutfitSide.containsKey(OutfitSide.TOP)) {
             List<StitchOptionDetail> stitchOptionDetails = groupedByOutfitSide.get(OutfitSide.TOP).stream().map(stitchOptionsDAO ->{
-            StitchOptionDetail stitchOptionDetail= new StitchOptionDetail(stitchOptionsDAO);return stitchOptionDetail;}).collect(Collectors.toList());
+            StitchOptionDetail stitchOptionDetail=
+                    new StitchOptionDetail(stitchOptionsDAO);return stitchOptionDetail;}).collect(Collectors.toList());
             GroupedStitchOptionDetails topStitchOptionDetails = new GroupedStitchOptionDetails(OutfitSide.TOP.getView(), stitchOptionDetails);
             response.add(topStitchOptionDetails);
         }
