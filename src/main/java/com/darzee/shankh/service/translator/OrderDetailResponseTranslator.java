@@ -24,23 +24,7 @@ public class OrderDetailResponseTranslator {
         response.getOrderItemDetails().forEach(orderItemDetails -> {
 
             orderItemDetailsTranslator.translate(orderItemDetails);
-            // orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
-            // if(orderItemDetails.getOrderItemStitchOptions()!=null){
-            //     orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
-            //                 List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
-            //                 orderStitchOptionDetails.forEach(orderStitchOptionDetail -> {
-            //                     orderStitchOptionDetail.setLabel(localisationService.translate(orderStitchOptionDetail.getLabel()));                 orderStitchOptionDetail.setValue(localisationService.translate(orderStitchOptionDetail.getValue()));
-            //                 });
-            //             }
-            //     );
-            // }
             if(orderItemDetails.getMeasurementDetails()!=null&&orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()!=null) {  measurementDetailsTranslator.getTranslatedInnerMeasurementDetailsList(orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails());
-                // orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(measurementDetails -> {
-                //     measurementDetails.setOutfitTypeHeading(localisationService.translate(measurementDetails.getOutfitTypeHeading()));
-                //     measurementDetails.getMeasurementDetailsList().forEach(innerMeasurementDetails -> {
-                //         innerMeasurementDetails.setTitle(localisationService.translate(innerMeasurementDetails.getTitle()));
-                //     });
-                // });
             }
         });
        return response;     

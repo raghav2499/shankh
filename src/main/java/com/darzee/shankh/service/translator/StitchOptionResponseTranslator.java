@@ -20,20 +20,7 @@ public class StitchOptionResponseTranslator {
 
     public GetStitchOptionsResponse getTranslatedStitchOptionDetailList(GetStitchOptionsResponse stitchOptionsResponse) {
         stitchOptionsResponse.getResponse().forEach(groupedStitchOptionDetails -> {
-            if (groupedStitchOptionDetails != null && groupedStitchOptionDetails.getStitchOptions() != null) {
-                orderStitchOptionsTranslator.translateStichOptionList(groupedStitchOptionDetails.getStitchOptions());
-                // groupedStitchOptionDetails.getStitchOptions().forEach(stitchOption -> {
-                //     if (stitchOption != null) {
-                //         stitchOption.setLabel(localisationService.translate(stitchOption.getLabel()));
-                //         if (stitchOption.getOptions() != null) {
-                //             stitchOption.getOptions().forEach(option -> {
-                //                 if (option != null) {
-                //                     option.setLabel(localisationService.translate(option.getLabel()));
-                //                 }
-                //             });
-                //         }
-                //     }
-                // });
+            if (groupedStitchOptionDetails != null && groupedStitchOptionDetails.getStitchOptions() != null) {        orderStitchOptionsTranslator.translateStichOptionList(groupedStitchOptionDetails.getStitchOptions());
             }
         });
         return stitchOptionsResponse;

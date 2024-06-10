@@ -17,14 +17,6 @@ public class MeasurementDetailsTranslator {
 
     public List<InnerMeasurementDetails> translate(List<InnerMeasurementDetails> measurementDetails) {
         getTranslatedInnerMeasurementDetailsList(measurementDetails);
-
-        // for(InnerMeasurementDetails measurementDetail : measurementDetails) {
-            
-            // measurementDetail.setOutfitTypeHeading(localisationService.translate(measurementDetail.getOutfitTypeHeading()));
-            // measurementDetail.getMeasurementDetailsList().forEach(detailsList -> {
-            //     detailsList.setTitle(localisationService.translate(detailsList.getTitle()));
-            // });
-        // }
         return measurementDetails;
     }
 

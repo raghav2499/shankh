@@ -2,7 +2,6 @@ package com.darzee.shankh.service.translator;
 
 import com.darzee.shankh.response.OrderItemDetails;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
-import com.darzee.shankh.service.LocalisationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -38,17 +38,7 @@ public class GetOrderResponseTranslator {
                                             }
                                     );
                                 }
-                               if(orderItemDetails.getMeasurementDetails()!=null&&orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()!=null) {
-                        
-                       measurementDetailsTranslator.getTranslatedInnerMeasurementDetailsList(orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails());
-
-                                //    orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(measurementDetails -> {
-                
-                                    //    measurementDetails.setOutfitTypeHeading(localisationService.translate(measurementDetails.getOutfitTypeHeading()));
-                                    //    measurementDetails.getMeasurementDetailsList().forEach(innerMeasurementDetails -> {
-                                    //        innerMeasurementDetails.setTitle(localisationService.translate(innerMeasurementDetails.getTitle()));
-                                    //    });
-                                //    });
+                               if(orderItemDetails.getMeasurementDetails()!=null&&orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()!=null) {               measurementDetailsTranslator.getTranslatedInnerMeasurementDetailsList(orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails());
                                }
                             });
                         });
