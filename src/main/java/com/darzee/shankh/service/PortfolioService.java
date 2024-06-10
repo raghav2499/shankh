@@ -17,6 +17,7 @@ import com.darzee.shankh.request.CreatePortfolioOutfitRequest;
 import com.darzee.shankh.request.CreatePortfolioRequest;
 import com.darzee.shankh.request.UpdatePortfolioRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.translator.SuccessMessageTranslator;
 import com.darzee.shankh.utils.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,9 @@ public class PortfolioService {
 
     @Value("${portfolio.base_url}")
     private String baseUrl;
+
+    @Autowired
+    private SuccessMessageTranslator successMessageTranslator;
 
     public ResponseEntity<UsernameAvailableResponse> isUsernameAvailable(String username) {
         boolean isUsernameAvailable = usernameAvailable(username);
@@ -505,7 +509,7 @@ public class PortfolioService {
         }
         GetPortfolioFilterResponse response = null;
         if (!portfolio.isPresent()) {
-            String message = "Portfolio doesn't exist";
+            String message = "Portfolio not found";
             response = new GetPortfolioFilterResponse(message);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }

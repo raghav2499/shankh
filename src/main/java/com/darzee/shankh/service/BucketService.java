@@ -1,6 +1,7 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
+import com.darzee.shankh.constants.ErrorMessages;
 import com.darzee.shankh.dao.ImageReferenceDAO;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.enums.FileType;
@@ -11,6 +12,7 @@ import com.darzee.shankh.request.DownloadImageRequest;
 import com.darzee.shankh.response.DownloadImageResponse;
 import com.darzee.shankh.response.FileDetail;
 import com.darzee.shankh.response.UploadMultipleFileResponse;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
 import com.darzee.shankh.utils.CommonUtils;
 import com.darzee.shankh.utils.s3utils.FileUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -40,6 +42,9 @@ public class BucketService {
 
     @Autowired
     private DaoEntityMapper mapper;
+
+    @Autowired
+    ErrorMessageTranslator errorMessageTranslator;
 
     @Value("invoice/")
     private String invoiceDirectory;
@@ -81,7 +86,8 @@ public class BucketService {
             UploadMultipleFileResponse response = new UploadMultipleFileResponse(uploadImageResultList);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed wtith exception {}", e);
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.FILE_UPLOAD_ERROR);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, e);
         }
     }
 
@@ -132,7 +138,7 @@ public class BucketService {
         return fileUploadResult.getValue();
     }
 
-    public String uploadItemDetailsPDF(File file, Long orderItemId, Language language) {
+    public String uploadItemDetailsPDF(File file, Long orderItemId,Language language) {
         String fileName = String.valueOf(orderItemId);
         String itemDetailsDirectory = getItemDetailsDirectory(language);
         ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, itemDetailsDirectory + fileName);
@@ -177,7 +183,8 @@ public class BucketService {
             if (file != null) {
                 file.delete();
             }
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed with exception " + e.getMessage(), e);
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.FILE_UPLOAD_ERROR_MSG)+e.getMessage();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, e);
         }
     }
 
