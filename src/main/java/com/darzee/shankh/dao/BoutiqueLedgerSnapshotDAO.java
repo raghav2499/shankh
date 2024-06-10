@@ -16,6 +16,7 @@ public class BoutiqueLedgerSnapshotDAO {
     private Double amountRecieved;
 
     private Integer activeOrderCount;
+    private Integer closedOrderCount;
 
     private Long boutiqueId;
 
@@ -26,12 +27,14 @@ public class BoutiqueLedgerSnapshotDAO {
     public BoutiqueLedgerSnapshotDAO(Double pendingAmount,
                                      Double amountRecieved,
                                      Integer activeOrderCount,
+                                     Integer closedOrderCount,
                                      Long boutiqueId,
                                      Integer month,
                                      Integer year) {
         this.pendingAmount = pendingAmount;
         this.amountRecieved = amountRecieved;
         this.activeOrderCount = activeOrderCount;
+        this.closedOrderCount = closedOrderCount;
         this.boutiqueId = boutiqueId;
         this.month = month;
         this.year = year;

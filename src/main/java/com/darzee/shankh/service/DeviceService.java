@@ -1,5 +1,7 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.constants.ErrorMessages;
+import com.darzee.shankh.constants.SuccesssMessages;
 import com.darzee.shankh.dao.DeviceInfoDAO;
 import com.darzee.shankh.entity.DeviceInfo;
 import com.darzee.shankh.entity.Tailor;
@@ -8,6 +10,9 @@ import com.darzee.shankh.repo.DeviceInfoRepo;
 import com.darzee.shankh.repo.TailorRepo;
 import com.darzee.shankh.request.DeviceInfoRequest;
 import com.darzee.shankh.response.DeviceInfoResponse;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
+import com.darzee.shankh.service.translator.SuccessMessageTranslator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +33,12 @@ public class DeviceService {
     @Autowired
     private DaoEntityMapper mapper;
 
+    @Autowired
+    private SuccessMessageTranslator successMessageTranslator;
+
+    @Autowired
+    private ErrorMessageTranslator errorMessageTranslator;
+
     public ResponseEntity saveDeviceInfo(DeviceInfoRequest request) {
         Long tailorId = request.getTailorId();
         Optional<Tailor> optionalTailor = tailorRepo.findById(tailorId);
@@ -46,9 +57,11 @@ public class DeviceService {
                 deviceInfoDAO.setAppVersion(request.getAppVersion());
             }
             repo.save(mapper.deviceInfoDAOToDeviceInfo(deviceInfoDAO));
-            DeviceInfoResponse response = new DeviceInfoResponse("Details saved successfully");
+            String successMessage = successMessageTranslator.getTranslatedMessage(SuccesssMessages.CUSTOMER_DETAILS_SAVE_SUCCESS);
+            DeviceInfoResponse response = new DeviceInfoResponse(successMessage);
             return new ResponseEntity(response, HttpStatus.OK);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid tailor Id");
+        String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_TAILOR_ID );
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 }

@@ -209,14 +209,8 @@
                 <p class="invoice-details" id="main-para" th:text="${businessName}"></p>
             </div>
             <div class="right" style="float: right;">
-                <p class="invoice-details">
-                    <span th:text="#{order.number}">Order Number:</span>
-                    <span class="black" th:text="${orderNo}"></span>
-                </p>
-                <p class="invoice-details">
-                    <span th:text="#{finish.by}">Finish By:</span>
-                    <span class="black" th:text="${invoiceNo}"></span>
-              </p>
+                <p class="invoice-details">ഓർഡർ നമ്പർ: <span class="black" th:text="${orderNo}"></span></p>
+                <p class="invoice-details">പൂർത്തിയാക്കുക: <span class="black" th:text="${invoiceNo}"></span></p>
             </div>
         </div>
         <hr style="height: 1px; border: none; background-color: #000;">
@@ -235,9 +229,7 @@
                             <span th:text="${outfitType}" style="margin-top: 100px;"></span>
                         </button>
                     </div>
-                    <p class="invoice mt-4">
-                        <span th:text="#{measurements}">Measurements</span>
-                    </p>
+                    <p class="invoice mt-4">Measurements</p>
 
                     <fieldset class="clother_measurements_div"
                         style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
@@ -266,9 +258,7 @@
 
                         </div>
                         <th:block th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 1}">
-                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">
-                                <span th:text="#{stitch.options}">Stitch Options</span>
-                            </p>
+                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">സ്റ്റിച്ച് ഓപ്ഷനുകൾ</p>
                             <div th:each="stich_options : ${groupedStitchOptions.get(0)}" class="stich_options"
                                 style="display: flex; flex-wrap: wrap;width: 100%;">
 
@@ -297,16 +287,13 @@
                             <span th:text="${outfitType}" style="margin-top: 100px;"></span>
                         </button>
                     </div>
-                    <p class="invoice mt-4">
-                        <span th:text="#{measurements}">Measurements</span>
-                    </p>
+                    <p class="invoice mt-4">Measurements</p>
 
                     <fieldset class="clother_measurements_div"
                         style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
                         <legend
                             style="padding: 0 10px; border: 1px solid #DEDEDF; border-radius: 5px; background-color: #FFFFFF; color: #333333;">
-                            <span th:text="#{top}">Top</span>
-                        </legend>
+                            Top</legend>
                         <div class="size-chart">
                             <table>
                                 <tbody>
@@ -331,9 +318,7 @@
 
                         </div>
                         <th:block th:if="${groupedStitchOptions != null and #lists.size(groupedStitchOptions) >= 1}">
-                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">
-                                <span th:text="#{stitch.options}">Stitch Options</span>
-                            </p>
+                            <p class="invoice" style="margin-right: 10px;margin-top: 15px;">Stitch Options</p>
                             <div th:each="stich_options : ${groupedStitchOptions.get(0)}" class="stich_options"
                                 style="display: flex; flex-wrap: wrap;width: 100%;">
 
@@ -356,8 +341,7 @@
                         style="border: 2px solid #DEDEDF; padding: 25px; border-radius: 8px;">
                         <legend
                             style="padding: 0 10px; border: 1px solid #DEDEDF; border-radius: 5px; background-color: #FFFFFF; color: #333333;">
-                            <span th:text="#{bottom}">Bottom</span>
-                        </legend>
+                            Bottom</legend>
                         <div class="size-chart">
                             <table>
                                 <tbody>
@@ -403,16 +387,12 @@
         </div>
 
         <div class="special-instructions" th:if="${not #lists.isEmpty(specialInstructions)}">
-            <p class="invoice">
-                <span th:text="#{special.instructions}">Special Instructions</span>
-            </p>
+            <p class="invoice">പ്രത്യേക നിർദ്ദേശങ്ങൾ</p>
             <p class="black" th:text="${specialInstructions}"></p>
         </div>
 
         <div class="audio_div" th:if="${not #lists.isEmpty(audioInstructions)}">
-            <p class="invoice">
-                <span th:text="#{audio.instructions}">Audio Instructions</span>
-            </p>
+            <p class="invoice">ഓഡിയോ നിർദ്ദേശങ്ങൾ</p>
             <div class="audio-row">
                 <div class="audio-col" th:each="audio : ${audioInstructions}">
                     <audio th:attr="controls='true'">
@@ -423,18 +403,15 @@
             </div>
         </div>
 
+
         <div class="Inspiration" th:if="${not #lists.isEmpty(inspiration)}">
-            <p class="invoice">
-                <span th:text="#{your.inspiration}">Inspiration</span>
-            </p>
+            <p class="invoice">നിങ്ങളുടെ പ്രചോദനം</p>
             <a th:href="${inspiration}" target="_blank" rel="noopener noreferrer">Link to Inspiration</a>
         </div>
 
 
         <div class="image_div" th:if="${not #lists.isEmpty(clothImages)}">
-            <p class="invoice">
-                <span th:text="#{cloth.images}">Cloth Images</span>
-            </p>
+            <p class="invoice">തുണി ചിത്രങ്ങൾ</p>
             <div class="image-row">
                 <!-- Iterate over each image -->
                 <div class="image-col" th:each="image : ${clothImages}">
