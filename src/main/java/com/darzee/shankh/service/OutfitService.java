@@ -41,7 +41,7 @@ public class OutfitService {
             outfitDetails.setStitchOptionsExist(stitchOptionsExist);
             outfitDetailsList.add(outfitDetails);
         }
-        outfitDetailsList =outfitTranslator.getTranslatedOutfitDetailsList(outfitDetailsList) ;
+        outfitDetailsList = outfitTranslator.getTranslatedOutfitDetailsList(outfitDetailsList) ;
         return new ResponseEntity(outfitDetailsList, HttpStatus.OK);
     }
 

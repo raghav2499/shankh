@@ -193,9 +193,12 @@ public class OrderOrderItemCommonService {
         return updatedItemsList;
     }
 
-     public String getItemDetailPdfLink(Long orderItemId, Language language) {
+    public String getItemDetailPdfLink(Long orderItemId, Language language) {
         Optional<OrderItem> item = orderItemRepo.findById(orderItemId);
-        if(item.isPresent()){OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(item.get(), new CycleAvoidingMappingContext());OrderDAO orderDAO = orderItemDAO.getOrder();
+
+        if(item.isPresent()) {
+            OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(item.get(), new CycleAvoidingMappingContext());
+            OrderDAO orderDAO = orderItemDAO.getOrder();
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
       try {
            String url= generateItemDetailPdf(orderItemDAO, orderDAO.getCustomerId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo, language);return url;} catch(Exception e) {String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.ITEM_PDF_GENERATION_ERROR);throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);}
