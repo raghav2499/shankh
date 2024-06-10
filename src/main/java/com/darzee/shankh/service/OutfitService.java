@@ -41,7 +41,6 @@ public class OutfitService {
             outfitDetails.setStitchOptionsExist(stitchOptionsExist);
             outfitDetailsList.add(outfitDetails);
         }
-
         outfitDetailsList =outfitTranslator.getTranslatedOutfitDetailsList(outfitDetailsList) ;
         return new ResponseEntity(outfitDetailsList, HttpStatus.OK);
     }
@@ -84,6 +83,4 @@ public class OutfitService {
         String subOutfitString = outfitTypeService.getSubOutfitMap().get(subOutfitIdx);
         return subOutfitString;
     }
-
-
 }

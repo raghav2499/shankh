@@ -32,7 +32,7 @@ public class FileLinkService {
 
     private String getFileLink(GetFileLinkRequest request) throws Exception {
         String entityType = request.getEntityType();
-        switch (entityType) {
+        switch(entityType) {
             case "invoice":
                 Long boutiqueId = request.getMetaData() != null ? request.getMetaData().getBoutiqueId() : null;
                 OrderDAO orderDAO = orderService.findOrder(request.getEntityId(), boutiqueId);

@@ -12,12 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetStitchOptionsResponse {
-
     private List<GroupedStitchOptionDetails> response;
 
     public GetStitchOptionsResponse(List<StitchOptionsDAO> stitchOptions) {
@@ -26,21 +24,14 @@ public class GetStitchOptionsResponse {
         List<GroupedStitchOptionDetails> response = new ArrayList<>();
         if(groupedByOutfitSide.containsKey(OutfitSide.TOP)) {
             List<StitchOptionDetail> stitchOptionDetails = groupedByOutfitSide.get(OutfitSide.TOP).stream().map(stitchOptionsDAO ->{
-                StitchOptionDetail stitchOptionDetail=   new StitchOptionDetail(stitchOptionsDAO);
-                return stitchOptionDetail;
-            } ).collect(Collectors.toList());
-
-            GroupedStitchOptionDetails topStitchOptionDetails = new GroupedStitchOptionDetails(
-               OutfitSide.TOP.getView() , stitchOptionDetails);
+            StitchOptionDetail stitchOptionDetail= new StitchOptionDetail(stitchOptionsDAO);return stitchOptionDetail;}).collect(Collectors.toList());
+            GroupedStitchOptionDetails topStitchOptionDetails = new GroupedStitchOptionDetails(OutfitSide.TOP.getView(), stitchOptionDetails);
             response.add(topStitchOptionDetails);
         }
         if(groupedByOutfitSide.containsKey(OutfitSide.BOTTOM)) {
-            List<StitchOptionDetail> stitchOptionDetails = groupedByOutfitSide.get(OutfitSide.BOTTOM).stream().map(stitchOptionsDAO ->{
-                StitchOptionDetail stitchOptionDetail=   new StitchOptionDetail(stitchOptionsDAO);
-                return stitchOptionDetail;
-            } ).collect(Collectors.toList());
-            GroupedStitchOptionDetails bottomStitchOptionDetails = new GroupedStitchOptionDetails( 
-              OutfitSide.BOTTOM.getView(), stitchOptionDetails);
+            List<StitchOptionDetail> stitchOptionDetails = groupedByOutfitSide.get(OutfitSide.BOTTOM).stream().map(stitchOptionsDAO ->{StitchOptionDetail stitchOptionDetail=
+                    new StitchOptionDetail(stitchOptionsDAO);return stitchOptionDetail;}).collect(Collectors.toList());
+            GroupedStitchOptionDetails bottomStitchOptionDetails = new GroupedStitchOptionDetails(OutfitSide.BOTTOM.getView(), stitchOptionDetails);
             response.add(bottomStitchOptionDetails);
         }
         this.response = response;

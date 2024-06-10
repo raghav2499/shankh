@@ -186,8 +186,6 @@ public class OrderService {
         Integer paymentMode = getOrderPaymentMode(order.getId());
         String message = successMessageTranslator.getTranslatedMessage(SuccesssMessages.DETAILS_FETCH_SUCCESS);
         OrderDetailResponse response = new OrderDetailResponse(customer, order, orderAmount, orderItemDetailsList, paymentMode,message);
-        
-
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -486,7 +484,7 @@ public class OrderService {
         if (orderAmountDelta != 0) {
             if (refundAmount > 0) {
                 if (refundAmount > -orderAmountDelta) {
-                    String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.REFUND_GREATER_THAN_ADVANCE, (-orderAmountDelta), refundAmount);
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.REFUND_GREATER_THAN_ADVANCE, (-orderAmountDelta), refundAmount);
                     throw new RuntimeException(errorMessage);
                 }
                 deltaAmountRecieved = -refundAmount;

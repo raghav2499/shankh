@@ -225,8 +225,7 @@ public class OrderItemService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
         OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
-        
-        OrderItemDetails orderItemDetails = getOrderItemDetails(orderItemDAO);        
+        OrderItemDetails orderItemDetails = getOrderItemDetails(orderItemDAO);
         return orderItemDetails;
     }
 
@@ -244,8 +243,7 @@ public class OrderItemService {
         List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems, new CycleAvoidingMappingContext());
         List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream().map(orderItem -> {
             try {
-                OrderItemDetails newOrderItemDetails = new OrderItemDetails(orderItem,
-                        outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
+                OrderItemDetails newOrderItemDetails = new OrderItemDetails(orderItem, outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
                 return orderItemDetailsTranslator.translate(newOrderItemDetails);
             } catch (Exception e) {
                 throw new RuntimeException(e);

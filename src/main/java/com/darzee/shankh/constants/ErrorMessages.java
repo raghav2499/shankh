@@ -43,5 +43,4 @@ public class ErrorMessages {
    public static String INVALID_ORDER ="Invalid order ID";
    public static String INVALID_OUTFIT_ID="Invalid Outfit Id";
    public static String INVALID_STITCH_OPTION="Some Stitch Option ID is invalid";
-   
 }

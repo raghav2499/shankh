@@ -125,7 +125,6 @@ public class BoutiqueLedgerService {
             if (boutiqueLedger != null) {
                 boutiqueLedgerDAO = mapper.boutiqueLedgerObjectToDAO(repo.findByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
             } else {
-                
                 String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.BOUTIQUE_LEDGER_NOT_EXIST_ERROR_MSG + boutiqueId)+boutiqueId;
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
@@ -175,10 +174,7 @@ public class BoutiqueLedgerService {
             Integer month = previousMonthDate.getMonthValue();
             Integer year = previousMonthDate.getYear();
 
-            BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotDAO = new BoutiqueLedgerSnapshotDAO(boutiqueLedgerDAO.getMonthlyPendingAmount(),
-                    boutiqueLedgerDAO.getMonthlyAmountRecieved(), boutiqueLedgerDAO.getMonthlyActiveOrders(),
-                    boutiqueLedgerDAO.getMonthlyClosedOrders(),
-                    boutiqueId, month, year);
+            BoutiqueLedgerSnapshotDAO boutiqueLedgerSnapshotDAO = new BoutiqueLedgerSnapshotDAO(boutiqueLedgerDAO.getMonthlyPendingAmount(), boutiqueLedgerDAO.getMonthlyAmountRecieved(), boutiqueLedgerDAO.getMonthlyActiveOrders(),boutiqueLedgerDAO.getMonthlyClosedOrders(), boutiqueId, month, year);
             boutiqueLedgerDAO.resetMonthlyDetailsInLedger();
             snapshotRepo.save(mapper.boutiqueLedgerSnapshotDAOToSnapshot(boutiqueLedgerSnapshotDAO));
             repo.save(mapper.boutiqueLedgerDAOToObject(boutiqueLedgerDAO, new CycleAvoidingMappingContext()));

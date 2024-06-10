@@ -12,7 +12,6 @@ import com.darzee.shankh.service.OrderOrderItemCommonService;
 import com.darzee.shankh.service.StitchOptionService;
 import com.darzee.shankh.service.translator.ErrorMessageTranslator;
 import com.darzee.shankh.service.translator.SuccessMessageTranslator;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,8 +33,6 @@ public class OrderItemController {
     private StitchOptionService stitchOptionService;
     @Autowired
     private OrderItemRepo orderItemRepo;
-    // @Autowired
-    // private LocalisationService localisationService;
 
     @Autowired
     private SuccessMessageTranslator successMessageTranslator;
@@ -50,9 +47,10 @@ public class OrderItemController {
         OrderDAO refreshedOrderOb = orderOrderItemCommonService.refresh(orderDAO.getId());//this hot reload is required to reload the values generated in run time like boutique_order_id, created_at
         OrderSummary orderSummary = new OrderSummary(refreshedOrderOb.getId(), refreshedOrderOb.getBoutiqueOrderId(),
                 refreshedOrderOb.getInvoiceNo(),
-                orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),             orderDAO.getNonDeletedItems());  
-                String successMessage = successMessageTranslator.getTranslatedMessage(SuccesssMessages.ITEM_CREATE_SUCCESS);              
-        CreateOrderResponse createOrderResponse = new CreateOrderResponse(successMessage ,
+                orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
+                orderDAO.getNonDeletedItems());
+        String successMessage = successMessageTranslator.getTranslatedMessage(SuccesssMessages.ITEM_CREATE_SUCCESS);
+        CreateOrderResponse createOrderResponse = new CreateOrderResponse(successMessage,
                 orderSummary);
         return new ResponseEntity<>(createOrderResponse, HttpStatus.CREATED);
     }
@@ -62,7 +60,6 @@ public class OrderItemController {
     public ResponseEntity<OrderSummary> updateOrderItem(@PathVariable("id") Long orderItemId,
                                                         @Valid @RequestBody OrderItemDetailRequest orderItemDetails) throws Exception {
         OrderSummary orderSummary = orderOrderItemCommonService.updateOrderItem(orderItemId, orderItemDetails);
-
         return new ResponseEntity<>(orderSummary, HttpStatus.OK);
     }
 
