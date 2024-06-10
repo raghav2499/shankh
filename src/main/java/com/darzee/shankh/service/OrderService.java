@@ -81,8 +81,6 @@ public class OrderService {
     @Autowired
     private OutfitTypeObjectService outfitTypeObjectService;
 
-    @Autowired
-    private ObjectFilesService objectFilesService;
 
     @Autowired
     private BucketService bucketService;
@@ -96,17 +94,6 @@ public class OrderService {
     @Autowired
     private OrderItemService orderItemService;
 
-    @Autowired
-    private FileReferenceRepo fileReferenceRepo;
-
-    @Autowired
-    private AmazonClient s3Client;
-
-    @Autowired
-    private PriceBreakUpService priceBreakUpService;
-
-    @Autowired
-    private OrderItemRepo orderItemRepo;
     @Autowired
     private PaymentRepo paymentRepo;
 
@@ -209,7 +196,7 @@ public class OrderService {
         OrderDAO orderDAO = findOrder(orderId, boutiqueId);
         validateOrderAmountInRequest(request.getOrderDetails().getOrderAmountDetails());
         if (!orderDAO.validateMandatoryOrderFields()) {
-            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.MANDATORY_FIELDS_MISSING)+errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_AND_CUSTOMER_ID);
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_AND_CUSTOMER_ID);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,errorMessage);
         }
         orderItemService.validateMandatoryOrderItemFields(orderDAO.getNonDeletedItems());
@@ -219,8 +206,7 @@ public class OrderService {
         Double totalOrderAmount = orderAmountDAO.getTotalAmount();
 
         if (!priceBreakupSum.equals(totalOrderAmount)) {
-            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_PRICE_BREAKUP)+totalOrderAmount+errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_PRICE_BREAKUP_SUM)+priceBreakupSum;
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,errorMessage);
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_PRICE_BREAKUP,totalOrderAmount,priceBreakupSum);        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,errorMessage);
         }
         orderDAO.setOrderStatus(OrderStatus.ACCEPTED);
         orderDAO = mapper.orderObjectToDao(orderRepo.save(mapper.orderaDaoToObject(orderDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
@@ -324,7 +310,7 @@ public class OrderService {
         Double pendingAmount = orderAmountDAO.getTotalAmount() - orderAmountDAO.getAmountRecieved();
         Double amountRecieved = request.getAmount();
         if (amountRecieved > pendingAmount) {
-            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_AMOUNT_RECEIVED)+amountRecieved+errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_PENDING_AMOUNT_RECEIVED)+pendingAmount;    
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_AMOUNT_RECEIVED,amountRecieved,pendingAmount)  ;  
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,errorMessage);
         }
         orderAmountDAO.setAmountRecieved(orderAmountDAO.getAmountRecieved() + amountRecieved);
@@ -500,7 +486,7 @@ public class OrderService {
         if (orderAmountDelta != 0) {
             if (refundAmount > 0) {
                 if (refundAmount > -orderAmountDelta) {
-                    String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.REFUND_GREATER_THAN_ORDER_CHANGE)+ errorMessageTranslator.getTranslatedMessage(ErrorMessages.ORDER_AMOUNT_CHANGED )+(-orderAmountDelta)+errorMessageTranslator.getTranslatedMessage(ErrorMessages.REFUND_NOT_ALLOWED)+refundAmount;
+                    String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.REFUND_GREATER_THAN_ADVANCE, (-orderAmountDelta), refundAmount);
                     throw new RuntimeException(errorMessage);
                 }
                 deltaAmountRecieved = -refundAmount;

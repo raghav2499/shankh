@@ -16,7 +16,6 @@ import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.translator.ErrorMessageTranslator;
 import com.darzee.shankh.service.translator.OrderItemDetailsTranslator;
-import com.darzee.shankh.service.translator.SuccessMessageTranslator;
 
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.support.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -79,18 +77,6 @@ public class OrderItemService {
 
     @Autowired
     private MeasurementService measurementService;
-
-    @Autowired
-    private ObjectFilesRepo objectFilesRepo;
-
-    @Autowired
-    private OrderRepo orderRepo;
-
-    @Autowired
-    private PriceBreakUpRepo priceBrekupRepo; 
-
-    @Autowired
-    private SuccessMessageTranslator successMessageTranslator;
 
     @Autowired
     private ErrorMessageTranslator errorMessageTranslator;
@@ -261,7 +247,6 @@ public class OrderItemService {
                 OrderItemDetails newOrderItemDetails = new OrderItemDetails(orderItem,
                         outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
                 return orderItemDetailsTranslator.translate(newOrderItemDetails);
-
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -343,7 +328,7 @@ public class OrderItemService {
 
     private void validateGetOrderItemRequest(Long boutiqueId, Long orderId) {
         if (boutiqueId == null && orderId == null) {
-            final String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ID_ERROR);
+             String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ID_ERROR);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
     }

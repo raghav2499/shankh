@@ -118,9 +118,9 @@ public class CustomerService {
         if (existingCustomer != null) {
             String customerName = existingCustomer.constructName();
             String gender = existingCustomer.getGender() != null ? existingCustomer.getGender().getString() : null;
-            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.CUSTOMER_ALREADY_REGISTERED_ERROR_MSG);
+            String message = successMessageTranslator.getTranslatedMessage(SuccesssMessages.CUSTOMER_ALREADY_REGISTERED_MSG);
             response = new CreateCustomerResponse(customerName, existingCustomer.getCountryCode(), existingCustomer.getPhoneNumber(),
-                    "", existingCustomer.getId(), gender, errorMessage);
+                    "", existingCustomer.getId(), gender, message);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         ImmutablePair<String, String> name = getCustomerNameFromRequest(request.getName());

@@ -24,10 +24,8 @@ import com.darzee.shankh.service.translator.SuccessMessageTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.support.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.concurrent.SuccessCallback;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -99,7 +97,7 @@ public class MeasurementService {
         OverallMeasurementDetails measurementDetails = getMeasurementDetails(customerId, measurementRevisionId,
                 orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
 
-        final String message = getMeasurementDetailsMessage(measurementDetails);
+         String message = getMeasurementDetailsMessage(measurementDetails);
         measurementDetails = overallMeasurementDetailsTranslator.translate(measurementDetails, message);
         return new ResponseEntity(measurementDetails, HttpStatus.OK);
     }
