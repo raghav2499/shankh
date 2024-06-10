@@ -572,7 +572,7 @@ public class OrderService {
     private void validateOrderAmountInRequest(OrderAmountDetails orderAmountDetails) {
         if (orderAmountDetails.getAdvanceReceived() != null
                 && orderAmountDetails.getAdvanceReceived() > orderAmountDetails.getTotalAmount()) {
-                    String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ADVANCE_RECEIVED);
+                    String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ADVANCE_RECEIVED,orderAmountDetails.getAdvanceReceived(),orderAmountDetails.getTotalAmount());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     errorMessage);
         }

@@ -39,7 +39,7 @@ public class ErrorMessages {
     public static String REFUND_GREATER_THAN_ORDER_CHANGE_MSG ="Amount refund could not be greater than order amount change. Order Amount changed by {0} and we cannot refund {1}";
     public static String INVALID_PRICE_BREAKUP_OR_TOTAL_ORDER_AMOUNT ="Either price break up or total order amount is incorrect";
     public static String INVALID_ORDER_STATUS_AND_ORDER_ITEM_STATUS = "Either order status or item status is necessary to get orders";
-    public static String INVALID_ADVANCE_RECEIVED ="Advance Received could not be greater than Total Order Amount";
+    public static String INVALID_ADVANCE_RECEIVED ="Advance Received :{0} could not be greater than Total Order Amount :{1}";
    public static String INVALID_ORDER ="Invalid order ID";
    public static String INVALID_OUTFIT_ID="Invalid Outfit Id";
    public static String INVALID_STITCH_OPTION="Some Stitch Option ID is invalid";
