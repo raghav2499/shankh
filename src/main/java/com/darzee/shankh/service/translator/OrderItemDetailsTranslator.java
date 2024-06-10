@@ -12,17 +12,13 @@ import java.util.List;
 public class OrderItemDetailsTranslator {
 
     @Autowired
-    private LocalisationService localisationService;
-
-    @Autowired
     private OrderStitchOptionsTranslator orderStitchOptionsTranslator;
 
     @Autowired
     private MeasurementDetailsTranslator measurementDetailsTranslator;
 
     public OrderItemDetails translate(OrderItemDetails orderItemDetails) {
-        orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
-
+    
         if (orderItemDetails.getMeasurementDetails() != null) {
             orderItemDetails.getMeasurementDetails().setInnerMeasurementDetails(
                     measurementDetailsTranslator.translate(orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()));

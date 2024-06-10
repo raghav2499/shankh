@@ -15,6 +15,13 @@ public class GetOrderResponseTranslator {
     @Autowired
     private LocalisationService localisationService;
 
+    @Autowired
+    private OrderStitchOptionsTranslator orderStitchOptionsTranslator;
+
+    @Autowired
+    private MeasurementDetailsTranslator measurementDetailsTranslator;
+    
+
     public String getTranslatedMessage(String message) {
         return localisationService.translate(message);
     }
@@ -22,32 +29,26 @@ public class GetOrderResponseTranslator {
     public GetOrderResponse getTranslatedOrderDetailList(GetOrderResponse response) {
         response.setMessage(localisationService.translate(response.getMessage()));
         if(response.getData()!=null){
-            response.getData().forEach(orderDetailResponse -> {
-                //            orderDetailResponse.setMessage(localisationService.translate(orderDetailResponse.getMessage()));
-                            if(orderDetailResponse.getOrderItemDetails()!=null){
-                                orderDetailResponse.getOrderItemDetails().forEach(orderItemDetails -> {
-                                    if(orderItemDetails.getOutfitAlias()!=null) {
-                                        // orderItemDetails.setOutfitAlias(localisationService.translate(orderItemDetails.getOutfitAlias()));
-                                    }
-                                });
-                            }
-                            orderDetailResponse.getOrderItemDetails().forEach(orderItemDetails -> {
+            response.getData().forEach(orderDetailResponse -> { 
+                            orderDetailResponse.getOrderItemDetails().forEach(orderItemDetails -> { 
+                                
                                 if(orderItemDetails.getOrderItemStitchOptions()!=null){
                                     orderItemDetails.getOrderItemStitchOptions().forEach((key, value) -> {
-                                                List<OrderStitchOptionDetail> orderStitchOptionDetails = value;
-                                                orderStitchOptionDetails.forEach(orderStitchOptionDetail -> {
-                                                    orderStitchOptionDetail.setLabel(localisationService.translate(orderStitchOptionDetail.getLabel()));                 orderStitchOptionDetail.setValue(localisationService.translate(orderStitchOptionDetail.getValue()));
-                                                });
+                                                List<OrderStitchOptionDetail> orderStitchOptionDetails = value;                                           orderStitchOptionsTranslator.translate(orderStitchOptionDetails);
                                             }
                                     );
                                 }
                                if(orderItemDetails.getMeasurementDetails()!=null&&orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()!=null) {
-                                   orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(measurementDetails -> {
-                                       measurementDetails.setOutfitTypeHeading(localisationService.translate(measurementDetails.getOutfitTypeHeading()));
-                                       measurementDetails.getMeasurementDetailsList().forEach(innerMeasurementDetails -> {
-                                           innerMeasurementDetails.setTitle(localisationService.translate(innerMeasurementDetails.getTitle()));
-                                       });
-                                   });
+                        
+                       measurementDetailsTranslator.getTranslatedInnerMeasurementDetailsList(orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails());
+
+                                //    orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails().forEach(measurementDetails -> {
+                
+                                    //    measurementDetails.setOutfitTypeHeading(localisationService.translate(measurementDetails.getOutfitTypeHeading()));
+                                    //    measurementDetails.getMeasurementDetailsList().forEach(innerMeasurementDetails -> {
+                                    //        innerMeasurementDetails.setTitle(localisationService.translate(innerMeasurementDetails.getTitle()));
+                                    //    });
+                                //    });
                                }
                             });
                         });

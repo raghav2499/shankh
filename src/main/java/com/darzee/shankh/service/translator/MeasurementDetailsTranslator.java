@@ -14,13 +14,17 @@ public class MeasurementDetailsTranslator {
     @Autowired
     private LocalisationService localisationService;
 
+
     public List<InnerMeasurementDetails> translate(List<InnerMeasurementDetails> measurementDetails) {
-        for(InnerMeasurementDetails measurementDetail : measurementDetails) {
-            measurementDetail.setOutfitTypeHeading(localisationService.translate(measurementDetail.getOutfitTypeHeading()));
-            measurementDetail.getMeasurementDetailsList().forEach(detailsList -> {
-                detailsList.setTitle(localisationService.translate(detailsList.getTitle()));
-            });
-        }
+        getTranslatedInnerMeasurementDetailsList(measurementDetails);
+
+        // for(InnerMeasurementDetails measurementDetail : measurementDetails) {
+            
+            // measurementDetail.setOutfitTypeHeading(localisationService.translate(measurementDetail.getOutfitTypeHeading()));
+            // measurementDetail.getMeasurementDetailsList().forEach(detailsList -> {
+            //     detailsList.setTitle(localisationService.translate(detailsList.getTitle()));
+            // });
+        // }
         return measurementDetails;
     }
 
@@ -34,6 +38,17 @@ public class MeasurementDetailsTranslator {
     public List<InnerMeasurementDetails> translateInnerMeasurementDetailsList(List<InnerMeasurementDetails> measurementDetails) {
         for(InnerMeasurementDetails measurementDetail : measurementDetails) {
             measurementDetail.setOutfitTypeHeading(localisationService.translate(measurementDetail.getOutfitTypeHeading()));
+        }
+        return measurementDetails;
+    }
+
+    public List<InnerMeasurementDetails> getTranslatedInnerMeasurementDetailsList(List<InnerMeasurementDetails> measurementDetails) {
+
+        for(InnerMeasurementDetails measurementDetail : measurementDetails) {
+            measurementDetail.setOutfitTypeHeading(localisationService.translate(measurementDetail.getOutfitTypeHeading()));
+            measurementDetail.getMeasurementDetailsList().forEach(detailsList -> {
+                detailsList.setTitle(localisationService.translate(detailsList.getTitle()));
+            });
         }
         return measurementDetails;
     }

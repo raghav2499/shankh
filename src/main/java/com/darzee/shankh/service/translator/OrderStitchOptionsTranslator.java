@@ -2,6 +2,7 @@ package com.darzee.shankh.service.translator;
 
 import com.darzee.shankh.response.GetOrderStitchOptionResponse;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
+import com.darzee.shankh.response.StitchOptionDetail;
 import com.darzee.shankh.service.LocalisationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,4 +34,22 @@ public class OrderStitchOptionsTranslator {
         );
         return response;
     }
+
+    public List<StitchOptionDetail> translateStichOptionList(List<StitchOptionDetail> stitchOptionDetails ){
+
+        stitchOptionDetails.forEach(stitchOption -> {
+            if (stitchOption != null) {
+                stitchOption.setLabel(localisationService.translate(stitchOption.getLabel()));
+                if (stitchOption.getOptions() != null) {
+                    stitchOption.getOptions().forEach(option -> {
+                        if (option != null) {
+                            option.setLabel(localisationService.translate(option.getLabel()));
+                        }
+                    });
+                }
+            }
+        });
+        return stitchOptionDetails;
+    }
 }
+
