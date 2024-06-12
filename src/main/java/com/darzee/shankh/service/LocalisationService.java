@@ -18,6 +18,6 @@ public class LocalisationService {
         if (englishText == null) return null;
         String key = englishText.toLowerCase().replaceAll("[^a-zA-Z ]", "").replace(" ", ".");
         Locale locale = LocaleContextHolder.getLocale();
-        return messageSource.getMessage(key, null, englishText, locale);
+        return messageSource.getMessage(key, null, englishText+"NF", locale);
     }
 }
