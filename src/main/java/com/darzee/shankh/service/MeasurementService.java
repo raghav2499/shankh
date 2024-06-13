@@ -242,7 +242,7 @@ public class MeasurementService {
             String imageLink = s3Client.generateShortLivedUrlForMeasurement("bottom.jpg");
             innerMeasurementDetailsList.add(new InnerMeasurementDetails(heading, measurementDetails, imageLink));
         }
-        innerMeasurementDetailsList = measurementDetailsTranslator.translateInnerMeasurementDetailsList(innerMeasurementDetailsList);
+//        innerMeasurementDetailsList = measurementDetailsTranslator.translateInnerMeasurementDetailsList(innerMeasurementDetailsList);
         return innerMeasurementDetailsList;
     }
 
@@ -379,7 +379,7 @@ public class MeasurementService {
                     .collect(Collectors.toList());
         }
 
-        measurementDetailsList = measurementDetailsTranslator.translateMeasurementDetailsList(measurementDetailsList);
+//        measurementDetailsList = measurementDetailsTranslator.translateMeasurementDetailsList(measurementDetailsList);
         return measurementDetailsList;
     }
 
