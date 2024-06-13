@@ -11,9 +11,10 @@ import com.darzee.shankh.service.LocalisationService;
 public class GetOrderResponseTranslator {
     
     @Autowired
-    private  OrderDetailResponseTranslator orderDetailResponseTranslator;
+    private OrderDetailResponseTranslator orderDetailResponseTranslator;
 
-    @Autowired LocalisationService localisationService;
+    @Autowired
+    private LocalisationService localisationService;
     
 
     public String getTranslatedMessage(String message) {

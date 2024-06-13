@@ -1,6 +1,7 @@
 package com.darzee.shankh.service.translator;
 
 
+import com.darzee.shankh.service.LocalisationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +17,13 @@ public class OrderDetailResponseTranslator {
     @Autowired
     private OrderItemDetailsTranslator orderItemDetailsTranslator;
 
-    public String getTranslatedMessage(String message) {
-        return message;
-    }
+    @Autowired
+    private LocalisationService localisationService;
 
-    public OrderDetailResponse getTransatedOrderDetailResponseTranslator(OrderDetailResponse response ){    
+    public OrderDetailResponse translate(OrderDetailResponse response ){
+        response.setOrderStatus(localisationService.translate(response.getOrderStatus()));
         response.getOrderItemDetails().forEach(orderItemDetails -> {
-
             orderItemDetailsTranslator.translate(orderItemDetails);
-            if(orderItemDetails.getMeasurementDetails()!=null&&orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()!=null) {  measurementDetailsTranslator.getTranslatedInnerMeasurementDetailsList(orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails());
-            }
         });
        return response;     
     }
