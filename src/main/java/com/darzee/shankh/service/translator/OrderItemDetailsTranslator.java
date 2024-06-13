@@ -22,6 +22,9 @@ public class OrderItemDetailsTranslator {
     private LocalisationService localisationService;
 
     public OrderItemDetails translate(OrderItemDetails orderItemDetails) {
+        if(orderItemDetails.getOutfitType()!=null){
+            orderItemDetails.setOutfitType(localisationService.translate(orderItemDetails.getOutfitType()));
+        }
 
         if (orderItemDetails.getMeasurementDetails() != null&&orderItemDetails.getMeasurementDetails().getInnerMeasurementDetails()!=null) {
             orderItemDetails.getMeasurementDetails().setInnerMeasurementDetails(
