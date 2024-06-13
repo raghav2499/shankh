@@ -1,6 +1,8 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
+import com.darzee.shankh.constants.ErrorMessages;
+import com.darzee.shankh.constants.SuccesssMessages;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.Boutique;
 import com.darzee.shankh.entity.Customer;
@@ -16,6 +18,8 @@ import com.darzee.shankh.response.CreateCustomerResponse;
 import com.darzee.shankh.response.CustomerDashboard;
 import com.darzee.shankh.response.CustomerDetails;
 import com.darzee.shankh.response.GetCustomersResponse;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
+import com.darzee.shankh.service.translator.SuccessMessageTranslator;
 import com.darzee.shankh.utils.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -61,6 +65,12 @@ public class CustomerService {
     @Autowired
     private BoutiqueLedgerRepo boutiqueLedgerRepo;
 
+    @Autowired
+    private ErrorMessageTranslator errorMessageTranslator;
+
+    @Autowired
+    private SuccessMessageTranslator successMessageTranslator;
+
     public ResponseEntity getCustomers(Long boutiqueId) {
         List<CustomerDAO> boutiqueCustomers =
                 mapper.customerObjectListToDAOList(customerRepo.findAllByBoutiqueId(boutiqueId), new CycleAvoidingMappingContext());
@@ -85,7 +95,8 @@ public class CustomerService {
             CustomerDetails customerDetails = new CustomerDetails(customerDAO, profilePicLink);
             return new ResponseEntity(customerDetails, HttpStatus.OK);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Customer id");
+        String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_CUSTOMER_ID);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     public CustomerDetails getCustomerDetails(Long customerId) {
@@ -95,7 +106,8 @@ public class CustomerService {
             CustomerDetails customerDetails = new CustomerDetails(customerDAO);
             return customerDetails;
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Customer id");
+        String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_CUSTOMER_ID);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     public ResponseEntity createCustomer(CreateCustomerRequest request) {
@@ -106,8 +118,9 @@ public class CustomerService {
         if (existingCustomer != null) {
             String customerName = existingCustomer.constructName();
             String gender = existingCustomer.getGender() != null ? existingCustomer.getGender().getString() : null;
+            String message = successMessageTranslator.getTranslatedMessage(SuccesssMessages.CUSTOMER_ALREADY_REGISTERED_MSG);
             response = new CreateCustomerResponse(customerName, existingCustomer.getCountryCode(), existingCustomer.getPhoneNumber(),
-                    "", existingCustomer.getId(), gender, "Customer already registered");
+                    "", existingCustomer.getId(), gender, message);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         ImmutablePair<String, String> name = getCustomerNameFromRequest(request.getName());
@@ -126,8 +139,9 @@ public class CustomerService {
 
         String customerName = customerDAO.constructName();
         String gender = customerDAO.getGender() != null ? customerDAO.getGender().getString() : null;
+        String successMessage = successMessageTranslator.getTranslatedMessage(SuccesssMessages.CUSTOMER_UPDATE_SUCCESS);
         response = new CreateCustomerResponse(customerName, customerDAO.getCountryCode(), customerDAO.getPhoneNumber(),
-                "", customerDAO.getId(), gender, "Customer created successfully");
+                "", customerDAO.getId(), gender, successMessage);
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
@@ -141,8 +155,9 @@ public class CustomerService {
                 String phoneNumber = CommonUtils.sanitisePhoneNumber(request.getPhoneNumber());
                 Optional<Customer> customerWithSameNumber = customerRepo.findByBoutiqueIdAndPhoneNumber(boutiqueId, phoneNumber);
                 if (customerWithSameNumber.isPresent()) {
+                    String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.CUSTOMER_ALREADY_REGISTERED_ERROR);
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Sorry! Customer with same phone number is already registered with this boutique");
+                            errorMessage);
                 }
                 customer.setPhoneNumber(phoneNumber);
             }
@@ -178,13 +193,16 @@ public class CustomerService {
                     new CycleAvoidingMappingContext());
             String customerName = customer.constructName();
             String gender = customer.getGender() != null ? customer.getGender().getString() : null;
+            String successMessage = successMessageTranslator.getTranslatedMessage(SuccesssMessages.CUSTOMER_UPDATE_SUCCESS);
             CreateCustomerResponse response = new CreateCustomerResponse(customerName, customer.getCountryCode(),
                     customer.getPhoneNumber(), getCustomerProfilePicLink(customerId), customer.getId(), gender,
-                    "Customer updated successfully");
+                    successMessage);
             return new ResponseEntity(response, HttpStatus.OK);
         }
+
+        String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.CUSTOMER_ALREADY_REGISTERED_ERROR);
         return new ResponseEntity(
-                "Sorry! Customer with this ID is not registered with us",
+                errorMessage,
                 HttpStatus.BAD_REQUEST);
     }
 
@@ -265,7 +283,8 @@ public class CustomerService {
     private BoutiqueDAO validateCreateCustomerRequest(Long boutiqueId) {
         Optional<Boutique> boutique = boutiqueRepo.findById(boutiqueId);
         if (!boutique.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This boutique is not enrolled with us");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_ERROR);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
         return mapper.boutiqueObjectToDao(boutique.get(), new CycleAvoidingMappingContext());
     }
