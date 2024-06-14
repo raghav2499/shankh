@@ -417,7 +417,7 @@
                 <div class="audio-col" th:each="audio : ${audioInstructions}">
                     <audio th:attr="controls='true'">
                         <source th:src="@{${audio}}" type="audio/mpeg" />
-                        <p>Your browser does not support the audio element. You can <a th:href="@{${audio}}" target="_blank">listen to the audio here</a>.</p>
+                        <p><a th:href="@{${audio}}" target="_blank">You can listen to the audio here</a>.</p>
                     </audio>
                 </div>
             </div>
