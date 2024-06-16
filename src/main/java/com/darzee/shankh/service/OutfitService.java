@@ -32,8 +32,8 @@ public class OutfitService {
     @Autowired
     private OutfitTranslator outfitTranslator;
 
-    @Autowired 
-    private PortfolioSuboutfitTranslator portfolioSuboutfitTranslator;  
+    @Autowired
+    private PortfolioSuboutfitTranslator portfolioSuboutfitTranslator;
 
     public ResponseEntity getOutfitDetails(String gender) throws Exception {
         List<OutfitType> outfitTypes = getOutfitTypes(gender);
@@ -45,7 +45,7 @@ public class OutfitService {
             outfitDetails.setStitchOptionsExist(stitchOptionsExist);
             outfitDetailsList.add(outfitDetails);
         }
-        outfitDetailsList = outfitTranslator.getTranslatedOutfitDetailsList(outfitDetailsList) ;
+        outfitDetailsList = outfitTranslator.getTranslatedOutfitDetailsList(outfitDetailsList);
         return new ResponseEntity(outfitDetailsList, HttpStatus.OK);
     }
 

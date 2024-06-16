@@ -90,7 +90,7 @@ public class OrderItemService {
         for (OrderItemDetailRequest itemDetail : orderItemDetails) {
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
             if (outfitType == null) {
-                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_OUTFIT_TYPE_ERROR)+itemDetail.getOutfitType();
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_OUTFIT_TYPE_ERROR) + itemDetail.getOutfitType();
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
 
@@ -160,7 +160,7 @@ public class OrderItemService {
         if (Boolean.TRUE.equals(updateItemDetail.getIsDeleted())) {
             orderItem.setIsDeleted(Boolean.TRUE);
             Double itemPrice = orderItem.calculateItemPrice();
-            if(updateItemDetail.getAmountRefunded() != null && updateItemDetail.getAmountRefunded() > itemPrice) {
+            if (updateItemDetail.getAmountRefunded() != null && updateItemDetail.getAmountRefunded() > itemPrice) {
                 throw new RuntimeException("Amount refunded cannot exceed item price");
             }
         }
@@ -221,7 +221,7 @@ public class OrderItemService {
     public OrderItemDetails getOrderItemDetails(Long orderItemId) throws Exception {
         Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
         if (!orderItem.isPresent()) {
-            String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ITEM_ID_ERROR);
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ITEM_ID_ERROR);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
         OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
@@ -327,7 +327,7 @@ public class OrderItemService {
 
     private void validateGetOrderItemRequest(Long boutiqueId, Long orderId) {
         if (boutiqueId == null && orderId == null) {
-             String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ID_ERROR);
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ID_ERROR);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
     }

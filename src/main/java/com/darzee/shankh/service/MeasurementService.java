@@ -102,12 +102,12 @@ public class MeasurementService {
                                                            String scale, Boolean nonEmptyValuesOnly) throws Exception {
 
         validateGetMeasurementRequestParams(customerId, measurementRevisionId, orderItemId, outfitTypeIndex, scale);
-        if(orderItemId != null) {
+        if (orderItemId != null) {
             Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
-            if(orderItem.isPresent()) {
+            if (orderItem.isPresent()) {
                 OrderType orderType = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext())
                         .getOrderType();
-                if(OrderType.ALTERATION.equals(orderType)) {
+                if (OrderType.ALTERATION.equals(orderType)) {
                     return new OverallMeasurementDetails();
                 }
             }
