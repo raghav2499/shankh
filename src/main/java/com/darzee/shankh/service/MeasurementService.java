@@ -102,12 +102,12 @@ public class MeasurementService {
                                                            String scale, Boolean nonEmptyValuesOnly) throws Exception {
 
         validateGetMeasurementRequestParams(customerId, measurementRevisionId, orderItemId, outfitTypeIndex, scale);
-        if(orderItemId != null) {
+        if (orderItemId != null) {
             Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
-            if(orderItem.isPresent()) {
+            if (orderItem.isPresent()) {
                 OrderType orderType = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext())
                         .getOrderType();
-                if(OrderType.ALTERATION.equals(orderType)) {
+                if (OrderType.ALTERATION.equals(orderType)) {
                     return new OverallMeasurementDetails();
                 }
             }
@@ -242,7 +242,6 @@ public class MeasurementService {
             String imageLink = s3Client.generateShortLivedUrlForMeasurement("bottom.jpg");
             innerMeasurementDetailsList.add(new InnerMeasurementDetails(heading, measurementDetails, imageLink));
         }
-        innerMeasurementDetailsList = measurementDetailsTranslator.translateInnerMeasurementDetailsList(innerMeasurementDetailsList);
         return innerMeasurementDetailsList;
     }
 
@@ -379,7 +378,6 @@ public class MeasurementService {
                     .collect(Collectors.toList());
         }
 
-        measurementDetailsList = measurementDetailsTranslator.translateMeasurementDetailsList(measurementDetailsList);
         return measurementDetailsList;
     }
 
