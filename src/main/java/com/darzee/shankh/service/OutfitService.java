@@ -7,6 +7,7 @@ import com.darzee.shankh.response.OutfitDetails;
 import com.darzee.shankh.response.PortfolioSubOutfit;
 import com.darzee.shankh.response.SubOutfitTypeDetailResponse;
 import com.darzee.shankh.service.translator.OutfitTranslator;
+import com.darzee.shankh.service.translator.PortfolioSuboutfitTranslator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,9 @@ public class OutfitService {
     @Autowired
     private OutfitTranslator outfitTranslator;
 
+    @Autowired
+    private PortfolioSuboutfitTranslator portfolioSuboutfitTranslator;
+
     public ResponseEntity getOutfitDetails(String gender) throws Exception {
         List<OutfitType> outfitTypes = getOutfitTypes(gender);
         List<OutfitDetails> outfitDetailsList = new ArrayList<>(outfitTypes.size());
@@ -41,7 +45,7 @@ public class OutfitService {
             outfitDetails.setStitchOptionsExist(stitchOptionsExist);
             outfitDetailsList.add(outfitDetails);
         }
-        outfitDetailsList = outfitTranslator.getTranslatedOutfitDetailsList(outfitDetailsList) ;
+        outfitDetailsList = outfitTranslator.getTranslatedOutfitDetailsList(outfitDetailsList);
         return new ResponseEntity(outfitDetailsList, HttpStatus.OK);
     }
 
@@ -54,6 +58,7 @@ public class OutfitService {
                 .collect(Collectors.toList());
         String successMessage = "Details fetched successfully";
         SubOutfitTypeDetailResponse response = new SubOutfitTypeDetailResponse(successMessage, subOutfits);
+        response = portfolioSuboutfitTranslator.translate(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
