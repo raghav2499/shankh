@@ -5,9 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import org.bouncycastle.jcajce.provider.asymmetric.ec.GMSignatureSpi.sha256WithSM2;
 
 @Getter
 @Setter
@@ -22,6 +22,10 @@ public class BoutiqueDAO {
     private BoutiqueType boutiqueType;
     private Integer tailorCount;
     private TailorDAO adminTailor;
+    private String gstNumber;
+    private BigDecimal gstRate;
+    private AddressDAO address;
+    private Boolean includeDeliveryDate;
 
     public BoutiqueDAO(String boutiqueName, String boutiqueType, String boutiqueReferenceId) {
         this.name = boutiqueName;

@@ -102,4 +102,16 @@ public class BoutiqueController {
                 outfitSide, request);
     }
 
+    @GetMapping(value = "/custom_invoice_detail", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity getCustomInvoiceDetail(@RequestParam("boutique_id") Long boutiqueId) {
+        return boutiqueService.getCustomInvoiceDetail(boutiqueId);
+    }
+
+    // @PostMapping(value = "/custom_invoice_detail", produces = MediaType.APPLICATION_JSON_VALUE)
+    // @CrossOrigin
+    // public ResponseEntity updateCustomInvoiceDetail(@RequestParam("boutique_id") Long boutiqueId,
+    //         @RequestBody Map<String, Object> request) {
+    //     return boutiqueService.updateCustomInvoiceDetail(boutiqueId, request);
+    // }
 }
