@@ -4,6 +4,8 @@ import com.darzee.shankh.enums.BoutiqueType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 import javax.persistence.*;
 
 @Table(name = "boutique")
@@ -34,4 +36,17 @@ public class Boutique extends GenericEntity {
     @OneToOne
     @JoinColumn(name = "admin_tailor_id")
     private Tailor adminTailor;
+
+    @Column(name = "gst_number", length = 15)
+    private String gstNumber;
+
+    @Column(name = "gst_rate")
+    private BigDecimal gstRate;
+
+    @OneToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
+
+    @Column(name = "include_delivery_date")
+    private Boolean includeDeliveryDate;
 }
