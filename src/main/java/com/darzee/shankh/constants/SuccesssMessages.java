@@ -9,7 +9,7 @@ public class SuccesssMessages {
 
     public static String ITEM_CREATE_SUCCESS ="Item created successfully";
 
-    public static String STITCH_OPTIONS_CREATE_SUCCESS="Stitch options created successfully";
+    public static String STITCH_OPTIONS_CREATE_SUCCESS="Stitch options saved sucssessfully";
 
     public static String BOUTIQUE_DATA_RESET_SUCCESS="Boutique data reset successfully";
 
