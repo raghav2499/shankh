@@ -12,8 +12,12 @@ public class OverallMeasurementDetailsTranslator {
     @Autowired
     private LocalisationService localisationService;
 
+    @Autowired
+    private MeasurementDetailsTranslator measurementDetailsTranslator;
+
     public OverallMeasurementDetails translate(OverallMeasurementDetails measurementDetails,String message) {
 measurementDetails.setMessage(localisationService.translate(message));
+            measurementDetailsTranslator.getTranslatedInnerMeasurementDetailsList(measurementDetails.getInnerMeasurementDetails());
         return measurementDetails;
     }
 }
