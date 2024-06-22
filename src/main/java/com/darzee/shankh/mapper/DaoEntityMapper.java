@@ -26,6 +26,10 @@ public interface DaoEntityMapper {
 
     OrderDAO orderObjectToDao(Order order, @Context CycleAvoidingMappingContext context);
 
+    AddressDAO addressObjectToDao(Address address, @Context CycleAvoidingMappingContext context);
+
+    Address addressDaoToObject(AddressDAO addressDAO, @Context CycleAvoidingMappingContext context);
+
     SampleImageReferenceDAO sampleImageRefToDAO(SampleImageReference sampleImageReference);
 
     //we don't want to use the getter method here to populate boutiqueOrderId,
