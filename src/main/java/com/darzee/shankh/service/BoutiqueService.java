@@ -273,43 +273,7 @@ public class BoutiqueService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
 
     }
-
-    public ResponseEntity getCustomInvoiceDetail(Long boutiqueId) {
-        Optional<Boutique> optionalBoutique = boutiqueRepo.findById(boutiqueId);
-        if (optionalBoutique.isPresent()) {
-            BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(),
-                    new CycleAvoidingMappingContext());
-
-            GetCustomInvoiceDetailResponse response = generateCustomInvoiceDetailResponse(boutiqueDAO); 
-
-            return new ResponseEntity(response, HttpStatus.OK);
-        }
-        return null;
-    }
-
-    public GetCustomInvoiceDetailResponse generateCustomInvoiceDetailResponse(BoutiqueDAO boutiqueDAO) {
-        GetCustomInvoiceDetailResponse response = new GetCustomInvoiceDetailResponse();
-        response.setBoutiqueName(boutiqueDAO.getName());
-        response.setAdminTailorPhoneNumber(boutiqueDAO.getAdminTailor().getPhoneNumber());
-        if(boutiqueDAO.getAddress()!=null){
-            response.setAddressLine1(boutiqueDAO.getAddress().getAddressLine1());
-            response.setAddressLine2(boutiqueDAO.getAddress().getAddressLine2());
-            response.setCity(boutiqueDAO.getAddress().getCity());
-            response.setCountry(boutiqueDAO.getAddress().getCountry());
-            response.setPostalCode(boutiqueDAO.getAddress().getPostalCode());
-        }
-        response.setAdminTailorProfilePicUrl(getAdminTailorProfilePictureUrl(boutiqueDAO));
-        return response;
-    }
-    public String getAdminTailorProfilePictureUrl(BoutiqueDAO boutiqueDAO) {
-        List<String> boutiqueProfilePictureRef= objectFilesService.getBoutiqueImageReferenceId(boutiqueDAO.getId());
-
-       if(boutiqueProfilePictureRef!=null && !boutiqueProfilePictureRef.isEmpty()){
-           return bucketService.getShortLivedUrl(boutiqueProfilePictureRef.get(0));
-       }
-       return null;
-    }
-
+    
     public AddressDAO updateAddress(AddressDAO addressDAO, UpdateAdreessRequest request) {
 
         if (addressDAO.isAddressLine1Updated(request.getAddressLine1())) {
