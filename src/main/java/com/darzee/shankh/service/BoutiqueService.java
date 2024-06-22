@@ -1,7 +1,7 @@
 package com.darzee.shankh.service;
 
-import com.amazonaws.services.dynamodbv2.xspec.B;
 import com.darzee.shankh.constants.ErrorMessages;
+import com.darzee.shankh.dao.AddressDAO;
 import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Boutique;
@@ -10,6 +10,7 @@ import com.darzee.shankh.enums.*;
 import com.darzee.shankh.mapper.CycleAvoidingMappingContext;
 import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
+import com.darzee.shankh.request.UpdateAdreessRequest;
 import com.darzee.shankh.request.UpdateBoutiqueDetails;
 import com.darzee.shankh.request.UpdateTailorRequest;
 import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
@@ -56,6 +57,9 @@ public class BoutiqueService {
     private TailorRepo tailorRepo;
 
     @Autowired
+    private AddressRepo addressRepo;
+
+    @Autowired
     private BoutiqueMeasurementRepo boutiqueMeasurementRepo;
 
     @Autowired
@@ -77,6 +81,7 @@ public class BoutiqueService {
             BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(optionalBoutique.get(),
                     new CycleAvoidingMappingContext());
             TailorDAO adminTailor = boutiqueDAO.getAdminTailor();
+            AddressDAO address = boutiqueDAO.getAddress();
 
             if (boutiqueDAO.isNameUpdated(request.getName())) {
                 boutiqueDAO.setName(request.getName());
@@ -99,15 +104,35 @@ public class BoutiqueService {
                 saveBoutiqueReferences(request.getBoutiqueImageReferenceId(), boutiqueDAO);
             }
 
+            if(boutiqueDAO.isGstNumberUpdated(request.getGstNumber())){
+                boutiqueDAO.setGstNumber(request.getGstNumber());
+            }
+            
+            if(boutiqueDAO.isGstRateUpdated(request.getGstRate())){
+                boutiqueDAO.setGstRate(request.getGstRate());
+            }
+
+            if(boutiqueDAO.isIncludeDeliveryDateUpdated(request.getIncludeDeliveryDate())){
+                boutiqueDAO.setIncludeDeliveryDate(request.getIncludeDeliveryDate());
+            }
+
+            if(boutiqueDAO.isBoutiquePhoneNumberUpdated(request.getBoutiquePhoneNumber())){
+                boutiqueDAO.setBoutiquePhoneNumber(request.getBoutiquePhoneNumber());
+            }
+
             if (request.getTailor() != null) {
                 adminTailor = updateAdminTailorProfile(adminTailor, request.getTailor());
+            }
+
+            if(request.getAddress()!=null){
+               address = updateAddress(address, request.getAddress());
             }
 
             boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
                     new CycleAvoidingMappingContext())),
                     new CycleAvoidingMappingContext());
 
-            response = generateBoutiqueDetailResponse(boutiqueDAO, adminTailor);
+            response = generateBoutiqueDetailResponse(boutiqueDAO, adminTailor,address);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_ERROR); 
@@ -119,8 +144,9 @@ public class BoutiqueService {
         if (boutique.isPresent()) {
             BoutiqueDAO boutiqueDAO = mapper.boutiqueObjectToDao(boutique.get(), new CycleAvoidingMappingContext());
             TailorDAO tailorDAO = boutiqueDAO.getAdminTailor();
+            AddressDAO addressDAO = boutiqueDAO.getAddress();
 
-            GetBoutiqueDetailsResponse response = generateBoutiqueDetailResponse(boutiqueDAO, tailorDAO);
+            GetBoutiqueDetailsResponse response = generateBoutiqueDetailResponse(boutiqueDAO, tailorDAO, addressDAO);
             return new ResponseEntity(response, HttpStatus.OK);
         }
         String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_ERROR); 
@@ -142,7 +168,7 @@ public class BoutiqueService {
                 boutique.getId());
     }
 
-    private GetBoutiqueDetailsResponse generateBoutiqueDetailResponse(BoutiqueDAO boutiqueDAO, TailorDAO tailorDAO) {
+    private GetBoutiqueDetailsResponse generateBoutiqueDetailResponse(BoutiqueDAO boutiqueDAO, TailorDAO tailorDAO, AddressDAO addressDAO) {
         List<String> shopImageReferenceIds = getBoutiqueImagesReferenceIds(boutiqueDAO.getId());
         String adminTailorImageReferenceId = objectFilesService
                 .getTailorImageReferenceId(boutiqueDAO.getAdminTailor().getId());
@@ -158,7 +184,7 @@ public class BoutiqueService {
         String portfolioLink = boutiqueTailorService.getTailorPortfolioLink(tailorDAO);
         GetBoutiqueDetailsResponse response = new GetBoutiqueDetailsResponse(boutiqueDAO, tailorDAO,
                 shopImageReferenceIds, shopImageUrls, adminTailorImageReferenceId, adminTailorImageUrl,
-                portfolioLink);
+                portfolioLink,addressDAO);
         return response;
     }
 
@@ -284,6 +310,30 @@ public class BoutiqueService {
        return null;
     }
 
-    // public updateCustomInvoiceDetail()
+    public AddressDAO updateAddress(AddressDAO addressDAO, UpdateAdreessRequest request) {
+
+        if (addressDAO.isAddressLine1Updated(request.getAddressLine1())) {
+            addressDAO.setAddressLine1(request.getAddressLine1());
+        }
+        if (addressDAO.isAddressLine2Updated(request.getAddressLine2())) {
+            addressDAO.setAddressLine2(request.getAddressLine2());
+        }
+        if (addressDAO.isCityUpdated(request.getCity())) {
+            addressDAO.setCity(request.getCity());
+        }
+        if (addressDAO.isStateUpdated(request.getState())) {
+            addressDAO.setState(request.getState());
+        }
+        if (addressDAO.isCountryUpdated(request.getCountry())) {
+            addressDAO.setCountry(request.getCountry());
+        }
+        if (addressDAO.isPostalCodeUpdated(request.getPostalCode())) {
+            addressDAO.setPostalCode(request.getPostalCode());
+        }
+
+        AddressDAO updatedAddressDAO = mapper.addressObjectToDao(addressRepo.save(mapper.addressDaoToObject(addressDAO, new CycleAvoidingMappingContext())), new CycleAvoidingMappingContext());
+
+        return updatedAddressDAO;
+    }
 
 }
