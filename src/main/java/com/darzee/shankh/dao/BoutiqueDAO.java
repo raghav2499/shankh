@@ -26,6 +26,8 @@ public class BoutiqueDAO {
     private BigDecimal gstRate;
     private AddressDAO address;
     private Boolean includeDeliveryDate;
+    private String boutiquePhoneNumber;
+    private String countryCode;
 
     public BoutiqueDAO(String boutiqueName, String boutiqueType, String boutiqueReferenceId) {
         this.name = boutiqueName;

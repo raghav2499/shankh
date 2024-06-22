@@ -49,4 +49,10 @@ public class Boutique extends GenericEntity {
 
     @Column(name = "include_delivery_date")
     private Boolean includeDeliveryDate;
+
+    @Column(name = "boutique_phone_number", length = 10)
+    private String boutiquephoneNumber;
+
+    @Column(name = "country_code")
+    private String countryCode;
 }
