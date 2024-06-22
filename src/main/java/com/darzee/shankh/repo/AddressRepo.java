@@ -10,5 +10,4 @@ import com.darzee.shankh.entity.Address;
 
 public interface AddressRepo extends JpaRepository<Address, Long> {
 
-    Optional<Address> findByAddressId(Long addressId);
 } 
