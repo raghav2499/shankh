@@ -6,7 +6,6 @@ import com.darzee.shankh.service.BoutiqueLedgerService;
 import com.darzee.shankh.service.BoutiqueService;
 import com.darzee.shankh.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -102,16 +101,4 @@ public class BoutiqueController {
                 outfitSide, request);
     }
 
-    @GetMapping(value = "/custom_invoice_detail", produces = MediaType.APPLICATION_JSON_VALUE)
-    @CrossOrigin
-    public ResponseEntity getCustomInvoiceDetail(@RequestParam("boutique_id") Long boutiqueId) {
-        return boutiqueService.getCustomInvoiceDetail(boutiqueId);
-    }
-
-    // @PostMapping(value = "/custom_invoice_detail", produces = MediaType.APPLICATION_JSON_VALUE)
-    // @CrossOrigin
-    // public ResponseEntity updateCustomInvoiceDetail(@RequestParam("boutique_id") Long boutiqueId,
-    //         @RequestBody Map<String, Object> request) {
-    //     return boutiqueService.updateCustomInvoiceDetail(boutiqueId, request);
-    // }
 }
