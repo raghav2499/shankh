@@ -46,4 +46,27 @@ public class BoutiqueDAO {
         return value != null && value != this.tailorCount;
     }
 
+    public boolean isGstNumberUpdated(String value) {
+        return value != null && !this.gstNumber.equals(value);
+    }
+
+    public boolean isGstRateUpdated(BigDecimal value) {
+        return value != null && !this.gstRate.equals(value);
+    }
+
+    public boolean isIncludeDeliveryDateUpdated(Boolean value) {
+        return value != null && !this.includeDeliveryDate.equals(value);
+    }
+
+    public boolean isBoutiquePhoneNumberUpdated(String value) {
+        return value != null && !this.boutiquePhoneNumber.equals(value);
+    }
+
+    public boolean isCountryCodeUpdated(String value) {
+        return value != null && !this.countryCode.equals(value);
+    }
+
+    public boolean isAddressUpdated(AddressDAO value) {
+        return value != null && !this.address.equals(value);
+    }
 }
