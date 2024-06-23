@@ -39,7 +39,6 @@ public class OrderItemDetailsTranslator {
             }
             orderItemDetails.setOrderItemStitchOptions(newOrderStichOptions);
         }
-
         if (orderItemDetails.getPriceBreakupSummaryList() != null) {
             orderItemDetails.getPriceBreakupSummaryList().forEach(priceBreakupSummary -> {
                 priceBreakupSummary.setComponent(localisationService.translate(priceBreakupSummary.getComponent()));
@@ -52,4 +51,5 @@ public class OrderItemDetailsTranslator {
         return orderItemDetails;
     }
 }
+
 
