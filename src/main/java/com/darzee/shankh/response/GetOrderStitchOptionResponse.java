@@ -17,10 +17,15 @@ public class GetOrderStitchOptionResponse {
 
     public GetOrderStitchOptionResponse(Map<String, List<OrderStitchOptionDetail>> orderStitchOptionDetailMap) {
         List<GroupedOrderStitchOptionDetail> groupedOrderStitchOptionDetails = new ArrayList<>();
-        for (Map.Entry<String, List<OrderStitchOptionDetail>> orderStitchOption : orderStitchOptionDetailMap.entrySet()) {
-            GroupedOrderStitchOptionDetail groupedOrderStitchOptionDetail =
-                    new GroupedOrderStitchOptionDetail(orderStitchOption.getKey(), orderStitchOption.getValue());
-            groupedOrderStitchOptionDetails.add(groupedOrderStitchOptionDetail);
+        if (orderStitchOptionDetailMap.containsKey("Top")) {
+            List<OrderStitchOptionDetail> stitchOptionDetails = orderStitchOptionDetailMap.get("Top");
+            GroupedOrderStitchOptionDetail topStitchOptionDetails = new GroupedOrderStitchOptionDetail("Top", stitchOptionDetails);
+            groupedOrderStitchOptionDetails.add(topStitchOptionDetails);
+        }
+        if (orderStitchOptionDetailMap.containsKey("Bottom")) {
+            List<OrderStitchOptionDetail> stitchOptionDetails = orderStitchOptionDetailMap.get("Bottom");
+            GroupedOrderStitchOptionDetail bottomStitchOptionDetails = new GroupedOrderStitchOptionDetail("Bottom", stitchOptionDetails);
+            groupedOrderStitchOptionDetails.add(bottomStitchOptionDetails);
         }
         this.response = groupedOrderStitchOptionDetails;
     }
