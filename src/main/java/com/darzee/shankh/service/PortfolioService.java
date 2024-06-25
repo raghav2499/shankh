@@ -22,6 +22,8 @@ import com.darzee.shankh.utils.CommonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -219,6 +221,7 @@ public class PortfolioService {
         }
     }
 
+    @CacheEvict(value = "topPortfolios", allEntries = true)
     public ResponseEntity<CreatePortfolioOutfitResponse> createPortfolioOutfits(CreatePortfolioOutfitRequest request,
                                                                                 Long portfolioId) throws Exception {
         CreatePortfolioOutfitResponse response = new CreatePortfolioOutfitResponse();
@@ -578,6 +581,75 @@ public class PortfolioService {
         }
         String username = portfolioDAO.getUsername();
         return baseUrl + "/" + username;
+    }
+
+    
+    @Cacheable(value="topPortfolios")
+    public List<HomePortfolio> getPortfoliosSortedByOutfits() {
+        List<HomePortfolio> responseList = new ArrayList<>();
+        List<Portfolio> portfolios = portfolioRepo.findAllWithOutfitsOrderByOutfitsDesc();
+
+        if(!portfolios.isEmpty()) {
+
+            for(Portfolio portfolio : portfolios) {
+                PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio,
+                        new CycleAvoidingMappingContext());
+                Long tailorId = portfolioDAO.getTailor().getId();
+                String tailorName = tailorRepo.findNameById(tailorId);
+                String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
+                String tailorImageReferenceId = objectFilesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
+                String portfolioCoverReference = objectFilesService.getProfileCoverReference(portfolioDAO.getId());
+                String portfolioAbout = portfolioDAO.getAboutDetails();
+                String tailorImageReferenceUrl = null;
+                String portfolioCoverImageUrl = null;
+                if (tailorImageReferenceId != null) {
+                    tailorImageReferenceUrl = bucketService.getShortLivedUrl(tailorImageReferenceId);
+                }
+                if (portfolioCoverReference != null) {
+                    portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
+                }
+               HomePortfolio response = new  HomePortfolio(tailorName, boutiqueName, tailorId, portfolioAbout, tailorName, tailorImageReferenceUrl, portfolioCoverImageUrl);
+               responseList.add(response);
+                    
+    
+        }
+    }
+        return responseList;
+
+    }
+
+    public List<HomePortfolio> getPortfoliosSortedByCreatedDate(){
+        List<Portfolio> portfolios = portfolioRepo.findAllByOrderByCreatedAtDesc();
+
+        List<HomePortfolio> responseList = new ArrayList<>();
+
+        if(!portfolios.isEmpty()) {
+
+            for(Portfolio portfolio : portfolios) {
+                PortfolioDAO portfolioDAO = mapper.portfolioToPortfolioDAO(portfolio,
+                        new CycleAvoidingMappingContext());
+                        Long tailorId = portfolioDAO.getTailor().getId();
+                        String tailorName = tailorRepo.findNameById(tailorId);
+                        String boutiqueName = boutiqueRepo.findNameByAdminTailorId(tailorId);
+                        String portfolioAbout = portfolioDAO.getAboutDetails();
+                        String tailorImageReferenceId =      objectFilesService.getTailorImageReferenceId(portfolioDAO.getTailor().getId());
+                        String portfolioCoverReference = objectFilesService.getProfileCoverReference(portfolioDAO.getId());
+                        String tailorImageReferenceUrl = null;
+                        String portfolioCoverImageUrl = null;
+                        if (tailorImageReferenceId != null) {
+                            tailorImageReferenceUrl = bucketService.getShortLivedUrl(tailorImageReferenceId);
+                        }
+                        if (portfolioCoverReference != null) {
+                            portfolioCoverImageUrl = bucketService.getPortfolioImageShortLivedUrl(portfolioCoverReference);
+                        }
+                        HomePortfolio response = new HomePortfolio(tailorName, boutiqueName, tailorId, portfolioAbout, tailorName, tailorImageReferenceUrl, portfolioCoverImageUrl);
+
+                responseList.add(response);
+            }
+        }
+
+        return responseList;
+
     }
 
 }

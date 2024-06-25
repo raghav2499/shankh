@@ -6,9 +6,12 @@ import com.darzee.shankh.request.UpdatePortfolioRequest;
 import com.darzee.shankh.response.*;
 import com.darzee.shankh.service.PortfolioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -87,5 +90,21 @@ public class PortfolioController {
     @CrossOrigin
     public ResponseEntity<GetPortfolioColorResponse> getPortfolioColors() {
         return portfolioService.getColors();
+    }
+
+    @GetMapping(value="/portfolios/top_portfolios", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity<GetHomePortfolioResponse> getTopPortfolios() {
+    List<HomePortfolio> portfolios = portfolioService.getPortfoliosSortedByOutfits();
+    GetHomePortfolioResponse response = new GetHomePortfolioResponse(portfolios);
+    return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value="/portfolios/latest_portfolios", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity<GetHomePortfolioResponse> getPortfoliosSortedByCreatedDate() {
+        List<HomePortfolio> portfolios = portfolioService.getPortfoliosSortedByCreatedDate();
+        GetHomePortfolioResponse response = new GetHomePortfolioResponse();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

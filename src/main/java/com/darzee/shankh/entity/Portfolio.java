@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,9 @@ public class Portfolio extends GenericEntity {
 
     @Column(name = "about_details")
     private String aboutDetails;
-
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
     @Type(type = "jsonb")
     @Column(name = "social_media", columnDefinition = "jsonb")
     private Map<String, String> socialMedia;
