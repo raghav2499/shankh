@@ -16,8 +16,8 @@ public class LocalisationService {
 
     public String translate(String englishText) {
         if (englishText == null) return null;
-        String key = englishText.toLowerCase().replaceAll("_", " ").replaceAll("[^a-zA-Z ]", "").replace(" ", ".");
+        String key = englishText.toLowerCase().replaceAll("_", " ").replaceAll("[^a-zA-Z0-9 ]", "").replaceAll("\\s+", " ").replace(" ", ".");
         Locale locale = LocaleContextHolder.getLocale();
-        return messageSource.getMessage(key, null, englishText + "NF", locale);
+        return messageSource.getMessage(key, null, englishText, locale);
     }
 }

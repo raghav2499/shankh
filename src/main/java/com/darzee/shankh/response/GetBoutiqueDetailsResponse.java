@@ -20,7 +20,7 @@ public class GetBoutiqueDetailsResponse {
     private Long boutiqueId;
     private String boutiqueName;
     private Integer tailorCount;
-    private Integer language;
+    private String language;
     private List<String> shopImagesRefId;
     private List<String> shopImageUrls;
     private String adminTailorName;
@@ -68,7 +68,7 @@ public class GetBoutiqueDetailsResponse {
             this.adminTailorRefId = adminTailorRefId;
             this.adminTailorProfilePicUrl = adminTailorImageUrl;
             if (tailorDAO.getLanguage() != null) {
-                this.language = tailorDAO.getLanguage().getOrdinal();
+                this.language = tailorDAO.getLanguage().getNotation();
             }
             this.portfolioLink = portfolioLink;
         }

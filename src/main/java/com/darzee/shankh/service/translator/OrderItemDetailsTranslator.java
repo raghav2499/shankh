@@ -6,7 +6,9 @@ import com.darzee.shankh.service.LocalisationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderItemDetailsTranslator {
@@ -30,10 +32,12 @@ public class OrderItemDetailsTranslator {
         }
 
         if (orderItemDetails.getOrderItemStitchOptions() != null) {
+            Map<String, List<OrderStitchOptionDetail>> newOrderStichOptions=new HashMap<>() ;
             for (String side : orderItemDetails.getOrderItemStitchOptions().keySet()) {
                 List<OrderStitchOptionDetail> translatedOrderItemDetails = orderStitchOptionsTranslator.translate(orderItemDetails.getOrderItemStitchOptions().get(side));
-                orderItemDetails.getOrderItemStitchOptions().put(side, translatedOrderItemDetails);
+                newOrderStichOptions.put(localisationService.translate(side), translatedOrderItemDetails);
             }
+            orderItemDetails.setOrderItemStitchOptions(newOrderStichOptions);
         }
         if (orderItemDetails.getPriceBreakupSummaryList() != null) {
             orderItemDetails.getPriceBreakupSummaryList().forEach(priceBreakupSummary -> {
@@ -47,4 +51,5 @@ public class OrderItemDetailsTranslator {
         return orderItemDetails;
     }
 }
+
 
