@@ -120,6 +120,10 @@ public class BoutiqueService {
                 boutiqueDAO.setBoutiquePhoneNumber(request.getBoutiquePhoneNumber());
             }
 
+            if(request.getCountryCode()!=null){
+                boutiqueDAO.setCountryCode(request.getCountryCode());
+            }
+
             if (request.getTailor() != null) {
                 adminTailor = updateAdminTailorProfile(adminTailor, request.getTailor());
             }

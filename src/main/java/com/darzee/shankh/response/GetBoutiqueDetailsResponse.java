@@ -25,6 +25,7 @@ public class GetBoutiqueDetailsResponse {
     private List<String> shopImageUrls;
     private String adminTailorName;
     private String adminTailorPhoneNumber;
+    private String countryCode;
     private String adminTailorRefId;
     private Integer boutiqueType;
     private String adminTailorProfilePicUrl;
@@ -48,6 +49,7 @@ public class GetBoutiqueDetailsResponse {
         this.boutiqueId = boutiqueDAO.getId();
         this.boutiqueName = boutiqueDAO.getName();
         this.tailorCount = boutiqueDAO.getTailorCount();
+        this.countryCode=boutiqueDAO.getCountryCode();
         this.boutiqueType = boutiqueDAO.getBoutiqueType().getOrdinal();
         this.shopImagesRefId = shopImagesRefId;
         this.shopImageUrls = shopImagesUrl;
