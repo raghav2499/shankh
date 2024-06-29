@@ -5,7 +5,6 @@ import com.darzee.shankh.dao.OrderAmountDAO;
 import com.darzee.shankh.dao.OrderDAO;
 import com.darzee.shankh.dao.OrderItemDAO;
 import com.darzee.shankh.enums.Language;
-import com.darzee.shankh.enums.OutfitSide;
 import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.service.OutfitTypeObjectService;
@@ -164,14 +163,14 @@ public class PdfGenerator {
         String outfitImageLink = outfitTypeService.getOutfitImageLink();
         String specialInstructions = Optional.ofNullable(orderItem.getSpecialInstructions()).orElse("");
         String inspiration = Optional.ofNullable(orderItem.getInspiration()).orElse("");
-        List<List<OrderStitchOptionDetail>> groupedStitchOptionList = new ArrayList<>();
-        if (groupedStitchOptions.containsKey(OutfitSide.TOP.getView())) {
-            groupedStitchOptionList.add(orderStitchOptionsTranslator.translate(groupedStitchOptions.get(OutfitSide.TOP.getView())));
-        }
-        if (groupedStitchOptions.containsKey(OutfitSide.BOTTOM.getView())) {
-            groupedStitchOptionList.add(orderStitchOptionsTranslator.translate(groupedStitchOptions.get(OutfitSide.BOTTOM.getView())));
-        }
-        measurementDetails = measurementDetailsTranslator.translate(measurementDetails);
+//        List<List<OrderStitchOptionDetail>> groupedStitchOptionList = new ArrayList<>();
+//        if (groupedStitchOptions.containsKey(OutfitSide.TOP.getView())) {
+//            groupedStitchOptionList.add(orderStitchOptionsTranslator.translate(groupedStitchOptions.get(OutfitSide.TOP.getView())));
+//        }
+//        if (groupedStitchOptions.containsKey(OutfitSide.BOTTOM.getView())) {
+//            groupedStitchOptionList.add(orderStitchOptionsTranslator.translate(groupedStitchOptions.get(OutfitSide.BOTTOM.getView())));
+//        }
+//        measurementDetails = measurementDetailsTranslator.translate(measurementDetails);
 
         // Create a JavaScript object and set the dynamic data
         context.setVariable("businessName", boutiqueName);
@@ -180,7 +179,7 @@ public class PdfGenerator {
         context.setVariable("outfitImageLink", outfitImageLink);
         context.setVariable("outfitPieces", outfitPieces);
         context.setVariable("measurementDetails", measurementDetails);
-        context.setVariable("groupedStitchOptions", groupedStitchOptionList);
+        context.setVariable("groupedStitchOptions", groupedStitchOptions);
         context.setVariable("specialInstructions", specialInstructions);
         context.setVariable("inspiration", inspiration);
         context.setVariable("clothImages", clothImages);
