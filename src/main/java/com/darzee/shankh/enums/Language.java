@@ -11,35 +11,35 @@ import java.util.Map;
 public enum Language {
 
     @JsonProperty("english")
-    ENGLISH("english", 1,"en"),
+    ENGLISH("english", 1, "en"),
 
     @JsonProperty("hindi")
-    HINDI("hindi", 2,"hi"),
+    HINDI("hindi", 2, "hi"),
 
     @JsonProperty("punjabi")
-    PUNJABI("punjabi",3,"pa"),
+    PUNJABI("punjabi", 3, "pa"),
 
     @JsonProperty("gujarati")
-    GUJARATI("gujarati",4,"gu"),
+    GUJARATI("gujarati", 4, "gu"),
 
     @JsonProperty("marathi")
-    MARATHI("marathi",5,"mr"),
+    MARATHI("marathi", 5, "mr"),
     @JsonProperty("telugu")
-    TELUGU("telugu",6,"te"),
+    TELUGU("telugu", 6, "te"),
     @JsonProperty("bengali")
-    BENGALI("bengali",7,"bn"),
+    BENGALI("bengali", 7, "bn"),
     @JsonProperty("kannada")
-    KANNADA("kannada",8,"kn"),
+    KANNADA("kannada", 8, "kn"),
     @JsonProperty("malyalam")
-    MALYALAM("malyalam",9,"ml"),
+    MALYALAM("malyalam", 9, "ml"),
     @JsonProperty("odia")
-    ODIA("odia",10,"or"),
+    ODIA("odia", 10, "or"),
     @JsonProperty("assamese")
-    ASSAMESE("assamese",11,"as"),
+    ASSAMESE("assamese", 11, "as"),
     @JsonProperty("tamil")
-    TAMIL("tamil",12,"ta"),
+    TAMIL("tamil", 12, "ta"),
     @JsonProperty("urdu")
-    URDU("urdu",13,"ur");
+    URDU("urdu", 13, "ur");
 
     private String value;
 
