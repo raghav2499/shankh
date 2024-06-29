@@ -86,7 +86,7 @@ public class TailorService {
         }
 
         TailorRole role = isAdminSignupRequest ? TailorRole.ADMIN : TailorRole.EMPLOYEE;
-        Language language = Language.getOrdinalEnumMap().get(request.getLanguage());
+        Language language = Language.getNotationEnumMap().get(request.getLanguage());
         TailorDAO tailorDAO = new TailorDAO(request.getTailorName(),
                 role,
                 language,

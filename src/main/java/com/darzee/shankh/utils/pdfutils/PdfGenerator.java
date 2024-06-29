@@ -10,6 +10,8 @@ import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.service.OutfitTypeObjectService;
 import com.darzee.shankh.service.OutfitTypeService;
+import com.darzee.shankh.service.translator.MeasurementDetailsTranslator;
+import com.darzee.shankh.service.translator.OrderStitchOptionsTranslator;
 import com.darzee.shankh.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,12 @@ public class PdfGenerator {
 
     @Autowired
     private OutfitTypeObjectService outfitTypeObjectService;
+
+    @Autowired
+    private OrderStitchOptionsTranslator orderStitchOptionsTranslator;
+
+    @Autowired
+    private MeasurementDetailsTranslator measurementDetailsTranslator;
 
     private final TemplateEngine templateEngine;
 
@@ -150,7 +158,7 @@ public class PdfGenerator {
                                 List<InnerMeasurementDetails> measurementDetails,
                                 List<String> clothImages,
                                 List<String> audioInstructionLinks,
-                                OrderItemDAO orderItem, Language language) throws Exception {
+                                OrderItemDAO orderItem) throws Exception {
         Context context = new Context();
         String outfitType = orderItem.getOutfitType().getDisplayString();
         Integer outfitPieces = orderItem.getOutfitType().getPieces();
@@ -158,13 +166,6 @@ public class PdfGenerator {
         String outfitImageLink = outfitTypeService.getOutfitImageLink();
         String specialInstructions = Optional.ofNullable(orderItem.getSpecialInstructions()).orElse("");
         String inspiration = Optional.ofNullable(orderItem.getInspiration()).orElse("");
-        List<List<OrderStitchOptionDetail>> groupedStitchOptionList = new ArrayList<>();
-        if (groupedStitchOptions.containsKey(OutfitSide.TOP.getView())) {
-            groupedStitchOptionList.add(groupedStitchOptions.get(OutfitSide.TOP.getView()));
-        }
-        if (groupedStitchOptions.containsKey(OutfitSide.BOTTOM.getView())) {
-            groupedStitchOptionList.add(groupedStitchOptions.get(OutfitSide.BOTTOM.getView()));
-        }
 
         // Create a JavaScript object and set the dynamic data
         context.setVariable("businessName", boutiqueName);
@@ -173,12 +174,12 @@ public class PdfGenerator {
         context.setVariable("outfitImageLink", outfitImageLink);
         context.setVariable("outfitPieces", outfitPieces);
         context.setVariable("measurementDetails", measurementDetails);
-        context.setVariable("groupedStitchOptions", groupedStitchOptionList);
+        context.setVariable("groupedStitchOptions", groupedStitchOptions);
         context.setVariable("specialInstructions", specialInstructions);
         context.setVariable("inspiration", inspiration);
         context.setVariable("clothImages", clothImages);
-        context.setVariable("audioInstructions", audioInstructionLinks);        // Process the HTML template with the Thymeleaf template engine
-        String processedHtml = templateEngine.process(getItemDetailsFileName(language), context);
+        context.setVariable("audioInstructions", audioInstructionLinks);
+        String processedHtml = templateEngine.process("item-details", context);
 
         // Generate PDF from the processed HTML
         ITextRenderer renderer = new ITextRenderer();

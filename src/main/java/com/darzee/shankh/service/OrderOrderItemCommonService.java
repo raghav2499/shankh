@@ -1,5 +1,6 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.constants.ErrorMessages;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.MeasurementRevisions;
 import com.darzee.shankh.entity.Order;
@@ -16,6 +17,7 @@ import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.response.InnerMeasurementDetails;
 import com.darzee.shankh.response.OrderStitchOptionDetail;
 import com.darzee.shankh.response.OrderSummary;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
 import com.darzee.shankh.utils.pdfutils.PdfGenerator;
 import io.jsonwebtoken.lang.Collections;
 import org.hibernate.Session;
@@ -80,13 +82,15 @@ public class OrderOrderItemCommonService {
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private ErrorMessageTranslator errorMessageTranslator;
+
     public ResponseEntity<OrderSummary> confirmOrderAndGenerateInvoice(Long orderId, Long boutiqueId, OrderCreationRequest request) throws Exception {
         OrderDAO orderDAO = orderService.confirmOrder(orderId, boutiqueId, request);
         OrderAmountDAO orderAmountDAO = orderDAO.getOrderAmount();
         OrderSummary summary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(), orderDAO.getInvoiceNo(),
                 orderAmountDAO.getTotalAmount(), orderAmountDAO.getAmountRecieved(), orderDAO.getNonDeletedItems());
         orderService.generateInvoiceV2(orderDAO);
-//        generateItemDetailPdfs(orderDAO);
         return new ResponseEntity<>(summary, HttpStatus.OK);
     }
 
@@ -161,7 +165,6 @@ public class OrderOrderItemCommonService {
         orderDAO = orderService.updateOrderPostItemUpdation(orderDAO, orderItemDetails.getAmountRefunded(), shouldUpdateLedger);
         orderService.generateInvoiceV2(orderDAO);
         Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
-//        generateItemDetailPdf(updatedItem, orderDAO.getCustomer().getId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo);
         OrderSummary orderItemSummary = new OrderSummary(orderDAO.getId(), orderDAO.getBoutiqueOrderId(),
                 orderDAO.getInvoiceNo(), orderDAO.getOrderAmount().getTotalAmount(), orderDAO.getOrderAmount().getAmountRecieved(),
                 orderDAO.getNonDeletedItems());
@@ -190,7 +193,7 @@ public class OrderOrderItemCommonService {
         return updatedItemsList;
     }
 
-    public String getItemDetailPdfLink(Long orderItemId, Language language) {
+    public String getItemDetailPdfLink(Long orderItemId) {
         Optional<OrderItem> item = orderItemRepo.findById(orderItemId);
         if(item.isPresent()) {
             OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(item.get(), new CycleAvoidingMappingContext());
@@ -198,7 +201,7 @@ public class OrderOrderItemCommonService {
             Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
             try {
                 String url = generateItemDetailPdf(orderItemDAO, orderDAO.getCustomerId(), orderDAO.getBoutiqueId(),
-                        orderDAO.getBoutique().getName(), orderNo, language);
+                        orderDAO.getBoutique().getName(), orderNo);
                 return url;
             } catch(Exception e) {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error occurred while generating item PDF");
@@ -208,7 +211,7 @@ public class OrderOrderItemCommonService {
     }
 
     public String generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId, String boutiqueName,
-                                      Long orderNo, Language language) throws Exception {
+                                      Long orderNo) throws Exception {
         Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions =
                 stitchOptionService.getOrderItemStitchOptions(orderItemDAO.getId());
         MeasurementRevisions measurementRevisions =
@@ -223,8 +226,8 @@ public class OrderOrderItemCommonService {
         List<String> audioInstructionLinks = orderItemService.getAudioInstructionLinks(orderItemDAO.getId()).stream().filter(link->link.endsWith(".mp3")).collect(Collectors.toList());
 
         File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions,
-                innerMeasurementDetailsList, clothImageLinks, audioInstructionLinks, orderItemDAO, language);
-        String url = bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId(), language);
+                innerMeasurementDetailsList, clothImageLinks, audioInstructionLinks, orderItemDAO);
+        String url = bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
         return url;
     }
 

@@ -1,7 +1,6 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.dao.OrderDAO;
-import com.darzee.shankh.enums.Language;
 import com.darzee.shankh.request.GetFileLinkRequest;
 import com.darzee.shankh.response.GetFileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +38,7 @@ public class FileLinkService {
                 Long entityId = Optional.ofNullable(orderDAO.getId()).orElse(orderDAO.getId());
                 return bucketService.getInvoiceShortLivedLink(entityId, boutiqueId);
             case "item_details":
-                Language language = request.getMetaData() != null && request.getMetaData().getLanguage() != null
-                        ? Language.getNotationEnumMap().get(request.getMetaData().getLanguage())
-                        : Language.ENGLISH;
-                return orderOrderItemCommonService.getItemDetailPdfLink(request.getEntityId(), language);
+                return orderOrderItemCommonService.getItemDetailPdfLink(request.getEntityId());
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This entity_type is not supported");
         }

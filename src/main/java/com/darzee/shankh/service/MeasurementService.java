@@ -3,6 +3,8 @@ package com.darzee.shankh.service;
 import com.amazonaws.util.StringUtils;
 import com.darzee.shankh.client.AmazonClient;
 import com.darzee.shankh.constants.Constants;
+import com.darzee.shankh.constants.ErrorMessages;
+import com.darzee.shankh.constants.SuccesssMessages;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.BoutiqueMeasurement;
 import com.darzee.shankh.entity.Customer;
@@ -14,6 +16,11 @@ import com.darzee.shankh.mapper.DaoEntityMapper;
 import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.MeasurementDetailsRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
+import com.darzee.shankh.service.translator.MeasurementDetailsTranslator;
+import com.darzee.shankh.service.translator.OverallMeasurementDetailsTranslator;
+import com.darzee.shankh.service.translator.SuccessMessageTranslator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,11 +76,24 @@ public class MeasurementService {
     @Autowired
     private BoutiqueRepo boutiqueRepo;
 
+    @Autowired
+    private MeasurementDetailsTranslator measurementDetailsTranslator;
+
+    @Autowired
+    private OverallMeasurementDetailsTranslator overallMeasurementDetailsTranslator;
+
+    @Autowired
+    private ErrorMessageTranslator errorMessageTranslator;
+
+    @Autowired
+    private SuccessMessageTranslator successMessageTranslator;
+
     public ResponseEntity getMeasurementDetailsResponse(Long customerId, Long measurementRevisionId,
                                                         Long orderItemId, Integer outfitTypeIndex,
                                                         String scale, Boolean nonEmptyValuesOnly) throws Exception {
         OverallMeasurementDetails measurementDetails = getMeasurementDetails(customerId, measurementRevisionId, orderItemId, outfitTypeIndex, scale, nonEmptyValuesOnly);
-        measurementDetails.setMessage(getMeasurementDetailsMessage(measurementDetails));
+        String message = getMeasurementDetailsMessage(measurementDetails);
+        measurementDetails = overallMeasurementDetailsTranslator.translate(measurementDetails, message);
         return new ResponseEntity(measurementDetails, HttpStatus.OK);
     }
 
@@ -82,12 +102,12 @@ public class MeasurementService {
                                                            String scale, Boolean nonEmptyValuesOnly) throws Exception {
 
         validateGetMeasurementRequestParams(customerId, measurementRevisionId, orderItemId, outfitTypeIndex, scale);
-        if(orderItemId != null) {
+        if (orderItemId != null) {
             Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
-            if(orderItem.isPresent()) {
+            if (orderItem.isPresent()) {
                 OrderType orderType = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext())
                         .getOrderType();
-                if(OrderType.ALTERATION.equals(orderType)) {
+                if (OrderType.ALTERATION.equals(orderType)) {
                     return new OverallMeasurementDetails();
                 }
             }
@@ -151,7 +171,8 @@ public class MeasurementService {
             }
             return measurementsDAO;
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer id is invalid");
+        String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.MEASUREMENT_CUSTOMER_ID_ERROR);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     public ResponseEntity<GetMeasurementRevisionsResponse> getMeasurementRevisions(Long customerId,
@@ -226,27 +247,29 @@ public class MeasurementService {
 
     private String getMeasurementDetailsMessage(OverallMeasurementDetails measurementDetails) {
         String message = (!CollectionUtils.isEmpty(measurementDetails.getInnerMeasurementDetails()))
-                ? "Measurement details fetched sucessfully"
-                : "Measurement details not found";
+                ? successMessageTranslator.getTranslatedMessage(SuccesssMessages.MEASUREMENT_DETAILS_FETCH_SUCCESS)
+                : errorMessageTranslator.getTranslatedMessage(ErrorMessages.MEASUREMENT_DETAIL_NOT_FOUND_ERROR);
         return message;
     }
 
     private void validateGetMeasurementRequestParams(Long customerId, Long measurementRevisionId,
                                                      Long orderItemId, Integer outfitTypeIndex, String scale) {
         if (orderItemId == null && measurementRevisionId == null && (customerId == null || outfitTypeIndex == null)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either send measurement rev id/ order item id" +
-                    " or (outfit type and customer id)");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_PARAMS_ERROR);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
         if (outfitTypeIndex != null && !OutfitType.getOutfitOrdinalEnumMap().containsKey(outfitTypeIndex)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Outfit Type not supported");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.OUTFIT_TYPE_NOT_SUPPORTED_ERROR);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
         if (scale != null && !MeasurementScale.getEnumMap().containsKey(scale)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Measurement Scale");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_MEASUREMENT_SCALE_ERROR);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
     }
 
     private CreateMeasurementResponse generateCreateMeasurementResponse(MeasurementsDAO measurementDAO, Long customerId) {
-        String successMessage = "Measurement details saved successfully";
+        String successMessage = successMessageTranslator.getTranslatedMessage(SuccesssMessages.MEASUREMENT_DETAILS_SAVE_SUCCESS);
         CreateMeasurementResponse response = new CreateMeasurementResponse(successMessage,
                 customerId, measurementDAO.getId(), measurementDAO.getMeasurementRevision().getId());
         return response;
