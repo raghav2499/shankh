@@ -101,4 +101,8 @@ public class OrderDAO {
     public Long getBoutiqueId() {
         return this.boutique.getId();
     }
+    public Long getCustomerId() {
+        return this.customer.getId();
+    }
+
 }

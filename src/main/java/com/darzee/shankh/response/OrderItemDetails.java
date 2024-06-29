@@ -48,6 +48,7 @@ public class OrderItemDetails {
     private CustomerDetails customerDetails;
     private String customerName;
     private String status;
+    private Integer statusOrdinal;
     private String outfitAlias;
     private List<PriceBreakupSummary> priceBreakupSummaryList;
 
@@ -63,6 +64,7 @@ public class OrderItemDetails {
         this.outfitTypeImageLink = outfitTypeImgLink;
         this.pieces = outfitType.getPieces();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
+        this.statusOrdinal = orderItem.getOrderItemStatus().getOrdinal();
         this.customerName = orderItem.getOrder().getCustomer().constructName();
         this.orderId = orderItem.getOrder().getId();
         this.boutiqueOrderId = orderItem.getOrder().getBoutiqueOrderId();
@@ -96,6 +98,7 @@ public class OrderItemDetails {
         this.orderItemStitchOptions = orderItemStitchOptions;
         this.itemPrice = orderItem.calculateItemPrice();
         this.status = orderItem.getOrderItemStatus().getDisplayString();
+        this.statusOrdinal=orderItem.getOrderItemStatus().getOrdinal();
         this.outfitAlias = orderItem.getOutfitAlias();
         this.priceBreakupSummaryList = orderItem.getActivePriceBreakUpList().stream()
                 .map(priceBreakup -> new PriceBreakupSummary(priceBreakup)).collect(Collectors.toList());

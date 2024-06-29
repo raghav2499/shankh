@@ -1,6 +1,7 @@
 package com.darzee.shankh.service;
 
 import com.darzee.shankh.client.AmazonClient;
+import com.darzee.shankh.constants.ErrorMessages;
 import com.darzee.shankh.dao.*;
 import com.darzee.shankh.entity.ImageReference;
 import com.darzee.shankh.entity.OrderItem;
@@ -13,6 +14,9 @@ import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.GetOrderDetailsRequest;
 import com.darzee.shankh.request.innerObjects.OrderItemDetailRequest;
 import com.darzee.shankh.response.*;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
+import com.darzee.shankh.service.translator.OrderItemDetailsTranslator;
+
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +38,9 @@ public class OrderItemService {
 
     @Autowired
     private StitchOptionService stitchOptionService;
+
+    @Autowired
+    private OrderItemDetailsTranslator orderItemDetailsTranslator;
 
     @Autowired
     private BoutiqueLedgerService ledgerService;
@@ -72,13 +79,7 @@ public class OrderItemService {
     private MeasurementService measurementService;
 
     @Autowired
-    private ObjectFilesRepo objectFilesRepo;
-
-    @Autowired
-    private OrderRepo orderRepo;
-
-    @Autowired
-    private PriceBreakUpRepo priceBrekupRepo;
+    private ErrorMessageTranslator errorMessageTranslator;
 
     @Transactional
     public List<OrderItemDAO> createOrderItems(List<OrderItemDetailRequest> orderItemDetails, OrderDAO order) {
@@ -89,7 +90,8 @@ public class OrderItemService {
         for (OrderItemDetailRequest itemDetail : orderItemDetails) {
             OutfitType outfitType = OutfitType.getOutfitOrdinalEnumMap().get(itemDetail.getOutfitType());
             if (outfitType == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid outfit type " + itemDetail.getOutfitType());
+                String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_OUTFIT_TYPE_ERROR) + itemDetail.getOutfitType();
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
 
             MeasurementRevisionsDAO measurementRevisionsDAO = null;
@@ -144,7 +146,8 @@ public class OrderItemService {
         if (orderItemOb.isPresent()) {
             orderItem = mapper.orderItemToOrderItemDAO(orderItemOb.get(), new CycleAvoidingMappingContext());
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item ID is invalid");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ID_ERROR);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
 
         if (orderItem.isStatusUpdated(updateItemDetail.getItemStatus())) {
@@ -157,7 +160,7 @@ public class OrderItemService {
         if (Boolean.TRUE.equals(updateItemDetail.getIsDeleted())) {
             orderItem.setIsDeleted(Boolean.TRUE);
             Double itemPrice = orderItem.calculateItemPrice();
-            if(updateItemDetail.getAmountRefunded() != null && updateItemDetail.getAmountRefunded() > itemPrice) {
+            if (updateItemDetail.getAmountRefunded() != null && updateItemDetail.getAmountRefunded() > itemPrice) {
                 throw new RuntimeException("Amount refunded cannot exceed item price");
             }
         }
@@ -218,10 +221,13 @@ public class OrderItemService {
     public OrderItemDetails getOrderItemDetails(Long orderItemId) throws Exception {
         Optional<OrderItem> orderItem = orderItemRepo.findById(orderItemId);
         if (!orderItem.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect order item id");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ITEM_ID_ERROR);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
         OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(orderItem.get(), new CycleAvoidingMappingContext());
-        return getOrderItemDetails(orderItemDAO);
+        OrderItemDetails orderItemDetails = getOrderItemDetails(orderItemDAO);
+        orderItemDetailsTranslator.translate(orderItemDetails);
+        return orderItemDetails;
     }
 
     public ResponseEntity<GetOrderItemResponse> getOrderItemDetails(Long boutiqueId, Long orderId, Long customerId, String orderItemStatusList,
@@ -238,7 +244,8 @@ public class OrderItemService {
         List<OrderItemDAO> orderItemDAOs = mapper.orderItemListToOrderItemDAOList(orderItems, new CycleAvoidingMappingContext());
         List<OrderItemDetails> orderItemDetails = Optional.ofNullable(orderItemDAOs).orElse(new ArrayList<>()).stream().map(orderItem -> {
             try {
-                return new OrderItemDetails(orderItem, outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
+                OrderItemDetails newOrderItemDetails = new OrderItemDetails(orderItem, outfitTypeObjectService.getOutfitTypeObject(orderItem.getOutfitType()).getOutfitImageLink());
+                return orderItemDetailsTranslator.translate(newOrderItemDetails);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -320,7 +327,8 @@ public class OrderItemService {
 
     private void validateGetOrderItemRequest(Long boutiqueId, Long orderId) {
         if (boutiqueId == null && orderId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either Order ID or Boutique ID is mandatory");
+            String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ID_ERROR);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
     }
 

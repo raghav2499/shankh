@@ -1,5 +1,6 @@
 package com.darzee.shankh.service;
 
+import com.darzee.shankh.constants.ErrorMessages;
 import com.darzee.shankh.dao.BoutiqueDAO;
 import com.darzee.shankh.dao.TailorDAO;
 import com.darzee.shankh.entity.Boutique;
@@ -11,6 +12,9 @@ import com.darzee.shankh.repo.*;
 import com.darzee.shankh.request.UpdateBoutiqueDetails;
 import com.darzee.shankh.request.UpdateTailorRequest;
 import com.darzee.shankh.response.GetBoutiqueDetailsResponse;
+import com.darzee.shankh.service.translator.ErrorMessageTranslator;
+import com.darzee.shankh.service.translator.SuccessMessageTranslator;
+
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,6 +61,12 @@ public class BoutiqueService {
     @Autowired
     private BoutiqueLedgerRepo boutiqueLedgerRepo;
 
+    @Autowired
+    private SuccessMessageTranslator successMessageTranslator;
+
+    @Autowired
+    private ErrorMessageTranslator        errorMessageTranslator;
+
     @Transactional
     public ResponseEntity updateBoutiqueDetails(Long boutiqueId, UpdateBoutiqueDetails request) {
         Optional<Boutique> optionalBoutique = boutiqueRepo.findById(boutiqueId);
@@ -73,7 +83,8 @@ public class BoutiqueService {
             if (boutiqueDAO.isBoutiqueTypeUpdated(request.getBoutiqueType())) {
                 BoutiqueType updatedBoutiqueType = BoutiqueType.getOrdinalEnumMap().get(request.getBoutiqueType());
                 if (updatedBoutiqueType == null) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique type");
+                    String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_ERROR);
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
                 }
                 boutiqueDAO.setBoutiqueType(updatedBoutiqueType);
             }
@@ -97,7 +108,8 @@ public class BoutiqueService {
             response = generateBoutiqueDetailResponse(boutiqueDAO, adminTailor);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique_id");
+        String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_ERROR); 
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     public ResponseEntity getBoutiqueDetails(Long boutiqueId) {
@@ -109,7 +121,8 @@ public class BoutiqueService {
             GetBoutiqueDetailsResponse response = generateBoutiqueDetailResponse(boutiqueDAO, tailorDAO);
             return new ResponseEntity(response, HttpStatus.OK);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique id");
+        String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_ERROR); 
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     private List<String> getBoutiqueImagesReferenceIds(Long boutiqueId) {
@@ -155,7 +168,7 @@ public class BoutiqueService {
             tailorDAO.setPhoneNumber(request.getPhoneNumber());
         }
         if (tailorDAO.isLanguageUpdated(request.getLanguage())) {
-            Language updatedLanguage = Language.getOrdinalEnumMap().get(request.getLanguage());
+            Language updatedLanguage = Language.getNotationEnumMap().get(request.getLanguage());
             tailorDAO.setLanguage(updatedLanguage);
         }
         if (request.getTailorProfilePicReferenceId() != null) {
@@ -181,7 +194,8 @@ public class BoutiqueService {
             for (Map<String, Object> measurementParam : measurementPramList) {
                 Object paramNameObject = measurementParam.get("name");
                 if (paramNameObject == null) {
-                    return ResponseEntity.badRequest().body("Measurement param name is missing");
+                    String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.MEASUREMENT_PARAM_NAME_MISSING);
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
                 }
                 String paramName = (String) paramNameObject;
                 measurementParams.add(paramName);
@@ -192,14 +206,16 @@ public class BoutiqueService {
 
             // if the outfit type is null, return a bad request
             if (outfitTypeEnum == null) {
-                return ResponseEntity.badRequest().body("Invalid outfit type");
+                String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_OUTFIT_TYPE_ERROR);
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
 
             // get outfit side from the ordinal
             OutfitSide outfitSideEnum = OutfitSide.getEnumByOrdinal(outfitSide);
 
             if (outfitSideEnum == null) {
-                return ResponseEntity.badRequest().body("Invalid outfit side");
+                String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_OUTFIT_SIDE_ERROR);
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
             }
 
             // create a new BoutiqueMeasurement with the boutiqueId, outfitType and
@@ -225,7 +241,8 @@ public class BoutiqueService {
             return new ResponseEntity<>(boutiqueMeasurement, HttpStatus.OK);
 
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique id");
+        String errorMessage =errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_BOUTIQUE_ID_ERROR); 
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
 
     }
 

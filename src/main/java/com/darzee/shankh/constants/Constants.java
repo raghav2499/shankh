@@ -28,6 +28,7 @@ public class Constants {
     public static final List<String> PHONE_NUMBER_POLLUTERS = Arrays.asList("+91", "0");
 
     public static final String PORTFOLIO_COVER_IMAGE = "portfolio_cover_image";
-
+    public static final String TOP_ALIAS="Top";
+    public static final String BOTTOM_ALIAS="Bottom";
 
 }

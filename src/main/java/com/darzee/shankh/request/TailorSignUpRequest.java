@@ -21,7 +21,7 @@ public class TailorSignUpRequest {
     @Size(min=10, max=10, message = "Invalid phone number")
     private String phoneNumber;
 
-    private Integer language;
+    private String language;
 
     @JsonProperty("profile_pic_url")//todo : rename this variable to profile_pic_reference_id
     private String profilePicReferenceId;
