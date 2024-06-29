@@ -163,14 +163,6 @@ public class PdfGenerator {
         String outfitImageLink = outfitTypeService.getOutfitImageLink();
         String specialInstructions = Optional.ofNullable(orderItem.getSpecialInstructions()).orElse("");
         String inspiration = Optional.ofNullable(orderItem.getInspiration()).orElse("");
-//        List<List<OrderStitchOptionDetail>> groupedStitchOptionList = new ArrayList<>();
-//        if (groupedStitchOptions.containsKey(OutfitSide.TOP.getView())) {
-//            groupedStitchOptionList.add(orderStitchOptionsTranslator.translate(groupedStitchOptions.get(OutfitSide.TOP.getView())));
-//        }
-//        if (groupedStitchOptions.containsKey(OutfitSide.BOTTOM.getView())) {
-//            groupedStitchOptionList.add(orderStitchOptionsTranslator.translate(groupedStitchOptions.get(OutfitSide.BOTTOM.getView())));
-//        }
-//        measurementDetails = measurementDetailsTranslator.translate(measurementDetails);
 
         // Create a JavaScript object and set the dynamic data
         context.setVariable("businessName", boutiqueName);
