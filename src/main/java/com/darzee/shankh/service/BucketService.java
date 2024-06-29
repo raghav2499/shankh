@@ -51,30 +51,7 @@ public class BucketService {
 
     @Value("items/")
     private String itemDetailsDirectory;
-    @Value("items-hi/")
-    private String hindiItemDetailsDirectory;
-    @Value("items-pa/")
-    private String punjabiItemDetailsDirectory;
-    @Value("items-gj/")
-    private String gujaratiItemDetailsDirectory;
-    @Value("items-mr/")
-    private String marathiItemDetailsDirectory;
-    @Value("items-te/")
-    private String teluguItemDetailsDirectory;
-    @Value("items-bn/")
-    private String bengaliItemDetailsDirectory;
-    @Value("items-kn/")
-    private String kannadaItemDetailsDirectory;
-    @Value("items-ml/")
-    private String malyalamItemDetailsDirectory;
-    @Value("items-or/")
-    private String odiaItemDetailsDirectory;
-    @Value("items-as/")
-    private String assameseItemDetailsDirectory;
-    @Value("items-ta/")
-    private String tamilItemDetailsDirectory;
-    @Value("items-ur/")
-    private String urduItemDetailsDirectory;
+
 
     public ResponseEntity<UploadMultipleFileResponse> uploadMultipleFiles(List<MultipartFile> files, String uploadFileType) {
         List<FileDetail> uploadImageResultList = new ArrayList<>();
@@ -138,9 +115,8 @@ public class BucketService {
         return fileUploadResult.getValue();
     }
 
-    public String uploadItemDetailsPDF(File file, Long orderItemId,Language language) {
+    public String uploadItemDetailsPDF(File file, Long orderItemId) {
         String fileName = String.valueOf(orderItemId);
-        String itemDetailsDirectory = getItemDetailsDirectory(language);
         ImmutablePair<String, String> fileUploadResult = client.uploadFile(file, itemDetailsDirectory + fileName);
         return fileUploadResult.getValue();
     }
@@ -185,39 +161,6 @@ public class BucketService {
             }
             String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.FILE_UPLOAD_ERROR_MSG)+e.getMessage();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, e);
-        }
-    }
-
-    private String getItemDetailsDirectory(Language language) {
-        switch (language) {
-            case ENGLISH:
-              return itemDetailsDirectory;
-            case HINDI:
-                return hindiItemDetailsDirectory;
-            case PUNJABI:
-                return punjabiItemDetailsDirectory;
-            case GUJARATI:
-                return gujaratiItemDetailsDirectory;
-            case MARATHI:
-                return marathiItemDetailsDirectory;
-            case TELUGU:
-                return teluguItemDetailsDirectory;
-            case BENGALI:
-                return bengaliItemDetailsDirectory;
-            case KANNADA:
-                return kannadaItemDetailsDirectory;
-            case MALYALAM:
-                return malyalamItemDetailsDirectory;
-            case ODIA:
-                return odiaItemDetailsDirectory;
-            case ASSAMESE:
-                return assameseItemDetailsDirectory;
-            case TAMIL:
-                return tamilItemDetailsDirectory;
-            case URDU:
-                return urduItemDetailsDirectory;
-            default:
-                return itemDetailsDirectory;
         }
     }
 

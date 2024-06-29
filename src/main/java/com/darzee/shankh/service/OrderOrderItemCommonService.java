@@ -193,22 +193,25 @@ public class OrderOrderItemCommonService {
         return updatedItemsList;
     }
 
-    public String getItemDetailPdfLink(Long orderItemId, Language language) {
+    public String getItemDetailPdfLink(Long orderItemId) {
         Optional<OrderItem> item = orderItemRepo.findById(orderItemId);
-
         if(item.isPresent()) {
             OrderItemDAO orderItemDAO = mapper.orderItemToOrderItemDAO(item.get(), new CycleAvoidingMappingContext());
             OrderDAO orderDAO = orderItemDAO.getOrder();
-        Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
-      try {
-           String url= generateItemDetailPdf(orderItemDAO, orderDAO.getCustomerId(), orderDAO.getBoutiqueId(), orderDAO.getBoutique().getName(), orderNo, language);return url;} catch(Exception e) {String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.ITEM_PDF_GENERATION_ERROR);throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);}
+            Long orderNo = Optional.ofNullable(orderDAO.getBoutiqueOrderId()).orElse(orderDAO.getId());
+            try {
+                String url = generateItemDetailPdf(orderItemDAO, orderDAO.getCustomerId(), orderDAO.getBoutiqueId(),
+                        orderDAO.getBoutique().getName(), orderNo);
+                return url;
+            } catch(Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error occurred while generating item PDF");
+            }
         }
-        String errorMessage = errorMessageTranslator.getTranslatedMessage(ErrorMessages.INVALID_ORDER_ITEM_ID_ERROR);
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Order Item Id");
     }
 
     public String generateItemDetailPdf(OrderItemDAO orderItemDAO, Long customerId, Long boutiqueId, String boutiqueName,
-                                      Long orderNo,Language language) throws Exception {
+                                      Long orderNo) throws Exception {
         Map<String, List<OrderStitchOptionDetail>> groupedStitchOptions =
                 stitchOptionService.getOrderItemStitchOptions(orderItemDAO.getId());
         MeasurementRevisions measurementRevisions =
@@ -223,8 +226,9 @@ public class OrderOrderItemCommonService {
         List<String> audioInstructionLinks = orderItemService.getAudioInstructionLinks(orderItemDAO.getId()).stream().filter(link->link.endsWith(".mp3")).collect(Collectors.toList());
 
         File itemDetailPdf = pdfGenerator.generateItemPdf(orderNo, boutiqueName, groupedStitchOptions,
-                innerMeasurementDetailsList, clothImageLinks, audioInstructionLinks, orderItemDAO,language);
-       String url= bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId(),language);return url;
+                innerMeasurementDetailsList, clothImageLinks, audioInstructionLinks, orderItemDAO);
+        String url = bucketService.uploadItemDetailsPDF(itemDetailPdf, orderItemDAO.getId());
+        return url;
     }
 
     /*

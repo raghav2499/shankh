@@ -48,8 +48,8 @@ public class TailorDAO {
         return value != null & !this.phoneNumber.equals(value);
     }
 
-    public boolean isLanguageUpdated(Integer value) {
-        return value != null && !value.equals(this.language);
+    public boolean isLanguageUpdated(String value) {
+        return value != null && !value.equals(this.language.getNotation());
     }
 
 }
