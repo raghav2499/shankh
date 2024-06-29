@@ -31,7 +31,7 @@ public class GetBoutiqueDetailsResponse {
     private Integer boutiqueType;
     private String adminTailorProfilePicUrl;
     private String boutiquePhoneNumber;
-    private Address address;
+    private UpdateAddressResponse address;
     private String gstNumber;
     private BigDecimal gstRate;
     private Boolean includeDeliveryDate;
@@ -51,8 +51,8 @@ public class GetBoutiqueDetailsResponse {
         this.shopImagesRefId = shopImagesRefId;
         this.shopImageUrls = shopImagesUrl;
         if(addressDAO!=null){
-            if(this.address==null){
-                this.address = new Address();
+            if(this.address ==null){
+                this.address = new UpdateAddressResponse();
             }
             this.address.setId(addressDAO.getId());
             this.address.setAddressLine1(addressDAO.getAddressLine1());

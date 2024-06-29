@@ -18,6 +18,7 @@ import com.darzee.shankh.response.GetCustomInvoiceDetailResponse;
 import com.darzee.shankh.service.translator.ErrorMessageTranslator;
 import com.darzee.shankh.service.translator.SuccessMessageTranslator;
 
+import com.darzee.shankh.utils.CommonUtils;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -121,6 +122,7 @@ public class BoutiqueService {
             }
 
             if(boutiqueDAO.isBoutiquePhoneNumberUpdated(request.getBoutiquePhoneNumber())){
+                request.setBoutiquePhoneNumber( CommonUtils.sanitisePhoneNumber(request.getBoutiquePhoneNumber()));
                 boutiqueDAO.setBoutiquePhoneNumber(request.getBoutiquePhoneNumber());
             }
 
