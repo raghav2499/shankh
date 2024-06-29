@@ -50,6 +50,9 @@ public class Boutique extends GenericEntity {
     @Column(name = "include_delivery_date")
     private Boolean includeDeliveryDate;
 
+    @Column(name="include_gst_in_price")
+    private Boolean includeGstInPrice;
+
     @Column(name = "boutique_phone_number", length = 10)
     private String boutiquephoneNumber;
 

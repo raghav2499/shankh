@@ -26,6 +26,7 @@ public class BoutiqueDAO {
     private BigDecimal gstRate;
     private AddressDAO address;
     private Boolean includeDeliveryDate;
+    private Boolean includeGstInPrice;
     private String boutiquePhoneNumber;
     private String countryCode;
 
@@ -56,6 +57,10 @@ public class BoutiqueDAO {
 
     public boolean isIncludeDeliveryDateUpdated(Boolean value) {
         return value != null && !this.includeDeliveryDate.equals(value);
+    }
+
+    public  boolean isIncludeGstInPrice(Boolean value){
+        return value != null && !this.includeGstInPrice.equals(value);
     }
 
     public boolean isBoutiquePhoneNumberUpdated(String value) {

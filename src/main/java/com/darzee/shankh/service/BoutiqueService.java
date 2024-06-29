@@ -116,6 +116,10 @@ public class BoutiqueService {
                 boutiqueDAO.setIncludeDeliveryDate(request.getIncludeDeliveryDate());
             }
 
+            if(boutiqueDAO.isIncludeGstInPrice(request.getIncludeDeliveryDate())){
+                boutiqueDAO.setIncludeGstInPrice(request.getIncludeDeliveryDate());
+            }
+
             if(boutiqueDAO.isBoutiquePhoneNumberUpdated(request.getBoutiquePhoneNumber())){
                 boutiqueDAO.setBoutiquePhoneNumber(request.getBoutiquePhoneNumber());
             }
@@ -130,6 +134,7 @@ public class BoutiqueService {
 
             if(request.getAddress()!=null){
                address = updateAddress(address, request.getAddress());
+               boutiqueDAO.setAddress(address);
             }
 
             boutiqueDAO = mapper.boutiqueObjectToDao(boutiqueRepo.save(mapper.boutiqueDaoToObject(boutiqueDAO,
@@ -280,6 +285,9 @@ public class BoutiqueService {
     
     public AddressDAO updateAddress(AddressDAO addressDAO, UpdateAdreessRequest request) {
 
+        if(addressDAO==null){
+            addressDAO = new AddressDAO();
+        }
         if (addressDAO.isAddressLine1Updated(request.getAddressLine1())) {
             addressDAO.setAddressLine1(request.getAddressLine1());
         }

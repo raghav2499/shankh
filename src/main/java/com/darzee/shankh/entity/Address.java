@@ -1,22 +1,19 @@
 package com.darzee.shankh.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "address")
+@SequenceGenerator(name = "address-seq", sequenceName = "address-seq", allocationSize = 1)
 @Getter
 @Setter
 public class Address {
+    //TODO to add custom sequence generator
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "address-seq")
     @Column(name = "address_id")
     private Long id;
 
