@@ -168,7 +168,7 @@ public class BoutiqueService {
             tailorDAO.setPhoneNumber(request.getPhoneNumber());
         }
         if (tailorDAO.isLanguageUpdated(request.getLanguage())) {
-            Language updatedLanguage = Language.getOrdinalEnumMap().get(request.getLanguage());
+            Language updatedLanguage = Language.getNotationEnumMap().get(request.getLanguage());
             tailorDAO.setLanguage(updatedLanguage);
         }
         if (request.getTailorProfilePicReferenceId() != null) {
