@@ -18,6 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +52,8 @@ public class DashboardService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid boutique Id");
         }
-        LocalDate currentDate = LocalDate.now();
+        ZoneId clientZoneId = ZoneId.of("Asia/Kolkata");
+        LocalDate currentDate = ZonedDateTime.of(LocalDateTime.now(), clientZoneId).toLocalDate();
         Integer startYear = boutiqueDAO.getCreatedAt() == null ? 2023 : boutiqueDAO.getCreatedAt().getYear();
         Integer startMonth = boutiqueDAO.getCreatedAt() == null ? 5 : boutiqueDAO.getCreatedAt().getMonthValue();
         if (year < startYear ||
